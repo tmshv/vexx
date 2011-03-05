@@ -1,0 +1,11 @@
+<alterPlugin>
+	<version>1.0</version>
+	<filename>SynapseCore.dll</filename>
+
+	<requires type="library">
+		<name>Shift</name>
+	</requires>
+	<requires type="library">
+		<name>UI</name>
+	</requires>
+</alterPlugin> 

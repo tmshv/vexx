@@ -1,0 +1,82 @@
+# -------------------------------------------------
+# Project created by QtCreator 2010-04-21T15:51:26
+# -------------------------------------------------
+QT += opengl \
+    xml
+TARGET = Eks3D
+TEMPLATE = lib
+DEFINES += EKS3D_BUILD
+SOURCES += ../src/XDoodad.cpp \
+    ../src/XScene.cpp \
+    ../src/XCuboid.cpp \
+    ../src/XTransform.cpp \
+    ../src/XRenderer.cpp \
+    ../src/XFrameEvent.cpp \
+    ../src/XTransformEvent.cpp \
+    ../src/XCamera.cpp \
+    ../src/XGeometry.cpp \
+    ../src/XShader.cpp \
+    ../src/XTexture.cpp \
+    ../src/XGLRenderer.cpp \
+    ../3rdParty/GL/glew.c \
+    ../src/XModeller.cpp \
+    ../src/XColladaFile.cpp \
+    ../src/XShape.cpp \
+    ../src/XAbstractEnvironmentInterface.cpp \
+    ../src/XEnvironment.cpp \
+    ../src/XEnvironmentArea.cpp \
+    ../src/XFrustum.cpp \
+    ../src/XPlane.cpp \
+    ../src/XLine.cpp \
+    ../src/XTriangle.cpp \
+    ../src/XEnvironmentRequest.cpp \
+    ../src/XFramebuffer.cpp \
+    ../src/XEnvironmentRenderer.cpp \
+    ../src/XEnvironmentViewer.cpp \
+    ../src/XLightManager.cpp \
+    ../src/XLightRig.cpp \
+    ../src/XAbstractCanvas.cpp \
+    ../src/XAbstractRenderModel.cpp \
+    ../src/XAbstractDelegate.cpp
+HEADERS += ../include/XDoodad.h \
+    ../include/X3DGlobal.h \
+    ../include/XScene.h \
+    ../include/XCuboid.h \
+    ../include/XTransform.h \
+    ../include/XRenderer.h \
+    ../include/XFrameEvent.h \
+    ../include/XTransformEvent.h \
+    ../include/XCamera.h \
+    ../include/XGeometry.h \
+    ../include/XShader.h \
+    ../include/XTexture.h \
+    ../include/XGLRenderer.h \
+    ../include/XModeller.h \
+    ../include/XColladaFile.h \
+    ../include/XShape.h \
+    ../include/XAbstractEnvironmentInterface.h \
+    ../include/XEnvironment.h \
+    ../include/XEnvironmentArea.h \
+    ../include/XFrustum.h \
+    ../include/XPlane.h \
+    ../include/XLine.h \
+    ../include/XTriangle.h \
+    ../include/XEnvironmentRequest.h \
+    ../include/XFramebuffer.h \
+    ../include/XEnvironmentRenderer.h \
+    ../include/XEnvironmentViewer.h \
+    ../include/XLightManager.h \
+    ../include/XLightRig.h \
+    ../include/XAbstractCanvas.h \
+    ../include/XAbstractRenderModel.h \
+    ../include/XAbstractDelegate.h
+DEFINES += GLEW_STATIC
+INCLUDEPATH += ../include/ \
+    ../../EksCore/ \
+    ../3rdParty
+LIBS += -L../../bin/ \
+    -lEksCore
+DESTDIR = ../../bin
+
+RESOURCES += \
+    ../GLResources.qrc

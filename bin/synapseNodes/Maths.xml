@@ -1,0 +1,118 @@
+<!DOCTYPE syanpse>
+<synapse>
+ <node group="Maths" colour="0.886275 0.443137 0.278431 1" name="Clamp">
+  <source>return clamp( getInput( "Input", coords ), getAttribute( "Minimum" ), getAttribute( "Maximum" ) );</source>
+  <shortHelp>Use the clamp node to keep the pixel values of an input between a minimum and a maximum value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+</shortHelp>
+  <longHelp>Use the clamp node to keep the pixel values of an input between a minimum and a maximum value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+</longHelp>
+  <attribute value="1.0" type="double">Maximum</attribute>
+  <input>Input</input>
+  <attribute value="0.0" type="double">Minimum</attribute>
+ </node>
+ <node group="Maths" colour="0.890196 0.847059 0.670588 1" name="Add">
+  <source>return ( getAttribute( "amount" ) * getInput( "Input", coords ) ) + getInput( "Background", coords );</source>
+  <shortHelp>The add node will take each image input and output the individual pixels added component-wise together.</shortHelp>
+  <longHelp>The add node will take each image input and output the individual pixels added component-wise together.</longHelp>
+  <attribute value="1.0" type="double">amount</attribute>
+  <input>Background</input>
+  <input>Input</input>
+ </node>
+ <node group="Maths" colour="0.894118 0.333333 0.215686 1" name="Alpha Divide">
+  <source>vec4 col;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+col = getInput( "Input", coords );&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+if( col.a > 0.0 )&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+{&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+return vec4( col.r/col.a, col.g/col.a, col.b/col.a, col.a );&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+}&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+else&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+{&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+return col;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+}</source>
+  <shortHelp>The Alpha Divide node will divide the RGB components of an input by their alpha value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The process will effectively un-premultiply an image.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+See the Alpha Multiply node for a premultipy node.</shortHelp>
+  <longHelp>The Alpha Divide node will divide the RGB components of an input by their alpha value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The process will effectively un-premultiply an image.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+See the Alpha Multiply node for a premultipy node.</longHelp>
+  <input>Input</input>
+ </node>
+ <node group="Maths" colour="0.858824 0.376471 0.215686 1" name="Alpha Multiply">
+  <source>vec4 col;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+col = getInput( "Input", coords );&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;&#xd;
+return vec4( col.r*col.a, col.g*col.a, col.b*col.a, col.a );</source>
+  <shortHelp>The Alpha Divide node will multiply the RGB components of an input by their alpha value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The process will effectively premultiply an image.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+See the Alpha Divide node for a un-premultipy effect.</shortHelp>
+  <longHelp>The Alpha Divide node will multiply the RGB components of an input by their alpha value.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The process will effectively premultiply an image.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+See the Alpha Divide node for a un-premultipy effect.</longHelp>
+  <input>Input</input>
+ </node>
+ <node group="Maths" colour="0.780392 0.627451 0.458824 1" name="Divide">
+  <source>return getInput( "Input A", coords ) / getInput( "Input B", coords );</source>
+  <shortHelp>A Divide node will Divide the pixel component values of Input A by Input B.</shortHelp>
+  <longHelp>A Divide node will Divide the pixel component values of Input A by Input B.</longHelp>
+  <input>Input A</input>
+  <input>Input B</input>
+ </node>
+ <node group="Maths" colour="0.858824 0.654902 0.466667 1" name="Subtract">
+  <source>return getInput( "Background", coords ) - ( getAttribute( "amount" ) * getInput( "Input", coords ) );</source>
+  <shortHelp>The subtract node will subtract the pixel component values on Input from background.</shortHelp>
+  <longHelp>The subtract node will subtract the pixel component values on Input from background.</longHelp>
+  <attribute value="1.0" type="double">amount</attribute>
+  <input>Background</input>
+  <input>Input</input>
+ </node>
+ <node group="Maths" colour="0.890196 0.788235 0.588235 1" name="Multiply">
+  <source>return getInput( "Input A", coords ) * getInput( "Input B", coords );</source>
+  <shortHelp>A Multiply node will multiplythe pixel component values of Input A by Input B.</shortHelp>
+  <longHelp>A Multiply node will multiplythe pixel component values of Input A by Input B.</longHelp>
+  <input>Input A</input>
+  <input>Input B</input>
+ </node>
+ <node group="Maths" colour="0.839216 0.552941 0.423529 1" name="Gamma">
+  <source>return pow( getInput("Input",coords), vec4( getAttribute("Gamma RGB"), getAttribute("Gamma A") ) );</source>
+  <shortHelp>A Gamma node will apply a gamma curve to Input.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The resulting pixels will be equivalent to pixel value to the power of gammaValues.</shortHelp>
+  <longHelp>A Gamma node will apply a gamma curve to Input.&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+The resulting pixels will be equivalent to pixel value to the power of gammaValues.</longHelp>
+  <attribute value="1 1 1" type="position3D">Gamma RGB</attribute>
+  <input>Input</input>
+  <attribute value="1" type="double">Gamma A</attribute>
+ </node>
+ <node group="Maths" colour="0.862745 0.559258 0.39585 1" name="Brightness Contrast">
+  <source>vec4 inp = vec4( getInput("Input",coords) );&#xd;&#xd;
+&#xd;&#xd;
+return vec4( getAttribute("Brightness") + ( ( inp.rgb - vec3( 0.5 )  ) * getAttribute("Contrast") ), inp.a );</source>
+  <shortHelp>The Brightness and contrast node will alter the luminosity and pixel contrast values of an image.</shortHelp>
+  <longHelp>The Brightness and contrast node will alter the luminosity and pixel contrast values of an image.</longHelp>
+  <attribute value="0.5" type="double">Brightness</attribute>
+  <attribute value="1" type="double">Contrast</attribute>
+  <input>Input</input>
+ </node>
+ <node group="Maths" colour="0.839216 0.254902 0.192157 1" name="Mix">
+  <source>vec4 inA = vec4( getInput("Input A", coords) );
+vec4 inB = vec4( getInput("Input B", coords) );
+vec4 mix = vec4( getInput("Mix", coords) );
+
+return ( inA * mix.a ) + ( (1-mix.a) * inB );</source>
+  <shortHelp>A Blank node is a base for you to create your own nodes from.</shortHelp>
+  <longHelp>A Blank node is a base for you to create your own nodes from.</longHelp>
+  <input>Input A</input>
+  <input>Input B</input>
+  <input>Mix</input>
+ </node>
+</synapse>

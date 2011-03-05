@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>simulationFrag.txt</file>
+        <file>simulationVert.txt</file>
+    </qresource>
+</RCC>

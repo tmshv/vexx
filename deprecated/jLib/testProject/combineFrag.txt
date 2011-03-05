@@ -1,0 +1,9 @@
+uniform sampler2D ambOcc;
+uniform sampler2D colour;
+
+void main(void)
+    {
+    gl_FragColor.rgb = texture2D( colour, gl_TexCoord[0].st ).rgb * texture2D( ambOcc, gl_TexCoord[0].st ).rrr;
+    gl_FragColor.a = 1.0;
+    }
+

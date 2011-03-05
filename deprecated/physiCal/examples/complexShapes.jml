@@ -1,0 +1,65 @@
+<alter>
+	<entities>
+		<entity name="Object1" type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2">
+			<property name="randomPoints" displayName="Random Points" type="0">0</property>
+			<property name="randomSprings" displayName="Random Springs" type="0">0</property>
+			<property name="entity/name" displayName="Name" type="3">/Object1</property>
+			<property name="position" displayName="Position" type="5">2 7.5 2</property>
+			<property name="velocity" displayName="Velocity" type="7">0</property>
+			<property name="file" displayName="File" type="3">/home/jorj/vex/physiCal/testProject/crazyShape.dae</property>
+			<property name="object/isObject" displayName="isObject" hide="" type="3">1</property>
+			<property name="material" displayName="Material" type="3">Material0</property>
+			<property name="viewport/object" displayName="object" hide="" type="3">1</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+		</entity>
+		<entity name="Time0" type="118f2846e4b95edd7018060731849fd8784e7581">
+			<property name="time/clipEnd" displayName="clipEnd" type="4">10</property>
+			<property name="time/loop" displayName="loop" type="0">0</property>
+			<property name="time/fps" displayName="fps" type="1">25</property>
+			<property name="entity/name" displayName="Name" type="3">/Time0</property>
+			<property name="time/currentTime" displayName="currentTime" type="4">0</property>
+			<property name="time/timeEnd" displayName="timeEnd" type="4">10</property>
+			<property name="time/clipBegin" displayName="clipBegin" type="4">0</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+			<property name="time/timeBegin" displayName="timeBegin" type="4">0</property>
+		</entity>
+		<entity name="Material0" type="edfc9bcdb78f7b04fa1d69d731f0df5739c0aff0">
+			<property name="elastic" displayName="Elastic Limit" type="1">999</property>
+			<property name="entity/name" displayName="Name" type="3">/Material0</property>
+			<property name="springDamping" displayName="Spring Damping" type="1">0.2</property>
+			<property name="springConstant" displayName="Spring Constant" type="1">1000</property>
+			<property name="density" displayName="Density" type="1">1</property>
+			<property name="restitution" displayName="Restitution" type="1">0.1</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+			<property name="plastic" displayName="Plastic Limit" type="1">999</property>
+		</entity>
+		<entity name="Ground Object0" type="c31505b251b485f34e3b36ec8910e2f1bfd4f6a3">
+			<property name="entity/name" displayName="Name" type="3">/Ground Object0</property>
+			<property name="zRes" displayName="Z Size" type="1">50</property>
+			<property name="xRes" displayName="X Size" type="1">50</property>
+			<property name="viewport/object" displayName="object" hide="" type="3">1</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+		</entity>
+		<entity name="system0" type="4097f08e1f7c0cdb414b19dcd74c33a54b6c3eb6">
+			<property name="system/organisation" displayName="organisation" type="3">jorjSoftware</property>
+			<property name="system/version" displayName="version" type="3">1.0</property>
+			<property name="entity/name" displayName="Name" type="3">/system0</property>
+			<property name="system/program" displayName="program" type="3">Alter</property>
+			<property name="system/domain" displayName="domain" type="3">placid-acid.com</property>
+			<property name="entity/hide" displayName="hide" type="3">1</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+		</entity>
+		<entity name="Object0" type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2">
+			<property name="randomPoints" displayName="Random Points" type="0">0</property>
+			<property name="randomSprings" displayName="Random Springs" type="0">0</property>
+			<property name="entity/name" displayName="Name" type="3">/Object0</property>
+			<property name="position" displayName="Position" type="5">0 5 0</property>
+			<property name="velocity" displayName="Velocity" type="7">0</property>
+			<property name="file" displayName="File" type="3">/home/jorj/vex/physiCal/testProject/crazyShape.dae</property>
+			<property name="object/isObject" displayName="isObject" hide="" type="3">1</property>
+			<property name="material" displayName="Material" type="3">Material0</property>
+			<property name="viewport/object" displayName="object" hide="" type="3">1</property>
+			<property name="entity/directory" displayName="Directory" type="3"></property>
+		</entity>
+	</entities>
+</alter>

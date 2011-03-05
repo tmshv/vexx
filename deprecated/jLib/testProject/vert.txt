@@ -1,0 +1,9 @@
+varying vec4 colour;
+varying vec3 normal;
+
+void main()
+    {
+    colour = gl_Color;
+    normal = normalize( gl_NormalMatrix * gl_Normal );
+    gl_Position = ftransform( );
+    }

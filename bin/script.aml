@@ -1,0 +1,7 @@
+<alterPlugin>
+	<version>1.0</version>
+	<filename>script.dll</filename>
+	<requires type="library">
+		<name>ui</name>
+	</requires>
+</alterPlugin> 

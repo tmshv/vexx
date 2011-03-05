@@ -1,0 +1,151 @@
+#ifndef XGLOBAL_H
+#define XGLOBAL_H
+
+#define QT_USE_FAST_CONCATENATION
+#define QT_USE_FAST_OPERATOR_PLUS
+
+#include "QtGlobal"
+#include "cstdlib"
+#include "cmath"
+
+#define X_DECL_EXPORT Q_DECL_EXPORT
+#define X_DECL_IMPORT Q_DECL_IMPORT
+
+#ifdef EKSCORE_LIBRARY
+# define EKSCORE_EXPORT X_DECL_EXPORT
+#else
+# define EKSCORE_EXPORT X_DECL_IMPORT
+#endif
+
+// todo: check the behaviour of both of these asserts in non windows oses and choose the nicest...
+// assert is best on windows because of the debug break...
+// but i think i prefered Q_ASSERT on linux?
+#ifdef Q_OS_WIN
+# include "assert.h"
+# define xAssert( arg ) assert(arg)
+#else
+# define xAssert( arg ) Q_ASSERT( arg )
+#endif
+
+#define X_DEBUG _DEBUG
+
+#define xAssertFail() xAssert(0);
+#define xAssertFailMessage(msg) xAssert(0 && msg);
+
+#define X_DISABLE_COPY(x) Q_DISABLE_COPY(x)
+
+#if 0 && defined Q_OS_LINUX && __GNUC__
+#   ifdef OSX
+#       define xCurrentFunction "_No Function Info Available_"
+#   else
+#       if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
+#           define xCurrentFunction	__PRETTY_FUNCTION__
+#       else
+#           if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#               define xCurrentFunction	__func__
+#           else
+#               define xCurrentFunction	"_No Function Info Available_"
+#           endif
+#       endif
+#   endif
+#else
+#   define xCurrentFunction "_No Function Info Available_"
+#endif
+
+#define xTypeof( x ) typeof( x )
+
+#define xMax qMax
+#define xMin qMin
+
+#define X_DEGTORAD(ang) ((ang/360.0f)*2.0f*M_PI)
+#define X_RADTODEG(ang) ((ang/2.0f*M_PI)*360.0f)
+
+typedef signed char xint8;         /* 8 bit signed */
+typedef unsigned char xuint8;      /* 8 bit unsigned */
+typedef short xint16;              /* 16 bit signed */
+typedef unsigned short xuint16;    /* 16 bit unsigned */
+typedef int xint32;                /* 32 bit signed */
+typedef unsigned int xuint32;      /* 32 bit unsigned */
+typedef size_t xsize;
+
+#define XUINT32_MAX (xuint32)-1
+
+#if defined(Q_OS_WIN) && !defined(Q_CC_GNU) && !defined(Q_CC_MWERKS)
+#  define X_INT64_C(c) c ## i64    /* signed 64 bit constant */
+#  define X_UINT64_C(c) c ## ui64   /* unsigned 64 bit constant */
+typedef __int64 xint64;            /* 64 bit signed */
+typedef unsigned __int64 xuint64;  /* 64 bit unsigned */
+#else
+#  define X_INT64_C(c) static_cast<long long>(c ## LL)     /* signed 64 bit constant */
+#  define X_UINT64_C(c) static_cast<unsigned long long>(c ## ULL) /* unsigned 64 bit constant */
+typedef long long xint64;           /* 64 bit signed */
+typedef unsigned long long xuint64; /* 64 bit unsigned */
+#endif
+
+#define X_SIZE_SENTINEL (xsize)-1
+#define X_UINT64_SENTINEL (xuint64)-1
+#define X_UINT32_SENTINEL (xuint32)-1
+
+typedef float xReal;
+#define EKS_XREAL_IS_DOUBLE 0
+
+inline void xNoop()
+  {
+  }
+
+template <typename T>T xMix( xReal t, const T &a, const T &b )
+  {
+  return ( (1-t) * a  ) + ( t * b );
+  }
+
+inline int xRand()
+  {
+  return qrand();
+  }
+
+inline int xRand( int min, int max )
+  {
+  return min + ( xRand() % (max-min+1) );
+  }
+
+inline xReal xRandF( )
+  {
+  return xRand() / (double)RAND_MAX;
+  }
+
+inline xReal xRandF( xReal min, xReal max )
+  {
+  return min + ( xRandF() * (max-min) );
+  }
+
+inline xReal xClamp( xReal in, xReal min, xReal max )
+  {
+  if( in < min )
+    {
+    return min;
+    }
+  else if( in > max )
+    {
+    return max;
+    }
+  return in;
+  }
+
+inline unsigned int xFactorial( unsigned int in )
+  {
+  // multiply 1 * 2 * 3 * ... * in
+  unsigned int ret = 1;
+  for( unsigned int x=2; x<=in; x++ )
+    {
+    ret *= x;
+    }
+  return ret;
+  }
+
+inline unsigned int xBinomialCoefficient( unsigned int n, unsigned int k )
+  {
+  // Find the coefficient of n and k...
+  return xFactorial( n ) / ( ( xFactorial( n - k ) * xFactorial( k ) ) );
+  }
+
+#endif // XGLOBAL_H

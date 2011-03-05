@@ -1,0 +1,9 @@
+<!DOCTYPE syanpse>
+<synapse>
+ <node group="Developer" colour="0.843137 0.901961 0.772549 1" name="Blank">
+  <source>// Put your code here&#xd;&#xd;&#xd;&#xd;
+return vec4( 0.0 );</source>
+  <shortHelp>A Blank node is a base for you to create your own nodes from.</shortHelp>
+  <longHelp>A Blank node is a base for you to create your own nodes from.</longHelp>
+ </node>
+</synapse>

@@ -1,0 +1,320 @@
+<!DOCTYPE alterDocument>
+<alterDocument>
+ <entities>
+  <entity type="b0d99e1594998ff6e386a5d3de48eab51f9419c8" name="Reorder">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.764706 0.733333 0.643137 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">return getInput("Input",coords);</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Name" type="4" name="entity/name">Reorder</property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">391.132 464.446 0</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="initiated" hide="1" type="0" name="initiated">1</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Channels</property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="Input" hide="1" default="0" Linkable="1" type="4" name="Input"></property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">0</property>
+   <property displayName="New Order" type="4" name="order">rgba</property>
+   <property displayName="editable" hide="1" type="0" name="editable">0</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Reorder</property>
+  </entity>
+  <entity type="5cf33cf568f306da54aeba557fc29176a0da22eb" name="Gaussian Blur">
+   <property displayName="Colour" hide="" type="" name="nodeEntity/colour"></property>
+   <property displayName="shortHelp" hide="" type="" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="" type="" name="nodeEntity/source">return vec4( 0.0 );</property>
+   <property displayName="Radius" forwardAttributes="" type="" name="Radius">10</property>
+   <property displayName="isNode" hide="" type="" name="nodeEntity/isNode"></property>
+   <property displayName="Name" type="" name="entity/name">Gaussian Blur</property>
+   <property displayName="Call Pointer" hide="" type="" name="callPointer">Horizontal Blur</property>
+   <property displayName="longHelp" hide="" type="" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="" type="" name="alwaysShowInputs"></property>
+   <property displayName="Position" hide="" type="" name="nodeEntity/pos">333.597 213.652 0</property>
+   <property displayName="Bypass" type="" name="bypass"></property>
+   <property displayName="initiated" hide="" type="" name="initiated"></property>
+   <property displayName="showProperties" hide="" type="" name="showProperties">0</property>
+   <property displayName="group" hide="" type="" name="nodeEntity/group">Filter</property>
+   <property displayName="output" hide="" Linkable="" type="" name="output"></property>
+   <property displayName="propertiesState" hide="" type="" name="propertiesState"></property>
+   <property displayName="Input" hide="" default="" Linkable="" type="" name="Input"></property>
+   <property displayName="isViewNode" hide="" type="" name="isViewNode">0</property>
+   <property displayName="editable" hide="" type="" name="editable"></property>
+   <property displayName="Directory" hide="" type="" name="entity/directory">/</property>
+   <property displayName="type" hide="" type="" name="nodeEntity/type">Gaussian Blur</property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="persistantProperties">
+   <property displayName="width" type="4" name="width">200</property>
+   <property displayName="Name" type="4" name="entity/name">persistantProperties</property>
+   <property displayName="height" type="4" name="height">400</property>
+   <property displayName="position" type="4" name="position">100 100</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="helpOn" type="4" name="helpOn">0</property>
+  </entity>
+  <entity type="5864802fac8a9f6e5c684f8a86f845982e9378d7" name="Pz_fixed">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.8 0.8 0.8 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">vec2 pos = vec2( ( coords.s / getAttribute( "width" ) ) + 0.5, ( ( getAttribute( "aspect" ) / getAttribute( "width" ) ) * coords.t ) + 0.5 );if( pos.s >= 0.0 &amp;&amp; pos.s &lt;= 1.0 &amp;&amp; 
+pos.t >= 0.0 &amp;&amp; pos.t &lt;= 1.0 )
+{
+return texture2D( Pz_fixed, pos );
+}
+else
+{
+return vec4( 0.0 );
+}
+</property>
+   <property displayName="File" type="5" name="File">/home/jorj/vex/calc/examples/zBlur/Pz_fixed.tif</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Name" type="4" name="entity/name">Pz_fixed</property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">498.699 204.366 10000</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="initiated" hide="1" type="0" name="initiated">1</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Source</property>
+   <property displayName="Width" Attribute="1" type="2" name="width">720</property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="isValid" hide="1" type="0" name="image/isValid">1</property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">0</property>
+   <property displayName="editable" hide="1" type="0" name="editable">0</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="Aspect Ratio" Attribute="1" type="2" name="aspect">1.25</property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Image</property>
+  </entity>
+  <entity type="675cfb19dde5e2f50b99f50b7ff1e1ce4d93c523" name="ZBlur THing">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.843137 0.901961 0.772549 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">vec4 ret;
+ret = getInput("Input",coords);
+
+float col;
+col = getAttribute("Blur Amount") * max( abs( ret.r - getAttribute("Focal Distance") ) - getAttribute("In Focus Size"), 0.0 );
+
+return vec4( col.r, ret.r, 3 * getAttribute("Blur Amount"), 1.0 );</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Focal Distance" Attribute="1" type="2" name="Focal Distance">0.38</property>
+   <property displayName="Name" type="4" name="entity/name">ZBlur THing</property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">517.523 317.748 -2500</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="initiated" hide="1" type="0" name="initiated">1</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Developer</property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="In Focus Size" Attribute="1" type="2" name="In Focus Size">0.001</property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">0</property>
+   <property displayName="Input" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="Pz_fixed" name="Input"></property>
+   <property displayName="Blur Amount" Attribute="1" type="2" name="Blur Amount">1.6231</property>
+   <property displayName="editable" hide="1" type="0" name="editable">1</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">ZBlur THing</property>
+  </entity>
+  <entity type="675cfb19dde5e2f50b99f50b7ff1e1ce4d93c523" name="Vertical Blur">
+   <property displayName="Colour" hide="" type="" name="nodeEntity/colour"></property>
+   <property displayName="shortHelp" hide="" type="" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="" type="" name="nodeEntity/source">// some basic maths
+const float e = 2.71828183;
+const float pi = 3.14159265;
+
+// our accumulator
+vec4 col = vec4( 0.0 );
+
+
+int radius = int( getAttribute("Radius") );
+
+if( radius &lt;= 0 )
+	{
+	return getInput("Input",coords);
+	}
+// calculate constant values in expression
+float twoRadSq = 2.0 * radius * radius;
+float oneOverSqrtTwoPiRadSq = 1.0 / ( sqrt( pi * twoRadSq ) );
+
+
+// loop variable
+int x = 0;
+for( x= -3*radius; x&lt;3*radius; x++ )
+	{
+	vec2 tmpCoord = vec2( 0.0, float(x) );
+
+	float xSqOverTwoRadSq = ( tmpCoord.y * tmpCoord.y ) / twoRadSq;
+
+	float mult = oneOverSqrtTwoPiRadSq * pow( e, -xSqOverTwoRadSq );
+
+	tmpCoord += coords;
+
+	col +=  mult * getInput( "Input", tmpCoord );
+	}
+
+return col;</property>
+   <property displayName="Radius" Attribute="" type="" name="Radius"></property>
+   <property displayName="isNode" hide="" type="" name="nodeEntity/isNode"></property>
+   <property displayName="Name" type="" name="entity/name">Vertical Blur</property>
+   <property displayName="longHelp" hide="" type="" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="" type="" name="alwaysShowInputs"></property>
+   <property displayName="Position" hide="" type="" name="nodeEntity/pos"></property>
+   <property displayName="Bypass" type="" name="bypass"></property>
+   <property displayName="initiated" hide="" type="" name="initiated"></property>
+   <property displayName="showProperties" hide="" type="" name="showProperties"></property>
+   <property displayName="group" hide="" type="" name="nodeEntity/group">Filter</property>
+   <property displayName="output" hide="" Linkable="" type="" name="output"></property>
+   <property displayName="propertiesState" hide="" type="" name="propertiesState"></property>
+   <property displayName="Input" hide="" default="" inputForwardAttribute="Input" Linkable="" type="" name="Input"></property>
+   <property displayName="isViewNode" hide="" type="" name="isViewNode">0</property>
+   <property displayName="editable" hide="" type="" name="editable"></property>
+   <property displayName="Directory" hide="" type="" name="entity/directory">/Gaussian Blur</property>
+   <property displayName="type" hide="" type="" name="nodeEntity/type">Vertical Blur</property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="floatingPropertiesSettings">
+   <property displayName="Name" type="4" name="entity/name">floatingPropertiesSettings</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="nodeEditState" type="4" name="nodeEditState"></property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="timeline">
+   <property displayName="Name" type="4" name="entity/name">timeline</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="ArraySettings">
+   <property displayName="Name" type="4" name="entity/name">ArraySettings</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="workingPath" type="4" name="workingPath">/</property>
+  </entity>
+  <entity type="4097f08e1f7c0cdb414b19dcd74c33a54b6c3eb6" name="system">
+   <property displayName="organisation" type="4" name="system/organisation">jorjSoftware</property>
+   <property displayName="version" type="4" name="system/version">1.0</property>
+   <property displayName="Name" type="4" name="entity/name">system</property>
+   <property displayName="program" type="4" name="system/program">Alter</property>
+   <property displayName="domain" type="4" name="system/domain">placid-acid.com</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="5864802fac8a9f6e5c684f8a86f845982e9378d7" name="beautyF3">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.8 0.8 0.8 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">vec2 pos = vec2( ( coords.s / getAttribute( "width" ) ) + 0.5, ( ( getAttribute( "aspect" ) / getAttribute( "width" ) ) * coords.t ) + 0.5 );if( pos.s >= 0.0 &amp;&amp; pos.s &lt;= 1.0 &amp;&amp; 
+pos.t >= 0.0 &amp;&amp; pos.t &lt;= 1.0 )
+{
+return texture2D( beautyF3, pos );
+}
+else
+{
+return vec4( 0.0 );
+}
+</property>
+   <property displayName="File" type="5" name="File">/home/jorj/vex/calc/examples/zBlur/beautyF3.tif</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Name" type="4" name="entity/name">beautyF3</property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">337 334 10000</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="initiated" hide="1" type="0" name="initiated">1</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Source</property>
+   <property displayName="Width" Attribute="1" type="2" name="width">720</property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="isValid" hide="1" type="0" name="image/isValid">1</property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">0</property>
+   <property displayName="editable" hide="1" type="0" name="editable">0</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="Aspect Ratio" Attribute="1" type="2" name="aspect">1.25</property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Image</property>
+  </entity>
+  <entity type="2c4458178c75e4c049dbdfde3a2ad4898f860fd5" name="Cache">
+   <property displayName="Colour" hide="" type="" name="nodeEntity/colour"></property>
+   <property displayName="shortHelp" hide="" type="" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="" type="" name="nodeEntity/source">return texture2D( Cache_cacheTexture, ( coords - vec2( getAttribute("left"), getAttribute("top") ) ) / vec2( getAttribute("width"), getAttribute("height") ) );</property>
+   <property displayName="isNode" hide="" type="" name="nodeEntity/isNode"></property>
+   <property displayName="Name" type="" name="entity/name">Cache</property>
+   <property displayName="longHelp" hide="" type="" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="" type="" name="alwaysShowInputs"></property>
+   <property displayName="Position" hide="" type="" name="nodeEntity/pos"></property>
+   <property displayName="Bypass" type="" name="bypass"></property>
+   <property displayName="initiated" hide="" type="" name="initiated"></property>
+   <property displayName="showProperties" hide="" type="" name="showProperties"></property>
+   <property displayName="group" hide="" type="" name="nodeEntity/group">Source</property>
+   <property displayName="width" hide="" Attribute="" type="" name="width"></property>
+   <property displayName="output" hide="" Linkable="" type="" name="output"></property>
+   <property displayName="top" hide="" Attribute="" type="" name="top"></property>
+   <property displayName="propertiesState" hide="" type="" name="propertiesState"></property>
+   <property displayName="Input" hide="" singleInput="1" default="" nodeConnectionProperty="output" Linkable="" type="" nodeConnectionPath="Vertical Blur" name="Input"></property>
+   <property displayName="isViewNode" hide="" type="" name="isViewNode">0</property>
+   <property displayName="independantRenderingToParent" hide="" type="" name="independantRenderingToParent"></property>
+   <property displayName="editable" hide="" type="" name="editable"></property>
+   <property displayName="height" hide="" Attribute="" type="" name="height"></property>
+   <property displayName="left" hide="" Attribute="" type="" name="left"></property>
+   <property displayName="Directory" hide="" type="" name="entity/directory">/Gaussian Blur</property>
+   <property displayName="type" hide="" type="" name="nodeEntity/type">Cache</property>
+  </entity>
+  <entity type="675cfb19dde5e2f50b99f50b7ff1e1ce4d93c523" name="Horizontal Blur">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.882353 0.847059 0.490196 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">// some basic maths
+const float e = 2.71828183;
+const float pi = 3.14159265;
+
+// our accumulator
+vec4 col = vec4( 0.0 );
+
+
+int radius = int( getAttribute("Radius") );
+
+if( radius &lt;= 0 )
+	{
+	return getInput("Input",coords);
+	}
+
+// calculate constant values in expression
+float twoRadSq = 2.0 * radius * radius;
+float oneOverSqrtTwoPiRadSq = 1.0 / ( sqrt( pi * twoRadSq ) );
+
+
+// loop variable
+int x = 0;
+for( x= -3*radius; x&lt;3*radius; x++ )
+	{
+	vec2 tmpCoord = vec2( float(x), 0.0 );
+
+	float xSqOverTwoRadSq = ( tmpCoord.x * tmpCoord.x ) / twoRadSq;
+
+	float mult = oneOverSqrtTwoPiRadSq * pow( e, -xSqOverTwoRadSq );
+
+	tmpCoord += coords;
+
+	col +=  mult * getInput( "Input", tmpCoord );
+	}
+
+return col;</property>
+   <property displayName="Radius" Attribute="1" type="2" name="Radius">10</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Name" type="4" name="entity/name">Horizontal Blur</property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">541.84 446.963 -5000</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="initiated" hide="1" type="0" name="initiated">1</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Filter</property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="Input" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="ZBlur THing" name="Input"></property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">1</property>
+   <property displayName="editable" hide="1" type="0" name="editable">1</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Horizontal Blur</property>
+  </entity>
+ </entities>
+</alterDocument>

@@ -1,0 +1,8 @@
+varying vec4 colour;
+varying vec3 normal;
+
+void main()
+    {
+    gl_FragColor.rgb = colour.rgb;// * clamp( dot( normal, vec3( 1, 1, 1 ) ), 0.0, 1.0 );
+    gl_FragColor.a = 1.0;
+    }

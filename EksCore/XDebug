@@ -1,0 +1,10 @@
+
+#ifndef XDEBUG_H
+#define XDEBUG_H
+
+#include "XMessageRouter"
+
+#define xDebug xStream( 1 )
+#define xError( arg ) xStream( 100 )<<arg; abort()
+
+#endif // XDEBUG_H

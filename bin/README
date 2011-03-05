@@ -1,0 +1,9 @@
+INSTALL
+
+This folder can now be copied and placed in an appropriate directory for execution
+
+RUNNING
+
+"alter" can be executed under windows, or "runSynapse.sh" under linux (the script will configure some environment variables, then run alter).
+
+For more information visit vexx.googlecode.com

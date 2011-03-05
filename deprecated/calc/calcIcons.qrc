@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/calc/viewport">
+        <file>a.png</file>
+        <file>b.png</file>
+        <file>g.png</file>
+        <file>r.png</file>
+        <file>rgb.png</file>
+        <file>splitWidget.svg</file>
+        <file>splitWidgetV.svg</file>
+        <file>splitEnable.svg</file>
+        <file>splitVertical.svg</file>
+        <file>oneToOne.svg</file>
+        <file>zoomToFit.svg</file>
+        <file>autoAlphaMult.svg</file>
+        <file>begin.svg</file>
+        <file>end.svg</file>
+        <file>pause.svg</file>
+        <file>play.svg</file>
+        <file>closeRender.svg</file>
+        <file>disableSplit.svg</file>
+    </qresource>
+    <qresource prefix="/calc/persistantProperties">
+        <file>add.png</file>
+        <file>remove.png</file>
+        <file>help.png</file>
+    </qresource>
+    <qresource prefix="/calc">
+        <file>folder.png</file>
+        <file>next.png</file>
+        <file>colourPicker.svg</file>
+    </qresource>
+    <qresource prefix="/roto">
+        <file>rotoAddPoint.svg</file>
+        <file>rotoMovePoint.svg</file>
+        <file>rotoRemovePoint.svg</file>
+    </qresource>
+</RCC>

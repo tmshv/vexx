@@ -1,0 +1,50 @@
+#ifndef XFILESEQUENCE_H
+#define XFILESEQUENCE_H
+
+#include "XGlobal"
+#include "XString"
+#include "XProperty"
+
+class XVariant;
+
+class EKSCORE_EXPORT XFileSequence
+    {
+public:
+    // parsed is file.$4F.jpg, numeric extract is file.1020.jpg
+    enum stringMode { Auto, Parsed, NumericExtract };
+    // construct a sequence sequence from the name of a file in the sequence
+    XFileSequence( XString="", stringMode=Auto );
+    // construct a sequence sequence from the name of a file in the sequence
+    XFileSequence( const char *, stringMode=Auto );
+    // construct a sequence from a variant
+    explicit XFileSequence( XVariant );
+    // compress a sequence to a variant
+    operator XVariant();
+
+    // set the sequence
+    void setSequence( XString, stringMode=Auto );
+
+    XString niceFilename() const;
+    XString parsedFilename( ) const;
+
+    void setHasFrameNumber( bool );
+    void setPreNumberString( XString );
+    void setPadding( uint );
+    void setPostNumberString( XString );
+
+
+    bool hasFrameNumber( ) const;
+    XString preNumberString( ) const;
+    uint padding( ) const;
+    XString postNumberString( ) const;
+
+    XString getFilename( int frame ) const;
+
+private:
+    XString _pre;
+    uint _padding;
+    XString _post;
+    bool _hasNumber;
+    };
+
+#endif // XFILESEQUENCE_

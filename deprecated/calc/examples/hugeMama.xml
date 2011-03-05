@@ -1,0 +1,105 @@
+<!DOCTYPE alterDocument>
+<alterDocument>
+ <entities>
+  <entity type="675cfb19dde5e2f50b99f50b7ff1e1ce4d93c523" name="Over">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">0.9 0 0.9 1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">vec4 front;&#xd;
+vec4 back;&#xd;
+front = getInput( "Front", coords );&#xd;
+back = getInput( "Back", coords );&#xd;
+return vec4( ( 1 - front.a ) * back.rgb + front.a * front.rgb, clamp( front.a + back.a, 0.0, 1.0 ) );</property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="Name" type="4" name="entity/name">Over</property>
+   <property displayName="Back" hide="1" default="0" Linkable="1" type="4" name="Back"></property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">1</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">736.061 405.427 2500</property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group"></property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">0</property>
+   <property displayName="Front" hide="1" default="0" Linkable="1" type="4" name="Front"></property>
+   <property displayName="editable" hide="1" type="0" name="editable">1</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Over</property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="persistantProperties">
+   <property displayName="width" type="4" name="width">265</property>
+   <property displayName="Name" type="4" name="entity/name">persistantProperties</property>
+   <property displayName="height" type="4" name="height">444</property>
+   <property displayName="position" type="4" name="position">60 73</property>
+   <property displayName="hidden" type="4" name="hidden">0</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="helpOn" type="4" name="helpOn">0</property>
+  </entity>
+  <entity type="328172e02102c519109317e0ab996234b59e8709" name="timeline">
+   <property displayName="Name" type="4" name="entity/name">timeline</property>
+   <property displayName="endFrame" type="4" name="endFrame">80</property>
+   <property displayName="frame" type="4" name="frame">59</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="startFrame" type="4" name="startFrame">40</property>
+   <property displayName="pos" type="4" name="pos">-342</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="675cfb19dde5e2f50b99f50b7ff1e1ce4d93c523" name="Multiply">
+   <property displayName="Colour" hide="1" type="13" name="nodeEntity/colour">1 0.900008 0 1</property>
+   <property displayName="editable" hide="1" type="0" name="editable">1</property>
+   <property displayName="qsdasf" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="qsdasf"></property>
+   <property displayName="isViewNode" hide="1" type="0" name="isViewNode">1</property>
+   <property displayName="shortHelp" hide="1" type="14" name="shortHelp">No Quick Help Available</property>
+   <property displayName="Position" hide="1" type="7" name="nodeEntity/pos">753.114 903.171 -5000</property>
+   <property displayName="Directory" hide="1" type="4" name="entity/directory"></property>
+   <property displayName="isNode" hide="1" type="0" name="nodeEntity/isNode">1</property>
+   <property displayName="group" hide="1" type="4" name="nodeEntity/group">Maths</property>
+   <property displayName="propertiesState" hide="1" type="1" name="propertiesState">0</property>
+   <property displayName="qwerqwer" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="qwerqwer"></property>
+   <property displayName="Name" type="4" name="entity/name">Multiply</property>
+   <property displayName="asdfasdf" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="asdfasdf"></property>
+   <property displayName="sdfg" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="sdfg"></property>
+   <property displayName="longHelp" hide="1" type="14" name="longHelp">No Help Available</property>
+   <property displayName="a" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="a"></property>
+   <property displayName="d" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="d"></property>
+   <property displayName="e" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="e"></property>
+   <property displayName="f" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="f"></property>
+   <property displayName="g" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="g"></property>
+   <property displayName="h" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="h"></property>
+   <property displayName="i" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="i"></property>
+   <property displayName="j" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="j"></property>
+   <property displayName="k" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="k"></property>
+   <property displayName="l" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="l"></property>
+   <property displayName="source" hide="1" type="4" name="nodeEntity/source">return getInput( "Input A", coords ) * getInput( "Input B", coords );</property>
+   <property displayName="o" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="o"></property>
+   <property displayName="p" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="p"></property>
+   <property displayName="alwaysShowInputs" hide="1" type="0" name="alwaysShowInputs">0</property>
+   <property displayName="q" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="q"></property>
+   <property displayName="showProperties" hide="1" type="0" name="showProperties">0</property>
+   <property displayName="r" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="r"></property>
+   <property displayName="s" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="s"></property>
+   <property displayName="t" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="t"></property>
+   <property displayName="qwertwer" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="qwertwer"></property>
+   <property displayName="output" hide="1" Linkable="1" type="4" name="output"></property>
+   <property displayName="u" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="u"></property>
+   <property displayName="w" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="w"></property>
+   <property displayName="y" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="y"></property>
+   <property displayName="type" hide="1" type="4" name="nodeEntity/type">Multiply</property>
+   <property displayName="Input A" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="Input A"></property>
+   <property displayName=";" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name=";"></property>
+   <property displayName="Input B" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="Input B"></property>
+   <property displayName="Bypass" type="0" name="bypass">0</property>
+   <property displayName="asfasdf" hide="1" default="0" singleInput="1" Linkable="1" nodeConnectionProperty="output" type="4" nodeConnectionPath="/Over" name="asfasdf"></property>
+  </entity>
+  <entity type="4097f08e1f7c0cdb414b19dcd74c33a54b6c3eb6" name="system">
+   <property displayName="organisation" type="4" name="system/organisation">jorjSoftware</property>
+   <property displayName="version" type="4" name="system/version">1.0</property>
+   <property displayName="Name" type="4" name="entity/name">system</property>
+   <property displayName="program" type="4" name="system/program">Alter</property>
+   <property displayName="domain" type="4" name="system/domain">placid-acid.com</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+ </entities>
+</alterDocument>

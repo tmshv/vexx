@@ -1,0 +1,8 @@
+<synapse>
+ <node group="Source" colour="0.8 0.8 0.8 1" name="Colour">
+  <source>return getAttribute( "colour" );</source>
+  <shortHelp>A Colour node creates a single coloured output.</shortHelp>
+  <longHelp>A Colour node creates a single coloured output.</longHelp>
+  <attribute value="0" type="colour">colour</attribute>
+ </node>
+</synapse>

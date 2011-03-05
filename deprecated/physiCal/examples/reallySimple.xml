@@ -1,0 +1,172 @@
+<!DOCTYPE alterDocument>
+<alterDocument>
+ <entities>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object1">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object1</property>
+   <property displayName="Position" type="7" name="position">2.0001 7 0</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="edfc9bcdb78f7b04fa1d69d731f0df5739c0aff0" name="Material">
+   <property displayName="Elastic Limit" type="2" name="elastic">999</property>
+   <property displayName="Name" type="4" name="entity/name">Material</property>
+   <property displayName="Spring Damping" type="2" name="springDamping">0.1594</property>
+   <property displayName="Spring Constant" type="2" name="springConstant">2207.08</property>
+   <property displayName="Density" type="2" name="density">1</property>
+   <property displayName="Restitution" type="2" name="restitution">0.1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="Plastic Limit" type="2" name="plastic">999</property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object2">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object2</property>
+   <property displayName="Position" type="7" name="position">0.0002 7 2.0004</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object3">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object3</property>
+   <property displayName="Position" type="7" name="position">-2.0001 7 0</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object4">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object4</property>
+   <property displayName="Position" type="7" name="position">-2 7 -2</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object5">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object5</property>
+   <property displayName="Position" type="7" name="position">2.0001 7.0001 -2</property>
+   <property displayName="Velocity" type="9" name="velocity">0 0 -0.0687</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object6">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">0</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object6</property>
+   <property displayName="Position" type="7" name="position">0 9 0</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object20">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object20</property>
+   <property displayName="Position" type="7" name="position">-2 7 2.0004</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object21">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object21</property>
+   <property displayName="Position" type="7" name="position">2.0002 7 2.0002</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="118f2846e4b95edd7018060731849fd8784e7581" name="Time">
+   <property displayName="clipEnd" type="6" name="time/clipEnd">1.25999</property>
+   <property displayName="loop" type="1" name="time/loop">0</property>
+   <property displayName="fps" type="2" name="time/fps">50.0004</property>
+   <property displayName="Name" type="4" name="entity/name">Time</property>
+   <property displayName="currentTime" type="6" name="time/currentTime">1.14921</property>
+   <property displayName="timeEnd" type="6" name="time/timeEnd">10</property>
+   <property displayName="clipBegin" type="6" name="time/clipBegin">0</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="timeBegin" type="6" name="time/timeBegin">0</property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object</property>
+   <property displayName="Position" type="7" name="position">-0.0002 7 0</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/doubleCube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="4097f08e1f7c0cdb414b19dcd74c33a54b6c3eb6" name="system">
+   <property displayName="organisation" type="4" name="system/organisation">jorjSoftware</property>
+   <property displayName="version" type="4" name="system/version">1.0</property>
+   <property displayName="Name" type="4" name="entity/name">system</property>
+   <property displayName="program" type="4" name="system/program">Alter</property>
+   <property displayName="domain" type="4" name="system/domain">placid-acid.com</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="c31505b251b485f34e3b36ec8910e2f1bfd4f6a3" name="Ground Object">
+   <property displayName="Name" type="4" name="entity/name">Ground Object</property>
+   <property displayName="Z Size" type="2" name="zRes">10</property>
+   <property displayName="X Size" type="2" name="xRes">10</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object0">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">3</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">1</property>
+   <property displayName="Name" type="4" name="entity/name">Object0</property>
+   <property displayName="Position" type="7" name="position">-0.0001 7.0001 -2</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+ </entities>
+</alterDocument>

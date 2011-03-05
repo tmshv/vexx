@@ -1,0 +1,35 @@
+                                         
+
+struct light    
+  {                                         
+  vec3 ambient;                             
+  vec3 diffuse;                             
+  vec3 specular;                            
+  vec3 position;                            
+  vec3 direction;                           
+  float coneAngle;                          
+  float coneFallOff;                        
+  float constantAttenuation;                
+  float linearAttenuation;                  
+  float quadraticAttenuation;               
+  };
+                                       
+uniform mat4 inverseCameraTransform;
+uniform struct light lights[ 8 ];            
+varying float lightDistance[ 8 ];
+varying float dotDir[ 8 ];
+varying vec4 position;
+varying vec3 normal;
+
+void main()                                               
+  {                                                         
+  int x;                                                  
+  for( x=0; x<8 ; x++ )                        
+    {        
+    //dotDir[x] = dot( inverseCameraTransform * vec4( lights[x].direction, 0 ), gl_NormalMatrix * gl_Normal );
+    //lightDistance[x] = distance( lights[x].position, ( gl_ModelViewMatrix * gl_Vertex ) ); 
+    }                                                         
+  position = gl_ModelViewMatrix * gl_Vertex;             
+  normal = gl_NormalMatrix * gl_Normal;
+  gl_Position = ftransform();                               
+  }

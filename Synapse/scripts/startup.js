@@ -1,0 +1,1 @@
+assert(script.loadPlugin("db"));

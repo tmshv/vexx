@@ -1,0 +1,8 @@
+varying vec4 colour;
+
+void main( )
+    {
+    colour.rgb = gl_Color.rgb * ( 0.5 + 0.5 * dot( normalize( gl_NormalMatrix * gl_Normal ), normalize( vec3( 0, 0, 1 ) ) ) );
+    colour.a = gl_Color.a;
+    gl_Position = ftransform();
+    }

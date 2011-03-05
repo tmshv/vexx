@@ -1,0 +1,48 @@
+uniform sampler2D depth;
+
+vec3 rand( float m )
+  {
+  return vec3( fract( sin(dot(gl_FragCoord.xy, vec2(m * 12.9898, m * 78.233))) * m * 43758.54),
+               fract( sin(dot(gl_FragCoord.xy, vec2(m * 76.9898, m * 124.233))) * m * 12335.54),
+               fract( sin(dot(gl_FragCoord.xy, vec2(m * 3.9898, m * 97.233))) * m * 34234.54) ) - 0.5;
+  }
+
+void main(void)
+  {
+  float radius = 0.004;
+  float objectThickness = 0.001;
+
+  vec4 thisPixel = texture2D( depth, gl_TexCoord[0].st );
+
+
+  float mult = 0.001;
+
+  float samples = 0.0;
+  float temp = 0.0;
+  int x;
+  for( x=0; x<16; ++x )
+    {
+    vec3 random = normalize( rand( 0.1 * x ) );
+
+    random *= x * radius;
+
+    float len = length( random );
+
+    vec4 thatPixel = texture2D( depth, gl_TexCoord[0].st + random.xy );
+
+    //if( (thatPixel.r+(random.z*mult)) > thisPixel.r && ( ( thatPixel.r - objectThickness ) + ( random.z * mult ) ) > thisPixel.r  )
+    if( thatPixel.r > (thisPixel.r+(random.z*mult)) )//&& ( thisPixel.r - thatPixel.r ) < ( objectThickness ) )
+      {
+      temp += len;
+      }
+    samples += len;
+    }
+
+  float ambOccMult = 2.5 * clamp( ( temp / samples ), 0.0, 0.5 );
+
+  gl_FragColor.r = ambOccMult;// * texture2D( colour, gl_TexCoord[0].st ).rgb;
+  gl_FragColor.g = thisPixel.r;
+  gl_FragColor.a = 1.0;
+  }
+
+

@@ -1,0 +1,89 @@
+<!DOCTYPE syanpse>
+<synapse>
+ <node group="Layer" colour="0.309804 0.466667 0.603922 1" name="Outside">
+  <source>return getInput( "Input", coords ) * ( 1 - getInput( "Mask", coords ).a );</source>
+  <shortHelp>The Outside node will make all the areas of Input transparent where Mask is opaque.&#xd;&#xd;
+&#xd;&#xd;
+The remaining parts of the Input are those "outside" the mask.&#xd;&#xd;
+&#xd;&#xd;
+Non Absolute alpha values will create transparent masks.</shortHelp>
+  <longHelp>The Outside node will make all the areas of Input transparent where Mask is opaque.&#xd;&#xd;
+&#xd;&#xd;
+The remaining parts of the Input are those "outside" the mask.&#xd;&#xd;
+&#xd;&#xd;
+Non Absolute alpha values will create transparent masks.</longHelp>
+  <input>Input</input>
+  <input>Mask</input>
+ </node>
+ <node group="Layer" colour="0.313726 0.494118 0.627451 1" name="Inside">
+  <source>return getInput( "Input", coords ) * getInput( "Mask", coords ).a;</source>
+  <shortHelp>The Inside node will make all the areas of Input transparent where Mask is transparent.&#xd;&#xd;
+&#xd;&#xd;
+The remaining parts of the Input are those "inside" the mask.&#xd;&#xd;
+&#xd;&#xd;
+Non Absolute alpha values will create transparent masks.</shortHelp>
+  <longHelp>The Inside node will make all the areas of Input transparent where Mask is transparent.&#xd;&#xd;
+&#xd;&#xd;
+The remaining parts of the Input are those "inside" the mask.&#xd;&#xd;
+&#xd;&#xd;
+Non Absolute alpha values will create transparent masks.</longHelp>
+  <input>Input</input>
+  <input>Mask</input>
+ </node>
+ <node group="Layer" colour="0.517647 0.733333 0.576471 1" name="Chroma Key">
+  <source>vec4 col = getInput("Input",coords);&#xd;&#xd;&#xd;
+vec3 variance = vec3( getAttribute("Variance Red"), getAttribute("Variance Green"), getAttribute("Variance Blue") );&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+bvec3 gtTh = greaterThan( (col.rgb + variance), getAttribute("Key Colour").rgb );&#xd;&#xd;&#xd;
+bvec3 ltTh = lessThan( (col.rgb - variance), getAttribute("Key Colour").rgb );&#xd;&#xd;&#xd;
+&#xd;&#xd;&#xd;
+if( gtTh.r &amp;&amp; gtTh.g &amp;&amp; gtTh.b &amp;&amp; ltTh.r &amp;&amp; ltTh.g &amp;&amp; ltTh.b )&#xd;&#xd;&#xd;
+	{&#xd;&#xd;&#xd;
+	return vec4( col.rgb, 0.0 );&#xd;&#xd;&#xd;
+	}&#xd;&#xd;&#xd;
+return col;</source>
+  <shortHelp>The Chroma Key node will attempt to remove a colour range from an image and make it transparent.&#xd;
+&#xd;
+The output can then be combined with an over node to place something behind the key.&#xd;
+&#xd;
+The output is not premultiplied.</shortHelp>
+  <longHelp>The Chroma Key node will attempt to remove a colour range from an image and make it transparent.&#xd;
+&#xd;
+The output can then be combined with an over node to place something behind the key.&#xd;
+&#xd;
+The output is not premultiplied.</longHelp>
+  <attribute value="0.560784 0.773068 1 0" type="colour">Key Colour</attribute>
+  <attribute value="0.907" type="double">Variance Green</attribute>
+  <attribute value="0.3023" type="double">Variance Red</attribute>
+  <input>Input</input>
+  <attribute value="0.4651" type="double">Variance Blue</attribute>
+ </node>
+ <node group="Layer" colour="0.279438 0.330465 0.619608 1" name="Over">
+  <source>vec4 front;
+vec4 back;
+
+front = getInput( "Front", coords );
+back = getInput( "Back", coords );
+
+float newAlpha = clamp( front.a + back.a, 0.0, 1.0 );
+
+if( newAlpha == 0 )
+	{
+	return vec4( ( ( 1 - front.a ) * back.a * back.rgb + front.a * front.rgb ), newAlpha );
+	}
+
+return vec4( ( ( 1 - front.a ) * back.a * back.rgb + front.a * front.rgb ) / newAlpha, newAlpha );</source>
+  <shortHelp>An Over node will place the Front input over the Back input.&#xd;
+&#xd;
+Non absolute alpha channels will allow areas of the back image to show through.&#xd;
+&#xd;
+The Over node will work best if non-premultiplied images are used as input.</shortHelp>
+  <longHelp>An Over node will place the Front input over the Back input.&#xd;
+&#xd;
+Non absolute alpha channels will allow areas of the back image to show through.&#xd;
+&#xd;
+The Over node will work best if non-premultiplied images are used as input.</longHelp>
+  <input>Back</input>
+  <input>Front</input>
+ </node>
+</synapse>

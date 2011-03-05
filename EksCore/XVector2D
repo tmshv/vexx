@@ -1,0 +1,16 @@
+#ifndef XVECTOR2D_H
+#define XVECTOR2D_H
+
+#include "XGlobal"
+#include "QVector2D"
+#include "XMetaType"
+
+typedef QVector2D XVector2D;
+
+class QTextStream;
+EKSCORE_EXPORT QTextStream &operator>>( QTextStream &str, XVector2D &vec );
+EKSCORE_EXPORT QTextStream &operator<<( QTextStream &str, const XVector2D &vec );
+
+X_DECLARE_SERIALISABLE_METATYPE(XVector2D);
+
+#endif // XVECTOR2D_H

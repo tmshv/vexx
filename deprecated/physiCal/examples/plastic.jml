@@ -1,0 +1,85 @@
+<!DOCTYPE alterDocument>
+<alterDocument>
+ <entities>
+  <entity type="edfc9bcdb78f7b04fa1d69d731f0df5739c0aff0" name="Material">
+   <property displayName="Elastic Limit" type="2" name="elastic">0.0001</property>
+   <property displayName="Name" type="4" name="entity/name">Material</property>
+   <property displayName="Spring Damping" type="2" name="springDamping">0.9</property>
+   <property displayName="Spring Constant" type="2" name="springConstant">1687.45</property>
+   <property displayName="Density" type="2" name="density">0.5001</property>
+   <property displayName="Restitution" type="2" name="restitution">0.8571</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="Plastic Limit" type="2" name="plastic">999.832</property>
+  </entity>
+  <entity type="edfc9bcdb78f7b04fa1d69d731f0df5739c0aff0" name="Material0">
+   <property displayName="Elastic Limit" type="2" name="elastic">999</property>
+   <property displayName="Name" type="4" name="entity/name">Material0</property>
+   <property displayName="Spring Damping" type="2" name="springDamping">0.2727</property>
+   <property displayName="Spring Constant" type="2" name="springConstant">1000</property>
+   <property displayName="Density" type="2" name="density">5</property>
+   <property displayName="Restitution" type="2" name="restitution">0.8571</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="Plastic Limit" type="2" name="plastic">999</property>
+  </entity>
+  <entity type="2a3413070ecf860f45706a18b8ade55bc2af4cc0" name="Freeze Box">
+   <property displayName="minimum" type="7" name="minimum">-11 -1 -0.8896</property>
+   <property displayName="Name" type="4" name="entity/name">Freeze Box</property>
+   <property displayName="maximum" type="7" name="maximum">11.0012 0.5521 0.822</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="118f2846e4b95edd7018060731849fd8784e7581" name="Time">
+   <property displayName="clipEnd" type="6" name="time/clipEnd">0.739926</property>
+   <property displayName="loop" type="1" name="time/loop">0</property>
+   <property displayName="fps" type="2" name="time/fps">100.01</property>
+   <property displayName="Name" type="4" name="entity/name">Time</property>
+   <property displayName="currentTime" type="6" name="time/currentTime">0.739926</property>
+   <property displayName="timeEnd" type="6" name="time/timeEnd">10</property>
+   <property displayName="clipBegin" type="6" name="time/clipBegin">0</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+   <property displayName="timeBegin" type="6" name="time/timeBegin">0</property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">4</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">3.7764</property>
+   <property displayName="Name" type="4" name="entity/name">Object</property>
+   <property displayName="Position" type="7" name="position">0.0001 5.1298 0.0001</property>
+   <property displayName="Velocity" type="9" name="velocity">0</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/wall.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="4097f08e1f7c0cdb414b19dcd74c33a54b6c3eb6" name="system">
+   <property displayName="organisation" type="4" name="system/organisation">jorjSoftware</property>
+   <property displayName="version" type="4" name="system/version">1.0</property>
+   <property displayName="Name" type="4" name="entity/name">system</property>
+   <property displayName="program" type="4" name="system/program">Alter</property>
+   <property displayName="domain" type="4" name="system/domain">placid-acid.com</property>
+   <property displayName="hide" type="4" name="entity/hide">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="c31505b251b485f34e3b36ec8910e2f1bfd4f6a3" name="Ground Object">
+   <property displayName="Name" type="4" name="entity/name">Ground Object</property>
+   <property displayName="Z Size" type="2" name="zRes">49.9993</property>
+   <property displayName="X Size" type="2" name="xRes">49.9993</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+  <entity type="b46e560bf8df0c6ca7821870cffcb89c7e628ec2" name="Object0">
+   <property displayName="Random Points" type="1" name="randomPoints">0</property>
+   <property displayName="Random Springs" type="1" name="randomSprings">2</property>
+   <property displayName="Maximum Internal Spring Length" type="2" name="maxLength">2.7632</property>
+   <property displayName="Name" type="4" name="entity/name">Object0</property>
+   <property displayName="Position" type="7" name="position">0.0994 6.5572 4.0001</property>
+   <property displayName="Velocity" type="9" name="velocity">0 0 -14.4196</property>
+   <property displayName="File" type="5" name="file">/home/jorj/vex/physiCal/testProject/cube2D.dae</property>
+   <property displayName="isObject" hide="1" type="4" name="object/isObject">1</property>
+   <property displayName="Material" type="4" name="material">Material0</property>
+   <property displayName="object" hide="1" type="4" name="viewport/object">1</property>
+   <property displayName="Directory" type="4" name="entity/directory"></property>
+  </entity>
+ </entities>
+</alterDocument>

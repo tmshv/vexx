@@ -1,0 +1,39 @@
+
+
+struct light    
+  {                                         
+  vec3 ambient;                             
+  vec3 diffuse;                             
+  vec3 specular;                            
+  vec3 position;                            
+  vec3 direction;                           
+  float coneAngle;                          
+  float coneFallOff;                        
+  float constantAttenuation;                
+  float linearAttenuation;                  
+  float quadraticAttenuation;               
+  };
+   
+uniform mat4 inverseCameraTransform;
+uniform struct light lights[ 8 ];
+varying vec4 position;
+varying vec3 normal;
+//varying vec lightDistance[ 8 ]; 
+//varying float dotDir[ 8 ];
+    
+float distanceToLight( int l )
+  {
+  return distance( vec4( lights[l].position, 1 ), position );
+  }
+
+vec3 ambient( int l, float dist )
+  {
+  return lights[l].ambient * ( 1.0 / ( lights[l].constantAttenuation + lights[l].linearAttenuation * dist + lights[l].quadraticAttenuation * dist * dist ) ).rrr;
+  }
+       
+void main()                                               
+  { 
+  gl_FragColor.rgb = ambient( 0, distanceToLight( 0 ) );//percentShaded( 0, normal );// * attenuation( 0, distance( vec4( lights[0].position, 1 ), position ) );
+  }
+
+

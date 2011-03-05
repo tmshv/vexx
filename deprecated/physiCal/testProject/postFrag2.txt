@@ -1,0 +1,38 @@
+uniform sampler2D ambOcc;
+
+void main(void)
+    {
+    float blurTolerance = 0.002;
+    float radiusMult = 0.007;
+    float angleInc = 45.0;
+    int samples = 32;
+    float col;
+
+    vec4 thisPixel = texture2D( ambOcc, gl_TexCoord[0].st );
+
+    int x;
+    float angle=0.0;
+    for( x=0; x<samples; x++ )
+        {
+        float radius = x * ( 1.0 / samples ) * radiusMult;
+
+        vec2 offset = vec2( sin( angle )*radius, cos( angle )*radius );
+
+        vec2 blurAdd = texture2D( ambOcc, ( gl_TexCoord[0].st + offset ) ).rg;
+
+        if( ( thisPixel.g + blurTolerance ) >= blurAdd.g )
+            {
+            col += blurAdd.r;
+            }
+        else
+            {
+            col += thisPixel.r;
+            }
+        angle += angleInc;
+        }
+
+    gl_FragColor.r =  clamp( ( ( ( col / samples ) * 1.0 ) + 0.02 ), 0.0, 1.0 ).r;
+    gl_FragColor.a = 1.0;
+    }
+
+

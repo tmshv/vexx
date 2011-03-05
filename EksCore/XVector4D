@@ -1,0 +1,18 @@
+#ifndef XVECTOR4D_H
+#define XVECTOR4D_H
+
+#include "XGlobal"
+#include "QVector4D"
+#include "XMetaType"
+#include "XList"
+
+typedef QVector4D XVector4D;
+typedef XList<XVector4D> XVector4DList;
+
+class QTextStream;
+EKSCORE_EXPORT QTextStream &operator>>( QTextStream &str, XVector4D &vec );
+EKSCORE_EXPORT QTextStream &operator<<( QTextStream &str, const XVector4D &vec );
+
+X_DECLARE_SERIALISABLE_METATYPE(XVector4D);
+
+#endif // XVECTOR4D_H

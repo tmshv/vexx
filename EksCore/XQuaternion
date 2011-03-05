@@ -1,0 +1,28 @@
+#ifndef XQUATERNION_H
+#define XQUATERNION_H
+
+#include "QQuaternion"
+#include "XMetaType"
+#include "QTextStream"
+
+typedef QQuaternion XQuaternion;
+
+inline QTextStream &operator<<(QTextStream &str, const XQuaternion &quat)
+  {
+  return str << (xReal)quat.x() << (xReal)quat.y() << (xReal)quat.z() << (xReal)quat.scalar();
+  }
+
+inline QTextStream &operator>>(QTextStream &str, XQuaternion &quat)
+  {
+  xReal x, y, z, w;
+  str >> x >> y >> z >> w;
+  quat.setX(x);
+  quat.setY(y);
+  quat.setZ(z);
+  quat.setScalar(w);
+  return str;
+  }
+
+X_DECLARE_SERIALISABLE_METATYPE(XQuaternion);
+
+#endif // XQUATERNION_H

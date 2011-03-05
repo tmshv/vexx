@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+  <asset>
+    <contributor>
+      <authoring_tool>FBX COLLADA exporter</authoring_tool>
+    </contributor>
+    <created>2010-02-09T09:04:06Z</created>
+    <modified>2010-02-09T09:04:06Z</modified>
+    <unit meter="0.010000"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_materials>
+    <material id="lambert1" name="lambert1">
+      <instance_effect url="#lambert1-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="lambert1-fx" name="lambert1">
+      <profile_COMMON>
+        <technique sid="standard">
+          <lambert>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0.000000  0.000000 0.000000 1.000000</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.400000  0.400000 0.400000 1.000000</color>
+            </diffuse>
+            <transparent>
+              <color sid="transparent">0.000000  0.000000 0.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">1.000000</float>
+            </transparency>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="pPipe1-lib" name="pPipe1Mesh">
+      <mesh>
+        <source id="pPipe1-lib-Position">
+          <float_array id="pPipe1-lib-Position-array" count="60">
+0.500000 2.450000 -0.000000
+0.500000 0.757092 -2.330089
+0.500000 -1.982092 -1.440074
+0.500000 -1.982092 1.440074
+0.500000 0.757092 2.330089
+-0.500000 2.450000 0.000000
+-0.500000 0.757092 -2.330089
+-0.500000 -1.982092 -1.440074
+-0.500000 -1.982092 1.440074
+-0.500000 0.757092 2.330089
+-0.500000 2.950000 0.000000
+-0.500000 0.911600 -2.805617
+-0.500000 -2.386600 -1.733966
+-0.500000 -2.386600 1.733967
+-0.500000 0.911601 2.805617
+0.500000 2.950000 -0.000000
+0.500000 0.911600 -2.805617
+0.500000 -2.386600 -1.733966
+0.500000 -2.386600 1.733967
+0.500000 0.911601 2.805617
+</float_array>
+          <technique_common>
+            <accessor source="#pPipe1-lib-Position-array" count="20" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPipe1-lib-Normal0">
+          <float_array id="pPipe1-lib-Normal0-array" count="240">
+0.000000 -0.809017 0.587785
+0.000000 -0.809017 0.587785
+0.000000 -0.809017 0.587785
+0.000000 -0.809017 0.587785
+0.000000 0.309017 0.951056
+0.000000 0.309017 0.951056
+0.000000 0.309017 0.951056
+0.000000 0.309017 0.951056
+0.000000 1.000000 -0.000000
+0.000000 1.000000 -0.000000
+0.000000 1.000000 -0.000000
+0.000000 1.000000 -0.000000
+0.000000 0.309017 -0.951056
+0.000000 0.309017 -0.951056
+0.000000 0.309017 -0.951056
+0.000000 0.309017 -0.951056
+0.000000 -0.809017 -0.587785
+0.000000 -0.809017 -0.587785
+0.000000 -0.809017 -0.587785
+0.000000 -0.809017 -0.587785
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+-1.000000 0.000000 0.000000
+0.000000 0.809017 -0.587785
+0.000000 0.809017 -0.587785
+0.000000 0.809017 -0.587785
+0.000000 0.809017 -0.587785
+0.000000 -0.309017 -0.951056
+0.000000 -0.309017 -0.951056
+0.000000 -0.309017 -0.951056
+0.000000 -0.309017 -0.951056
+0.000000 -1.000000 0.000000
+0.000000 -1.000000 0.000000
+0.000000 -1.000000 0.000000
+0.000000 -1.000000 0.000000
+0.000000 -0.309017 0.951057
+0.000000 -0.309017 0.951057
+0.000000 -0.309017 0.951057
+0.000000 -0.309017 0.951057
+0.000000 0.809017 0.587785
+0.000000 0.809017 0.587785
+0.000000 0.809017 0.587785
+0.000000 0.809017 0.587785
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+1.000000 0.000000 0.000000
+</float_array>
+          <technique_common>
+            <accessor source="#pPipe1-lib-Normal0-array" count="80" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPipe1-lib-UV1">
+          <float_array id="pPipe1-lib-UV1-array" count="60">
+0.000000 1.000000
+0.200000 1.000000
+0.400000 1.000000
+0.600000 1.000000
+0.800000 1.000000
+1.000000 1.000000
+0.000000 0.750000
+0.200000 0.750000
+0.400000 0.750000
+0.600000 0.750000
+0.800000 0.750000
+1.000000 0.750000
+0.000000 0.500000
+0.200000 0.500000
+0.400000 0.500000
+0.600000 0.500000
+0.800000 0.500000
+1.000000 0.500000
+0.000000 0.250000
+0.200000 0.250000
+0.400000 0.250000
+0.600000 0.250000
+0.800000 0.250000
+1.000000 0.250000
+0.000000 0.000000
+0.200000 0.000000
+0.400000 0.000000
+0.600000 0.000000
+0.800000 0.000000
+1.000000 0.000000
+</float_array>
+          <technique_common>
+            <accessor source="#pPipe1-lib-UV1-array" count="30" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="pPipe1-lib-Vertex">
+          <input semantic="POSITION" source="#pPipe1-lib-Position"/>
+        </vertices>
+        <polygons material="lambert1" count="20">
+          <input semantic="VERTEX" offset="0" source="#pPipe1-lib-Vertex"/>
+          <input semantic="NORMAL" offset="1" source="#pPipe1-lib-Normal0"/>
+          <input semantic="TEXCOORD" offset="2" set="1" source="#pPipe1-lib-UV1"/>
+          <p>1 0 1 0 1 0 5 2 5 6 3 6</p>
+          <p>2 4 2 1 5 1 6 6 6 7 7 7</p>
+          <p>3 8 3 2 9 2 7 10 7 8 11 8</p>
+          <p>4 12 4 3 13 3 8 14 8 9 15 9</p>
+          <p>0 16 0 4 17 4 9 18 9 5 19 5</p>
+          <p>6 20 6 5 21 5 10 22 10 11 23 11</p>
+          <p>7 24 7 6 25 6 11 26 11 12 27 12</p>
+          <p>8 28 8 7 29 7 12 30 12 13 31 13</p>
+          <p>9 32 9 8 33 8 13 34 13 14 35 14</p>
+          <p>5 36 5 9 37 9 14 38 14 10 39 10</p>
+          <p>11 40 11 10 41 10 15 42 15 16 43 16</p>
+          <p>12 44 12 11 45 11 16 46 16 17 47 17</p>
+          <p>13 48 13 12 49 12 17 50 17 18 51 18</p>
+          <p>14 52 14 13 53 13 18 54 18 19 55 19</p>
+          <p>10 56 10 14 57 14 19 58 19 15 59 15</p>
+          <p>16 60 16 15 61 15 0 62 0 1 63 1</p>
+          <p>17 64 17 16 65 16 1 66 1 2 67 2</p>
+          <p>18 68 18 17 69 17 2 70 2 3 71 3</p>
+          <p>19 72 19 18 73 18 3 74 3 4 75 4</p>
+          <p>15 76 15 19 77 19 4 78 4 0 79 0</p>
+        </polygons>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_lights>
+    <light id="SceneAmbient-lib" name="SceneAmbientMesh">
+      <technique_common>
+        <ambient>
+          <color>0.400000 0.400000 0.400000</color>
+        </ambient>
+      </technique_common>
+    </light>
+  </library_lights>
+  <library_visual_scenes>
+    <visual_scene id="RootNode" name="RootNode">
+      <node id="pPipe1" name="pPipe1">
+        <instance_geometry url="#pPipe1-lib">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="lambert1" target="#lambert1"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#RootNode"/>
+  </scene>
+</COLLADA>
+

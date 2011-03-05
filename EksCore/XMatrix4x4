@@ -1,0 +1,13 @@
+#ifndef XMATRIX4X4_H
+#define XMATRIX4X4_H
+
+#include "XGlobal"
+#include "QMatrix4x4"
+
+typedef QMatrix4x4 XMatrix4x4;
+
+class QTextStream;
+EKSCORE_EXPORT QTextStream &operator>>( QTextStream &str, XMatrix4x4 &mat );
+EKSCORE_EXPORT QTextStream &operator<<( QTextStream &str, const XMatrix4x4 &mat );
+
+#endif
