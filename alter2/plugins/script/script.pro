@@ -16,10 +16,17 @@ TARGET = script
 TEMPLATE = lib
 DEFINES += SCRIPT_BUILD
 SOURCES += scplugin.cpp \
-    scsurface.cpp
+    scsurface.cpp \
+    scshiftdynamicpropertyinformation.cpp \
+    scshiftproperty.cpp \
+    scembeddedtypes.cpp
 HEADERS += scplugin.h \
     scglobal.h \
-    scsurface.h
+    scsurface.h \
+    scshiftdynamicpropertyinformation.h \
+    scshiftproperty.h \
+    scembeddedtypes.h \
+    scwrappedclass.h
 
 RESOURCES += \
     ScResources.qrc

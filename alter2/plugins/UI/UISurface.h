@@ -17,7 +17,7 @@ public:
     PropertiesPage
     };
 
-properties:
+XProperties:
   XROProperty(QString, name);
   XROProperty(QWidget *, widget);
   XROProperty(SurfaceType, type);

@@ -8,13 +8,13 @@ class SEntity;
 
 class GRAPHICSCORE_EXPORT GCSingleLevelRenderModel : public XAbstractRenderModel
   {
-properties:
+XProperties:
   XROProperty(SEntity *, entity);
 
 public:
   class GRAPHICSCORE_EXPORT Iterator : public XAbstractRenderModel::Iterator
     {
-  properties:
+  XProperties:
     XProperty(SEntity *, entity, setEntity);
 
     virtual bool next();

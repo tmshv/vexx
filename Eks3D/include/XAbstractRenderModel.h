@@ -10,7 +10,7 @@ class XAbstractDelegate;
 
 class EKS3D_EXPORT XAbstractRenderModel
   {
-properties:
+XProperties:
   XRORefProperty(XList<XAbstractCanvas*>, canvases);
 
 public:

@@ -16,7 +16,7 @@ class SHIFT_EXPORT SEntityUI
 public:
   typedef QWidget *(*WidgetCreator)(const SProperty *property, bool readOnly, QWidget *parent);
 
-properties:
+XProperties:
   typedef XList<WidgetCreator> TypeList;
   typedef XMap<XMetaType::Type, int> LookupMap;
   XRORefProperty(TypeList, types);

@@ -7,7 +7,7 @@
 
 class EKS3D_EXPORT XAbstractCanvas
   {
-properties:
+XProperties:
   XROProperty(XAbstractRenderModel *, model);
 
 public:

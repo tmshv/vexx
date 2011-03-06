@@ -4,6 +4,8 @@
 #include "QString"
 #include "XGlobal"
 #include "spropertydata.h"
+#include "XHash"
+#include "XVariant"
 
 class SProperty;
 class SLoader;
@@ -32,6 +34,7 @@ public:
 
   const SPropertyInformation *parentTypeInformation;
 
+
   // Child information
   struct Child
     {
@@ -40,6 +43,9 @@ public:
     SProperty SPropertyContainer::* location;
     ComputeFunction compute;
     SProperty SPropertyContainer::* *affects;
+
+    typedef xuint16 DataKey;
+    XHash<DataKey, XVariant> data;
     };
 
   xsize propertyOffset;
@@ -49,6 +55,12 @@ public:
   xsize size;
   xsize instances;
   bool dynamic;
+
+  typedef xuint16 DataKey;
+  XHash<DataKey, XVariant> data;
+
+  static DataKey newDataKey();
+  static Child::DataKey newChildDataKey();
 
   const Child *child(xsize index) const;
   };

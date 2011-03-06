@@ -17,7 +17,7 @@ class ALTER_EXPORT AAbstractPlugin : public QObject
   {
   Q_OBJECT
 
-properties:
+XProperties:
   XProperty( ACore *, core, setCore );
 
 public:

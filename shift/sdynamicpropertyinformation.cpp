@@ -1,6 +1,28 @@
 #include "sdynamicpropertyinformation.h"
 
-SDynamicPropertyInformation::SDynamicPropertyInformation(const QString &name, SPropertyType id, xuint32 version)
-{
-  xAssert(0);
-}
+SDynamicPropertyInformation::Property::Property(const QString& type,
+                                                const QString &name,
+                                                SPropertyInformation::ComputeFunction computeFn,
+                                                const XList<xsize> &affects)
+    : _typeName(type), _name(name), _computeFunction(computeFn), _affects(affects)
+  {
+  }
+
+SDynamicPropertyInformation::SDynamicPropertyInformation(const QString &name, xuint32 version)
+    : _typeName(name), _parentTypeName("SProperty"), _version(version)
+  {
+  }
+
+bool SDynamicPropertyInformation::isValid() const
+  {
+  return _typeName != 0;
+  }
+
+void SDynamicPropertyInformation::setParentTypeName(SPropertyInformation *info)
+  {
+  _parentTypeName = info->typeName;
+  }
+
+void SDynamicPropertyInformation::addType(SDatabase *db)
+  {
+  }

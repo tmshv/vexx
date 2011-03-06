@@ -38,7 +38,7 @@ public:
 
   class EKS3D_EXPORT RayCastResult
     {
-  properties:
+  XProperties:
     XROProperty( XTransform, worldTransform );
     XROProperty( ItemID, ID );
     XRORefProperty( RayCastResults, results );
@@ -65,7 +65,7 @@ public:
     bool isValid() const;
     };
 
-properties:
+XProperties:
   XROProperty(XRenderer *, renderer);
   XProperty(XEnvironment *, environment, setEnvironment);
   XProperty(XEnvironmentViewer *, viewer, setViewer);

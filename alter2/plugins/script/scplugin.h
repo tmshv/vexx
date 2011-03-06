@@ -6,10 +6,13 @@
 
 class ScCoreObject;
 class QScriptEngine;
+class QScriptValue;
+class QScriptClass;
 class QScriptEngineDebugger;
 class ScObject;
 class ScInputThread;
 class ScSurface;
+class ScEmbeddedTypes;
 
 class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
   {
@@ -34,7 +37,11 @@ public:
 
   Q_INVOKABLE bool isDebuggingEnabled();
 
+  QScriptEngine *engine();
+
   void registerScriptGlobal(QObject *);
+  void registerScriptGlobal(const QString &, QScriptClass *cl);
+  void registerScriptGlobal(const QString &, const QScriptValue &cl);
 
 signals:
   void debuggingStateChanged(bool enabled);
@@ -51,6 +58,7 @@ private:
   QScriptEngineDebugger *_debugger;
 
   ScSurface *_surface;
+  ScEmbeddedTypes *_types;
   };
 
 #endif // SCPLUGIN_H

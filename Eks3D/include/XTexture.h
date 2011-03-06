@@ -21,7 +21,7 @@ public:
     InvertY = 1
     };
 
-properties:
+XProperties:
   XROProperty( QImage, texture );
   XROProperty( quint32, options );
 

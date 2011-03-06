@@ -37,7 +37,7 @@ public:
     CreateItem
     };
 
-properties:
+XProperties:
   XROProperty(XAbstractEnvironmentInterface *, environmentInterface);
 
 public:

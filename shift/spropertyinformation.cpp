@@ -29,3 +29,15 @@ const SPropertyInformation::Child *SPropertyInformation::child(xsize index) cons
 
   return 0;
   }
+
+SPropertyInformation::DataKey g_maxKey = 0;
+SPropertyInformation::DataKey SPropertyInformation::newDataKey()
+  {
+  return g_maxKey++;
+  }
+
+SPropertyInformation::Child::DataKey g_maxChildKey = 0;
+SPropertyInformation::Child::DataKey SPropertyInformation::newChildDataKey()
+  {
+  return g_maxChildKey++;
+  }

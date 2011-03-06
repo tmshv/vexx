@@ -20,7 +20,7 @@ public:
                      sizeof(quint32) // the size of the extra data
     };
 
-properties:
+XProperties:
   XROProperty( xuint16, type );
   XROProperty( ItemID, ID );
   XROProperty( SubType, subType );

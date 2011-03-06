@@ -10,7 +10,8 @@ class QTextEdit;
 class ScSurface : public QObject, public UISurface
   {
   Q_OBJECT
-properties:
+
+XProperties:
   XROProperty(ScPlugin *, plugin);
 
 public:

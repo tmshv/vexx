@@ -14,7 +14,7 @@ class EKS3D_EXPORT XAbstractEnvironmentInterface
 public:
   typedef XEnvironmentRequest ItemRequest;
 
-properties:
+XProperties:
   XProperty(XEnvironment *, controller, setController)
 
 public:

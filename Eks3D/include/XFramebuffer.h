@@ -29,7 +29,7 @@ public:
     Depth = 2
     };
 
-properties:
+XProperties:
   XROProperty( xuint32, width );
   XROProperty( xuint32, height );
   XROProperty( xuint32, options );

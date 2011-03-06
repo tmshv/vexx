@@ -13,7 +13,7 @@ public:
   UISurfacePrivate();
   ~UISurfacePrivate();
 
-properties:
+XProperties:
   XProperty(QDockWidget *, dock, setDock);
   XProperty(UISurface *, surface, setSurface);
   XProperty(UIPlugin *, plugin, setPlugin);

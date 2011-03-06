@@ -1,5 +1,6 @@
 #include "scplugin.h"
 #include "scsurface.h"
+#include "scembeddedtypes.h"
 #include "QApplication"
 #include "QScriptEngine"
 #include "UIPlugin.h"
@@ -10,9 +11,10 @@
 #include "QDebug"
 #include "QMainWindow"
 
+
 ALTER_PLUGIN(ScPlugin);
 
-ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0)
+ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
   {
   }
 
@@ -21,6 +23,7 @@ ScPlugin::~ScPlugin()
   delete _debugger;
   delete _engine;
   delete _surface;
+  delete _types;
 
   _debugger = 0;
   _engine = 0;
@@ -32,6 +35,8 @@ void ScPlugin::load()
   _engine = new QScriptEngine(this);
   _debugger = new QScriptEngineDebugger(this);
   _debugger->setAutoShowStandardWindow(true);
+
+  _types = new ScEmbeddedTypes(_engine);
 
 
   registerScriptGlobal(this);
@@ -115,6 +120,17 @@ void ScPlugin::registerScriptGlobal(QObject *in)
   _engine->globalObject().setProperty(in->objectName(), objectValue);
   }
 
+void ScPlugin::registerScriptGlobal(const QString &name, const QScriptValue &val)
+  {
+  _engine->globalObject().setProperty(name, val);
+  }
+
+void ScPlugin::registerScriptGlobal(const QString &name, QScriptClass *in)
+  {
+  QScriptValue objectValue = _engine->newObject(in);
+  _engine->globalObject().setProperty(name, objectValue);
+  }
+
 bool ScPlugin::executeFile(const QString &filename)
   {
   QFile file(filename);
@@ -129,6 +145,11 @@ bool ScPlugin::executeFile(const QString &filename)
 bool ScPlugin::isDebuggingEnabled()
   {
   return _engine->agent() != 0;
+  }
+
+QScriptEngine *ScPlugin::engine()
+  {
+  return _engine;
   }
 
 bool ScPlugin::execute(const QString &code)

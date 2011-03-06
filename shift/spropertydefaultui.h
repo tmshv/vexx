@@ -19,7 +19,7 @@ namespace SPropertyDefaultUI
 {
 template <typename T, typename U> class SUIBase : private SDataObserver
   {
-properties:
+XProperties:
   XProperty(bool, isAlreadySetting, setAlreadySetting);
 
 public:

@@ -23,7 +23,7 @@ class XAbstractShader;
 
 class EKS3D_EXPORT XAbstractShaderVariable
   {
-properties:
+XProperties:
   XROProperty( XAbstractShader *, abstractShader )
 
 public:
@@ -68,7 +68,7 @@ public:
 
 class EKS3D_EXPORT XShaderVariable
   {
-properties:
+XProperties:
   XROProperty( QVariant, value );
   XROProperty( XShader *, shader );
   XROProperty( QString, name );
@@ -118,7 +118,7 @@ public:
 
 class EKS3D_EXPORT XAbstractShader
   {
-properties:
+XProperties:
   XROProperty( XRenderer *, renderer );
 
 public:
@@ -137,7 +137,7 @@ private:
 
 class EKS3D_EXPORT XShader : public XObject
   {
-properties:
+XProperties:
   XROProperty( XRenderer *, renderer );
 
 public:

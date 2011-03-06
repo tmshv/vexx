@@ -23,7 +23,7 @@ public:
 
   class MeshPair
     {
-  properties:
+  XProperties:
     typedef ItemID MeshID;
     XProperty(MeshID, mesh, setMesh);
     XRefProperty(XTransform, transform);
@@ -35,7 +35,7 @@ public:
 
   class ShadingGroup
     {
-  properties:
+  XProperties:
     typedef ItemID ShaderID;
     XRORefProperty(MeshPairList, meshes);
     XProperty(ShaderID, shader, setShader);
@@ -44,7 +44,7 @@ public:
     friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, ShadingGroup &itemRequest);
     };
 
-properties:
+XProperties:
   typedef XVector<ShadingGroup> ShadingGroupList;
   typedef XVector<ItemID> VisBox;
   typedef XMap<ItemID, VisBox> VisBoxHash;
