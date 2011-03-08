@@ -51,3 +51,5 @@ HEADERS += ../XObject \
     ../XRandomAccessAllocator
 INCLUDEPATH += ../
 DESTDIR = ../../bin
+
+include("../EnableSIMD.pri")

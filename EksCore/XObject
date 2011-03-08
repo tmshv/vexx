@@ -6,22 +6,24 @@
 
 // XObject - XBaseObject, with signals and casting
 class EKSCORE_EXPORT XObject : public XBaseObject
-    {
-    X_CASTABLE_ROOT( XObject, 1, static_cast<T*>(0)->Type )
+  {
+  X_CASTABLE_ROOT( XObject, 1, static_cast<T*>(0)->Type )
 public:
-    XObject( );
-    ~XObject( );
+  enum {Type = 1};
 
-    X_SIGNAL( destroyed );
-    };
+  XObject( );
+  ~XObject( );
+
+  X_SIGNAL( destroyed );
+  };
 
 template <typename T>inline T xobject_cast( XObject *obj )
+  {
+  if( obj )
     {
-    if( obj )
-        {
-        return static_cast<T>( obj->castToType( static_cast<T>(0)->Type ) ); \
-        }
-    return 0;
+    return static_cast<T>( obj->castToType( static_cast<T>(0)->Type ) ); \
     }
+  return 0;
+  }
 
 #endif
