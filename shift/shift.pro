@@ -46,7 +46,8 @@ HEADERS += \
     sloader.h \
     sarrayproperty.h \
     sdatabasemodel.h \
-    sdynamicpropertyinformation.h
+    sdynamicpropertyinformation.h \
+    sentityweakpointer.h
 DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -Wall

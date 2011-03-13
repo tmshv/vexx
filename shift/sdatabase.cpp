@@ -9,12 +9,12 @@
 #include "QDebug"
 
 S_ENTITY_DEFINITION(SDatabase, SEntity)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, majorVersion)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, minorVersion)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, revision)
+  S_PROPERTY_DEFINITION(UnsignedIntProperty, majorVersion, 0)
+  S_PROPERTY_DEFINITION(UnsignedIntProperty, minorVersion, 0)
+  S_PROPERTY_DEFINITION(UnsignedIntProperty, revision, 0)
 S_ENTITY_END_DEFINITION(SDatabase, SEntity)
 
-SDatabase::SDatabase() : majorVersion(0), minorVersion(0), revision(0), _blockLevel(0), _inSubmitChange(0), _readLevel(0)
+SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _readLevel(0)
   {
   _database = this;
   _info = staticTypeInformation();
@@ -91,8 +91,8 @@ SProperty *SDatabase::createProperty(xuint32 t)
   {
   xAssert(_types.contains(t));
   const SPropertyInformation *type = _types[t];
-  void *ptr = _properties.alloc(type->size);
-  SProperty *prop = type->create(ptr);
+  void *ptr = _properties.alloc(type->size());
+  SProperty *prop = type->create()(ptr);
   prop->_database = this;
   prop->_info = type;
 
@@ -104,23 +104,24 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
   {
   xAssert(mD);
 
-  if(mD->parentTypeInformation)
+  if(mD->parentTypeInformation())
     {
-    initiatePropertyFromMetaData(container, mD->parentTypeInformation);
+    initiatePropertyFromMetaData(container, mD->parentTypeInformation());
     }
 
-  for(xsize i=0; i<mD->propertyCount; ++i)
+  for(xsize i=0; i<mD->childCount(); ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInformation::Child &child = mD->childMetaData[i];
+    const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child.location);
+    const SProperty SPropertyContainer::* prop(child->location());
     SProperty *thisProp = (SProperty*)&(container->*prop);
 
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
-    thisProp->_info = child.childInformation;
+    thisProp->_info = child->childInformation();
     initiateProperty(thisProp);
+    child->initiateProperty(thisProp);
     }
   }
 
@@ -128,18 +129,18 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
   {
   xAssert(mD);
 
-  if(mD->parentTypeInformation)
+  if(mD->parentTypeInformation())
     {
-    uninitiatePropertyFromMetaData(container, mD->parentTypeInformation);
+    uninitiatePropertyFromMetaData(container, mD->parentTypeInformation());
     }
 
-  for(xsize i=0; i<mD->propertyCount; ++i)
+  for(xsize i=0; i<mD->childCount(); ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInformation::Child &child = mD->childMetaData[i];
+    const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child.location);
+    const SProperty SPropertyContainer::* prop(child->location());
     SProperty *thisProp = (SProperty*)&(container->*prop);
 
     uninitiateProperty(thisProp);
@@ -148,7 +149,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
 
 void SDatabase::initiateProperty(SProperty *prop)
   {
-  ++((SPropertyInformation*)prop->typeInformation())->instances;
+  prop->typeInformation()->reference();
 
   SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
@@ -163,7 +164,7 @@ void SDatabase::initiateProperty(SProperty *prop)
 
 void SDatabase::uninitiateProperty(SProperty *prop)
   {
-  --((SPropertyInformation*)prop->typeInformation())->instances;
+  prop->typeInformation()->dereference();
 
   SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
@@ -230,7 +231,7 @@ const SPropertyInformation *SDatabase::findType(const QString &in) const
   QList <xuint32> keys(_types.keys());
   for(int i=0, s=keys.size(); i<s; ++i)
     {
-    if(_types[keys[i]]->typeName == in)
+    if(_types[keys[i]]->typeName() == in)
       {
       return ((XMap <SPropertyType, SPropertyInformation*>&)_types)[keys[i]];
       }
@@ -254,11 +255,11 @@ void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData:
 
   const SPropertyInformation *type = prop->typeInformation();
 
-  data.setName(type->typeName);
+  data.setName(type->typeName());
   data.appendAttribute("name", prop->name().toUtf8());
-  data.appendAttribute("version", QString::number(type-> version).toUtf8());
+  data.appendAttribute("version", QString::number(type->version()).toUtf8());
   data.appendAttribute("dynamic", QString::number(prop->isDynamic()).toUtf8());
-  type->save(prop, data, mode);
+  type->save()(prop, data, mode);
   }
 
 SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent, SPropertyData::Mode mode)
@@ -271,7 +272,7 @@ SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent
 
   const SPropertyInformation *type = findType(data.name());
   xAssert(type);
-  xAssert(type->load);
+  xAssert(type->load());
 
   if(!type)
     {
@@ -286,7 +287,7 @@ SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent
     bool dynamic(QString::fromUtf8(data.attribute("dynamic")).toUInt());
     if(dynamic)
       {
-      prop = parent->addProperty(type->typeId);
+      prop = parent->addProperty(type->typeId());
       prop->setName(name);
       }
     else
@@ -301,7 +302,7 @@ SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent
     }
 
   xuint32 version = QString::fromUtf8(data.attribute("version")).toUInt();
-  type->load(prop, data, version, mode, *this);
+  type->load()(prop, data, version, mode, *this);
   _readLevel--;
 
   if(_readLevel == 0)

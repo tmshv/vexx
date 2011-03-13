@@ -5,7 +5,7 @@
 
 class SHIFT_EXPORT SPropertyArray : public SPropertyContainer
   {
-  S_PROPERTY_CONTAINER(SPropertyArray, SPropertyContainer);
+  S_PROPERTY_CONTAINER(SPropertyArray, SPropertyContainer, 0);
 
 public:
   SPropertyArray();
@@ -25,7 +25,7 @@ public:
 
 template <typename T> class STypedPropertyArray : public SPropertyContainer
   {
-  S_PROPERTY_CONTAINER(STypedPropertyArray, SPropertyContainer);
+  S_PROPERTY_CONTAINER(STypedPropertyArray, SPropertyContainer, 0);
 
 public:
   T *add()
@@ -76,22 +76,13 @@ public:
 
 template <typename T>const SPropertyInformation *STypedPropertyArray<T>::staticTypeInformation()
   {
-  const SPropertyInformation* parentInfo = SPropertyContainer::staticTypeInformation();
-  static SPropertyInformation metaData =
-    {
-    STypedPropertyArray<T>::createSTypedPropertyArray,
-    saveContainer,
-    loadContainer,
-    assignContainer,
-    0,
-    "STypedPropertyArray<T>",
-    Type,
-    parentInfo,
-    parentInfo->propertyOffset + parentInfo->propertyCount,
-    0,
-    0
-    };
-  return &metaData;
+  const SPropertyInformation* parentMetaData = SPropertyContainer::staticTypeInformation();
+  xAssert(parentMetaData);
+  static SPropertyInformation info(createSTypedPropertyArray, saveContainer, loadContainer, assignContainer,
+                                   Version, "STypedPropertyArray<T>", Type, parentMetaData,
+                                   XList<SPropertyInstanceInformation*>(), parentMetaData->completeChildCount(),
+                                   sizeof(STypedPropertyArray<T>) );
+  return &info;
   }
 
 #endif // SPROPERTYARRAY_H

@@ -24,7 +24,7 @@ bool SProperty::NameChange::apply(int mode, SObservers& obs)
   }
 
 SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
-    _database(0), _parent(0), _info(0), _entity(0), _dirty(true)
+    _database(0), _parent(0), _info(0), _entity(0), _flags(Dirty)
   {
   }
 
@@ -97,11 +97,11 @@ bool SProperty::inheritsFromType(SPropertyType type) const
   xAssert(current);
   while(current)
     {
-    if(current->typeId == type)
+    if(current->typeId() == type)
       {
       return true;
       }
-    current = current->parentTypeInformation;
+    current = current->parentTypeInformation();
     }
   return false;
   }
@@ -111,30 +111,30 @@ bool SProperty::inheritsFromType(const QString &type) const
   const SPropertyInformation *current = typeInformation();
   while(current)
     {
-    if(current->typeName == type)
+    if(current->typeName() == type)
       {
       return true;
       }
-    current = current->parentTypeInformation;
+    current = current->parentTypeInformation();
     }
   return false;
   }
 
-const SPropertyInformation::Child *SProperty::instanceInformation() const
+const SPropertyInstanceInformation *SProperty::baseInstanceInformation() const
   {
   if(!isDynamic() && _parent)
     {
-    return _parent->typeInformation()->child(index());
+    return _parent->typeInformation()->completeChild(index());
     }
   return 0;
   }
 
 const QString &SProperty::name() const
   {
-  const SPropertyInformation::Child *propInfo = instanceInformation();
+  const SPropertyInstanceInformation *propInfo = instanceInformation();
   if(propInfo)
     {
-    return propInfo->name;
+    return propInfo->name();
     }
   return _name;
   }
@@ -144,7 +144,7 @@ void SProperty::assign(const SProperty *propToAssign)
   const SPropertyInformation *info = typeInformation();
   xAssert(info);
 
-  info->assign(propToAssign, this);
+  info->assign()(propToAssign, this);
   }
 
 SEntity *SProperty::entity() const
@@ -172,7 +172,7 @@ void *SProperty::getChangeMemory(size_t size) const
 
 SPropertyType SProperty::type() const
   {
-  return typeInformation()->typeId;
+  return typeInformation()->typeId();
   }
 
 void SProperty::connect(SProperty *prop) const
@@ -211,10 +211,14 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
     if(_mode == Connect)
       {
       _driver->connectInternal(_driven);
+      setParentHasInputConnection(_driven);
+      setParentHasOutputConnection(_driver);
       }
     else if(_mode == Disconnect)
       {
       _driver->disconnectInternal(_driven);
+      clearParentHasInputConnection(_driven);
+      clearParentHasOutputConnection(_driver);
       }
     }
   else if(mode&Backward)
@@ -222,10 +226,14 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
     if(_mode == Connect)
       {
       _driver->disconnectInternal(_driven);
+      clearParentHasInputConnection(_driven);
+      clearParentHasOutputConnection(_driver);
       }
     else if(_mode == Disconnect)
       {
       _driver->connectInternal(_driven);
+      setParentHasInputConnection(_driven);
+      setParentHasOutputConnection(_driver);
       }
     }
   if(mode&Inform)
@@ -237,6 +245,90 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
     _driven->entity()->informConnectionObservers(mode, this, obs);
     }
   return true;
+  }
+
+void SProperty::ConnectionChange::setParentHasInputConnection(SProperty *prop)
+  {
+  xAssert(prop);
+  SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *child = cont->firstChild();
+    while(child)
+      {
+      if(!child->_flags.hasFlag(SProperty::ParentHasInput))
+        {
+        child->_flags.setFlag(SProperty::ParentHasInput);
+        setParentHasInputConnection(child);
+        }
+      child = child->nextSibling();
+      }
+    }
+  }
+
+void SProperty::ConnectionChange::setParentHasOutputConnection(SProperty *prop)
+  {
+  xAssert(prop);
+  SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *child = cont->firstChild();
+    while(child)
+      {
+      if(!child->_flags.hasFlag(SProperty::ParentHasOutput))
+        {
+        child->_flags.setFlag(SProperty::ParentHasOutput);
+        setParentHasInputConnection(child);
+        }
+      child = child->nextSibling();
+      }
+    }
+  }
+
+void SProperty::ConnectionChange::clearParentHasInputConnection(SProperty *prop)
+  {
+  xAssert(prop);
+  SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *child = cont->firstChild();
+    while(child)
+      {
+      if(child->_flags.hasFlag(SProperty::ParentHasInput))
+        {
+        child->_flags.clearFlag(SProperty::ParentHasInput);
+        clearParentHasInputConnection(child);
+        }
+      child = child->nextSibling();
+      }
+    }
+  }
+
+void SProperty::ConnectionChange::clearParentHasOutputConnection(SProperty *prop)
+  {
+  xAssert(prop);
+  SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *child = cont->firstChild();
+    while(child)
+      {
+      if(child->_flags.hasFlag(SProperty::ParentHasOutput))
+        {
+        child->_flags.clearFlag(SProperty::ParentHasOutput);
+        clearParentHasOutputConnection(child);
+        }
+      child = child->nextSibling();
+      }
+    }
   }
 
 void SProperty::connectInternal(SProperty *prop) const
@@ -409,14 +501,14 @@ inline void setDependantsDirty(SProperty* prop)
     o->setDirty();
     }
 
-  const SPropertyInformation::Child *child = prop->instanceInformation();
+  const SPropertyInstanceInformation *child = prop->instanceInformation();
 
-  if(child && child->affects)
+  if(child && child->affects())
     {
     xsize i=0;
-    while(child->affects[i])
+    while(child->affects()[i])
       {
-      const SProperty SPropertyContainer::* affectsPtr(child->affects[i]);
+      const SProperty SPropertyContainer::* affectsPtr(child->affects()[i]);
       SProperty *affectsProp = (SProperty*)&(prop->parent()->*affectsPtr);
 
       xAssert(affectsProp);
@@ -424,20 +516,33 @@ inline void setDependantsDirty(SProperty* prop)
       i++;
       }
     }
+
+  // if we know the parent has an output
+  if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *parent = prop;
+    while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
+      {
+      parent = parent->parent();
+      parent->setDirty();
+      }
+    }
   }
 
 void SProperty::postSet()
   {
-  _dirty = false;
+  _flags.clearFlag(Dirty);
 
   setDependantsDirty(this);
   }
 
 void SProperty::setDirty()
   {
-  if(!_dirty)
+  if(!_flags.hasFlag(Dirty))
     {
-    _dirty = true;
+    _flags.setFlag(Dirty);
 
     setDependantsDirty(this);
     }
@@ -445,23 +550,31 @@ void SProperty::setDirty()
 
 void SProperty::preGet() const
   {
-  if(_dirty)
+  if(_flags.hasFlag(Dirty))
     {
     // this is a const function, but because we delay computation we may need to assign here
     SProperty *prop = ((SProperty*)this);
 
-    prop->_dirty = false;
+    prop->_flags.clearFlag(Dirty);
+
+    const SPropertyInstanceInformation *child = instanceInformation();
+    if(child && child->compute())
+      {
+      xAssert(parent());
+      child->compute()(parent());
+      return;
+      }
 
     if(input())
       {
       prop->assign(input());
+      return;
       }
 
-    const SPropertyInformation::Child *child = instanceInformation();
-    if(child && child->compute)
+    if(_flags.hasFlag(ParentHasInput))
       {
-      xAssert(parent());
-      child->compute(parent());
+      // break and check this works...
+      parent()->preGet();
       }
     }
   }

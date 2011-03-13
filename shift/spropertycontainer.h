@@ -7,76 +7,62 @@
 
 class SPropertyContainer;
 
-#define S_PROPERTY_CONTAINER(myName, superName) \
+#define S_PROPERTY_CONTAINER(myName, superName, version) \
   private: \
   static SProperty *create##myName(void *ptr) { return new(ptr) myName(); } \
-  template <typename INTERNALMETADATA_CLASS> friend class myName ## InternalMetaData; \
   public: \
-  enum { Type = Types::myName }; \
+  enum { Type = Types::myName, Version = version }; \
   static const SPropertyInformation * staticTypeInformation(); \
+  S_ADD_INSTANCE_INFORMATION(myName) \
   virtual const SPropertyInformation * typeInformation() const { return staticTypeInformation(); }
 
 #define S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name, parent, saveFn, loadFn) \
   const SPropertyInformation * name::staticTypeInformation() { \
   const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
-  xAssert(parentMetaData && "Parent MetaData"); \
-  static SPropertyInformation info = { name::create##name, \
-    name::saveFn, \
-    name::loadFn, \
-    name::assignContainer, \
-    0, \
-    #name, \
-    name::Type, \
-    parentMetaData, \
-    parentMetaData->propertyCount+parentMetaData->propertyOffset, \
-    0, \
-    0, \
-    sizeof(name), \
-    0, \
-    false }; return &info;}
+  xAssert(parentMetaData); \
+  static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
+                                   Version, #name, name::Type, parentMetaData, \
+                                   XList<SPropertyInstanceInformation*>(), parentMetaData->completeChildCount(), \
+                                   sizeof(name) ); \
+  return &info;}
 
 
-#define S_PROPERTY_CONTAINER_DEFINITION_WITH_COMPUTATION(name, parent) template <typename T> class name ## InternalMetaData { public: static SPropertyInformation *typeInformation() {
-#define S_COMPUTE_INPUTS(name) static SProperty SPropertyContainer::* name[] = {
-#define S_INPUT(property) reinterpret_cast<SProperty SPropertyContainer::*>(&T :: property),
-#define S_COMPUTE_INPUTS_END() 0 };
-#define S_PROPERTY_CONTAINER_DEFINITION_CHILDREN(name, parent) xsize count = 0; static SPropertyInformation::Child childMetaData[] = {
 #define S_PROPERTY_CONTAINER_DEFINITION(name, parent) \
-  S_PROPERTY_CONTAINER_DEFINITION_WITH_COMPUTATION(name, parent) \
-  S_PROPERTY_CONTAINER_DEFINITION_CHILDREN(name, parent)
-#define S_PROPERTY_DEFINITION(type, name) { type :: staticTypeInformation() + (0*++count), #name, reinterpret_cast<SProperty SPropertyContainer::*>(&T :: name), 0, 0 },
-  #define S_COMPUTABLE_PROPERTY_DEFINITION(type, name, computeFn, computeVars) { type :: staticTypeInformation() + (0*++count), #name, reinterpret_cast<SProperty SPropertyContainer::*>(&T :: name), computeFn, computeVars },
+  const SPropertyInformation *name::staticTypeInformation() \
+    { typedef name className; \
+    XList<SPropertyInstanceInformation*> childData;
 
-#define S_PROPERTY_CONTAINER_END_DEFINITION_PART1(name, parent, saveFn, loadFn) \
-  }; \
-  const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
-  xAssert(parentMetaData && "Parent MetaData"); \
-  static SPropertyInformation info = { name::create##name, \
-    name::saveFn, \
-    name::loadFn, \
-    name::assignContainer, \
-    0, \
-    #name, \
-    name::Type, \
-    parentMetaData, \
-    parentMetaData->propertyCount+parentMetaData->propertyOffset, \
-    count, \
-    childMetaData, \
-    sizeof(name), \
-    0, \
-    false };
+#define S_COMPUTE_INPUTS(name) static SProperty SPropertyContainer::* name[] = {
+#define S_INPUT(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
+#define S_COMPUTE_INPUTS_END() 0 };
 
-#define S_PROPERTY_CONTAINER_END_DEFINITION_PART2(name, parent, saveFn, loadFn) \
-  return &info;} }; \
-  const SPropertyInformation *name::staticTypeInformation() { return name ## InternalMetaData<name>::typeInformation(); }
+#define S_PROPERTY_DEFINITION(type, name, ...) \
+    static type::InstanceInformation name##InstanceData(type :: staticTypeInformation(), \
+                                                        #name, \
+                                                        reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
+                                                        0, 0); \
+    name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
+    childData << &name##InstanceData;
+
+#define S_COMPUTABLE_PROPERTY_DEFINITION(type, name, computeFn, computeVars, ...) \
+    static type::InstanceInformation name##InstanceData(type :: staticTypeInformation(), \
+                                                        #name, \
+                                                        reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
+                                                        computeFn, computeVars); \
+    name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
+    childData << &name##InstanceData;
 
 #define S_PROPERTY_CONTAINER_END_DEFINITION(name, parent, saveFn, loadFn) \
-  S_PROPERTY_CONTAINER_END_DEFINITION_PART1(name, parent, saveFn, loadFn) \
-  S_PROPERTY_CONTAINER_END_DEFINITION_PART2(name, parent, saveFn, loadFn)
+    const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
+    xAssert(parentMetaData); \
+    static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
+                                     Version, #name, name::Type, parentMetaData, \
+                                      childData, parentMetaData->completeChildCount(), sizeof(name) ); \
+    return &info; }
 
 class SHIFT_EXPORT SPropertyContainer : public SProperty
   {
-  S_PROPERTY_CONTAINER(SPropertyContainer, SProperty);
+  S_PROPERTY_CONTAINER(SPropertyContainer, SProperty, 0);
 
 public:
   class TreeChange : public SChange

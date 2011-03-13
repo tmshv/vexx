@@ -2,7 +2,7 @@
 
 SDynamicPropertyInformation::Property::Property(const QString& type,
                                                 const QString &name,
-                                                SPropertyInformation::ComputeFunction computeFn,
+                                                SPropertyInstanceInformation::ComputeFunction computeFn,
                                                 const XList<xsize> &affects)
     : _typeName(type), _name(name), _computeFunction(computeFn), _affects(affects)
   {
@@ -20,7 +20,7 @@ bool SDynamicPropertyInformation::isValid() const
 
 void SDynamicPropertyInformation::setParentTypeName(SPropertyInformation *info)
   {
-  _parentTypeName = info->typeName;
+  _parentTypeName = info->typeName();
   }
 
 void SDynamicPropertyInformation::addType(SDatabase *db)

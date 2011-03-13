@@ -5,6 +5,7 @@
 #include "QItemDelegate"
 #include "sobserver.h"
 #include "sentityui.h"
+#include "sentityweakpointer.h"
 #include "XFlags"
 
 class SDatabase;
@@ -63,7 +64,7 @@ public:
 
 private:
   SDatabase *_db;
-  SEntity *_root;
+  SEntityWeakPointer _root;
   Options _options;
   };
 

@@ -11,7 +11,7 @@ typedef XList<Item*> Items;
 
 class Item : public SEntity
   {
-  S_ENTITY(Item, SEntity);
+  S_ENTITY(Item, SEntity, 0);
 
 public:
   Item();

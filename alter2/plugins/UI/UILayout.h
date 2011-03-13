@@ -6,7 +6,7 @@
 
 class UI_EXPORT UILayout : public SEntity
   {
-  S_ENTITY(UILayout, SEntity)
+  S_ENTITY(UILayout, SEntity, 0)
 public:
   UILayout();
   };

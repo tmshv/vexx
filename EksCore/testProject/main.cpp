@@ -1,11 +1,32 @@
 #include "XDebug"
 #include "timeNow.h"
 #include "TestClasses.h"
+#include <iostream>
 
 #define TESTCYCLES 1000000
 
 int main( )
+  {
     {
+    uint16_t i[1024];
+    uint16_t j[1024];
+    uint16_t k[1024];
+
+    for(int x=0; x<1024; ++x)
+      {
+      k[x] = i[x] * j[x];
+      }
+
+    for(int x=0; x<1024; ++x)
+      {
+      std::cout << k[x] << std::endl;
+      }
+    }
+
+  return EXIT_SUCCESS;
+}
+
+#if 0
     XObjectList list;
     QObjectList list2;
     list << new TestA << new TestB << new TestC;
@@ -103,3 +124,5 @@ int main( )
            << "XObject Cast was" <<  (end3-begin3) / (end2-begin2) << "times faster than Dynamic Cast" << endl
            << "and" << (end1-begin1) / (end2-begin2) << "faster than QObject Cast";
     }
+
+#endif

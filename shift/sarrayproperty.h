@@ -40,22 +40,23 @@ template <typename T> QTextStream & operator >>(QTextStream &str, XList<T> &data
 
 template <typename T> class SArrayProperty : public SProperty
 {
-    S_PROPERTY(SArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction)
+  S_PROPERTY(SArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction, 0)
 public:
 
-    // called by parent
-    static void SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in); // Mode = Binary / ASCII
-    static void LoadFunction( SProperty* p_in, const SPropertyData& data_in, xuint32 v_in, SPropertyData::Mode mode_in, SLoader&); // Mode = Binary / ASCII
-    static void AssignFunction( const SProperty *, SProperty * ) {} // typecheck this when implementing
+  // called by parent
+  static void SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in); // Mode = Binary / ASCII
+  static void LoadFunction( SProperty* p_in, const SPropertyData& data_in, xuint32 v_in, SPropertyData::Mode mode_in, SLoader&); // Mode = Binary / ASCII
+  static void AssignFunction( const SProperty *, SProperty * ) {} // typecheck this when implementing
 #if 0
-    void WriteData(int index, T value)
-    {
-        mData.insert(index, value);
-    }
+  void WriteData(int index, T value)
+  {
+      mData.insert(index, value);
+  }
 #endif
 
 private:
-    XList <T> mData;
+  // todo: use Eigne array here, possible using some inherited types form EksCore... will give us SSEEEEEEE
+  XList <T> mData;
 };
 
 
@@ -63,7 +64,7 @@ private:
 
 class SFloatArrayProperty : public SArrayProperty<float>
 {
-   S_PROPERTY(SFloatArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction)
+  S_PROPERTY(SFloatArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction, 0)
 public:
 
 

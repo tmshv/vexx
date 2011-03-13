@@ -18,7 +18,7 @@ public:
   XProperties:
     XProperty(QString, typeName, setTypeName);
     XProperty(QString, name, setName);
-    XProperty(SPropertyInformation::ComputeFunction, computeFunction, setComputeFunction);
+    XProperty(SPropertyInstanceInformation::ComputeFunction, computeFunction, setComputeFunction);
     XRefProperty(XList<xsize>, affects);
 
   public:
@@ -30,7 +30,7 @@ public:
 
     Property(SPropertyType type, const QString &name, SPropertyInformation::ComputeFunction computeFn=0, const XList<xsize> &affects=XList<xsize>());
     */
-    Property(const QString& type, const QString &name, SPropertyInformation::ComputeFunction computeFn=0, const XList<xsize> &affects=XList<xsize>());
+    Property(const QString& type, const QString &name, SPropertyInstanceInformation::ComputeFunction computeFn=0, const XList<xsize> &affects=XList<xsize>());
 
     };
 

@@ -6,7 +6,7 @@
 
 class UI_EXPORT UIHorizontalLayout : public UILayout
   {
-  S_ENTITY(UIHorizontalLayout, UILayout)
+  S_ENTITY(UIHorizontalLayout, UILayout, 0)
 public:
   UIHorizontalLayout();
   };

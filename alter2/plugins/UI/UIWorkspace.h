@@ -6,7 +6,7 @@
 
 class UI_EXPORT UIWorkspace : public SReferenceEntity
   {
-  S_ENTITY(UIWorkspace, SReferenceEntity)
+  S_ENTITY(UIWorkspace, SReferenceEntity, 0)
 public:
   UIWorkspace();
   };

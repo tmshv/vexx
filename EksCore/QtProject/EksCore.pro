@@ -48,7 +48,8 @@ HEADERS += ../XObject \
     ../XShared \
     ../XMetaType \
     ../XFlags \
-    ../XRandomAccessAllocator
+    ../XRandomAccessAllocator \
+    ../XWeakShared
 INCLUDEPATH += ../
 DESTDIR = ../../bin
 

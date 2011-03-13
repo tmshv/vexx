@@ -1,8 +1,8 @@
 #include "GCImageChannel.h"
 
 S_PROPERTY_CONTAINER_DEFINITION(GCImageChannel, SPropertyContainer) // registers these properties in the database
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, width)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, height)
+  S_PROPERTY_DEFINITION(UnsignedIntProperty, width, 0)
+  S_PROPERTY_DEFINITION(UnsignedIntProperty, height, 0)
   S_PROPERTY_DEFINITION(GCImageChannelData, channelData)
 S_PROPERTY_CONTAINER_END_DEFINITION(GCImageChannel, SPropertyContainer, saveContainer, loadContainer)
 

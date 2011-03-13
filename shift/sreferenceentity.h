@@ -5,7 +5,7 @@
 
 class SHIFT_EXPORT SReferenceEntity : public SEntity
   {
-  S_ENTITY(SReferenceEntity, SEntity);
+  S_ENTITY(SReferenceEntity, SEntity, 0);
 
 public:
   SReferenceEntity();

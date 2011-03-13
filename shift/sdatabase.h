@@ -13,7 +13,7 @@ class SChange;
 
 class SHIFT_EXPORT SDatabase : public SEntity, private SLoader
   {
-  S_ENTITY(SDatabase, SEntity);
+  S_ENTITY(SDatabase, SEntity, 0);
 
 public:
   UnsignedIntProperty majorVersion;
@@ -29,11 +29,11 @@ public:
     if(!_types.contains(id))
       {
       const SPropertyInformation *info = T::staticTypeInformation();
-      xAssert(info->assign);
-      xAssert(info->save);
-      xAssert(info->load);
-      xAssert(info->create);
-      xAssert(info->typeName.length());
+      xAssert(info->assign());
+      xAssert(info->save());
+      xAssert(info->load());
+      xAssert(info->create());
+      xAssert(info->typeName().length());
       _types.insert(id, info);
       }
     else

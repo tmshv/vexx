@@ -10,7 +10,7 @@ class SDatabaseModel;
 
 class TaskDatabase : public SDatabase
   {
-  S_ENTITY(TaskDatabase, SDatabase);
+  S_ENTITY(TaskDatabase, SDatabase, 0);
   XROProperty(Item *, rootItem);
 
 public:

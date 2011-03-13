@@ -14,8 +14,17 @@
 #define DEFINE_POD_PROPERTY(name, type) \
 class SHIFT_EXPORT name : public SProperty \
   { \
-  S_PROPERTY(name, SProperty, savePOD, loadPOD, assignPOD); \
 public: \
+  class InstanceInformation : public SProperty::InstanceInformation { public: \
+    InstanceInformation(const SPropertyInformation *info, \
+     const QString &name, SProperty SPropertyContainer::* location, \
+     ComputeFunction computeFn, SProperty SPropertyContainer::* *affects) \
+      : SProperty::InstanceInformation(info, name, location, computeFn, affects) { } \
+    XProperties: XRORefProperty(type, defaultValue); \
+    void initiateFromDefinition(const type &def) { SProperty::InstanceInformation::initiateFromDefinition(); _defaultValue = def; } \
+    virtual void initiateProperty(SProperty *propertyToInitiate) const \
+      { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
+  S_PROPERTY(name, SProperty, savePOD, loadPOD, assignPOD, 0); \
   class Change : public SProperty::DataChange \
     { \
     S_CHANGE( Change, SChange, Type); \
@@ -128,7 +137,7 @@ DEFINE_POD_PROPERTY(LongStringProperty, XString);
 
 class SHIFT_EXPORT Pointer : public SProperty
   {
-  S_PROPERTY(Pointer, SProperty, save, load, blankAssign);
+  S_PROPERTY(Pointer, SProperty, save, load, blankAssign, 0);
 
 public:
   SProperty *pointed() const { preGet(); return input(); }
@@ -142,7 +151,7 @@ public:
 
 class SHIFT_EXPORT PointerArray : public STypedPropertyArray<Pointer>
   {
-  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<Pointer>);
+  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<Pointer>, 0);
 public:
   void addPointer(SProperty *);
   void removePointer(SProperty *);

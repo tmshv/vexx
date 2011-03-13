@@ -9,7 +9,7 @@
 class GCImageChannelData : public SProperty
 {
     // registers type information for SPropertyInfo, including save / load functions
-   S_PROPERTY(GCImageChannelData, SProperty, SaveFunction, LoadFunction, AssignFunction)
+   S_PROPERTY(GCImageChannelData, SProperty, SaveFunction, LoadFunction, AssignFunction, 0)
 
 public:
    // called by parent
@@ -26,7 +26,7 @@ public:
 class GCImageChannel : public SPropertyContainer
 {
     // Registers property info
-    S_PROPERTY_CONTAINER(GCImageChannel, SPropertyContainer)
+    S_PROPERTY_CONTAINER(GCImageChannel, SPropertyContainer, 0)
 
 public:
     GCImageChannel();

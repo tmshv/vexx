@@ -67,7 +67,7 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
 
 int SDatabaseModel::rowCount( const QModelIndex &parent ) const
   {
-  SProperty *prop = _root;
+  const SProperty *prop = _root;
   int size = 0;
   if(parent.isValid())
     {
@@ -81,13 +81,13 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
 
   if(_options.hasFlag(EntitiesOnly))
     {
-    SEntity *ent = prop->castTo<SEntity>();
+    const SEntity *ent = prop->castTo<SEntity>();
     xAssert(ent);
 
     prop = &ent->children;
     }
 
-  SPropertyContainer *container = prop->castTo<SPropertyContainer>();
+  const SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
     SProperty *child = container->firstChild();
@@ -103,7 +103,7 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
 
 QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &parent ) const
   {
-  SProperty *prop = _root;
+  const SProperty *prop = _root;
   int size = 0;
   if(parent.isValid())
     {
@@ -117,13 +117,13 @@ QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &paren
 
   if(_options.hasFlag(EntitiesOnly))
     {
-    SEntity *ent = prop->castTo<SEntity>();
+    const SEntity *ent = prop->castTo<SEntity>();
     xAssert(ent);
 
     prop = &ent->children;
     }
 
-  SPropertyContainer *container = prop->castTo<SPropertyContainer>();
+  const SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
     SProperty *child = container->firstChild();
@@ -180,7 +180,7 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
 
 int SDatabaseModel::columnCount( const QModelIndex &parent ) const
   {
-  SProperty *prop = _root;
+  const SProperty *prop = _root;
   if(parent.isValid())
     {
     prop = (SProperty *)parent.internalPointer();
@@ -190,7 +190,7 @@ int SDatabaseModel::columnCount( const QModelIndex &parent ) const
     {
     xsize columns = 1;
 
-    SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
+    const SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
     if(cont)
       {
       SProperty *child = cont->firstChild();
@@ -302,7 +302,7 @@ void SDatabaseModel::setRoot(SEntity *ent)
     }
   endResetModel();
 
-  emit dataChanged(index(0,0), index(_root->children.size(),0));
+  emit dataChanged(index(0, 0), index(_root->children.size(), 0));
   }
 
 void SDatabaseModel::setDatabase(SDatabase *db, SEntity *root)

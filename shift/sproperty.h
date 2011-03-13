@@ -4,6 +4,7 @@
 #include "sglobal.h"
 #include "XObject"
 #include "schange.h"
+#include "XFlags"
 #include "spropertyinformation.h"
 
 class SEntity;
@@ -12,40 +13,36 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
 
-#define REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childOffset, childCount, childData) \
+#define S_REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childOffset, childData, version) \
   static const SPropertyInformation * staticTypeInformation() { \
-  static SPropertyInformation info = { myName::createFn, \
-  saveFn, \
-  loadFn, \
-  assignFn, \
-  0, \
-  #myName, \
-  typeId, \
-  parentInfo, \
-  childOffset, \
-  childCount, \
-  childData, \
-  sizeof(myName), \
-  0, \
-  false }; return &info;}
+  static SPropertyInformation info(myName::createFn, saveFn, loadFn, assignFn, \
+                                   version, #myName, typeId, parentInfo, \
+                                    childData, childOffset, sizeof(myName) ); \
+  return &info;}
 
-#define S_PROPERTY_ROOT(myName, saveFn, loadFn, assignFn) \
+#define S_ADD_INSTANCE_INFORMATION(name) const name :: InstanceInformation *instanceInformation() const { return static_cast<const name :: InstanceInformation *>(baseInstanceInformation()); }
+
+#define S_PROPERTY_ROOT(myName, saveFn, loadFn, assignFn, version) \
   private: \
   static SProperty *create##myName(void *ptr) { return new(ptr) myName(); } \
   public: \
-  enum { Type = Types::myName }; \
-  REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, 0, 0, 0 )
+  enum { Type = Types::myName, Version = version }; \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, 0, XList<SPropertyInstanceInformation*>(), version )
 
-#define S_PROPERTY(myName, superName, saveFn, loadFn, assignFn) \
+#define S_PROPERTY(myName, superName, saveFn, loadFn, assignFn, version) \
   private: \
   static SProperty *create##myName(void *ptr) { return new(ptr)  myName(); } \
   public: \
-  enum { Type = Types::myName }; \
-  REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), 0, 0, 0 ) \
+  enum { Type = Types::myName, Version = version }; \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), 0, XList<SPropertyInstanceInformation*>(), version ) \
 
 class SHIFT_EXPORT SProperty
   {
-  S_PROPERTY_ROOT(SProperty, save, load, blankAssign)
+public:
+  typedef SPropertyInstanceInformation InstanceInformation;
+  S_PROPERTY_ROOT(SProperty, save, load, blankAssign, 0)
 
 public:
   SProperty();
@@ -93,9 +90,10 @@ public:
 
   bool inheritsFromType(const QString &type) const;
   bool inheritsFromType(SPropertyType type) const;
+  template <typename T> bool inheritsFromType() const { return inheritsFromType(T::Type); }
 
   const SPropertyInformation *typeInformation() const { return _info; }
-  const SPropertyInformation::Child *instanceInformation() const;
+  const SPropertyInstanceInformation *baseInstanceInformation() const;
   SPropertyType type() const;
 
   void postSet();
@@ -195,6 +193,10 @@ public:
     SProperty *_driven;
     Mode _mode;
     bool apply(int mode, SObservers &obs);
+    void setParentHasInputConnection(SProperty *);
+    void setParentHasOutputConnection(SProperty *);
+    void clearParentHasInputConnection(SProperty *);
+    void clearParentHasOutputConnection(SProperty *);
     };
 
 protected:
@@ -223,8 +225,13 @@ private:
   const SPropertyInformation *_info;
   mutable SEntity *_entity;
 
-  // could be replaced by a flag system if required.
-  xuint8 _dirty;
+  enum Flags
+    {
+    Dirty = 1,
+    ParentHasInput = 2,
+    ParentHasOutput = 4
+    };
+  XFlags<Flags, xuint8> _flags;
 
   // only used for dynamic properties
   QString _name;

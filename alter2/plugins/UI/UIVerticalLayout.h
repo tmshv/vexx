@@ -6,7 +6,7 @@
 
 class UI_EXPORT UIVerticalLayout : public UILayout
   {
-  S_ENTITY(UIVerticalLayout, UILayout)
+  S_ENTITY(UIVerticalLayout, UILayout, 0)
 public:
   UIVerticalLayout();
   };

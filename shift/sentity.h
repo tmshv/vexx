@@ -5,6 +5,7 @@
 #include "spropertycontainer.h"
 #include "spropertyarray.h"
 #include "sobserver.h"
+#include "XWeakShared"
 
 class SProperty;
 class SDatabase;
@@ -12,7 +13,7 @@ class STreeObserver;
 class SDataObserver;
 class SConnectionObserver;
 
-#define S_ENTITY(name, parent) S_PROPERTY_CONTAINER(name, parent)
+#define S_ENTITY(name, parent, version) S_PROPERTY_CONTAINER(name, parent, version)
 
 #define S_ENTITY_DEFINITION S_PROPERTY_CONTAINER_DEFINITION
 #define S_ENTITY_END_DEFINITION(name, parent) S_PROPERTY_CONTAINER_END_DEFINITION(name, parent, saveEntity, loadEntity)
@@ -22,9 +23,9 @@ class SConnectionObserver;
 #define S_ENTITY_COMPUTATION(function, ...)
 
 
-class SHIFT_EXPORT SEntity : public SPropertyContainer
+class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
   {
-  S_ENTITY(SEntity, SPropertyContainer);
+  S_ENTITY(SEntity, SPropertyContainer, 0);
 
 public:
   SEntity();
