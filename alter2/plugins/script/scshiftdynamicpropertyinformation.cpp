@@ -5,7 +5,7 @@
 #define EXPOSED_NAME "DynamicPropertyInformation"
 
 ScShiftDynamicPropertyInformation::ScShiftDynamicPropertyInformation(QScriptEngine *engine)
-    : ScWrappedClass<SDynamicPropertyInformation, ScShiftDynamicPropertyInformation>(engine, "Object")
+    : ScWrappedClassNoInheritance<SDynamicPropertyInformation, ScShiftDynamicPropertyInformation>(engine, "Object")
   {
   addMemberProperty("parentType", parentType);
   addMemberProperty("version", version);
@@ -13,7 +13,7 @@ ScShiftDynamicPropertyInformation::ScShiftDynamicPropertyInformation(QScriptEngi
 
   _compute = SPropertyInstanceInformation::newDataKey();
 
-  setConstructor(EXPOSED_NAME, construct);
+  setConstructor<ScShiftDynamicPropertyInformation>(EXPOSED_NAME, construct);
   }
 
 QScriptValue ScShiftDynamicPropertyInformation::construct(QScriptContext *ctx, QScriptEngine *eng)
@@ -22,7 +22,7 @@ QScriptValue ScShiftDynamicPropertyInformation::construct(QScriptContext *ctx, Q
   if(arg.instanceOf(ctx->callee()))
     {
     // copy
-    return packValue(eng, EXPOSED_NAME, *unpackValue(arg));
+    return packDefaultValue(eng, *unpackValue(arg));
     }
   else
     {
@@ -31,7 +31,7 @@ QScriptValue ScShiftDynamicPropertyInformation::construct(QScriptContext *ctx, Q
 
     SDynamicPropertyInformation info(arg.toString(), arg1.toUInt32());
 
-    return packValue(eng, EXPOSED_NAME, info);
+    return packDefaultValue(eng, info);
     }
   return QScriptValue();
   }

@@ -7,11 +7,13 @@
 
 S_ENTITY_EMPTY_DEFINITION(TaskDatabase, SDatabase)
 
-TaskDatabase::TaskDatabase() : SDatabase(staticTypeInformation()), _rootItem(0)
+TaskDatabase::TaskDatabase() : SDatabase(), _rootItem(0)
   {
   addType<Item>();
   addType<TaskDatabase>();
   _rootItem = addItem(0, "Root Item");
+
+  initiatePropertyFromMetaData(this, staticTypeInformation(), false);
   }
 
 TaskDatabase::~TaskDatabase()

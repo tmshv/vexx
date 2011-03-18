@@ -1,4 +1,5 @@
 #include "scplugin.h"
+#include "splugin.h"
 #include "scsurface.h"
 #include "scembeddedtypes.h"
 #include "QApplication"
@@ -6,6 +7,7 @@
 #include "UIPlugin.h"
 #include "acore.h"
 #include "QScriptEngineDebugger"
+#include "scshiftentity.h"
 #include "QDir"
 #include "aplugin.h"
 #include "QDebug"
@@ -38,8 +40,14 @@ void ScPlugin::load()
 
   _types = new ScEmbeddedTypes(_engine);
 
-
   registerScriptGlobal(this);
+
+  APlugin<SPlugin> db(this, "db");
+  if(db.isValid())
+    {
+    registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
+    }
+
 
   APlugin<UIPlugin> ui(this, "ui");
   if(ui.isValid())

@@ -9,7 +9,7 @@
 class ScPlugin;
 class QScriptContext;
 
-template <typename T, typename U> class ScWrappedClass : public QScriptClass
+template <typename T> class ScWrappedClass : public QScriptClass
   {
   XWOProperty(QScriptValue, prototype);
   XWOProperty(QScriptValue, constructor);
@@ -20,13 +20,9 @@ public:
       : QScriptClass(eng), _engine(eng)
     {
     _prototype = engine()->newObject();
-
-    // init our prototypes parent class
-    QScriptValue globalObject = engine()->globalObject();
-    _prototype.setPrototype(globalObject.property(parentType).property("prototype"));
     }
 
-  void setConstructor(const QString &name, QScriptEngine::FunctionSignature constuctor)
+  template <typename U> void setConstructor(const QString &name, QScriptEngine::FunctionSignature constuctor, bool defaultValueForType=true)
     {
     QScriptValue globalObject = engine()->globalObject();
     _constructor = engine()->newFunction(constuctor, _prototype);
@@ -34,9 +30,14 @@ public:
 
     // register the constructor
     globalObject.setProperty(name, constructor());
+
+    if(defaultValueForType)
+      {
+      engine()->setDefaultPrototype(qMetaTypeId<T*>(), _prototype);
+      }
     }
 
-  void setBlankConstructor(const QString &name)
+  template <typename U> void setBlankConstructor(const QString &name)
     {
     QScriptValue globalObject = engine()->globalObject();
     _constructor = engine()->newFunction(blank, _prototype);
@@ -48,8 +49,7 @@ public:
 
   void addMemberFunction(const QString &str, QScriptEngine::FunctionSignature sig)
     {
-    QScriptValue fn = engine()->newFunction(sig);
-    _prototype.setProperty(str, fn);
+    _prototype.setProperty(str, engine()->newFunction(sig), QScriptValue::Undeletable|QScriptValue::SkipInEnumeration);
     }
 
   void addMemberProperty(const QString &str, QScriptEngine::FunctionSignature sig, QScriptValue::PropertyFlags flags=QScriptValue::PropertyGetter|QScriptValue::PropertySetter)
@@ -70,24 +70,18 @@ public:
   static T *getThis(QScriptContext *ctx)
     {
     T *t = unpackValue(ctx->thisObject());
-    xAssert(t);
     return t;
     }
 
-  static U *getWrappedClass(QScriptEngine *eng, const QString &name)
+  static QScriptValue packValue(QScriptEngine *eng, QScriptClass *cls, const T &pack)
     {
-    QScriptValue ctor = eng->globalObject().property(name);
-    return qscriptvalue_cast<U*>(ctor.data());
+    xAssert(cls);
+    return eng->newObject(cls, eng->newVariant(qVariantFromValue(pack)));
     }
 
-  static QScriptValue packValue(QScriptEngine *eng, const QString &name, const T &pack)
+  static QScriptValue packDefaultValue(QScriptEngine *eng, const T &pack)
     {
-    U *cls = getWrappedClass(eng, name);
-    if(cls)
-      {
-      return eng->newObject(cls, eng->newVariant(qVariantFromValue(pack)));
-      }
-    return QScriptValue();
+    return eng->newVariant(qVariantFromValue(pack));
     }
 
   static T *unpackValue(const QScriptValue &val)
@@ -99,6 +93,21 @@ private:
   static QScriptValue blank(QScriptContext *ctx, QScriptEngine *)
     {
     return QScriptValue();
+    }
+  };
+
+template <typename T, typename U> class ScWrappedClassNoInheritance : public ScWrappedClass<T>
+  {
+public:
+  ScWrappedClassNoInheritance(QScriptEngine *eng, const QString &parentType)
+      : ScWrappedClass<T>(eng, parentType)
+    {
+    }
+
+  static U *getWrappedClass(QScriptEngine *eng, const QString &name)
+    {
+    QScriptValue ctor = eng->globalObject().property(name);
+    return qscriptvalue_cast<U*>(ctor.data());
     }
   };
 

@@ -16,6 +16,11 @@ public:
     return addProperty(T::Type, X_SIZE_SENTINEL)->castTo<T>();
     }
 
+  SProperty *add(SPropertyType id)
+    {
+    return addProperty(id, X_SIZE_SENTINEL);
+    }
+
   SProperty *operator[](xsize i) { return at(i); }
   SProperty *at(xsize i);
   void clear();
@@ -80,7 +85,7 @@ template <typename T>const SPropertyInformation *STypedPropertyArray<T>::staticT
   xAssert(parentMetaData);
   static SPropertyInformation info(createSTypedPropertyArray, saveContainer, loadContainer, assignContainer,
                                    Version, "STypedPropertyArray<T>", Type, parentMetaData,
-                                   XList<SPropertyInstanceInformation*>(), parentMetaData->completeChildCount(),
+                                   XList<SPropertyInstanceInformation*>(),
                                    sizeof(STypedPropertyArray<T>) );
   return &info;
   }

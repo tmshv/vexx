@@ -23,15 +23,6 @@ SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _readLevel(0)
   initiatePropertyFromMetaData(this, staticTypeInformation());
   }
 
-SDatabase::SDatabase(const SPropertyInformation *info) : majorVersion(0), minorVersion(0), revision(0), _blockLevel(0), _inSubmitChange(0), _readLevel(0)
-  {
-  _database = this;
-  _info = info;
-
-  initiate();
-  initiatePropertyFromMetaData(this, info);
-  }
-
 void SDatabase::initiate()
   {
   addType<SProperty>();
@@ -100,11 +91,11 @@ SProperty *SDatabase::createProperty(xuint32 t)
   return prop;
   }
 
-void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD)
+void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool includeParents)
   {
   xAssert(mD);
 
-  if(mD->parentTypeInformation())
+  if(includeParents && mD->parentTypeInformation())
     {
     initiatePropertyFromMetaData(container, mD->parentTypeInformation());
     }

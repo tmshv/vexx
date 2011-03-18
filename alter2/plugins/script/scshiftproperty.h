@@ -4,16 +4,18 @@
 #include "scwrappedclass.h"
 class SProperty;
 
-class ScShiftProperty : public ScWrappedClass<SProperty *, ScShiftProperty>
+class ScShiftProperty : public ScWrappedClass<SProperty *>
   {
 public:
-  ScShiftProperty(QScriptEngine *engine);
+  ScShiftProperty(QScriptEngine *engine, const QString &parentType="Object");
+  ~ScShiftProperty();
 
   void initiate();
 
   static QScriptValue input(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue outputs(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue firstOutput(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue name(QScriptContext *ctx, QScriptEngine *);
   };
 
 Q_DECLARE_METATYPE(SProperty*)

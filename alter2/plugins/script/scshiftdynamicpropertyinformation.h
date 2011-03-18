@@ -6,7 +6,7 @@
 
 
 class ScShiftDynamicPropertyInformation
-    : public ScWrappedClass<SDynamicPropertyInformation, ScShiftDynamicPropertyInformation>
+    : public ScWrappedClassNoInheritance<SDynamicPropertyInformation, ScShiftDynamicPropertyInformation>
   {
 public:
   ScShiftDynamicPropertyInformation(QScriptEngine *);

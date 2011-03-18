@@ -18,13 +18,16 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      xuint32 typeId,
                      const SPropertyInformation *parent,
                      const XList<SPropertyInstanceInformation*> children,
-                     xsize propertyOffset,
                      xsize size,
                      bool dynamic)
     : _create(createFn), _save(saveFn), _load(loadFn), _assign(assignFn), _version(version), _typeName(typeName),
-    _typeId(typeId), _parentTypeInformation(parent), _children(children), _propertyOffset(propertyOffset),
+    _typeId(typeId), _parentTypeInformation(parent), _children(children), _propertyOffset(0),
     _size(size), _instances(0), _dynamic(dynamic)
   {
+  if(_parentTypeInformation)
+    {
+    _propertyOffset = _parentTypeInformation->completeChildCount();
+    }
   }
 
 SPropertyInformation::~SPropertyInformation()

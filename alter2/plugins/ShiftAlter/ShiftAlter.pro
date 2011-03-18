@@ -9,11 +9,13 @@ TEMPLATE = lib
 
 DEFINES += SHIFTALTER_BUILD
 
-SOURCES += splugin.cpp
+SOURCES += splugin.cpp \
+    sappdatabase.cpp
 QMAKE_CXXFLAGS += -Wall
 
 HEADERS += splugin.h \
-    saglobal.h
+    saglobal.h \
+    sappdatabase.h
 
 INCLUDEPATH += ../../../EksCore ../../../Shift ../../
 

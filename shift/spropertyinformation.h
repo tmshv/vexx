@@ -85,7 +85,6 @@ public:
                        xuint32 typeId,
                        const SPropertyInformation *parent,
                        const XList<SPropertyInstanceInformation*> children,
-                       xsize propertyOffset,
                        xsize size,
                        bool dynamic=false);
   ~SPropertyInformation();

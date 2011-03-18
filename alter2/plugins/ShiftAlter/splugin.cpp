@@ -6,18 +6,19 @@ SPlugin::SPlugin()
   {
   }
 
-SDatabase &SPlugin::db()
+SAppDatabase &SPlugin::db()
   {
   return _db;
   }
 
-const SDatabase &SPlugin::db() const
+const SAppDatabase &SPlugin::db() const
   {
   return _db;
   }
 
 void SPlugin::load()
   {
+  _db.addType<SAppDatabase>();
   }
 
 void SPlugin::unload()

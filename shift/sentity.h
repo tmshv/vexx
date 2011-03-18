@@ -42,6 +42,14 @@ public:
     return ent;
     }
 
+  SProperty *addChild(SPropertyType id, const QString& name)
+    {
+    SProperty *ent = children.add(id);
+    xAssert(ent);
+    ent->setName(name);
+    return ent;
+    }
+
   SEntity *parentEntity() const;
   SEntity *firstChildEntity() const;
   SEntity *nextSiblingEntity() const;

@@ -4,4 +4,7 @@
 	<requires type="library">
 		<name>ui</name>
 	</requires>
+	<requires type="library">
+		<name>db</name>
+	</requires>
 </alterPlugin> 

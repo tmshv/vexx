@@ -5,13 +5,15 @@ QT += script scripttools
 INCLUDEPATH += ../../ \
     ../../../EksCore \
     ../../../shift \
-    ../../../alter2/plugins/UI/
+    ../../../alter2/plugins/UI/ \
+    ../../../alter2/plugins/ShiftAlter/
 DESTDIR = ../../../bin
 LIBS += -L../../../bin \
     -lalter \
     -lEksCore \
     -lUI \
-    -lshift
+    -lshift \
+    -lShiftAlter
 TARGET = script
 TEMPLATE = lib
 DEFINES += SCRIPT_BUILD
@@ -19,14 +21,20 @@ SOURCES += scplugin.cpp \
     scsurface.cpp \
     scshiftdynamicpropertyinformation.cpp \
     scshiftproperty.cpp \
-    scembeddedtypes.cpp
+    scembeddedtypes.cpp \
+    scshiftpropertycontainer.cpp \
+    scshiftentity.cpp \
+    scshiftdatabase.cpp
 HEADERS += scplugin.h \
     scglobal.h \
     scsurface.h \
     scshiftdynamicpropertyinformation.h \
     scshiftproperty.h \
     scembeddedtypes.h \
-    scwrappedclass.h
+    scwrappedclass.h \
+    scshiftpropertycontainer.h \
+    scshiftentity.h \
+    scshiftdatabase.h
 
 RESOURCES += \
     ScResources.qrc

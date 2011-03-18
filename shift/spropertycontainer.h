@@ -22,7 +22,7 @@ class SPropertyContainer;
   xAssert(parentMetaData); \
   static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
                                    Version, #name, name::Type, parentMetaData, \
-                                   XList<SPropertyInstanceInformation*>(), parentMetaData->completeChildCount(), \
+                                   XList<SPropertyInstanceInformation*>(), \
                                    sizeof(name) ); \
   return &info;}
 
@@ -57,7 +57,7 @@ class SPropertyContainer;
     xAssert(parentMetaData); \
     static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
                                      Version, #name, name::Type, parentMetaData, \
-                                      childData, parentMetaData->completeChildCount(), sizeof(name) ); \
+                                      childData, sizeof(name) ); \
     return &info; }
 
 class SHIFT_EXPORT SPropertyContainer : public SProperty

@@ -13,11 +13,11 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
 
-#define S_REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childOffset, childData, version) \
+#define S_REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childData, version) \
   static const SPropertyInformation * staticTypeInformation() { \
   static SPropertyInformation info(myName::createFn, saveFn, loadFn, assignFn, \
                                    version, #myName, typeId, parentInfo, \
-                                    childData, childOffset, sizeof(myName) ); \
+                                    childData, sizeof(myName) ); \
   return &info;}
 
 #define S_ADD_INSTANCE_INFORMATION(name) const name :: InstanceInformation *instanceInformation() const { return static_cast<const name :: InstanceInformation *>(baseInstanceInformation()); }
@@ -28,7 +28,7 @@ class SDatabase;
   public: \
   enum { Type = Types::myName, Version = version }; \
   S_ADD_INSTANCE_INFORMATION(myName) \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, 0, XList<SPropertyInstanceInformation*>(), version )
+  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, XList<SPropertyInstanceInformation*>(), version )
 
 #define S_PROPERTY(myName, superName, saveFn, loadFn, assignFn, version) \
   private: \
@@ -36,7 +36,7 @@ class SDatabase;
   public: \
   enum { Type = Types::myName, Version = version }; \
   S_ADD_INSTANCE_INFORMATION(myName) \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), 0, XList<SPropertyInstanceInformation*>(), version ) \
+  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), XList<SPropertyInstanceInformation*>(), version ) \
 
 class SHIFT_EXPORT SProperty
   {

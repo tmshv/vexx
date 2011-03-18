@@ -3,7 +3,7 @@
 
 #include "saglobal.h"
 #include "aabstractplugin.h"
-#include "sdatabase.h"
+#include "sappdatabase.h"
 
 class SHIFTALTER_EXPORT SPlugin : public AAbstractPlugin
   {
@@ -12,14 +12,16 @@ class SHIFTALTER_EXPORT SPlugin : public AAbstractPlugin
 public:
   SPlugin();
 
-  SDatabase &db();
-  const SDatabase &db() const;
+  SAppDatabase &db();
+  const SAppDatabase &db() const;
+
+
 
 private:
   virtual void load();
   virtual void unload();
 
-  SDatabase _db;
+  SAppDatabase _db;
   };
 
 #endif // SPLUGIN_H

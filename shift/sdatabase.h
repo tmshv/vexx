@@ -60,7 +60,8 @@ public:
   const SPropertyInformation *findType(xuint32) const;
 
 protected:
-  SDatabase(const SPropertyInformation *metaData);
+  // should be called by inheriting database types, ignoring parents.
+  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD, bool includeParents=true);
 
 private:
   SProperty *createProperty(xuint32);
@@ -83,7 +84,6 @@ private:
   XList <SChange*> _done;
 
   void initiateProperty(SProperty *);
-  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD);
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 
