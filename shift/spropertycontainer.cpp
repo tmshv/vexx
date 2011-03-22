@@ -14,11 +14,11 @@ SPropertyContainer::TreeChange::~TreeChange()
     {
     if(after())
       {
-      after()->database()->deleteProperty(_property);
+      after()->database()->deleteDynamicProperty(_property);
       }
     else if(before())
       {
-      before()->database()->deleteProperty(_property);
+      before()->database()->deleteDynamicProperty(_property);
       }
     else
       {
@@ -108,29 +108,6 @@ SProperty *SPropertyContainer::findChild(const QString &name)
   return 0;
   }
 
-bool SPropertyContainer::isChildDynamic(const SProperty *child) const
-  {
-  preGet();
-  return indexOfChild(child) >= _containedProperties;
-  }
-
-xsize SPropertyContainer::indexOfChild(const SProperty *child) const
-  {
-  preGet();
-  xsize propIndex = 0;
-  SProperty *prop = _child;
-  while(prop)
-    {
-    if(child == prop)
-      {
-      return propIndex;
-      }
-    propIndex++;
-    prop = prop->_nextSibling;
-    }
-  return X_SIZE_SENTINEL;
-  }
-
 bool SPropertyContainer::contains(SProperty *child) const
   {
   preGet();
@@ -155,7 +132,7 @@ SPropertyContainer::~SPropertyContainer()
     SProperty *next = prop->_nextSibling;
     if(propIndex >= _containedProperties)
       {
-      database()->deleteProperty(prop);
+      database()->deleteDynamicProperty(prop);
       }
     propIndex++;
     prop = next;
@@ -167,7 +144,7 @@ SProperty *SPropertyContainer::addProperty(xuint32 type, xsize index)
   {
   xAssert(index >= _containedProperties);
 
-  SProperty *newProp = database()->createProperty(type);
+  SProperty *newProp = database()->createDynamicProperty(type);
 
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(0, this, newProp, index);
@@ -181,7 +158,7 @@ void SPropertyContainer::moveProperty(SPropertyContainer *c, SProperty *p)
   xAssert(p->parent() == this);
 
   void *changeMemory = getChange< TreeChange >();
-  TreeChange *change = new(changeMemory) TreeChange(this, c, p, indexOfChild(p));
+  TreeChange *change = new(changeMemory) TreeChange(this, c, p, p->index());
   database()->submitChange(change);
   postSet();
   }
@@ -197,7 +174,7 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
 
   oldProp->disconnect();
   void *changeMemory = getChange< TreeChange >();
-  TreeChange *change = new(changeMemory) TreeChange(this, 0, oldProp, indexOfChild(oldProp));
+  TreeChange *change = new(changeMemory) TreeChange(this, 0, oldProp, oldProp->index());
   database()->submitChange(change);
   postSet();
   }
@@ -309,6 +286,10 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
           xAssert(_containedProperties == (propIndex+1));
           _containedProperties++;
           }
+        else
+          {
+          ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = propIndex;
+          }
         // insert this prop into the list
         newProp->_nextSibling = prop->_nextSibling;
         prop->_nextSibling = newProp;
@@ -330,6 +311,10 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
       xAssert(_containedProperties == 0);
       _containedProperties++;
       }
+    else
+      {
+      ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = 0;
+      }
     _child = newProp;
     newProp->_parent = this;
     newProp->_entity = 0;
@@ -350,6 +335,7 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
     oldProp->_parent = this;
     oldProp->_entity = 0;
     oldProp->_database = 0;
+    ((SProperty::InstanceInformation*)oldProp->_instanceInfo)->_index = X_SIZE_SENTINEL;
     }
   else
     {
@@ -364,6 +350,7 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
         oldProp->_parent = this;
         oldProp->_entity = 0;
         oldProp->_database = 0;
+        ((SProperty::InstanceInformation*)oldProp->_instanceInfo)->_index = X_SIZE_SENTINEL;
 
         prop->_nextSibling = oldProp->_nextSibling;
         }

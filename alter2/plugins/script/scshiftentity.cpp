@@ -22,20 +22,29 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
   SProperty **propPtr = getThis(ctx);
   if(propPtr && ctx->argumentCount() >= 1)
     {
+    QString name;
+    if(ctx->argumentCount() >= 2)
+      {
+      QScriptValue arg2 = ctx->argument(1);
+      if(arg2.isString())
+        {
+        name = ctx->argument(1).toString();
+        }
+      }
     SEntity *ent = (*propPtr)->uncheckedCastTo<SEntity>();
     if(ent)
       {
       const SPropertyInformation *info = ent->database()->findType(ctx->argument(0).toString());
       if(info)
         {
-        return ScEmbeddedTypes::packValue(ent->addChild(info->typeId(), ctx->argument(1).toString()));
+        return ScEmbeddedTypes::packValue(ent->addChild(info->typeId(), name));
         }
       else
         {
-        ctx->throwError(QScriptContext::TypeError, "Invalid type name passed to SEntity.addChild(...);");
+        ctx->throwError(QScriptContext::SyntaxError, "Invalid type name passed to SEntity.addChild(...);");
         }
       }
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect arguments to SEntity.addChild(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect arguments to SEntity.addChild(...);");
   return QScriptValue();
   }

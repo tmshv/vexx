@@ -11,15 +11,17 @@
 #include "schange.h"
 #include "sobserver.h"
 
-#define DEFINE_POD_PROPERTY(name, type) \
+#define DEFINE_POD_PROPERTY(name, type, defaultDefault) \
 class SHIFT_EXPORT name : public SProperty \
   { \
 public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
+    InstanceInformation() : _defaultValue(defaultDefault) { } \
     InstanceInformation(const SPropertyInformation *info, \
-     const QString &name, SProperty SPropertyContainer::* location, \
-     ComputeFunction computeFn, SProperty SPropertyContainer::* *affects) \
-      : SProperty::InstanceInformation(info, name, location, computeFn, affects) { } \
+     const QString &name, xsize index, SProperty SPropertyContainer::* location, \
+     ComputeFunction computeFn, SProperty SPropertyContainer::* *affects, bool entityChild, bool extra) \
+      : SProperty::InstanceInformation(info, name, index, location, computeFn, affects, entityChild, extra), \
+      _defaultValue(defaultDefault) { } \
     XProperties: XRORefProperty(type, defaultValue); \
     void initiateFromDefinition(const type &def) { SProperty::InstanceInformation::initiateFromDefinition(); _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
@@ -120,20 +122,20 @@ void name::loadPOD(SProperty *p, const SPropertyData &data, xuint32 v, SProperty
       QTextStream str(&arr, QIODevice::ReadOnly); \
       str >> ptr->_value; } } }
 
-DEFINE_POD_PROPERTY(BoolProperty, int);
-DEFINE_POD_PROPERTY(IntProperty, xint32);
-DEFINE_POD_PROPERTY(LongIntProperty, xint64);
-DEFINE_POD_PROPERTY(UnsignedIntProperty, xuint32);
-DEFINE_POD_PROPERTY(LongUnsignedIntProperty, xuint64);
-DEFINE_POD_PROPERTY(FloatProperty, float);
-DEFINE_POD_PROPERTY(DoubleProperty, double);
-DEFINE_POD_PROPERTY(Vector2DProperty, XVector2D);
-DEFINE_POD_PROPERTY(Vector3DProperty, XVector3D);
-DEFINE_POD_PROPERTY(Vector4DProperty, XVector4D);
-DEFINE_POD_PROPERTY(QuaternionProperty, XQuaternion);
-DEFINE_POD_PROPERTY(StringProperty, XString);
-DEFINE_POD_PROPERTY(ColourProperty, XColour);
-DEFINE_POD_PROPERTY(LongStringProperty, XString);
+DEFINE_POD_PROPERTY(BoolProperty, int, 0);
+DEFINE_POD_PROPERTY(IntProperty, xint32, 0);
+DEFINE_POD_PROPERTY(LongIntProperty, xint64, 0);
+DEFINE_POD_PROPERTY(UnsignedIntProperty, xuint32, 0);
+DEFINE_POD_PROPERTY(LongUnsignedIntProperty, xuint64, 0);
+DEFINE_POD_PROPERTY(FloatProperty, float, 0.0f);
+DEFINE_POD_PROPERTY(DoubleProperty, double, 0.0);
+DEFINE_POD_PROPERTY(Vector2DProperty, XVector2D, XVector2D(0.0f, 0.0f));
+DEFINE_POD_PROPERTY(Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f));
+DEFINE_POD_PROPERTY(Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f));
+DEFINE_POD_PROPERTY(QuaternionProperty, XQuaternion, XQuaternion());
+DEFINE_POD_PROPERTY(StringProperty, XString, "");
+DEFINE_POD_PROPERTY(ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
+DEFINE_POD_PROPERTY(LongStringProperty, XString, "");
 
 class SHIFT_EXPORT Pointer : public SProperty
   {

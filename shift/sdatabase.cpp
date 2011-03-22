@@ -14,10 +14,11 @@ S_ENTITY_DEFINITION(SDatabase, SEntity)
   S_PROPERTY_DEFINITION(UnsignedIntProperty, revision, 0)
 S_ENTITY_END_DEFINITION(SDatabase, SEntity)
 
-SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _readLevel(0)
+SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false), _readLevel(0)
   {
   _database = this;
   _info = staticTypeInformation();
+  _instanceInfo = &_instanceInfoData;
 
   initiate();
   initiatePropertyFromMetaData(this, staticTypeInformation());
@@ -63,7 +64,7 @@ SDatabase::~SDatabase()
     prop->~SProperty();
     if(propIndex >= _containedProperties)
       {
-      database()->deleteProperty(prop);
+      database()->deleteDynamicProperty(prop);
       }
     propIndex++;
     prop = next;
@@ -78,17 +79,48 @@ SDatabase::~SDatabase()
   xAssert(_properties.empty());
   }
 
-SProperty *SDatabase::createProperty(xuint32 t)
+void SDatabase::addType(const SPropertyInformation *t)
+  {
+  xAssert(!_types.values().contains(t));
+  if(!_types.values().contains(t))
+    {
+    _types.insert(t->typeId(), t);
+    }
+  }
+
+SProperty *SDatabase::createDynamicProperty(xuint32 t)
   {
   xAssert(_types.contains(t));
   const SPropertyInformation *type = _types[t];
-  void *ptr = _properties.alloc(type->size());
-  SProperty *prop = type->create()(ptr);
+  SProperty *prop = (SProperty*)_properties.alloc(type->dynamicSize());
+  type->create()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
   prop->_database = this;
   prop->_info = type;
 
   initiateProperty(prop);
   return prop;
+  }
+
+void SDatabase::deleteDynamicProperty(SProperty *prop)
+  {
+  uninitiateProperty(prop);
+
+  SEntity *ent = prop->castTo<SEntity>();
+  if(ent)
+    {
+    if(ent->parentEntity())
+      {
+      ent->parentEntity()->children.internalRemoveProperty(ent);
+      }
+    }
+  prop->~SProperty();
+  _properties.free(prop);
+  }
+
+void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)
+  {
+  _info = info;
+  initiatePropertyFromMetaData(this, info, false);
   }
 
 void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool includeParents)
@@ -100,7 +132,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     initiatePropertyFromMetaData(container, mD->parentTypeInformation());
     }
 
-  for(xsize i=0; i<mD->childCount(); ++i)
+  for(xsize i=0, s=mD->childCount(); i<s; ++i)
     {
     // no contained properties with duplicated names...
     const SPropertyInstanceInformation *child = mD->child(i);
@@ -109,8 +141,18 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     const SProperty SPropertyContainer::* prop(child->location());
     SProperty *thisProp = (SProperty*)&(container->*prop);
 
+    xAssert(thisProp->_parent == 0);
+    xAssert(thisProp->_entity == 0);
+    xAssert(thisProp->_nextSibling == 0);
+
+    if(child->extra())
+      {
+      child->childInformation()->create()(thisProp, child->childInformation(), 0);
+      }
+
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     thisProp->_info = child->childInformation();
+    thisProp->_instanceInfo = child;
     initiateProperty(thisProp);
     child->initiateProperty(thisProp);
     }
@@ -135,6 +177,11 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
     SProperty *thisProp = (SProperty*)&(container->*prop);
 
     uninitiateProperty(thisProp);
+
+    if(child->extra())
+      {
+      thisProp->~SProperty();
+      }
     }
   }
 
@@ -165,22 +212,6 @@ void SDatabase::uninitiateProperty(SProperty *prop)
 
     uninitiatePropertyFromMetaData(container, metaData);
     }
-  }
-
-void SDatabase::deleteProperty(SProperty *prop)
-  {
-  uninitiateProperty(prop);
-
-  SEntity *ent = prop->castTo<SEntity>();
-  if(ent)
-    {
-    if(ent->parentEntity())
-      {
-      ent->parentEntity()->children.internalRemoveProperty(ent);
-      }
-    }
-  prop->~SProperty();
-  _properties.free(prop);
   }
 
 void SDatabase::beginBlock()

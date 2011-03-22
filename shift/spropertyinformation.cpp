@@ -2,10 +2,21 @@
 
 SPropertyInstanceInformation::SPropertyInstanceInformation(const SPropertyInformation *info,
                  const QString &name,
+                 xsize index,
                  SProperty SPropertyContainer::* location,
                  ComputeFunction computeFn,
-                 SProperty SPropertyContainer::* *affects)
-    : _childInformation(info), _name(name), _location(location), _compute(computeFn), _affects(affects)
+                 SProperty SPropertyContainer::* *affects,
+                 bool entityChild,
+                 bool extra)
+    : _childInformation(info), _name(name), _location(location), _compute(computeFn),
+      _affects(affects), _index(index), _entityChild(entityChild), _extra(extra), _dynamic(false)
+  {
+  xAssert(location != 0);
+  }
+
+SPropertyInstanceInformation::SPropertyInstanceInformation(bool dynamic)
+  : _childInformation(0), _name(""), _location(0), _compute(0),
+    _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(dynamic)
   {
   }
 
@@ -19,10 +30,31 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      const SPropertyInformation *parent,
                      const XList<SPropertyInstanceInformation*> children,
                      xsize size,
-                     bool dynamic)
+                     xsize instanceInfoSize)
     : _create(createFn), _save(saveFn), _load(loadFn), _assign(assignFn), _version(version), _typeName(typeName),
     _typeId(typeId), _parentTypeInformation(parent), _children(children), _propertyOffset(0),
-    _size(size), _instances(0), _dynamic(dynamic)
+    _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
+  {
+  if(_parentTypeInformation)
+    {
+    _propertyOffset = _parentTypeInformation->completeChildCount();
+    }
+  }
+
+SPropertyType g_maxDynamicCount = 0x7FFFFFFF;
+SPropertyInformation::SPropertyInformation(CreateFunction createFn,
+                     SaveFunction saveFn,
+                     LoadFunction loadFn,
+                     AssignFunction assignFn,
+                     xuint32 version,
+                     const QString &typeName,
+                     const SPropertyInformation *parent,
+                     const XList<SPropertyInstanceInformation*> children,
+                     xsize size,
+                     xsize instanceInfoSize)
+    : _create(createFn), _save(saveFn), _load(loadFn), _assign(assignFn), _version(version), _typeName(typeName),
+    _typeId(g_maxDynamicCount++), _parentTypeInformation(parent), _children(children), _propertyOffset(0),
+    _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
   {
   if(_parentTypeInformation)
     {

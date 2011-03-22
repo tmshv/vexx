@@ -28,7 +28,7 @@ QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *
       return QScriptValue((quint32)prop->size());
       }
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect this argument to SPropertyContainer.size(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
   return QScriptValue();
   }
 

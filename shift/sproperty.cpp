@@ -8,11 +8,11 @@ bool SProperty::NameChange::apply(int mode, SObservers& obs)
   {
   if(mode&Forward)
     {
-    property()->_name = after();
+    property()->internalSetName(after());
     }
   else if(mode&Backward)
     {
-    property()->_name = before();
+    property()->internalSetName(before());
     }
   if(mode&Inform)
     {
@@ -24,27 +24,27 @@ bool SProperty::NameChange::apply(int mode, SObservers& obs)
   }
 
 SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
-    _database(0), _parent(0), _info(0), _entity(0), _flags(Dirty)
+    _database(0), _parent(0), _info(0), _instanceInfo(0), _entity(0), _flags(Dirty)
   {
+  }
+
+SProperty::~SProperty()
+  {
+  if(isDynamic())
+    {
+    ((InstanceInformation*)instanceInformation())->~InstanceInformation();
+    }
   }
 
 bool SProperty::isDynamic() const
   {
-  if(_parent)
-    {
-    return _parent->isChildDynamic(this);
-    }
-  return true;
+  return instanceInformation()->dynamic();
   }
 
 xsize SProperty::index() const
   {
   preGet();
-  if(_parent)
-    {
-    return _parent->indexOfChild(this);
-    }
-  return -1;
+  return _instanceInfo->index();
   }
 
 void SProperty::setName(const QString &in)
@@ -52,17 +52,23 @@ void SProperty::setName(const QString &in)
   xAssert(isDynamic());
   xAssert(parent());
 
-  if(name() == in)
+  QString fixedName = in;
+  if(fixedName == "")
+    {
+    fixedName = typeInformation()->typeName();
+    }
+
+  if(name() == fixedName)
     {
     return;
     }
 
   // ensure the name is unique
-  QString realName = in;
   xsize num = 1;
+  QString realName = fixedName;
   while(parent()->findChild(realName))
     {
-    realName = in + QString::number(num++);
+    realName = fixedName + QString::number(num++);
     }
 
   void *changeMemory = getChange< NameChange >();
@@ -120,23 +126,9 @@ bool SProperty::inheritsFromType(const QString &type) const
   return false;
   }
 
-const SPropertyInstanceInformation *SProperty::baseInstanceInformation() const
-  {
-  if(!isDynamic() && _parent)
-    {
-    return _parent->typeInformation()->completeChild(index());
-    }
-  return 0;
-  }
-
 const QString &SProperty::name() const
   {
-  const SPropertyInstanceInformation *propInfo = instanceInformation();
-  if(propInfo)
-    {
-    return propInfo->name();
-    }
-  return _name;
+  return baseInstanceInformation()->name();
   }
 
 void SProperty::assign(const SProperty *propToAssign)
@@ -494,6 +486,11 @@ const SProperty *SProperty::resolvePath(const QString &path) const
   return cur;
   }
 
+void SProperty::internalSetName(const QString &name)
+  {
+  ((InstanceInformation*)this->baseInstanceInformation())->_name = name;
+  }
+
 inline void setDependantsDirty(SProperty* prop)
   {
   for(SProperty *o=prop->output(); o; o = o->nextOutput())
@@ -501,7 +498,7 @@ inline void setDependantsDirty(SProperty* prop)
     o->setDirty();
     }
 
-  const SPropertyInstanceInformation *child = prop->instanceInformation();
+  const SPropertyInstanceInformation *child = prop->baseInstanceInformation();
 
   if(child && child->affects())
     {
@@ -557,7 +554,7 @@ void SProperty::preGet() const
 
     prop->_flags.clearFlag(Dirty);
 
-    const SPropertyInstanceInformation *child = instanceInformation();
+    const SPropertyInstanceInformation *child = baseInstanceInformation();
     if(child && child->compute())
       {
       xAssert(parent());

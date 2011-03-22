@@ -31,7 +31,7 @@ QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *eng)
       }
     return ScEmbeddedTypes::packValue((*prop)->input());
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect this argument to SProperty.input(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.input(...);");
   return QScriptValue();
   }
 
@@ -46,7 +46,7 @@ QScriptValue ScShiftProperty::name(QScriptContext *ctx, QScriptEngine *eng)
       }
     return QScriptValue((*prop)->name());
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect this argument to SProperty.name(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.name(...);");
   return QScriptValue();
   }
 
@@ -66,7 +66,7 @@ QScriptValue ScShiftProperty::outputs(QScriptContext *ctx, QScriptEngine *eng)
       }
     return ret;
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect this argument to SProperty.outputs(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.outputs(...);");
   return QScriptValue();
   }
 
@@ -77,6 +77,6 @@ QScriptValue ScShiftProperty::firstOutput(QScriptContext *ctx, QScriptEngine *en
     {
     return ScEmbeddedTypes::packValue((*prop)->output());
     }
-  ctx->throwError(QScriptContext::TypeError, "Incorrect this argument to SProperty.firstOutput(...);");
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.firstOutput(...);");
   return QScriptValue();
   }

@@ -23,6 +23,8 @@ public:
   SDatabase();
   virtual ~SDatabase();
 
+  void addType(const SPropertyInformation *);
+
   template <typename T> void addType()
     {
     SPropertyType id = static_cast<T*>(0)->Type;
@@ -60,12 +62,11 @@ public:
   const SPropertyInformation *findType(xuint32) const;
 
 protected:
-  // should be called by inheriting database types, ignoring parents.
-  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD, bool includeParents=true);
+  void initiateInheritedDatabaseType(const SPropertyInformation *info);
 
 private:
-  SProperty *createProperty(xuint32);
-  void deleteProperty(SProperty *);
+  SProperty *createDynamicProperty(xuint32);
+  void deleteDynamicProperty(SProperty *);
 
   template <typename T> static T *createHelper()
     {
@@ -82,8 +83,10 @@ private:
   bool _inSubmitChange;
 
   XList <SChange*> _done;
+  InstanceInformation _instanceInfoData;
 
   void initiateProperty(SProperty *);
+  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD, bool includeParents=true);
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 

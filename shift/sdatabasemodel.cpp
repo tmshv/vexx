@@ -153,25 +153,11 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
         SEntity *ent = prop->castTo<SEntity>();
         xAssert(ent);
 
-        if(ent->parentEntity()->parentEntity())
-          {
-          return createIndex(ent->parentEntity()->parentEntity()->children.indexOfChild(ent->parentEntity()), 0, ent->parentEntity());
-          }
-        else
-          {
-          return createIndex(0,0,ent->parentEntity());
-          }
+        return createIndex(ent->parentEntity()->index(), 0, ent->parentEntity());
         }
       else
         {
-        if(prop->parent()->parent())
-          {
-          return createIndex(prop->parent()->parent()->indexOfChild(prop->parent()), 0, prop->parent());
-          }
-        else
-          {
-          return createIndex(0,0,prop->parent());
-          }
+        return createIndex(prop->parent()->index(), 0, prop->parent());
         }
       }
     }

@@ -17,24 +17,30 @@ class SDatabase;
   static const SPropertyInformation * staticTypeInformation() { \
   static SPropertyInformation info(myName::createFn, saveFn, loadFn, assignFn, \
                                    version, #myName, typeId, parentInfo, \
-                                    childData, sizeof(myName) ); \
+                                    childData, sizeof(myName), sizeof(myName::InstanceInformation) ); \
   return &info;}
 
 #define S_ADD_INSTANCE_INFORMATION(name) const name :: InstanceInformation *instanceInformation() const { return static_cast<const name :: InstanceInformation *>(baseInstanceInformation()); }
 
+
+#define S_ADD_STATIC_INFO(name, version) \
+  private: static void create##name(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
+    name *prop = new(ptr) name(); \
+    if(instanceInfo) { \
+    *instanceInfo = (SPropertyInstanceInformation *)(prop + 1); \
+    new(*instanceInfo) InstanceInformation(); \
+    } } \
+  public: enum { Type = Types::name, Version = version }; \
+
 #define S_PROPERTY_ROOT(myName, saveFn, loadFn, assignFn, version) \
-  private: \
-  static SProperty *create##myName(void *ptr) { return new(ptr) myName(); } \
   public: \
-  enum { Type = Types::myName, Version = version }; \
+  S_ADD_STATIC_INFO(myName, version); \
   S_ADD_INSTANCE_INFORMATION(myName) \
   S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, XList<SPropertyInstanceInformation*>(), version )
 
 #define S_PROPERTY(myName, superName, saveFn, loadFn, assignFn, version) \
-  private: \
-  static SProperty *create##myName(void *ptr) { return new(ptr)  myName(); } \
   public: \
-  enum { Type = Types::myName, Version = version }; \
+  S_ADD_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), XList<SPropertyInstanceInformation*>(), version ) \
 
@@ -46,7 +52,7 @@ public:
 
 public:
   SProperty();
-  virtual ~SProperty() { }
+  virtual ~SProperty();
 
   void assign(const SProperty *propToAssign);
 
@@ -92,8 +98,8 @@ public:
   bool inheritsFromType(SPropertyType type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::Type); }
 
-  const SPropertyInformation *typeInformation() const { return _info; }
-  const SPropertyInstanceInformation *baseInstanceInformation() const;
+  const SPropertyInformation *typeInformation() const { xAssert(_info); return _info; }
+  const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
   SPropertyType type() const;
 
   void postSet();
@@ -212,6 +218,7 @@ protected:
 private:
   void setDirty();
   friend void setDependantsDirty(SProperty* prop);
+  void internalSetName(const QString &name);
 
   void connectInternal(SProperty *) const;
   void disconnectInternal(SProperty *) const;
@@ -223,6 +230,7 @@ private:
   SDatabase *_database;
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
+  const InstanceInformation *_instanceInfo;
   mutable SEntity *_entity;
 
   enum Flags
@@ -232,9 +240,6 @@ private:
     ParentHasOutput = 4
     };
   XFlags<Flags, xuint8> _flags;
-
-  // only used for dynamic properties
-  QString _name;
 
   friend class SEntity;
   friend class SDatabase;
