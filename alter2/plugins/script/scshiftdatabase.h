@@ -3,6 +3,9 @@
 
 #include "scshiftentity.h"
 
+class SPropertyInstanceInformation;
+class SPropertyContainer;
+
 class ScShiftDatabase : public ScShiftEntity
   {
 public:
@@ -13,8 +16,10 @@ public:
 
 private:
   static QScriptValue addType(QScriptContext *ctx, QScriptEngine *);
+  static void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node);
   };
 
 Q_DECLARE_METATYPE(ScShiftDatabase*)
+Q_DECLARE_METATYPE(QScriptValue)
 
 #endif // SCSHIFTDATABASE_H

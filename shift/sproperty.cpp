@@ -578,7 +578,7 @@ void SProperty::preGet() const
     if(child && child->compute())
       {
       xAssert(parent());
-      child->compute()(parent());
+      child->compute()(child, parent());
       return;
       }
 

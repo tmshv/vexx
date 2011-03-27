@@ -2,6 +2,8 @@
 #include "sdatabase.h"
 #include "scembeddedtypes.h"
 
+SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
+
 ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng, "SEntity")
   {
   addMemberFunction("addType", addType);
@@ -99,9 +101,71 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         break;
         }
 
-      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory), 0, 0, false, true);
+      SPropertyInstanceInformation::ComputeFunction computeFn = 0;
+      tempArrayObject = val.property("compute");
+      if(tempArrayObject.isFunction())
+        {
+        computeFn = computeNode;
+        }
+
+      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory), computeFn, 0, false, true);
       endOfUsedMemory += propType->size();
       properties << info;
+
+      if(computeFn)
+        {
+        info->setData(g_computeKey, qVariantFromValue(tempArrayObject));
+        }
+
+      val = tempObject.property(++i);
+      }
+
+    i = 0;
+    val = tempObject.property(i);
+    while(val.isObject())
+      {
+      SProperty SPropertyContainer::* *affects = 0;
+      tempArrayObject = val.property("affects");
+      bool affectsIsValid = false;
+      if(tempArrayObject.isArray())
+        {
+        affectsIsValid = true;
+        xuint32 length = tempArrayObject.property("length").toUInt32();
+        affects = new SProperty SPropertyContainer::* [length+1];
+        affects[length] = 0;
+        for(xuint32 i=0; i<length; ++i)
+          {
+          affects[i] = 0;
+          QString name = tempArrayObject.property(i).toString();
+
+          for(int propIdx=0, s=properties.size(); propIdx<s; ++propIdx)
+            {
+            if(name == properties[propIdx]->name())
+              {
+              affects[i] = properties[propIdx]->location();
+              break;
+              }
+            }
+
+          if(!affects[i])
+            {
+            affectsIsValid = false;
+            ctx->throwError(QScriptContext::SyntaxError, "Defined sibling property name expected for affectedBy members.");
+            break;
+            }
+          }
+        }
+
+      if(!affectsIsValid)
+        {
+        delete [] affects;
+        affects = 0;
+        }
+
+
+      SPropertyInstanceInformation *info = properties[i];
+      info->setAffects(affects);
+
 
       val = tempObject.property(++i);
       }
@@ -116,4 +180,15 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   db->addType(newType);
 
   return QScriptValue();
+  }
+
+void ScShiftDatabase::computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node)
+  {
+  ScProfileFunction
+  const QVariant &val = instanceInfo->data()[g_computeKey];
+  QScriptValue compute = qvariant_cast<QScriptValue>(val);
+  xAssert(compute.isFunction());
+
+  // call with this as the node being computed, and no arguments.
+  compute.call(ScEmbeddedTypes::packValue(node));
   }

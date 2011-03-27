@@ -71,7 +71,7 @@ SPropertyInformation::~SPropertyInformation()
     {
     for(xsize i=0; i<childCount(); ++i)
       {
-      delete child(i)->affects();
+      delete [] child(i)->affects();
       delete child(i);
       }
     }
@@ -105,6 +105,12 @@ SPropertyInstanceInformation::DataKey g_maxChildKey = 0;
 SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   {
   return g_maxChildKey++;
+  }
+
+void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)
+  {
+  xAssert(k < g_maxChildKey);
+  _data[k].setValue(v);
   }
 
 xsize SPropertyInformation::completeChildCount() const

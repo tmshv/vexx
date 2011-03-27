@@ -6,7 +6,7 @@
 #include "XProperty"
 #include "spropertydata.h"
 #include "XHash"
-#include "XVariant"
+#include "QVariant"
 
 class SProperty;
 class SLoader;
@@ -18,22 +18,22 @@ class SPropertyInformation;
 class SHIFT_EXPORT SPropertyInstanceInformation
   {
 public:
-  typedef void (*ComputeFunction)( SPropertyContainer * );
+  typedef void (*ComputeFunction)( const SPropertyInstanceInformation *, SPropertyContainer * );
 
   typedef xuint16 DataKey;
-  typedef XHash<DataKey, XVariant> DataHash;
+  typedef XHash<DataKey, QVariant> DataHash;
 
 XProperties:
-  XROProperty(const SPropertyInformation *, childInformation);
-  XRORefProperty(QString, name);
-  XROProperty(SProperty SPropertyContainer::*, location);
-  XROProperty(ComputeFunction, compute);
-  XROProperty(SProperty SPropertyContainer::* *, affects);
-  XROProperty(xsize, index);
-  XROProperty(bool, entityChild);
-  XROProperty(bool, extra);
-  XROProperty(bool, dynamic);
-  XROProperty(DataHash, data);
+  XProperty(const SPropertyInformation *, childInformation, setChildInformation);
+  XRefProperty(QString, name);
+  XProperty(SProperty SPropertyContainer::*, location, setLocation);
+  XProperty(ComputeFunction, compute, setCompute);
+  XProperty(SProperty SPropertyContainer::* *, affects, setAffects);
+  XProperty(xsize, index, setINdex);
+  XProperty(bool, entityChild, setEntityChild);
+  XProperty(bool, extra, setExtra);
+  XProperty(bool, dynamic, setDynamic);
+  XRORefProperty(DataHash, data);
 
 public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
@@ -52,6 +52,8 @@ public:
   void initiateFromDefinition() { }
   virtual void initiateProperty(SProperty *propertyToInitiate) const { }
   static DataKey newDataKey();
+
+  void setData(DataKey, const QVariant &);
 
 private:
   friend class SProperty;
