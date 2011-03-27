@@ -5,6 +5,9 @@
 #include "QPushButton"
 #include "QStyleOptionViewItem"
 
+#define SDataModelProfileFunction XProfileFunction(ShiftDataModelProfileScope)
+#define SDataModelProfileScopedBlock(mess) XProfileScopedBlock(ShiftDataModelProfileScope, mess)
+
 SDatabaseDelegate::SDatabaseDelegate() : _currentWidget(0)
   {
   }
@@ -16,8 +19,11 @@ QWidget *SDatabaseDelegate::createEditor(QWidget *parent, const QStyleOptionView
     {
     SProperty *prop = (SProperty *)index.internalPointer();
     _currentWidget = _ui.createControlWidget(prop, parent);
-    connect(_currentWidget, SIGNAL(destroyed(QObject *)), this, SLOT(currentItemDestroyed()));
-    emit ((SDatabaseDelegate*)this)->sizeHintChanged(_currentIndex);
+    if(_currentWidget)
+      {
+      connect(_currentWidget, SIGNAL(destroyed(QObject *)), this, SLOT(currentItemDestroyed()));
+      emit ((SDatabaseDelegate*)this)->sizeHintChanged(_currentIndex);
+      }
     return _currentWidget;
     }
   return 0;
@@ -33,6 +39,7 @@ void SDatabaseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 
 QSize SDatabaseDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
   {
+  SDataModelProfileFunction
   if(index == _currentIndex)
     {
       xAssert(_currentWidget);
@@ -67,6 +74,7 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
 
 int SDatabaseModel::rowCount( const QModelIndex &parent ) const
   {
+  SDataModelProfileFunction
   const SProperty *prop = _root;
   int size = 0;
   if(parent.isValid())
@@ -103,6 +111,7 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
 
 QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &parent ) const
   {
+  SDataModelProfileFunction
   const SProperty *prop = _root;
   int size = 0;
   if(parent.isValid())
@@ -143,6 +152,7 @@ QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &paren
 
 QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
   {
+  SDataModelProfileFunction
   if(child.isValid())
     {
     SProperty *prop = (SProperty *)child.internalPointer();
@@ -166,6 +176,7 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
 
 int SDatabaseModel::columnCount( const QModelIndex &parent ) const
   {
+  SDataModelProfileFunction
   const SProperty *prop = _root;
   if(parent.isValid())
     {
@@ -199,6 +210,7 @@ int SDatabaseModel::columnCount( const QModelIndex &parent ) const
 
 QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   {
+  SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
   if(prop && role == Qt::DisplayRole)
     {
@@ -223,6 +235,7 @@ bool SDatabaseModel::setData(const QModelIndex & index, const QVariant & value, 
 
 Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
+  SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
   if(prop && index.column() == 1)
     {

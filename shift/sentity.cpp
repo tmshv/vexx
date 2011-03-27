@@ -129,6 +129,7 @@ void SEntity::removeConnectionObserver(SConnectionObserver *in)
 
 void SEntity::informDataObservers(int m, const DataChange *event, SObservers &obsList)
   {
+  SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
     if(obs.mode == ObserverStruct::Data)
@@ -141,6 +142,7 @@ void SEntity::informDataObservers(int m, const DataChange *event, SObservers &ob
 
 void SEntity::informTreeObservers(int m, const SChange *event, SObservers &obsList)
   {
+  SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
     if(obs.mode == ObserverStruct::Tree)
@@ -158,6 +160,7 @@ void SEntity::informTreeObservers(int m, const SChange *event, SObservers &obsLi
 
 void SEntity::informConnectionObservers(int m, const SChange *event, SObservers &obsList)
   {
+  SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
     if(obs.mode == ObserverStruct::Connection)

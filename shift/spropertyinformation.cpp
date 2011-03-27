@@ -21,6 +21,7 @@ SPropertyInstanceInformation::SPropertyInstanceInformation(bool dynamic)
   }
 
 SPropertyInformation::SPropertyInformation(CreateFunction createFn,
+                     CreateInstanceInformationFunction cIIF,
                      SaveFunction saveFn,
                      LoadFunction loadFn,
                      AssignFunction assignFn,
@@ -31,9 +32,9 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      const XList<SPropertyInstanceInformation*> children,
                      xsize size,
                      xsize instanceInfoSize)
-    : _create(createFn), _save(saveFn), _load(loadFn), _assign(assignFn), _version(version), _typeName(typeName),
-    _typeId(typeId), _parentTypeInformation(parent), _children(children), _propertyOffset(0),
-    _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
+    : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
+    _version(version), _typeName(typeName), _typeId(typeId), _parentTypeInformation(parent), _children(children),
+    _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
   {
   if(_parentTypeInformation)
     {
@@ -43,6 +44,7 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
 
 SPropertyType g_maxDynamicCount = 0x7FFFFFFF;
 SPropertyInformation::SPropertyInformation(CreateFunction createFn,
+                     CreateInstanceInformationFunction cIIF,
                      SaveFunction saveFn,
                      LoadFunction loadFn,
                      AssignFunction assignFn,
@@ -52,9 +54,10 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      const XList<SPropertyInstanceInformation*> children,
                      xsize size,
                      xsize instanceInfoSize)
-    : _create(createFn), _save(saveFn), _load(loadFn), _assign(assignFn), _version(version), _typeName(typeName),
-    _typeId(g_maxDynamicCount++), _parentTypeInformation(parent), _children(children), _propertyOffset(0),
-    _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
+    : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
+    _version(version), _typeName(typeName), _typeId(g_maxDynamicCount++), _parentTypeInformation(parent),
+    _children(children), _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize),
+    _instances(0), _dynamic(false)
   {
   if(_parentTypeInformation)
     {

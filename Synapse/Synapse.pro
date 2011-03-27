@@ -16,4 +16,5 @@ SOURCES += main.cpp
 
 DESTDIR = ../bin
 
-OTHER_FILES += scripts/startup.js
+OTHER_FILES += scripts/startup.js \
+    scripts/nodes/add.js

@@ -17,8 +17,8 @@ class SPropertyContainer;
   const SPropertyInformation * name::staticTypeInformation() { \
   const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
   xAssert(parentMetaData); \
-  static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
-                                   Version, #name, name::Type, parentMetaData, \
+  static SPropertyInformation info(create##name, SProperty::createInstanceInformation<name>, saveFn, \
+                                   loadFn, assignContainer, Version, #name, name::Type, parentMetaData, \
                                    XList<SPropertyInstanceInformation*>(), \
                                    sizeof(name), sizeof(name::InstanceInformation) ); \
   return &info;}
@@ -64,8 +64,8 @@ class SPropertyContainer;
 #define S_PROPERTY_CONTAINER_END_DEFINITION(name, parent, saveFn, loadFn) \
     const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
     xAssert(parentMetaData); \
-    static SPropertyInformation info(create##name, saveFn, loadFn, assignContainer, \
-                                     Version, #name, name::Type, parentMetaData, \
+    static SPropertyInformation info(create##name, SProperty::createInstanceInformation<name>, saveFn, \
+                                     loadFn, assignContainer, Version, #name, name::Type, parentMetaData, \
                                       childDataArray, sizeof(name), sizeof(name::InstanceInformation) ); \
     infoPtr = &info; } \
     return infoPtr; }

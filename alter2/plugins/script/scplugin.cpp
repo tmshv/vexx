@@ -34,6 +34,7 @@ ScPlugin::~ScPlugin()
 
 void ScPlugin::load()
   {
+  XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new QScriptEngine(this);
   _debugger = new QScriptEngineDebugger(this);
   _debugger->setAutoShowStandardWindow(true);
@@ -86,11 +87,13 @@ void ScPlugin::hideDebugger()
 
 bool ScPlugin::loadPlugin(const QString &plugin)
   {
+  ScProfileFunction
   return core()->load(plugin);
   }
 
 void ScPlugin::includePath(const QString &filename)
   {
+  ScProfileFunction
   bool result = executeFile(filename);
   if(result)
     {
@@ -104,21 +107,47 @@ void ScPlugin::includePath(const QString &filename)
 
 void ScPlugin::include(const QString &filename)
   {
+  ScProfileFunction
   qDebug() << "Include File" << filename;
-  foreach( const QFileInfo &fileInfo, core()->directories() )
+  QString file;
+  foreach( const QString &dir, core()->directories() )
     {
-    includePath(fileInfo.filePath());
+    file = dir + QDir::separator() + filename;
+    if(QFile::exists(file))
+      {
+      includePath(file);
+      return;
+      }
     }
   }
 
 void ScPlugin::includeFolder(const QString &folder)
   {
+  ScProfileFunction
   qDebug() << "Include Folder" << folder;
   QDir dir(folder);
-  foreach(const QFileInfo &filename, dir.entryInfoList(QStringList() << "*.js"))
-    {    
-    includePath(filename.filePath());
+  if(dir.exists())
+    {
+    foreach(const QFileInfo &filename, dir.entryInfoList(QStringList() << "*.js"))
+      {
+      includePath(filename.filePath());
+      }
     }
+  else
+    {
+    foreach( const QString &dir, core()->directories() )
+      {
+      QDir relativeDir(dir + QDir::separator() + folder);
+      if(relativeDir.exists())
+        {
+        foreach(const QFileInfo &filename, relativeDir.entryInfoList(QStringList() << "*.js"))
+          {
+          includePath(filename.filePath());
+          }
+        }
+      }
+    }
+
   qDebug() << "... Success";
   }
 
@@ -141,6 +170,7 @@ void ScPlugin::registerScriptGlobal(const QString &name, QScriptClass *in)
 
 bool ScPlugin::executeFile(const QString &filename)
   {
+  ScProfileFunction
   QFile file(filename);
   if(file.exists() && file.open( QIODevice::ReadOnly))
     {
@@ -162,6 +192,7 @@ QScriptEngine *ScPlugin::engine()
 
 bool ScPlugin::execute(const QString &code)
   {
+  ScProfileFunction
   QScriptValue ret = _engine->evaluate(code);
 
   if(_engine->hasUncaughtException())

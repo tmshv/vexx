@@ -83,7 +83,7 @@ template <typename T>const SPropertyInformation *STypedPropertyArray<T>::staticT
   {
   const SPropertyInformation* parentMetaData = SPropertyContainer::staticTypeInformation();
   xAssert(parentMetaData);
-  static SPropertyInformation info(createSTypedPropertyArray, saveContainer, loadContainer, assignContainer,
+  static SPropertyInformation info(createSTypedPropertyArray, SProperty::createInstanceInformation<STypedPropertyArray<T> >, saveContainer, loadContainer, assignContainer,
                                    Version, "STypedPropertyArray<T>", Type, parentMetaData,
                                    XList<SPropertyInstanceInformation*>(),
                                    sizeof(STypedPropertyArray<T>), sizeof(STypedPropertyArray<T>::InstanceInformation) );

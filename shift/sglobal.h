@@ -4,6 +4,7 @@
 #include <QtCore/qglobal.h>
 #include "XGlobal"
 #include "XList"
+#include "XProfiler"
 
 #if defined(SHIFT_BUILD)
 #  define SHIFT_EXPORT Q_DECL_EXPORT
@@ -12,6 +13,11 @@
 #endif
 
 typedef xuint32 SPropertyType;
+
+#define ShiftCoreProfileScope 1043
+#define ShiftDataModelProfileScope 1044
+#define SProfileFunction XProfileFunction(ShiftCoreProfileScope)
+#define SProfileScopedBlock(mess) XProfileScopedBlock(ShiftCoreProfileScope, mess)
 
 class SEntity;
 class SProperty;

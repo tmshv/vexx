@@ -19,7 +19,8 @@ SOURCES += UIPlugin.cpp \
     UIStackedLayout.cpp \
     UILayout.cpp \
     UIDatabaseDebugSurface.cpp \
-    UISurfacePrivate.cpp
+    UISurfacePrivate.cpp \
+    UIProfilerSurface.cpp
 
 HEADERS += UIPlugin.h \
     UIGlobal.h \
@@ -30,7 +31,8 @@ HEADERS += UIPlugin.h \
     UIStackedLayout.h \
     UILayout.h \
     UIDatabaseDebugSurface.h \
-    UISurfacePrivate.h
+    UISurfacePrivate.h \
+    UIProfilerSurface.h
 
 DESTDIR += ../../../bin
 

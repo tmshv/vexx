@@ -73,10 +73,10 @@ SDatabase::~SDatabase()
 
   foreach(SChange *ch, _done)
     {
-    delete ch;
+    destoryChangeMemory(ch);
     }
 
-  xAssert(_properties.empty());
+  xAssert(_memory.empty());
   }
 
 void SDatabase::addType(const SPropertyInformation *t)
@@ -90,9 +90,10 @@ void SDatabase::addType(const SPropertyInformation *t)
 
 SProperty *SDatabase::createDynamicProperty(xuint32 t)
   {
+  SProfileFunction
   xAssert(_types.contains(t));
   const SPropertyInformation *type = _types[t];
-  SProperty *prop = (SProperty*)_properties.alloc(type->dynamicSize());
+  SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
   type->create()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
   prop->_database = this;
   prop->_info = type;
@@ -114,7 +115,7 @@ void SDatabase::deleteDynamicProperty(SProperty *prop)
       }
     }
   prop->~SProperty();
-  _properties.free(prop);
+  _memory.free(prop);
   }
 
 void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)
@@ -141,14 +142,14 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     const SProperty SPropertyContainer::* prop(child->location());
     SProperty *thisProp = (SProperty*)&(container->*prop);
 
-    xAssert(thisProp->_parent == 0);
-    xAssert(thisProp->_entity == 0);
-    xAssert(thisProp->_nextSibling == 0);
-
     if(child->extra())
       {
       child->childInformation()->create()(thisProp, child->childInformation(), 0);
       }
+
+    xAssert(thisProp->_parent == 0);
+    xAssert(thisProp->_entity == 0);
+    xAssert(thisProp->_nextSibling == 0);
 
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     thisProp->_info = child->childInformation();
@@ -241,6 +242,7 @@ QString SDatabase::propertySeparator()
 
 const SPropertyInformation *SDatabase::findType(xuint32 i) const
   {
+  SProfileFunction
   if(_types.contains(i))
     {
     return ((XMap <SPropertyType, SPropertyInformation*>&)_types)[i];
@@ -250,6 +252,7 @@ const SPropertyInformation *SDatabase::findType(xuint32 i) const
 
 const SPropertyInformation *SDatabase::findType(const QString &in) const
   {
+  SProfileFunction
   QList <xuint32> keys(_types.keys());
   for(int i=0, s=keys.size(); i<s; ++i)
     {
@@ -263,6 +266,7 @@ const SPropertyInformation *SDatabase::findType(const QString &in) const
 
 void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData::Mode mode) const
   {
+  SProfileFunction
   if(!prop)
     {
     prop = this;
@@ -286,6 +290,7 @@ void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData:
 
 SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent, SPropertyData::Mode mode)
   {
+  SProfileFunction
   if(_readLevel == 0)
     {
     _resolveAfterLoad.clear();
@@ -356,16 +361,20 @@ SBlock::~SBlock()
 
 void *SDatabase::allocateChangeMemory(xsize s)
   {
-  return new char[s];
+  SProfileFunction
+  return _memory.alloc(s);
   }
 
-void SDatabase::destoryChangeMemory(xsize s, void *ptr)
+void SDatabase::destoryChangeMemory(SChange *ptr)
   {
-  delete [] (char*)ptr;
+  SProfileFunction
+  ptr->~SChange();
+  _memory.free(ptr);
   }
 
 void SDatabase::submitChange(SChange *ch)
   {
+  SProfileFunction
   _inSubmitChange = true;
   try
     {
@@ -397,6 +406,7 @@ void SDatabase::submitChange(SChange *ch)
 
 void SDatabase::inform()
   {
+  SProfileFunction
   foreach(SObserver *obs, _blockObservers)
     {
     obs->actOnChanges();
@@ -406,6 +416,7 @@ void SDatabase::inform()
 
 void SDatabase::resolveInputAfterLoad(SProperty *prop, QString inputPath)
   {
+  SProfileFunction
   xAssert(_readLevel > 0);
   if(_readLevel > 0)
     {

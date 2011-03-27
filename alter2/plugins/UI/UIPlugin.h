@@ -3,7 +3,6 @@
 
 #include "UIGlobal.h"
 #include "aabstractplugin.h"
-#include "UIDatabaseDebugSurface.h"
 
 class UISurface;
 class UIPluginPrivate;

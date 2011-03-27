@@ -9,15 +9,18 @@ int main(int argc, char *argv[])
 
   app.addDirectory(ACore::rootPath());
 
-  app.load("Script");
+  app.load("script");
 
   APlugin<ScPlugin> script(app, "script");
 
   // this will work in debug only...
-  script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
+  app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
 
   // more like this in release...
   // script->includeFolder(app.rootPath() + "/scripts/");
+
+  script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
+
 
   return app.execute();
   }

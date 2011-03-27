@@ -17,7 +17,9 @@ SOURCES += ../src/XObject.cpp \
     ../src/XBaseObject.cpp \
     ../src/XSize.cpp \
     ../src/XCurve.cpp \
-    ../src/XMetaType.cpp
+    ../src/XMetaType.cpp \
+    ../src/XTime.cpp \
+    ../src/XProfiler.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -49,8 +51,10 @@ HEADERS += ../XObject \
     ../XMetaType \
     ../XFlags \
     ../XRandomAccessAllocator \
-    ../XWeakShared
+    ../XWeakShared \
+    ../XTime \
+    ../XProfiler
 INCLUDEPATH += ../
 DESTDIR = ../../bin
 
-include("../EnableSIMD.pri")
+include("../SIMD.pri")

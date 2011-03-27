@@ -19,6 +19,7 @@ void ScShiftEntity::initiate()
 
 QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
   {
+  ScProfileFunction
   SProperty **propPtr = getThis(ctx);
   if(propPtr && ctx->argumentCount() >= 1)
     {

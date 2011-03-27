@@ -29,6 +29,7 @@ ScEmbeddedTypes::~ScEmbeddedTypes()
 
 QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
   {
+  ScProfileFunction
   if(!prop)
     {
     return QScriptValue();

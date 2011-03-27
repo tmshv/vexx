@@ -18,6 +18,7 @@ void ScShiftDatabase::initiate()
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
   {
+  ScProfileFunction
   SProperty **propPtr = getThis(ctx);
   SDatabase *db = 0;
   if(propPtr)
@@ -98,7 +99,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         break;
         }
 
-      SPropertyInstanceInformation *info = new SPropertyInstanceInformation(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory), 0, 0, false, true);
+      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory), 0, 0, false, true);
       endOfUsedMemory += propType->size();
       properties << info;
 
@@ -107,7 +108,8 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     }
 
 #warning check what happens if you embed a script type in a script type... etc, i think it will crash and burn?
-  SPropertyInformation *newType = new SPropertyInformation(parent->create(), parent->save(), parent->load(), parent->assign(),
+  SPropertyInformation *newType = new SPropertyInformation(parent->create(), parent->createInstanceInformation(),
+                                                           parent->save(), parent->load(), parent->assign(),
                                                            version, name, parent,
                                                            properties, endOfUsedMemory, parent->instanceInformationSize());
 

@@ -3,9 +3,11 @@
 #include "sdatabase.h"
 #include "schange.h"
 #include "QString"
+#include "XProfiler"
 
 bool SProperty::NameChange::apply(int mode, SObservers& obs)
   {
+  SProfileFunction
   if(mode&Forward)
     {
     property()->internalSetName(after());
@@ -38,17 +40,20 @@ SProperty::~SProperty()
 
 bool SProperty::isDynamic() const
   {
+  SProfileFunction
   return instanceInformation()->dynamic();
   }
 
 xsize SProperty::index() const
   {
+  SProfileFunction
   preGet();
   return _instanceInfo->index();
   }
 
 void SProperty::setName(const QString &in)
   {
+  SProfileFunction
   xAssert(isDynamic());
   xAssert(parent());
 
@@ -99,6 +104,7 @@ void SProperty::load(SProperty *p, const SPropertyData &d, xuint32, SPropertyDat
 
 bool SProperty::inheritsFromType(SPropertyType type) const
   {
+  SProfileFunction
   const SPropertyInformation *current = typeInformation();
   xAssert(current);
   while(current)
@@ -114,6 +120,7 @@ bool SProperty::inheritsFromType(SPropertyType type) const
 
 bool SProperty::inheritsFromType(const QString &type) const
   {
+  SProfileFunction
   const SPropertyInformation *current = typeInformation();
   while(current)
     {
@@ -128,6 +135,7 @@ bool SProperty::inheritsFromType(const QString &type) const
 
 const QString &SProperty::name() const
   {
+  SProfileFunction
   return baseInstanceInformation()->name();
   }
 
@@ -141,6 +149,7 @@ void SProperty::assign(const SProperty *propToAssign)
 
 SEntity *SProperty::entity() const
   {
+  SProfileFunction
   if(_entity)
     {
     return _entity;
@@ -169,6 +178,7 @@ SPropertyType SProperty::type() const
 
 void SProperty::connect(SProperty *prop) const
   {
+  SProfileFunction
   void *changeMemory = getChange< ConnectionChange >();
   ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Connect, (SProperty*)this, prop);
   ((SDatabase*)database())->submitChange(change);
@@ -177,6 +187,7 @@ void SProperty::connect(SProperty *prop) const
 
 void SProperty::disconnect(SProperty *prop) const
   {
+  SProfileFunction
   void *changeMemory = getChange< ConnectionChange >();
   ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Disconnect, (SProperty*)this, prop);
   ((SDatabase*)database())->submitChange(change);
@@ -185,6 +196,7 @@ void SProperty::disconnect(SProperty *prop) const
 
 void SProperty::disconnect() const
   {
+  SProfileFunction
   if(_input)
     {
     ((SProperty*)_input)->disconnect((SProperty*)this);
@@ -198,6 +210,7 @@ void SProperty::disconnect() const
 
 bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
   {
+  SProfileFunction
   if(mode&Forward)
     {
     if(_mode == Connect)
@@ -369,6 +382,7 @@ void SProperty::disconnectInternal(SProperty *prop) const
 
 QString SProperty::path() const
   {
+  SProfileFunction
   if(parent() == 0)
     {
     return SDatabase::pathSeparator() + name();
@@ -378,6 +392,7 @@ QString SProperty::path() const
 
 QString SProperty::path(const SProperty *from) const
   {
+  SProfileFunction
   if(from == this)
     {
     return "";
@@ -405,6 +420,7 @@ QString SProperty::path(const SProperty *from) const
 
 bool SProperty::isDescendedFrom(const SProperty *in) const
   {
+  SProfileFunction
   if(this == in)
     {
     return true;
@@ -418,6 +434,7 @@ bool SProperty::isDescendedFrom(const SProperty *in) const
 
 SProperty *SProperty::resolvePath(const QString &path)
   {
+  SProfileFunction
   preGet();
   QStringList splitPath(path.split(SDatabase::pathSeparator()));
   SProperty *cur = this;
@@ -453,6 +470,7 @@ SProperty *SProperty::resolvePath(const QString &path)
 
 const SProperty *SProperty::resolvePath(const QString &path) const
   {
+  SProfileFunction
   preGet();
   QStringList splitPath(path.split(SDatabase::pathSeparator()));
   const SProperty *cur = this;
@@ -530,6 +548,7 @@ inline void setDependantsDirty(SProperty* prop)
 
 void SProperty::postSet()
   {
+  SProfileFunction
   _flags.clearFlag(Dirty);
 
   setDependantsDirty(this);
@@ -547,6 +566,7 @@ void SProperty::setDirty()
 
 void SProperty::preGet() const
   {
+  SProfileFunction
   if(_flags.hasFlag(Dirty))
     {
     // this is a const function, but because we delay computation we may need to assign here

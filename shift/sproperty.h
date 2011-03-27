@@ -15,9 +15,10 @@ class SDatabase;
 
 #define S_REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childData, version) \
   static const SPropertyInformation * staticTypeInformation() { \
-  static SPropertyInformation info(myName::createFn, saveFn, loadFn, assignFn, \
+  static SPropertyInformation info(myName::createFn, SProperty::createInstanceInformation<myName>, \
+                                   saveFn, loadFn, assignFn, \
                                    version, #myName, typeId, parentInfo, \
-                                    childData, sizeof(myName), sizeof(myName::InstanceInformation) ); \
+                                   childData, sizeof(myName), sizeof(myName::InstanceInformation) ); \
   return &info;}
 
 #define S_ADD_INSTANCE_INFORMATION(name) const name :: InstanceInformation *instanceInformation() const { return static_cast<const name :: InstanceInformation *>(baseInstanceInformation()); }
@@ -62,9 +63,9 @@ public:
 
   SPropertyContainer *parent() const {return _parent;}
 
-  SProperty *input() const {preGet(); return _input;}
-  SProperty *output() const {preGet(); return _output;}
-  SProperty *nextOutput() const {preGet(); return _nextOutput;}
+  SProperty *input() const {return _input;}
+  SProperty *output() const {return _output;}
+  SProperty *nextOutput() const {return _nextOutput;}
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
@@ -209,6 +210,17 @@ protected:
   template <typename T> T *getChange() const
     {
     return reinterpret_cast<T*>(getChangeMemory(sizeof(T)));
+    }
+
+  template <typename T> static InstanceInformation *createInstanceInformation(const SPropertyInformation *type, const QString &name,
+                                                                              xsize index,
+                                                                              SProperty SPropertyContainer::* location,
+                                                                              SPropertyInstanceInformation::ComputeFunction computeFn,
+                                                                              SProperty SPropertyContainer::* *affects,
+                                                                              bool entityChild,
+                                                                              bool extra)
+    {
+    return new typename T::InstanceInformation(type, name, index, location, computeFn, affects, entityChild, extra);
     }
 
   static void blankAssign(const SProperty *, SProperty *);

@@ -5,6 +5,7 @@
 #include "QScriptEngine"
 #include "XGlobal"
 #include "XProperty"
+#include "scglobal.h"
 
 class ScPlugin;
 class QScriptContext;

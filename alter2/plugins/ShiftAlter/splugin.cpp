@@ -1,4 +1,5 @@
 #include "splugin.h"
+#include "sglobal.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -19,6 +20,9 @@ const SAppDatabase &SPlugin::db() const
 void SPlugin::load()
   {
   _db.addType<SAppDatabase>();
+
+  XProfiler::setStringForContext(ShiftCoreProfileScope, "ShiftCore");
+  XProfiler::setStringForContext(ShiftDataModelProfileScope, "ShiftDataModel");
   }
 
 void SPlugin::unload()

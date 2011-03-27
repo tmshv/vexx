@@ -19,6 +19,7 @@ void ScShiftPropertyContainer::initiate()
 
 QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *eng)
   {
+  ScProfileFunction
   SProperty **propPtr = getThis(ctx);
   if(propPtr)
     {
@@ -34,6 +35,7 @@ QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *
 
 QScriptClass::QueryFlags ScShiftPropertyContainer::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id)
   {
+  ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
   if (!prop)
     {
@@ -62,6 +64,7 @@ QScriptClass::QueryFlags ScShiftPropertyContainer::queryProperty(const QScriptVa
 
 QScriptValue ScShiftPropertyContainer::property(const QScriptValue &object, const QScriptString &name, uint id)
   {
+  ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
   if (!prop)
     {

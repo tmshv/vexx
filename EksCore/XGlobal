@@ -27,29 +27,36 @@
 # define xAssert( arg ) Q_ASSERT( arg )
 #endif
 
-#define X_DEBUG _DEBUG
+#ifndef QT_NO_DEBUG
+# define X_DEBUG
+# define X_PROFILING_ENABLED
+#endif
 
 #define xAssertFail() xAssert(0);
 #define xAssertFailMessage(msg) xAssert(0 && msg);
 
 #define X_DISABLE_COPY(x) Q_DISABLE_COPY(x)
 
-#if 0 && defined Q_OS_LINUX && __GNUC__
-#   ifdef OSX
-#       define xCurrentFunction "_No Function Info Available_"
+#if defined Q_OS_LINUX && __GNUC__
+# ifdef Q_OS_DARWIN
+#  define xCurrentFunction "_No Function Info Available_"
+# else
+#  if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
+#   define xCurrentFunction	__PRETTY_FUNCTION__
+#  else
+#   if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#    define xCurrentFunction	__func__
 #   else
-#       if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
-#           define xCurrentFunction	__PRETTY_FUNCTION__
-#       else
-#           if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#               define xCurrentFunction	__func__
-#           else
-#               define xCurrentFunction	"_No Function Info Available_"
-#           endif
-#       endif
+#    define xCurrentFunction	"_No Function Info Available_"
 #   endif
+#  endif
+# endif
 #else
-#   define xCurrentFunction "_No Function Info Available_"
+# ifdef Q_CC_MINGW
+#  define xCurrentFunction __PRETTY_FUNCTION__
+# else
+#  define xCurrentFunction "_No Function Info Available_"
+# endif
 #endif
 
 #define xTypeof( x ) typeof( x )

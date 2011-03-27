@@ -3,9 +3,9 @@
 	<filename>SynapseCore.dll</filename>
 
 	<requires type="library">
-		<name>Shift</name>
+		<name>db</name>
 	</requires>
 	<requires type="library">
-		<name>UI</name>
+		<name>ui</name>
 	</requires>
 </alterPlugin> 

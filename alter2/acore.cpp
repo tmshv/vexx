@@ -87,9 +87,10 @@ int ACore::execute()
 
 bool ACore::isLoaded( const QString &name ) const
   {
+  QString lower = name.toLower();
   foreach( const ACorePrivate::Plugin &plugin, _priv->installed )
     {
-    if( plugin.name == name )
+    if( plugin.name == lower )
       {
       return true;
       }

@@ -40,7 +40,8 @@ public:
       }
     else
       {
-      xAssertFailMessage("Registering a type twice? or duplicate IDs")
+      qDebug() << "Registering a type twice? or duplicate IDs. Already got type '" << _types[id]->typeName() << "', trying to register '" << T::staticTypeInformation()->typeName() << "'";
+      xAssertFail();
       }
     }
 
@@ -54,7 +55,6 @@ public:
   static QString propertySeparator();
 
   void *allocateChangeMemory(xsize);
-  void destoryChangeMemory(xsize, void *);
 
   void submitChange(SChange *change);
 
@@ -67,6 +67,8 @@ protected:
 private:
   SProperty *createDynamicProperty(xuint32);
   void deleteDynamicProperty(SProperty *);
+
+  void destoryChangeMemory(SChange *);
 
   template <typename T> static T *createHelper()
     {
@@ -93,7 +95,7 @@ private:
   virtual void resolveInputAfterLoad(SProperty *prop, QString inputPath);
   PostLoadInputHash _resolveAfterLoad;
   xsize _readLevel;
-  XRandomAccessAllocator _properties;
+  XRandomAccessAllocator _memory;
 
   friend class SPropertyContainer;
   friend class SPropertyContainer::TreeChange;

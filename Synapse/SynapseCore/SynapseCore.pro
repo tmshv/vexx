@@ -10,10 +10,12 @@ TEMPLATE = lib
 DEFINES += SYNAPSECORE_BUILD
 QMAKE_CXXFLAGS += -Wall
 
-SOURCES += syplugin.cpp
+SOURCES += syplugin.cpp \
+    synode.cpp
 
 HEADERS += syplugin.h \
-    syglobal.h
+    syglobal.h \
+    synode.h
 
 INCLUDEPATH += ../../EksCore ../../Shift ../../alter2 ../../alter2/plugins/ShiftAlter
 

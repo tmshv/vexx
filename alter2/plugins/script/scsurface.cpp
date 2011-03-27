@@ -6,6 +6,7 @@
 #include "QSplitter"
 #include "scplugin.h"
 #include "scsurface.h"
+#include "QScrollBar"
 #include <iostream>
 
 ScSurface *g_surface = 0;
@@ -125,4 +126,8 @@ void ScSurface::threadSafeLog(const QString &message)
 void ScSurface::appendToLog(const QString &message)
   {
   _log->insertHtml(message + "<br>");
+
+  // scroll to bottom
+  QScrollBar *sb = _log->verticalScrollBar();
+  sb->setValue(sb->maximum());
   }

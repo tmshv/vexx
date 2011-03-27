@@ -14,6 +14,8 @@
 #include "splugin.h"
 #include "aplugin.h"
 #include "UISurfacePrivate.h"
+#include "UIDatabaseDebugSurface.h"
+#include "UIProfilerSurface.h"
 
 ALTER_PLUGIN(UIPlugin);
 
@@ -35,6 +37,7 @@ public:
   QDialog *_preferences;
   QTabWidget *_preferenceTabs;
   UIDatabaseDebugSurface _dbDebug;
+  UIProfilerSurface _profiler;
   UIPlugin *_plugin;
   };
 
@@ -77,6 +80,10 @@ void UIPlugin::load()
       _priv->_dbDebug.setDatabase(&db);
       addSurface(&_priv->_dbDebug);
       }
+
+#ifdef X_PROFILING_ENABLED
+    addSurface(&_priv->_profiler);
+#endif
     }
   }
 

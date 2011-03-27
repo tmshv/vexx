@@ -62,6 +62,14 @@ class SHIFT_EXPORT SPropertyInformation
   {
 public:
   typedef void (*CreateFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
+  typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const SPropertyInformation *type,
+                                                                            const QString &name,
+                                                                            xsize index,
+                                                                            SProperty SPropertyContainer::* location,
+                                                                            SPropertyInstanceInformation::ComputeFunction computeFn,
+                                                                            SProperty SPropertyContainer::* *affects,
+                                                                            bool entityChild,
+                                                                            bool extra);
   typedef void (*SaveFunction)( const SProperty *, SPropertyData &, SPropertyData::Mode );
   typedef void (*LoadFunction)( SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
@@ -71,6 +79,7 @@ public:
 
 XProperties:
   XROProperty(CreateFunction, create);
+  XROProperty(CreateInstanceInformationFunction, createInstanceInformation);
   XROProperty(SaveFunction, save);
   XROProperty(LoadFunction, load);
   XROProperty(AssignFunction, assign);
@@ -93,6 +102,7 @@ XProperties:
 
 public:
   SPropertyInformation(CreateFunction createFn,
+                       CreateInstanceInformationFunction createInstanceInfoFn,
                        SaveFunction saveFn,
                        LoadFunction loadFn,
                        AssignFunction assignFn,
@@ -105,6 +115,7 @@ public:
                        xsize instanceInformationSize);
 
   SPropertyInformation(CreateFunction createFn,
+                       CreateInstanceInformationFunction createInstanceInfoFn,
                        SaveFunction saveFn,
                        LoadFunction loadFn,
                        AssignFunction assignFn,
