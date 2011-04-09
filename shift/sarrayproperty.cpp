@@ -30,7 +30,7 @@ template <typename T> void SArrayProperty<T>::LoadFunction( SProperty* p_in, con
 
     SProperty::load(p_in, data_in, v_in, mode_in, l_in);
 
-    const SArrayProperty* ptr = p_in->castTo<SArrayProperty>();
+    SArrayProperty* ptr = p_in->castTo<SArrayProperty>();
     xAssert(ptr);
     if(ptr)
     {
@@ -38,12 +38,12 @@ template <typename T> void SArrayProperty<T>::LoadFunction( SProperty* p_in, con
         if(mode_in == SPropertyData::Binary)
         {
             QDataStream str(&arr, QIODevice::ReadOnly);
-            //str >> ptr->mData;
+            str >> ptr->mData;
         }
         else
         {
             QTextStream str(&arr, QIODevice::ReadOnly);
-            //str >> ptr->mData;
+            str >> ptr->mData;
         }
     }
 }

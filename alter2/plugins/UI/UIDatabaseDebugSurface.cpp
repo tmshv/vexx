@@ -64,7 +64,7 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
         {
         QAction *act = menu.addAction(output->path(), this, SLOT(disconnectOutput()));
 
-        act->setData((xsize)output);
+        act->setData((qint64)output);
 
         output = output->nextOutput();
         }
@@ -98,7 +98,7 @@ void UIDatabaseDebugSurface::disconnectOutput()
 
     if(act)
       {
-      SProperty *prop = (SProperty*)act->data().value<xsize>();
+      SProperty *prop = (SProperty*)act->data().value<qint64>();
 
       _clickedItem->disconnect(prop);
       }

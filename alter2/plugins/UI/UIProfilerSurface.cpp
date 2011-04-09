@@ -26,7 +26,7 @@ public:
     if(role == Qt::DisplayRole)
       {
       if(column == 0) return message();
-      if(column == 1) return statistics().count();
+      if(column == 1) return (quint64) statistics().count();
       if(column == 2) return statistics().total().milliseconds();
       if(column == 3) return statistics().minimum().milliseconds();
       if(column == 4) return statistics().average().milliseconds();

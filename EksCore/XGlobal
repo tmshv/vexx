@@ -37,10 +37,10 @@
 
 #define X_DISABLE_COPY(x) Q_DISABLE_COPY(x)
 
-#if defined Q_OS_LINUX && __GNUC__
-# ifdef Q_OS_DARWIN
-#  define xCurrentFunction "_No Function Info Available_"
-# else
+#ifdef Q_OS_DARWIN
+# define xCurrentFunction __PRETTY_FUNCTION__
+#else
+# if defined Q_OS_LINUX && __GNUC__
 #  if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
 #   define xCurrentFunction	__PRETTY_FUNCTION__
 #  else
@@ -50,12 +50,12 @@
 #    define xCurrentFunction	"_No Function Info Available_"
 #   endif
 #  endif
-# endif
-#else
-# ifdef Q_CC_MINGW
-#  define xCurrentFunction __PRETTY_FUNCTION__
 # else
-#  define xCurrentFunction "_No Function Info Available_"
+#  ifdef Q_CC_MINGW
+#   define xCurrentFunction __PRETTY_FUNCTION__
+#  else
+#   define xCurrentFunction "_No Function Info Available_"
+#  endif
 # endif
 #endif
 
@@ -95,6 +95,8 @@ typedef unsigned long long xuint64; /* 64 bit unsigned */
 
 typedef float xReal;
 #define EKS_XREAL_IS_DOUBLE 0
+
+#define X_UNUSED(x)
 
 inline void xNoop()
   {

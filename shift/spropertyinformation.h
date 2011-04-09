@@ -50,7 +50,7 @@ public:
   SPropertyInstanceInformation(bool dynamic=true);
 
   void initiateFromDefinition() { }
-  virtual void initiateProperty(SProperty *propertyToInitiate) const { }
+  virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
 
   void setData(DataKey, const QVariant &);

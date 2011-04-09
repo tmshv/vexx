@@ -1,6 +1,6 @@
 <alterPlugin>
 	<version>1.0</version>
-	<filename>SynapseCore.dll</filename>
+        <filename>SynapseCore</filename>
 
 	<requires type="library">
 		<name>db</name>

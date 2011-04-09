@@ -31,7 +31,7 @@ public:
   virtual void syncGUI() = 0;
 
 private:
-  virtual void onDataChange(int m, const SProperty::DataChange *ev)
+  virtual void onDataChange(int X_UNUSED(m), const SProperty::DataChange *ev)
     {
     if(ev->type() == U::Type)
       {
@@ -248,7 +248,7 @@ class Colour : public XColourWidget, private SUIBase<ColourProperty, ColourPrope
   {
   Q_OBJECT
 public:
-  Colour( SProperty *prop, bool readOnly, QWidget *parent ) : XColourWidget( XColour(), false, parent ), SUIBase<ColourProperty, ColourProperty::Change>(prop)
+  Colour( SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent ) : XColourWidget( XColour(), false, parent ), SUIBase<ColourProperty, ColourProperty::Change>(prop)
     {
     connect( this, SIGNAL(colourChanged(XColour)), this, SLOT(guiChanged(XColour)));
     // setReadOnly(readOnly); <- implement this...

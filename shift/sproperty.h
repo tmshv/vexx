@@ -21,7 +21,7 @@ class SDatabase;
                                    childData, sizeof(myName), sizeof(myName::InstanceInformation) ); \
   return &info;}
 
-#define S_ADD_INSTANCE_INFORMATION(name) const name :: InstanceInformation *instanceInformation() const { return static_cast<const name :: InstanceInformation *>(baseInstanceInformation()); }
+#define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
 
 #define S_ADD_STATIC_INFO(name, version) \

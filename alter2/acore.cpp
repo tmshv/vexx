@@ -137,8 +137,18 @@ bool ACore::load( const QString &name )
       plugin.name = name.toLower();
       plugin.filename = docElem.firstChildElement( "filename" ).text();
 
+#if defined Q_OS_WIN32 || defined Q_OS_WIN64
+      const char *extension = ".dll";
+#else
+# ifdef Q_OS_DARWIN
+      const char *extension = ".dylib";
+# else
+      const char *extension = ".so";
+# endif
+#endif
+
       typedef AAbstractPlugin *(*InitPrototype)( );
-      InitPrototype initFunction = (InitPrototype)QLibrary::resolve( dirName + QDir::separator() + plugin.filename, "initAlterPlugin" );
+      InitPrototype initFunction = (InitPrototype)QLibrary::resolve( dirName + QDir::separator() + plugin.filename + extension, "initAlterPlugin" );
       if( initFunction )
         {
         plugin.plugin = initFunction( );

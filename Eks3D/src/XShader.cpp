@@ -1,4 +1,3 @@
-#include "GL/gl.h"
 #include "XShader.h"
 #include "XRenderer.h"
 #include "XTexture.h"

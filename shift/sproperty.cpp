@@ -85,7 +85,7 @@ void SProperty::blankAssign(const SProperty *, SProperty *)
   {
   }
 
-void SProperty::save(const SProperty *p, SPropertyData &d, SPropertyData::Mode m)
+void SProperty::save(const SProperty *p, SPropertyData &d, SPropertyData::Mode X_UNUSED(m))
   {
   if(p->input())
     {
@@ -93,7 +93,7 @@ void SProperty::save(const SProperty *p, SPropertyData &d, SPropertyData::Mode m
     }
   }
 
-void SProperty::load(SProperty *p, const SPropertyData &d, xuint32, SPropertyData::Mode m, SLoader &loader)
+void SProperty::load(SProperty *p, const SPropertyData &d, xuint32, SPropertyData::Mode X_UNUSED(m), SLoader &loader)
   {
   if(d.hasAttribute("input"))
     {

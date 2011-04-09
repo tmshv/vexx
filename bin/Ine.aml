@@ -1,4 +1,4 @@
 <alterPlugin>
 	<version>1.0</version>
-	<filename>IneAlter.dll</filename>
+        <filename>IneAlter</filename>
 </alterPlugin> 

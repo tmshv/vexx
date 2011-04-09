@@ -1,6 +1,6 @@
 <alterPlugin>
 	<version>1.0</version>
-	<filename>ui.dll</filename>
+        <filename>ui</filename>
 	<requires type="library">
 		<name>db</name>
 	</requires>
