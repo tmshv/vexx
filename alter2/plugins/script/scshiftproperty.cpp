@@ -6,7 +6,7 @@
 
 ScShiftProperty::ScShiftProperty(QScriptEngine *eng, const QString &parent) : ScWrappedClass<SProperty *>(eng, parent)
   {
-  addMemberProperty("input", input, QScriptValue::PropertyGetter);
+  addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("outputs", outputs, QScriptValue::PropertyGetter);
   addMemberProperty("firstOutput", firstOutput, QScriptValue::PropertyGetter);
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
@@ -31,8 +31,16 @@ QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *eng)
     {
     if(ctx->argumentCount() == 1)
       {
-      SProperty **newInput = unpackValue(ctx->argument(1));
-      (*newInput)->connect(*prop);
+      SProperty **newInput = unpackValue(ctx->argument(0));
+      if(newInput)
+        {
+        (*newInput)->connect(*prop);
+        }
+      else
+        {
+        ctx->throwError(QScriptContext::SyntaxError, "Incorrect argument to SProperty.input(...); expected property type");
+        return QScriptValue();
+        }
       }
     return ScEmbeddedTypes::packValue((*prop)->input());
     }
@@ -130,6 +138,14 @@ QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *)
       {
       return prop->uncheckedCastTo<DoubleProperty>()->value();
       }
+    else if(prop->inheritsFromType<StringProperty>())
+      {
+      return prop->uncheckedCastTo<StringProperty>()->value();
+      }
+    else if(prop->inheritsFromType<LongStringProperty>())
+      {
+      return prop->uncheckedCastTo<LongStringProperty>()->value();
+      }
 
     SPropertyData data;
     prop->database()->write(prop, data, SPropertyData::Ascii);
@@ -193,6 +209,11 @@ QScriptValue ScShiftProperty::setValue(QScriptContext *ctx, QScriptEngine *)
     else if(prop->inheritsFromType<DoubleProperty>())
       {
       prop->uncheckedCastTo<DoubleProperty>()->assign(arg.toNumber());
+      return QScriptValue();
+      }
+    else if(prop->inheritsFromType<StringProperty>())
+      {
+      prop->uncheckedCastTo<StringProperty>()->assign(arg.toString());
       return QScriptValue();
       }
 

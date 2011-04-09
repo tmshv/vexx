@@ -18,7 +18,7 @@ db.addType({
       type: "SyImageOutput",
       compute: function()
         {
-        // something like: this.Output.add(this.InputA, this.InputB);
+        this.Output.image.add(this.InputA.image, this.InputB.image);
         }
       }
     ]

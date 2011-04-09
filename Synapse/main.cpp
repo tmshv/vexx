@@ -1,7 +1,8 @@
 #include "acore.h"
 #include "aplugin.h"
 #include "ScPlugin.h"
-#include "QDebug"
+#include "splugin.h"
+#include "syimagenode.h"
 
 int main(int argc, char *argv[])
   {
@@ -11,16 +12,23 @@ int main(int argc, char *argv[])
 
   app.load("script");
 
-  APlugin<ScPlugin> script(app, "script");
-
   // this will work in debug only...
   app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
 
-  // more like this in release...
-  // script->includeFolder(app.rootPath() + "/scripts/");
+  APlugin<SPlugin> shift(app, "db");
+  if(shift.isValid())
+  {
+    shift->db().addType<SyImageNode>();
+  }
 
-  script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
+  APlugin<ScPlugin> script(app, "script");
+  if(script.isValid())
+  {
+    // more like this in release...
+    // script->includeFolder(app.rootPath() + "/scripts/");
 
+    script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
+  }
 
   return app.execute();
   }

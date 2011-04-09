@@ -17,4 +17,6 @@ SYNAPSE_TYPE(SyImageBase, 2);
 SYNAPSE_TYPE(SyImageInput, 3);
 SYNAPSE_TYPE(SyImageOutput, 4);
 
+SYNAPSE_TYPE(SyImageNode, 50);
+
 #endif // SYGLOBAL_H

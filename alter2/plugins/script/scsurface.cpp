@@ -14,11 +14,6 @@ QtMsgHandler g_oldHandler = 0;
 
 void logHandler(QtMsgType msgType, const char *message)
   {
-  if(msgType == QtFatalMsg)
-    {
-    xAssertFail();
-    }
-
   if(g_oldHandler)
     {
     g_oldHandler(msgType, message);
@@ -35,6 +30,11 @@ void logHandler(QtMsgType msgType, const char *message)
   if(g_surface && !recursion)
     {
     recursion = true;
+    if(msgType == QtFatalMsg)
+      {
+      xAssertFail();
+      }
+
     if(msgType == QtDebugMsg)
       {
       g_surface->threadSafeLog(message);

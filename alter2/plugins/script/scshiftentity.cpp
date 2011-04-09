@@ -42,7 +42,8 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
         }
       else
         {
-        ctx->throwError(QScriptContext::SyntaxError, "Invalid type name passed to SEntity.addChild(...);");
+        ctx->throwError(QScriptContext::SyntaxError, "Invalid type name " + ctx->argument(0).toString() + "passed to SEntity.addChild(...);");
+        return QScriptValue();
         }
       }
     }

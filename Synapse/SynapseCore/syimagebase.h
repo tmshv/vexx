@@ -5,13 +5,16 @@
 #include "sbaseproperties.h"
 #include "sarrayproperty.h"
 
+class QImage;
+
 class SyImageBase : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(SyImageBase, SPropertyContainer, 0);
 public:
   SyImageBase();
 
-  SFloatArrayProperty test;
+  SFloatArrayProperty image;
+  void loadImage(const QImage& );
   };
 
 #endif // SYIMAGEBASE_H

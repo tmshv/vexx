@@ -24,7 +24,8 @@ SOURCES += scplugin.cpp \
     scembeddedtypes.cpp \
     scshiftpropertycontainer.cpp \
     scshiftentity.cpp \
-    scshiftdatabase.cpp
+    scshiftdatabase.cpp \
+    scshiftfloatarrayproperty.cpp
 HEADERS += scplugin.h \
     scglobal.h \
     scsurface.h \
@@ -34,7 +35,8 @@ HEADERS += scplugin.h \
     scwrappedclass.h \
     scshiftpropertycontainer.h \
     scshiftentity.h \
-    scshiftdatabase.h
+    scshiftdatabase.h \
+    scshiftfloatarrayproperty.h
 
 RESOURCES += \
     ScResources.qrc

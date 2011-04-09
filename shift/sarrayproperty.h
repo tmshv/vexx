@@ -18,7 +18,7 @@ template <typename T, int U, int V> QTextStream & operator <<(QTextStream &str, 
     {
         for(xsize j = 0; j < width; ++j)
         {
-            str << data(j, i);
+            str << data(i, j);
             if((i < height-1) && (j < width-1)) // while not last element
             {
                 str << " "; // separate each element with space
@@ -38,7 +38,7 @@ template <typename T, int U, int V> QDataStream & operator <<(QDataStream &str, 
     {
         for(xsize j = 0; j < width; ++j)
         {
-            str << data(j, i);
+            str << data(i, j);
         }
     }
     return str;
@@ -59,7 +59,7 @@ template <typename T, int U, int V> QTextStream & operator >>(QTextStream &str, 
         {
             T tVal;
             str >> tVal;
-            data(j, i) = tVal;
+            data(i, j) = tVal;
         }
     }
     return str;
@@ -78,7 +78,7 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
         {
             T tVal;
             str >> tVal;
-            data(j, i) = tVal;
+            data(i, j) = tVal;
         }
     }
     return str;
@@ -93,17 +93,32 @@ public:
   static void SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in); // Mode = Binary / ASCII
   static void LoadFunction( SProperty* p_in, const SPropertyData& data_in, xuint32 v_in, SPropertyData::Mode mode_in, SLoader&); // Mode = Binary / ASCII
   static void AssignFunction( const SProperty *, SProperty * ) {} // typecheck this when implementing
-#if 0
-  void WriteData(int index, T value)
+
+  void add(const SArrayProperty <T> *in)
   {
-      mData.insert(index, value);
+     #warning test that rows and cols are the same for both
+     mData += in->mData;
   }
-#endif
+
+  void add(const SArrayProperty <T> *inA, const SArrayProperty <T> *inB)
+  {
+     #warning test that rows and cols are the same for both
+     mData = inA->mData + inB->mData;
+  }
+
+  void resize(xsize width, xsize height)
+  {
+        mData.resize(height, width);
+  }
+
+  void setIndex(xsize i, xsize j, T val)
+  {
+        mData(j,i) = val;
+  }
 
 private:
-  // todo: use Eigne array here, possible using some inherited types form EksCore... will give us SSEEEEEEE
 
-Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
+    Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
 
 };
 

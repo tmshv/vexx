@@ -217,7 +217,7 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
     if(_options.hasFlag(ShowValues) && index.column() == 1)
       {
       SPropertyData data;
-      _db->write(prop, data, SPropertyData::Ascii);
+      //_db->write(prop, data, SPropertyData::Ascii);
       return QString::fromUtf8(data.value());
       }
     else

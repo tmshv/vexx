@@ -8,13 +8,17 @@ TARGET = Synapse
 
 TEMPLATE = app
 
-INCLUDEPATH += ../Alter2 ../EksCore ../ALter2/plugins/script
+INCLUDEPATH += ../Alter2 ../EksCore ../ALter2/plugins/script ../ALter2/plugins/ShiftAlter ../shift/ SynapseCore/
 
-LIBS += -L../bin -lalter -lEksCore -lscript
+LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lSynapseCore
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    syimagenode.cpp
 
 DESTDIR = ../bin
 
 OTHER_FILES += scripts/startup.js \
     scripts/nodes/add.js
+
+HEADERS += \
+    syimagenode.h
