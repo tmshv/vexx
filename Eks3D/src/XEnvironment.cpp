@@ -2,8 +2,8 @@
 #include "XAbstractEnvironmentInterface.h"
 #include "QDataStream"
 
-XEnvironment::XEnvironment(XAbstractEnvironmentInterface *iface) :
-    XInitProperty(environmentInterface, iface), _requestID(0)
+XEnvironment::XEnvironment(XAbstractEnvironmentInterface *iface, Listener *l) :
+    XInitProperty(environmentInterface, iface), _listener(l), _requestID(0)
   {
   environmentInterface()->setController(this);
   }
@@ -12,62 +12,91 @@ XEnvironment::ItemID XEnvironment::createItem(ItemType type)
   {
   Request item = requestSpecialItem(type, CreateItem, true);
 
-  WriteLock lock(this);
   ItemID id;
-  QDataStream stream(&_specials[CreateItem], QIODevice::ReadOnly);
+  xAssert(_specials[CreateItem]);
+  QDataStream stream(_specials[CreateItem], QIODevice::ReadOnly);
   stream >> id;
   _specials.remove(CreateItem);
-  _areas[id] = Area();
   return id;
   }
 
 void XEnvironment::requestComplete(xuint32 requestID)
   {
-  WriteLock lock(this);
-  for(int i=0; i<_pendingRequests.size(); ++i)
+  Request r;
     {
-    if(_pendingRequests[i].requestID() == requestID)
+    for(int i=0; i<_pendingRequests.size(); ++i)
       {
-      _pendingRequests.removeAt(i);
+      if(_pendingRequests[i].requestID() == requestID)
+        {
+        r = _pendingRequests[i];
+        _pendingRequests.removeAt(i);
+        }
       }
     }
+
+  xAssert(_listener);
+  _listener->onRequestComplete(r);
   qDebug() << "Request Complete" << requestID;
-  }
-
-void XEnvironment::lock()
-  {
-  _lock.lock();
-  }
-
-void XEnvironment::unlock()
-  {
-  _lock.unlock();
-  }
-
-void XEnvironment::readLock() const
-  {
-  _lock.lock();
-  }
-
-void XEnvironment::readUnlock() const
-  {
-  _lock.unlock();
   }
 
 QByteArray XEnvironment::getData(const Request &req, bool *correct) const
   {
   correct ? *correct = false : false;
+
+  QByteArray arr;
+  if(req.type() == ContainerType && _containers.contains(req.ID()))
     {
-    ReadLock lock(this);
-#warning switch on type and stream to byte arr etc...
+    QDataStream str(&arr, QIODevice::WriteOnly);
+    str << *_containers[req.ID()];
+
+    correct ? *correct = true : true;
     }
-  return QByteArray();
+  else if(req.type() == SpecialType && _specials.contains(req.ID()))
+    {
+    arr = *_specials[req.ID()];
+
+    correct ? *correct = true : true;
+    }
+  else
+    {
+    xAssertFail();
+    }
+
+  return arr;
   }
 
 void XEnvironment::setData(const Request &req, const QByteArray &arr)
   {
-  WriteLock lock(this);
-#warning switch on type etc...
+  if(req.type() == ContainerType)
+    {
+    Container *&ctr = _containers[req.ID()];
+    if(!ctr)
+      {
+      ctr = new Container(req.ID());
+      }
+
+    if(arr.length())
+      {
+      // cast because we are not going to change to contents due to ReadOnly, but IODevice expects a non-const ptr.
+      QDataStream str((QByteArray*)&arr, QIODevice::ReadOnly);
+
+      str >> *ctr;
+      }
+    }
+  else if(req.type() == SpecialType)
+    {
+    QByteArray *&spe = _specials[req.subType()];
+    if(!spe)
+      {
+      spe = new QByteArray;
+      }
+
+    *spe = arr;
+    }
+  else
+    {
+    xAssertFail();
+    }
   }
 
 void XEnvironment::syncData(const Request &req)
@@ -75,18 +104,20 @@ void XEnvironment::syncData(const Request &req)
   environmentInterface()->syncItem( req );
   }
 
-void XEnvironment::requestItem( Request &request, bool block )
+void XEnvironment::requestItem(Request &request, bool block)
   {
   qDebug() << "Request Item" << request.type() << request.ID() << request.subType();
 
-  WriteLock lock(this);
-  request.setRequestID(_requestID++);
-  _pendingRequests << request;
-  environmentInterface()->requestItem( request );
+  if(!hasUncompleteRequestForSameData(request))
+    {
+    request.setRequestID(_requestID++);
+    _pendingRequests << request;
+    environmentInterface()->requestItem( request );
+    }
 
   if(block)
     {
-    while(hasUncompleteRequest(request.requestID()))
+    while(hasUncompleteRequest(request))
       {
       // now refresh the data interface until it has our item
       environmentInterface()->poll();
@@ -94,12 +125,11 @@ void XEnvironment::requestItem( Request &request, bool block )
     }
   }
 
-bool XEnvironment::hasUncompleteRequest(xuint32 id) const
+bool XEnvironment::hasUncompleteRequest(const Request &r) const
   {
-  ReadLock lock(this);
   foreach(const Request &req, _pendingRequests)
     {
-    if(req.requestID() == id)
+    if(req.requestID() == r.requestID())
       {
       return true;
       }
@@ -107,9 +137,44 @@ bool XEnvironment::hasUncompleteRequest(xuint32 id) const
   return false;
   }
 
-XEnvironment::Request XEnvironment::requestSpecialItem( ItemID id, SpecialType type, bool block )
+bool XEnvironment::hasUncompleteRequestForSameData(const Request &req) const
   {
-  Request request(Special, id, type);
+  foreach(const Request &r, _pendingRequests)
+    {
+    if(req.type() == r.type() && req.ID() == r.ID() && req.subType() == r.subType())
+      {
+      return true;
+      }
+    }
+  return false;
+  }
+
+XEnvironment::Request XEnvironment::requestSpecialItem(ItemID id, SpecialIdentifier type, bool block)
+  {
+  Request request(SpecialType, id, type);
   requestItem( request, block );
   return request;
+  }
+
+XEnvironment::Container::Container(ItemID id) : _parentID(0), _ID(id)
+  {
+  }
+
+void XEnvironment::Container::reparent(Container *oldParent, Container *parent)
+  {
+  xAssert(oldParent);
+  xAssert(parent);
+  oldParent->items().removeAll(ID());
+  _parentID = parent->ID();
+  parent->items() << ID();
+  }
+
+QDataStream &operator<<(QDataStream &stream, const XEnvironment::Container &c)
+  {
+  return stream << c._items << c._name << c._parentID;
+  }
+
+QDataStream &operator>>(QDataStream &stream, XEnvironment::Container &c)
+  {
+  return stream >> c._items >> c._name >> c._parentID;
   }

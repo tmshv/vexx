@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/tang">
+        <file>resources/Folder.svg</file>
+    </qresource>
+</RCC>

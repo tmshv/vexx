@@ -12,6 +12,7 @@
 #include "EnvironmentEntity.h"
 #include "XEnvironmentRenderer.h"
 #include "sentityui.h"
+#include "application.h"
 
 QGLContext *Viewport::initRenderer()
   {
@@ -19,10 +20,11 @@ QGLContext *Viewport::initRenderer()
   return _renderer->context();
   }
 
-Viewport::Viewport() : QGLWidget( initRenderer() ),
+Viewport::Viewport(Application *app) : QGLWidget( initRenderer() ),
     UISurface("Tang", this, UISurface::Dock),
     _camera( 55, XVector3D( 0, 5, 10 ) ),
-    _scene( _renderer, &_camera ), _initMouse( true )
+    _scene( _renderer, &_camera ), _initMouse( true ),
+    _app(app)
   {
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
@@ -32,7 +34,7 @@ Viewport::Viewport() : QGLWidget( initRenderer() ),
 
   _move << 0 << 0 << 0;
 
-  _properties = new QWidget(0);
+  /*_properties = new QWidget(0);
   _properties->show();
   _properties->setGeometry(QRect(_properties->pos(), QSize(250, 600)));
   connect(this, SIGNAL(destroyed()), _properties, SLOT(deleteLater()));
@@ -42,17 +44,12 @@ Viewport::Viewport() : QGLWidget( initRenderer() ),
   QAction *newItemAction = new QAction(this);
   connect(newItemAction, SIGNAL(triggered()), this, SLOT(newItem()));
   newItemAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-  addAction(newItemAction);
+  addAction(newItemAction);*/
   }
 
 void Viewport::initializeGL()
   {
   _renderer->intialise();
-
-  _interface = new Interface;
-  _env = new XEnvironment(_interface);
-  //_envRenderer = new XEnvironmentRenderer(_env, this, _renderer);
-  //_entity = new EnvironmentEntity(_env, 0);
 
   class EnvironmentDoodad : public XDoodad
     {
@@ -159,8 +156,9 @@ void Viewport::showEvent(QShowEvent *event)
 
 void Viewport::newItem()
   {
-  NewItemDialog *dialog = new NewItemDialog(_env, this);
-  dialog->show();
+  /*
+  NewItemDialog *dialog = new NewItemDialog(_app->environment(), this);
+  dialog->show();*/
   }
 
 XVector3D Viewport::screenToWorld(const QPoint &pt) const

@@ -5,28 +5,20 @@ db.addType({
     [
       {
       name: "InputA",
-      type: "IntProperty",
-      affects: [ "Output", "Output2" ]
+      type: "SyImageInput",
+      affects: [ "Output" ]
       },
       {
       name: "InputB",
-      type: "IntProperty",
-      affects: [ "Output", "Output2" ]
+      type: "SyImageInput",
+      affects: [ "Output" ]
       },
       {
       name: "Output",
-      type: "IntProperty",
+      type: "SyImageOutput",
       compute: function()
         {
-        this.Output.setValue(this.InputA.value() + this.InputB.value());
-        }
-      },
-      {
-      name: "Output2",
-      type: "IntProperty",
-      compute: function()
-        {
-        this.Output2.setValue(this.InputA.value() * this.InputB.value());
+        // something like: this.Output.add(this.InputA, this.InputB);
         }
       }
     ]

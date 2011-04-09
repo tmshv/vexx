@@ -4,6 +4,9 @@
 #include "sappdatabase.h"
 #include "GraphicsCore/GraphicsCore.h"
 #include "synode.h"
+#include "syimagebase.h"
+#include "syimageinput.h"
+#include "syimageoutput.h"
 
 ALTER_PLUGIN(SynapseCorePlugin);
 
@@ -20,5 +23,8 @@ void SynapseCorePlugin::load()
     initiateGraphicsCore(&db);
 
     db.addType<SyNode>();
+    db.addType<SyImageBase>();
+    db.addType<SyImageInput>();
+    db.addType<SyImageOutput>();
     }
   }

@@ -50,6 +50,7 @@ public:
   virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
   bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
   virtual void onTreeChange(int m, const SChange *);
   virtual void actOnChanges();

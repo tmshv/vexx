@@ -233,6 +233,22 @@ bool SDatabaseModel::setData(const QModelIndex & index, const QVariant & value, 
   return true;
   }
 
+QVariant SDatabaseModel::headerData(int section, Qt::Orientation orientation, int role) const
+  {
+  if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+    if(section == 0)
+      {
+      return "Property";
+      }
+    else if(section == 1)
+      {
+      return "Value";
+      }
+    }
+  return QVariant();
+  }
+
 Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
   SDataModelProfileFunction

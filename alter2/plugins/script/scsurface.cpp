@@ -10,6 +10,7 @@
 #include <iostream>
 
 ScSurface *g_surface = 0;
+QtMsgHandler g_oldHandler = 0;
 
 void logHandler(QtMsgType msgType, const char *message)
   {
@@ -17,6 +18,18 @@ void logHandler(QtMsgType msgType, const char *message)
     {
     xAssertFail();
     }
+
+  if(g_oldHandler)
+    {
+    g_oldHandler(msgType, message);
+    }
+
+#ifdef X_DEBUG
+  if(QString(message).startsWith("QMutex::lock: Deadlock detected"))
+    {
+    xAssertFail();
+    }
+#endif
 
   static bool recursion = false;
   if(g_surface && !recursion)
@@ -67,7 +80,7 @@ ScSurface::ScSurface(ScPlugin *plugin) : UISurface("Script", new QWidget(), UISu
   sLayout->addWidget(splitter);
 
   _log = new QTextEdit(widget());
-  qInstallMsgHandler(logHandler);
+  g_oldHandler = qInstallMsgHandler(logHandler);
   connect(this, SIGNAL(threadSafeLogSignal(QString)), this, SLOT(appendToLog(QString)), Qt::QueuedConnection);
   splitter->addWidget(_log);
   _log->setReadOnly(true);

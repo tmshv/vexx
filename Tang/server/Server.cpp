@@ -122,21 +122,27 @@ QByteArray Server::getSpecialData(const XEnvironmentRequest &request) const
   {
   QByteArray arr;
   QDataStream str(&arr, QIODevice::WriteOnly);
-  if(request.ID() == XEnvironment::CreateItem)
+  if(request.subType() == XEnvironment::CreateItem)
     {
-    xuint64 firstFreeId = 0;
+    ItemID firstFreeId = X_UINT64_SENTINEL;
     QString dir;
 
     do
       {
-      dir = getItemDirectory(request.subType(), firstFreeId);
-
       firstFreeId++;
+      dir = getItemDirectory(request.ID(), firstFreeId);
       } while(QDir::root().exists(dir));
 
     xAssert(prepareItemDirectory(dir));
     str << firstFreeId;
-#warning create the item...
+
+    QString filename = getItemFilename(request.subType());
+
+    QFile file(dir + filename);
+    if(file.open(QIODevice::WriteOnly))
+      {
+      file.close();
+      }
     }
   return arr;
   }
@@ -168,7 +174,10 @@ QString Server::getItemDirectory(xuint16 type, ItemID id) const
 
 void Server::cacheData(const XEnvironmentRequest &request, const QByteArray &a) const
   {
-  _data[request.type()][request.ID()][request.subType()] = a;
+  if(a.length())
+    {
+    _data[request.type()][request.ID()][request.subType()] = a;
+    }
   }
 
 const QByteArray Server::cachedData(const XEnvironmentRequest &request, bool *correct) const
@@ -189,7 +198,7 @@ const QByteArray Server::cachedData(const XEnvironmentRequest &request, bool *co
 
 QByteArray Server::getItem(const XEnvironmentRequest &req) const
   {
-  if(req.type() == XEnvironment::Special)
+  if(req.type() == XEnvironment::SpecialType)
     {
     return getSpecialData(req);
     }

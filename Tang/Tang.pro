@@ -13,7 +13,9 @@ SOURCES += main.cpp \
     Interface.cpp \
     viewport.cpp \
     NewItemDialog.cpp \
-    EnvironmentEntity.cpp
+    EnvironmentEntity.cpp \
+    assettree.cpp \
+    application.cpp
 LIBS += -L../bin \
     -lEksCore \
     -lEks3D \
@@ -30,6 +32,11 @@ INCLUDEPATH += ../include \
 HEADERS += Interface.h \
     viewport.h \
     NewItemDialog.h \
-    EnvironmentEntity.h
+    EnvironmentEntity.h \
+    assettree.h \
+    application.h
 
 FORMS += NewItemDialog.ui
+
+RESOURCES += \
+    TangResources.qrc

@@ -41,7 +41,6 @@ void Interface::requestReady()
       controller()->setData(request, request.extraData());
       controller()->requestComplete(request.requestID());
 
-      xAssertFail();
       complete = true;
       _readingLength = X_UINT64_SENTINEL;
       }
@@ -70,7 +69,6 @@ void Interface::pollPendingRequests()
     bool correct = false;
     QByteArray data = controller()->getData(r, &correct);
 
-    xAssertFail();
     if(correct)
       {
       r.setExtraData(data);

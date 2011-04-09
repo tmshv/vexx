@@ -8,18 +8,17 @@
 #include "XScene.h"
 #include "XEnvironmentViewer.h"
 
-class XEnvironment;
 class XEnvironmentRenderer;
 class XGLRenderer;
+class Application;
 
-class Interface;
 class EnvironmentEntity;
 
 class Viewport : public QGLWidget, public UISurface, XEnvironmentViewer
   {
   Q_OBJECT
 public:
-  Viewport();
+  Viewport(Application *env);
 
   void initializeGL();
   void resizeGL( int w, int h );
@@ -50,11 +49,10 @@ private:
   QPoint _oldPos;
   bool _initMouse;
   XList <int> _move;
-  XEnvironment *_env;
   XEnvironmentRenderer *_envRenderer;
-  Interface *_interface;
   //EnvironmentEntity *_entity;
   QWidget *_properties;
+  Application *_app;
   };
 
 #endif // VIEWPORT_H

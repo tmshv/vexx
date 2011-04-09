@@ -16,7 +16,6 @@ UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db) : UISurface("Datab
 
   _treeView->setModel(&_model);
 
-  _treeView->header()->hide();
   _treeView->setItemDelegate(&_delegate);
   _treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   _treeView->setContextMenuPolicy(Qt::CustomContextMenu);
