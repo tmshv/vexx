@@ -3,6 +3,7 @@
 #include "schange.h"
 #include "sentity.h"
 #include "spropertydata.h"
+#include "sarrayproperty.h"
 #include "sreferenceentity.h"
 #include "QFile"
 #include "QRegExp"
@@ -51,6 +52,8 @@ void SDatabase::initiate()
 
   addType<Pointer>();
   addType<PointerArray>();
+
+  addType<SFloatArrayProperty>();
   }
 
 SDatabase::~SDatabase()
