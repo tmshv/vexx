@@ -18,7 +18,7 @@ template <typename T> void SArrayProperty<T>::SaveFunction( const SProperty* p_i
         else // ASCII
         {
             QTextStream str(&arr, QIODevice::WriteOnly); // writes ascii into arr
-            const XList<T> &data = ptr->mData;
+            const Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> &data = ptr->mData;
             str << data;
         }
         data_in.setValue(arr); // set the data (this is written to disk later)

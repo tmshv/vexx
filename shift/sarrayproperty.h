@@ -5,42 +5,88 @@
 #include "sbaseproperties.h"
 #include "spropertydata.h"
 #include "XList"
+#include "Eigen/Core"
 
 // reimplement stream for QTextStream to allow it to work with template classes
 
-template <typename T> QTextStream & operator <<(QTextStream &str, const XList<T> &data)
+template <typename T, int U, int V> QTextStream & operator <<(QTextStream &str, const Eigen::Array <T, U, V> &data)
 {
-    int size = data.size();
-    str << size << " ";
-    for (int i = 0; i < size; ++i)
+    xsize width = data.cols();
+    xsize height = data.rows();
+    str << width << " " << height << " ";
+    for (xsize i = 0; i < height; ++i)
     {
-        str << data[i];
-        if(i < size-1) // while not last element
+        for(xsize j = 0; j < width; ++j)
         {
-            str << " "; // separate each element with space
+            str << data(j, i);
+            if((i < height-1) && (j < width-1)) // while not last element
+            {
+                str << " "; // separate each element with space
+            }
         }
     }
     return str;
 }
 
-template <typename T> QTextStream & operator >>(QTextStream &str, XList<T> &data)
+
+template <typename T, int U, int V> QDataStream & operator <<(QDataStream &str, const Eigen::Array <T, U, V> &data)
 {
-    xuint32 size;
-    str >> size; // first element in str is size of str
-    for(int i = 0; i < size; ++i )
+    xsize width = data.cols();
+    xsize height = data.rows();
+    str << (quint64) width << (quint64) height;
+    for (xsize i = 0; i < height; ++i)
     {
-        T tVal;
-        str >> tVal;
-        data.append(tVal);
+        for(xsize j = 0; j < width; ++j)
+        {
+            str << data(j, i);
+        }
     }
     return str;
 }
 
 
+template <typename T, int U, int V> QTextStream & operator >>(QTextStream &str, Eigen::Array <T, U, V> &data)
+{
+    xsize width;
+    xsize height;
+
+    str >> width >> height; // first element in str is size of str
+    data.resize(width, height);
+
+    for(xsize i = 0; i < height; ++i )
+    {
+        for(xsize j = 0; j < width; j++)
+        {
+            T tVal;
+            str >> tVal;
+            data(j, i) = tVal;
+        }
+    }
+    return str;
+}
+
+template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, Eigen::Array <T, U, V> &data)
+{
+    quint64 width;
+    quint64 height;
+
+    str >> width >> height; // first element in str is size of str
+    data.resize(width, height);
+    for(xsize i = 0; i < height; ++i )
+    {
+        for(xsize j = 0; j < width; j++)
+        {
+            T tVal;
+            str >> tVal;
+            data(j, i) = tVal;
+        }
+    }
+    return str;
+}
+
 
 template <typename T> class SArrayProperty : public SProperty
 {
-  S_PROPERTY(SArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction, 0)
 public:
 
   // called by parent
@@ -56,7 +102,9 @@ public:
 
 private:
   // todo: use Eigne array here, possible using some inherited types form EksCore... will give us SSEEEEEEE
-  XList <T> mData;
+
+Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
+
 };
 
 
