@@ -228,8 +228,8 @@ protected:
   static void load(SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader &);
 
 private:
-  void setDirty();
-  friend void setDependantsDirty(SProperty* prop);
+  void setDirty(bool force=false);
+  friend void setDependantsDirty(SProperty* prop, bool force=false);
   void internalSetName(const QString &name);
 
   void connectInternal(SProperty *) const;

@@ -5,6 +5,43 @@
 #include "QString"
 #include "XProfiler"
 
+inline void setDependantsDirty(SProperty* prop, bool force)
+  {
+  for(SProperty *o=prop->output(); o; o = o->nextOutput())
+    {
+    o->setDirty(force);
+    }
+
+  const SPropertyInstanceInformation *child = prop->baseInstanceInformation();
+
+  if(child && child->affects())
+    {
+    xsize i=0;
+    while(child->affects()[i])
+      {
+      const SProperty SPropertyContainer::* affectsPtr(child->affects()[i]);
+      SProperty *affectsProp = (SProperty*)&(prop->parent()->*affectsPtr);
+
+      xAssert(affectsProp);
+      affectsProp->setDirty(force);
+      i++;
+      }
+    }
+
+  // if we know the parent has an output
+  if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
+    {
+    // break and check this works...
+    xAssertFail();
+    SProperty *parent = prop;
+    while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
+      {
+      parent = parent->parent();
+      parent->setDirty(force);
+      }
+    }
+  }
+
 bool SProperty::NameChange::apply(int mode, SObservers& obs)
   {
   SProfileFunction
@@ -182,7 +219,6 @@ void SProperty::connect(SProperty *prop) const
   void *changeMemory = getChange< ConnectionChange >();
   ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Connect, (SProperty*)this, prop);
   ((SDatabase*)database())->submitChange(change);
-  prop->postSet();
   }
 
 void SProperty::disconnect(SProperty *prop) const
@@ -191,7 +227,6 @@ void SProperty::disconnect(SProperty *prop) const
   void *changeMemory = getChange< ConnectionChange >();
   ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Disconnect, (SProperty*)this, prop);
   ((SDatabase*)database())->submitChange(change);
-  prop->postSet();
   }
 
 void SProperty::disconnect() const
@@ -218,6 +253,7 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
       _driver->connectInternal(_driven);
       setParentHasInputConnection(_driven);
       setParentHasOutputConnection(_driver);
+      setDependantsDirty(_driver, true);
       }
     else if(_mode == Disconnect)
       {
@@ -239,6 +275,7 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
       _driver->connectInternal(_driven);
       setParentHasInputConnection(_driven);
       setParentHasOutputConnection(_driver);
+      setDependantsDirty(_driver, true);
       }
     }
   if(mode&Inform)
@@ -258,8 +295,6 @@ void SProperty::ConnectionChange::setParentHasInputConnection(SProperty *prop)
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
-    // break and check this works...
-    xAssertFail();
     SProperty *child = cont->firstChild();
     while(child)
       {
@@ -279,15 +314,13 @@ void SProperty::ConnectionChange::setParentHasOutputConnection(SProperty *prop)
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
-    // break and check this works...
-    xAssertFail();
     SProperty *child = cont->firstChild();
     while(child)
       {
       if(!child->_flags.hasFlag(SProperty::ParentHasOutput))
         {
         child->_flags.setFlag(SProperty::ParentHasOutput);
-        setParentHasInputConnection(child);
+        setParentHasOutputConnection(child);
         }
       child = child->nextSibling();
       }
@@ -300,8 +333,6 @@ void SProperty::ConnectionChange::clearParentHasInputConnection(SProperty *prop)
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
-    // break and check this works...
-    xAssertFail();
     SProperty *child = cont->firstChild();
     while(child)
       {
@@ -321,8 +352,6 @@ void SProperty::ConnectionChange::clearParentHasOutputConnection(SProperty *prop
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
-    // break and check this works...
-    xAssertFail();
     SProperty *child = cont->firstChild();
     while(child)
       {
@@ -509,43 +538,6 @@ void SProperty::internalSetName(const QString &name)
   ((InstanceInformation*)this->baseInstanceInformation())->_name = name;
   }
 
-inline void setDependantsDirty(SProperty* prop)
-  {
-  for(SProperty *o=prop->output(); o; o = o->nextOutput())
-    {
-    o->setDirty();
-    }
-
-  const SPropertyInstanceInformation *child = prop->baseInstanceInformation();
-
-  if(child && child->affects())
-    {
-    xsize i=0;
-    while(child->affects()[i])
-      {
-      const SProperty SPropertyContainer::* affectsPtr(child->affects()[i]);
-      SProperty *affectsProp = (SProperty*)&(prop->parent()->*affectsPtr);
-
-      xAssert(affectsProp);
-      affectsProp->setDirty();
-      i++;
-      }
-    }
-
-  // if we know the parent has an output
-  if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
-    {
-    // break and check this works...
-    xAssertFail();
-    SProperty *parent = prop;
-    while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
-      {
-      parent = parent->parent();
-      parent->setDirty();
-      }
-    }
-  }
-
 void SProperty::postSet()
   {
   SProfileFunction
@@ -554,13 +546,13 @@ void SProperty::postSet()
   setDependantsDirty(this);
   }
 
-void SProperty::setDirty()
+void SProperty::setDirty(bool force)
   {
-  if(!_flags.hasFlag(Dirty))
+  if(!_flags.hasFlag(Dirty) || force)
     {
     _flags.setFlag(Dirty);
 
-    setDependantsDirty(this);
+    setDependantsDirty(this, force);
     }
   }
 
@@ -571,7 +563,6 @@ void SProperty::preGet() const
     {
     // this is a const function, but because we delay computation we may need to assign here
     SProperty *prop = ((SProperty*)this);
-
     prop->_flags.clearFlag(Dirty);
 
     const SPropertyInstanceInformation *child = baseInstanceInformation();
@@ -587,11 +578,10 @@ void SProperty::preGet() const
       prop->assign(input());
       return;
       }
+    }
 
-    if(_flags.hasFlag(ParentHasInput))
-      {
-      // break and check this works...
-      parent()->preGet();
-      }
+  if(_flags.hasFlag(ParentHasInput))
+    {
+    parent()->preGet();
     }
   }

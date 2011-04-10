@@ -7,6 +7,7 @@
 ScShiftFloatArrayProperty::ScShiftFloatArrayProperty(QScriptEngine *eng, const QString &parent) : ScShiftProperty(eng, parent)
   {
   addMemberFunction("add", add);
+  addMemberFunction("at", at);
   }
 
 ScShiftFloatArrayProperty::~ScShiftFloatArrayProperty()
@@ -19,35 +20,54 @@ void ScShiftFloatArrayProperty::initiate()
   }
 
 QScriptValue ScShiftFloatArrayProperty::add(QScriptContext *ctx, QScriptEngine *)
-{
-    ScProfileFunction
-    SProperty **thisProperty = getThis(ctx);
-    SProperty **addAProperty = unpackValue(ctx->argument(0)); // returning script node as object
+  {
+  ScProfileFunction
+  SProperty **thisProperty = getThis(ctx);
+  SProperty **addAProperty = unpackValue(ctx->argument(0)); // returning script node as object
 
-    SProperty **addBProperty = 0;
-    if(ctx->argumentCount() > 1 )
+  SProperty **addBProperty = 0;
+  if(ctx->argumentCount() > 1 )
     {
-        addBProperty = unpackValue(ctx->argument(1)); // returning script node as object
+    addBProperty = unpackValue(ctx->argument(1)); // returning script node as object
     }
 
-    if(addAProperty && thisProperty)
+  if(addAProperty && thisProperty)
     {
-        SFloatArrayProperty* addThis = (*thisProperty)->castTo<SFloatArrayProperty>();
-        SFloatArrayProperty* addA = (*addAProperty)->castTo<SFloatArrayProperty>();
-        SFloatArrayProperty* addB = (*addBProperty)->castTo<SFloatArrayProperty>();
+    SFloatArrayProperty* addThis = (*thisProperty)->castTo<SFloatArrayProperty>();
+    SFloatArrayProperty* addA = (*addAProperty)->castTo<SFloatArrayProperty>();
+    SFloatArrayProperty* addB = (*addBProperty)->castTo<SFloatArrayProperty>();
 
-        if(addThis && addA)
+    if(addThis && addA)
+      {
+      if(addB)
         {
-            if(addB)
-            {
-                addThis->add(addA, addB);
-            }
-            else
-            {
-                addThis->add(addA);
-            }
+        addThis->add(addA, addB);
         }
+      else
+        {
+        addThis->add(addA);
+        }
+      }
     }
-    return QScriptValue();
-}
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftFloatArrayProperty::at(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **thisProperty = getThis(ctx);
+
+  if(thisProperty && ctx->argumentCount() == 2)
+    {
+    SFloatArrayProperty* thisArray = (*thisProperty)->castTo<SFloatArrayProperty>();
+
+    if(thisArray)
+      {
+      quint32 x = ctx->argument(0).toUInt32();
+      quint32 y = ctx->argument(1).toUInt32();
+      return thisArray->atIndex(x, y);
+      }
+    }
+  return QScriptValue();
+  }
 

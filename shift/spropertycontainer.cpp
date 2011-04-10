@@ -181,15 +181,14 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
 
 void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
   {
-  if(t->type() == f->type())
-    {
-    const SPropertyContainer *from = f->uncheckedCastTo<SPropertyContainer>();
-    SPropertyContainer *to = t->uncheckedCastTo<SPropertyContainer>();
+  const SPropertyContainer *from = f->uncheckedCastTo<SPropertyContainer>();
+  SPropertyContainer *to = t->uncheckedCastTo<SPropertyContainer>();
 
+  if(from->containedProperties() == to->containedProperties())
+    {
     const SProperty *fChild=from->firstChild();
     SProperty *tChild=to->firstChild();
     xsize index = 0;
-    xAssert(0 && "Test this fool... break and step through it.");
     while(fChild)
       {
       if(!tChild || tChild->type() != fChild->type())
@@ -209,6 +208,10 @@ void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
       fChild = fChild->nextSibling();
       index++;
       }
+    }
+  else
+    {
+    xAssertFail();
     }
   }
 

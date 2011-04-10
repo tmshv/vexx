@@ -10,17 +10,18 @@ SyImageBase::SyImageBase()
   }
 
 void SyImageBase::loadImage(const QImage &imageIn)
-{
-    int width = imageIn.width();
-    int height = imageIn.height();
+  {
+  int width = imageIn.width();
+  int height = imageIn.height();
 
-    image.resize(width, height);
+  image.resize(width, height);
 
-    for(int i = 0; i < height; ++i )
+  for(int i = 0; i < height; ++i )
     {
-        for(int j = 0; j < width; ++j)
-        {
-           image.setIndex(j, i, qRed(imageIn.pixel(i, j)));
-        }
+    for(int j = 0; j < width; ++j)
+      {
+      image.setIndex(j, i, qRed(imageIn.pixel(j, i)));
+      }
     }
-}
+  postSet();
+  }

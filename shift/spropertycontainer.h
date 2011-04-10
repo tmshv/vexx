@@ -121,6 +121,7 @@ public:
   SProperty *findChild(const QString &name);
 
   xsize size() const;
+  xsize containedProperties() const { return _containedProperties; }
 
   bool contains(SProperty *) const;
 

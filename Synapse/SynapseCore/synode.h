@@ -4,7 +4,7 @@
 #include "syglobal.h"
 #include "sentity.h"
 
-class SyNode : public SEntity
+class SYNAPSECORE_EXPORT SyNode : public SEntity
   {
   S_ENTITY(SyNode, SEntity, 0);
 public:

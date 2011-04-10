@@ -4,7 +4,7 @@
 #include "syglobal.h"
 #include "syimagebase.h"
 
-class SyImageInput : public SyImageBase
+class SYNAPSECORE_EXPORT SyImageInput : public SyImageBase
   {
   S_PROPERTY_CONTAINER(SyImageInput, SyImageBase, 0);
 public:

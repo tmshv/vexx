@@ -12,6 +12,7 @@ public:
   void initiate();
 
   static QScriptValue add(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue at(QScriptContext *ctx, QScriptEngine *);
   };
 
 Q_DECLARE_METATYPE(ScShiftFloatArrayProperty*)

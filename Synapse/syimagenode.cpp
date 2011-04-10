@@ -15,6 +15,6 @@ SyImageNode::SyImageNode()
 
 void SyImageNode::computeImage(const SPropertyInstanceInformation *, SPropertyContainer* node)
   {
-        SyImageNode* syImage = node->castTo<SyImageNode>();
-        syImage->output.loadImage(QImage(syImage->filename.value()));
+  SyImageNode* syImage = node->castTo<SyImageNode>();
+  syImage->output.loadImage(QImage(syImage->filename.value()));
   }

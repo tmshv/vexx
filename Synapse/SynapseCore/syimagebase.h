@@ -7,7 +7,7 @@
 
 class QImage;
 
-class SyImageBase : public SPropertyContainer
+class SYNAPSECORE_EXPORT SyImageBase : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(SyImageBase, SPropertyContainer, 0);
 public:
