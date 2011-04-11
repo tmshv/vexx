@@ -8,7 +8,7 @@ TARGET = Synapse
 
 TEMPLATE = app
 
-INCLUDEPATH += ../Alter2 ../EksCore ../ALter2/plugins/script ../ALter2/plugins/ShiftAlter ../shift/ SynapseCore/
+INCLUDEPATH += ../Alter2 ../EksCore ../Alter2/plugins/script ../Alter2/plugins/ShiftAlter ../shift/ SynapseCore/
 
 LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lSynapseCore
 
