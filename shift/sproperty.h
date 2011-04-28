@@ -72,7 +72,8 @@ public:
   void disconnect(SProperty *) const;
   void disconnect() const;
 
-  bool hasInput() const { preGet(); return _input; }
+  bool isComputed() const { return baseInstanceInformation()->compute() != 0; }
+  bool hasInput() const { return _input; }
   bool hasOutputs() const { preGet(); return _output; }
 
   template <typename T> T *nextSibling()
@@ -90,7 +91,7 @@ public:
     return 0;
     }
 
-  SProperty *nextSibling() const { preGet(); return _nextSibling; }
+  SProperty *nextSibling() const;
 
   SDatabase *database() { return _database; }
   const SDatabase *database() const { return _database; }
@@ -249,7 +250,8 @@ private:
     {
     Dirty = 1,
     ParentHasInput = 2,
-    ParentHasOutput = 4
+    ParentHasOutput = 4,
+    PreGetting = 8
     };
   XFlags<Flags, xuint8> _flags;
 

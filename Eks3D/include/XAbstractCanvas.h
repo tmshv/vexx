@@ -5,16 +5,19 @@
 #include "XAbstractRenderModel.h"
 #include "X3DGlobal.h"
 
+class XAbstractCanvasController;
+
 class EKS3D_EXPORT XAbstractCanvas
   {
 XProperties:
   XROProperty(XAbstractRenderModel *, model);
+  XProperty(XAbstractCanvasController *, controller, setController);
 
 public:
-  XAbstractCanvas(XAbstractRenderModel *model=0);
+  XAbstractCanvas(XAbstractRenderModel *model=0, XAbstractCanvasController *controller=0);
   virtual ~XAbstractCanvas();
 
-  virtual void update(XAbstractRenderModel::UpdateMode) const;
+  virtual void update(XAbstractRenderModel::UpdateMode);
   virtual void paint();
 
   void setModel(XAbstractRenderModel *);

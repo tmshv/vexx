@@ -29,7 +29,8 @@ XProperties:
   XProperty(SProperty SPropertyContainer::*, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
   XProperty(SProperty SPropertyContainer::* *, affects, setAffects);
-  XProperty(xsize, index, setINdex);
+  // this index is internal to this instance information only
+  XProperty(xsize, index, setIndex);
   XProperty(bool, entityChild, setEntityChild);
   XProperty(bool, extra, setExtra);
   XProperty(bool, dynamic, setDynamic);
@@ -131,6 +132,13 @@ public:
   ~SPropertyInformation();
 
   static DataKey newDataKey();
+
+  template <typename T> bool inheritsFromType() const
+    {
+    return inheritsFromType(T::Type);
+    }
+
+  bool inheritsFromType(SPropertyType type) const;
 
   // this classes and all its inherited children count
   xsize completeChildCount() const;

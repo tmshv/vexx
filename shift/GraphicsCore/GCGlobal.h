@@ -1,3 +1,6 @@
+#ifndef GCGLOBAL_H
+#define GCGLOBAL_H
+
 #include "XGlobal"
 #include "sglobal.h"
 
@@ -12,3 +15,5 @@
 GRAPHICSCORE_TYPE(GCImageChannelData, 1);
 GRAPHICSCORE_TYPE(GCImageChannel, 2);
 GRAPHICSCORE_TYPE(GCImage, 3)
+
+#endif // GCGLOBAL_H

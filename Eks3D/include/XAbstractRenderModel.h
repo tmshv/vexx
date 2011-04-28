@@ -37,8 +37,7 @@ public:
 
   virtual void resetIterator(Iterator *) const = 0;
 
-  virtual void paint(XAbstractCanvas *, const Iterator *, const XAbstractDelegate *) const = 0;
-  virtual XAbstractDelegate *delegateFor(Iterator *) const = 0;
+  virtual const XAbstractDelegate *delegateFor(Iterator *, const XAbstractCanvas *) const = 0;
 
 private:
   friend class XAbstractCanvas;

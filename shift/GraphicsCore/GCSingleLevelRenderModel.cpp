@@ -1,14 +1,23 @@
 #include "GCSingleLevelRenderModel.h"
 #include "sentity.h"
 
+GCSingleLevelRenderModel::Iterator::Iterator(const GCSingleLevelRenderModel *m) : _model(m)
+  {
+  }
+
 bool GCSingleLevelRenderModel::Iterator::next()
   {
-  if(_entity)
+  xAssert(_model);
+  if(entity())
     {
-    _entity = _entity->nextSibling<SEntity>();
+    setEntity(entity()->nextSibling<SEntity>());
+    }
+  else
+    {
+    setEntity(_model->entity()->children.firstChild<SEntity>());
     }
 
-  return _entity != 0;
+  return entity() != 0;
   }
 
 GCSingleLevelRenderModel::GCSingleLevelRenderModel(SEntity *ent) : _entity(0)
@@ -16,30 +25,71 @@ GCSingleLevelRenderModel::GCSingleLevelRenderModel(SEntity *ent) : _entity(0)
   setEntity(ent);
   }
 
+GCSingleLevelRenderModel::~GCSingleLevelRenderModel()
+  {
+  setEntity(0);
+  }
+
 void GCSingleLevelRenderModel::setEntity(SEntity *entity)
   {
+  if(_entity)
+    {
+    _entity->removeTreeObserver(this);
+
+    for(SEntity *child=_entity->children.firstChild<SEntity>(); child; child=child->nextSibling<SEntity>())
+      {
+      child->removeConnectionObserver(this);
+      }
+    }
+
   _entity = entity;
+
+  if(_entity)
+    {
+    _entity->addTreeObserver(this);
+
+    for(SEntity *child=_entity->children.firstChild<SEntity>(); child; child=child->nextSibling<SEntity>())
+      {
+      child->addConnectionObserver(this);
+      }
+    }
   }
 
-GCSingleLevelRenderModel::Iterator *GCSingleLevelRenderModel::createIterator() const
+XAbstractRenderModel::Iterator *GCSingleLevelRenderModel::createIterator() const
   {
-  return new GCSingleLevelRenderModel::Iterator();
+  return new GCSingleLevelRenderModel::Iterator(this);
   }
 
-void GCSingleLevelRenderModel::destroyIterator(Iterator *it) const
+void GCSingleLevelRenderModel::destroyIterator(XAbstractRenderModel::Iterator *it) const
   {
   delete it;
   }
 
-void GCSingleLevelRenderModel::resetIterator(Iterator *it) const
+void GCSingleLevelRenderModel::resetIterator(XAbstractRenderModel::Iterator *it) const
   {
   GCSingleLevelRenderModel::Iterator *slIt = static_cast<GCSingleLevelRenderModel::Iterator*>(it);
-  if(_entity)
+  slIt->setEntity(0);
+  }
+
+void GCSingleLevelRenderModel::onConnectionChange(int m, const SChange *)
+  {
+  update(TreeChange);
+  }
+
+void GCSingleLevelRenderModel::onTreeChange(int m, const SChange *c)
+  {
+  update(TreeChange);
+
+  const SPropertyContainer::TreeChange *t = c->castTo<SPropertyContainer::TreeChange>();
+  if(t)
     {
-    slIt->setEntity(_entity->firstChild<SEntity>());
-    }
-  else
-    {
-    slIt->setEntity(0);
+    if(t->before() && t->before()->isDescendedFrom(_entity))
+      {
+      t->property()->entity()->removeConnectionObserver(this);
+      }
+    if(t->after() && t->after()->isDescendedFrom(_entity))
+      {
+      t->property()->entity()->addConnectionObserver(this);
+      }
     }
   }

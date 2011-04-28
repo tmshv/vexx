@@ -248,7 +248,7 @@ const SPropertyInformation *SDatabase::findType(xuint32 i) const
   SProfileFunction
   if(_types.contains(i))
     {
-    return ((XMap <SPropertyType, SPropertyInformation*>&)_types)[i];
+    return ((XHash <SPropertyType, SPropertyInformation*>&)_types)[i];
     }
   return 0;
   }
@@ -261,7 +261,7 @@ const SPropertyInformation *SDatabase::findType(const QString &in) const
     {
     if(_types[keys[i]]->typeName() == in)
       {
-      return ((XMap <SPropertyType, SPropertyInformation*>&)_types)[keys[i]];
+      return ((XHash <SPropertyType, SPropertyInformation*>&)_types)[keys[i]];
       }
     }
   return 0;

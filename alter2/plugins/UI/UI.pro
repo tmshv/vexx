@@ -19,6 +19,7 @@ SOURCES += UIPlugin.cpp \
     UIStackedLayout.cpp \
     UILayout.cpp \
     UIDatabaseDebugSurface.cpp \
+    UIGraphDebugSurface.cpp \
     UISurfacePrivate.cpp \
     UIProfilerSurface.cpp
 
@@ -31,11 +32,12 @@ HEADERS += UIPlugin.h \
     UIStackedLayout.h \
     UILayout.h \
     UIDatabaseDebugSurface.h \
+    UIGraphDebugSurface.h \
     UISurfacePrivate.h \
     UIProfilerSurface.h
 
 DESTDIR += ../../../bin
 
-INCLUDEPATH += ../../ ../../../EksCore ../../../Alter2/plugins/ShiftAlter ../../../Shift
+INCLUDEPATH += ../../ ../../../EksCore ../../../Eks3D/include ../../../Alter2/plugins/ShiftAlter ../../../Shift ../../../Shift/GraphicsCore
 
-LIBS += -L../../../bin  -lEksCore -lalter -lShiftAlter -lShift
+LIBS += -L../../../bin  -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore

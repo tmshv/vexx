@@ -31,8 +31,6 @@ inline void setDependantsDirty(SProperty* prop, bool force)
   // if we know the parent has an output
   if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
     {
-    // break and check this works...
-    xAssertFail();
     SProperty *parent = prop;
     while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
       {
@@ -85,7 +83,7 @@ xsize SProperty::index() const
   {
   SProfileFunction
   preGet();
-  return _instanceInfo->index();
+  return _info->propertyOffset() + _instanceInfo->index();
   }
 
 void SProperty::setName(const QString &in)
@@ -116,6 +114,12 @@ void SProperty::setName(const QString &in)
   void *changeMemory = getChange< NameChange >();
   NameChange *change = new(changeMemory) NameChange(name(), realName, this);
   database()->submitChange(change);
+  }
+
+SProperty *SProperty::nextSibling() const
+  {
+  parent()->preGet();
+  return _nextSibling;
   }
 
 void SProperty::blankAssign(const SProperty *, SProperty *)
@@ -216,9 +220,17 @@ SPropertyType SProperty::type() const
 void SProperty::connect(SProperty *prop) const
   {
   SProfileFunction
-  void *changeMemory = getChange< ConnectionChange >();
-  ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Connect, (SProperty*)this, prop);
-  ((SDatabase*)database())->submitChange(change);
+  if(prop && prop != this)
+    {
+    SProfileFunction
+    void *changeMemory = getChange< ConnectionChange >();
+    ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Connect, (SProperty*)this, prop);
+    ((SDatabase*)database())->submitChange(change);
+    }
+  else
+    {
+    xAssertFail();
+    }
   }
 
 void SProperty::disconnect(SProperty *prop) const
@@ -377,14 +389,13 @@ void SProperty::connectInternal(SProperty *prop) const
   SProperty **output = (SProperty**)&_output;
   while(*output)
     {
-    SProperty **nextOutput =  &((*output)->_nextOutput);
-    if(!*nextOutput)
-      {
-      break;
-      }
-    output = nextOutput;
+    output = &((*output)->_nextOutput);
     }
-  *output = prop;
+
+  if(output)
+    {
+    *output = prop;
+    }
   }
 
 void SProperty::disconnectInternal(SProperty *prop) const
@@ -398,9 +409,8 @@ void SProperty::disconnectInternal(SProperty *prop) const
     {
     if((*output) == prop)
       {
-      SProperty **nextOutput = &((*output)->_nextSibling);
-      (*output) = 0;
-      output = nextOutput;
+      (*output) = (*output)->_nextOutput;
+      return;
       }
     else
       {
@@ -562,26 +572,33 @@ void SProperty::preGet() const
   if(_flags.hasFlag(Dirty))
     {
     // this is a const function, but because we delay computation we may need to assign here
-    SProperty *prop = ((SProperty*)this);
+    SProperty *prop = const_cast<SProperty*>(this);
     prop->_flags.clearFlag(Dirty);
+    prop->_flags.setFlag(PreGetting);
 
     const SPropertyInstanceInformation *child = baseInstanceInformation();
     if(child && child->compute())
       {
       xAssert(parent());
       child->compute()(child, parent());
-      return;
       }
-
-    if(input())
+    else if(input())
       {
       prop->assign(input());
-      return;
+      xAssert(!_flags.hasFlag(Dirty));
       }
+
+    // dirty can be set again in compute functions.
+    prop->_flags.clearFlag(Dirty);
+    prop->_flags.clearFlag(PreGetting);
+
+    xAssert(!_flags.hasFlag(Dirty));
+    return;
     }
 
   if(_flags.hasFlag(ParentHasInput))
     {
     parent()->preGet();
+    xAssert(!_flags.hasFlag(Dirty));
     }
   }

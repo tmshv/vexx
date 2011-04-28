@@ -60,6 +60,10 @@ bool SPropertyContainer::TreeChange::apply(int mode, SObservers &obs)
     xAssert(property()->entity());
     obs.clear();
     property()->entity()->informTreeObservers(mode, this, obs);
+    if(before())
+      {
+      before()->entity()->informTreeObservers(mode, this, obs);
+      }
     }
   return true;
   }
@@ -187,7 +191,7 @@ void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
   if(from->containedProperties() == to->containedProperties())
     {
     const SProperty *fChild=from->firstChild();
-    SProperty *tChild=to->firstChild();
+    SProperty *tChild=to->_child;
     xsize index = 0;
     while(fChild)
       {
@@ -204,8 +208,8 @@ void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
 
       tChild->assign(fChild);
 
-      tChild = tChild->nextSibling();
       fChild = fChild->nextSibling();
+      tChild = tChild->_nextSibling;
       index++;
       }
     }
@@ -361,4 +365,28 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
       prop = prop->_nextSibling;
       }
     }
+  }
+
+const SProperty *SPropertyContainer::at(xsize i) const
+  {
+  const SProperty *c = firstChild();
+  while(c && i)
+    {
+    --i;
+    c = c->nextSibling();
+    }
+
+  return c;
+  }
+
+SProperty *SPropertyContainer::at(xsize i)
+  {
+  SProperty *c = firstChild();
+  while(c && i)
+    {
+    --i;
+    c = c->nextSibling();
+    }
+
+  return c;
   }

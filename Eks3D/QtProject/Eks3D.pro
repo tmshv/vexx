@@ -36,8 +36,10 @@ SOURCES += ../src/XDoodad.cpp \
     ../src/XLightManager.cpp \
     ../src/XLightRig.cpp \
     ../src/XAbstractCanvas.cpp \
+    ../src/X2DCanvas.cpp \
     ../src/XAbstractRenderModel.cpp \
-    ../src/XAbstractDelegate.cpp
+    ../src/XAbstractDelegate.cpp \
+    ../src/XAbstractCanvasController.cpp
 HEADERS += ../include/XDoodad.h \
     ../include/X3DGlobal.h \
     ../include/XScene.h \
@@ -68,8 +70,10 @@ HEADERS += ../include/XDoodad.h \
     ../include/XLightManager.h \
     ../include/XLightRig.h \
     ../include/XAbstractCanvas.h \
+    ../include/X2DCanvas.h \
     ../include/XAbstractRenderModel.h \
-    ../include/XAbstractDelegate.h
+    ../include/XAbstractDelegate.h \
+    ../include/XAbstractCanvasController.h
 DEFINES += GLEW_STATIC
 INCLUDEPATH += ../include/ \
     ../../EksCore/ \

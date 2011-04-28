@@ -50,6 +50,9 @@ public:
     return ent;
     }
 
+  // accessing child properties by index
+  using SPropertyContainer::at;
+
   SEntity *parentEntity() const;
   SEntity *firstChildEntity() const;
   SEntity *nextSiblingEntity() const;

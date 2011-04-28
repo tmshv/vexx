@@ -11,7 +11,7 @@ class SObserver
   {
 public:
   virtual ~SObserver() { }
-  virtual void actOnChanges() = 0;
+  virtual void actOnChanges() { };
   };
 
 class SHIFT_EXPORT STreeObserver : public SObserver

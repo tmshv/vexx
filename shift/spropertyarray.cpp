@@ -11,18 +11,6 @@ SPropertyArray::~SPropertyArray()
   {
   }
 
-SProperty *SPropertyArray::at(xsize i)
-  {
-  SProperty *c = firstChild();
-  while(c && i)
-    {
-    --i;
-    c = c->nextSibling();
-    }
-
-  return c;
-  }
-
 void SPropertyArray::remove(SProperty *prop)
   {
   SPropertyContainer::removeProperty(prop);

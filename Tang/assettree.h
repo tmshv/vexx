@@ -5,6 +5,7 @@
 #include "QAbstractItemModel"
 #include "XEnvironment.h"
 #include "QTimer"
+#include "QIcon"
 
 class QTreeView;
 class Application;
@@ -22,16 +23,36 @@ public:
   virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
 
+protected:
+  virtual void timerEvent(QTimerEvent *event);
+
 private slots:
   void contextMenu(QPoint);
   void updateFromRequest(const XEnvironment::Request &);
   void contextMentTriggered(QAction *);
 
 private:
+  XEnvironment::ItemID containerID(const QModelIndex &index) const;
+  bool isContainer(const QModelIndex &index) const;
+  bool isTexture(const QModelIndex &index) const;
+  quint32 indexForID(xuint16 type, XEnvironment::ItemID) const;
+
   void requestContainer(XEnvironment::ItemID) const;
 
   QTreeView* _treeView;
   Application* _app;
+
+  QIcon _containerIcon;
+  QIcon _textureIcon;
+
+  struct Index
+    {
+    xuint16 type;
+    XEnvironment::ItemID id;
+    bool operator==(const Index & i) { return type == i.type && id == i.id; }
+    };
+  mutable QVector<Index> _indexMap;
+  mutable int _cleanupTimerID;
   };
 
 #endif // ASSETTREE_H

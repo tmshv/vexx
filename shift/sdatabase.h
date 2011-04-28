@@ -23,6 +23,7 @@ public:
   SDatabase();
   virtual ~SDatabase();
 
+  const XHash <SPropertyType, const SPropertyInformation *> &types() const { return _types; }
   void addType(const SPropertyInformation *);
 
   template <typename T> void addType()
@@ -74,7 +75,7 @@ private:
     {
     return new T();
     }
-  XMap <SPropertyType, const SPropertyInformation *> _types;
+  XHash <SPropertyType, const SPropertyInformation *> _types;
   xuint32 _blockLevel;
 
   void initiate();

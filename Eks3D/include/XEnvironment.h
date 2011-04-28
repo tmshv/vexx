@@ -16,13 +16,41 @@ class XPerspectiveCamera;
 class EKS3D_EXPORT XEnvironment
   {
 public:
+  enum ItemType
+    {
+    SpecialType,
+    ContainerType,
+    TextureType,
+    ShaderType,
+    MeshType,
+    WorldType,
+
+    LastType
+    };
+
+  enum ItemSubType
+    {
+    InfoSubType,
+
+    LastSubType
+    };
   typedef XEnvironmentArea Area;
   typedef XEnvironmentID ItemID;
 
   class EKS3D_EXPORT Container
     {
   XProperties:
-    XRefProperty(QList <ItemID>, items);
+    class EKS3D_EXPORT Item
+      {
+    XProperties:
+      XProperty(xuint16, type, setType);
+      XProperty(ItemID, ID, setID);
+
+      friend QDataStream &operator<<(QDataStream &s, const Item &c) { return s << c._type << c._ID; }
+      friend QDataStream &operator>>(QDataStream &s, Item &c) { return s >> c._type >> c._ID; }
+      };
+
+    XRefProperty(QList <Item>, items);
     XProperty(QString, name, setName);
     XROProperty(ItemID, parentID);
     XROProperty(ItemID, ID);
@@ -30,10 +58,24 @@ public:
     Container(ItemID id);
     void reparent(Container *oldParent, Container *newParent);
 
-    xsize indexOf(const Container *c) const { int in = _items.indexOf(c->ID()); return in == -1 ? X_SIZE_SENTINEL : in; }
+    xsize indexOf(const Container *c) const { xAssertFail(); return -1;/*int in = _items.indexOf(c->ID()); return in == -1 ? X_SIZE_SENTINEL : in;*/ }
 
     friend EKS3D_EXPORT QDataStream &operator<<(QDataStream &stream, const Container &c);
     friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, Container &c);
+    };
+
+  class EKS3D_EXPORT TextureInfo
+    {
+  XProperties:
+    XProperty(QString, name, setName);
+    XROProperty(ItemID, parentID);
+    XROProperty(ItemID, ID);
+
+    TextureInfo(ItemID id);
+    void reparent(Container *oldParent, Container *newParent);
+
+    friend EKS3D_EXPORT QDataStream &operator<<(QDataStream &stream, const TextureInfo &c);
+    friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, TextureInfo &c);
     };
 
 
@@ -43,6 +85,7 @@ public:
   typedef XHash<ItemID, XGeometry*> GeomtryHash;
   typedef XHash<ItemID, XShader*> ShaderHash;
   typedef XHash<ItemID, XTexture*> TextureHash;
+  typedef XHash<ItemID, TextureInfo*> TextureInfoHash;
   typedef XEnvironmentRequest Request;
 
   enum SpecialIdentifier
@@ -54,18 +97,6 @@ XProperties:
   XROProperty(XAbstractEnvironmentInterface *, environmentInterface);
 
 public:
-  enum ItemType
-  {
-    SpecialType,
-    ContainerType,
-    TextureType,
-    ShaderType,
-    MeshType,
-    WorldType,
-
-    LastType
-  };
-
   class EKS3D_EXPORT Listener
     {
   public:
@@ -90,6 +121,7 @@ public:
   const XGeometry *mesh(ItemID id) const { return _meshes.value(id, 0); }
 
   Container *container(ItemID id) { return _containers.value(id, 0); }
+  TextureInfo *textureInfo(ItemID id) { return _textureInfos.value(id, 0); }
   Area *area(ItemID id) { return _areas.value(id, 0); }
   XGeometry *mesh(ItemID id) { return _meshes.value(id, 0); }
 
@@ -102,7 +134,7 @@ private:
 
   ByteArrayHash _specials;
   ContainerHash _containers;
-  TextureHash _textures;
+  TextureInfoHash _textureInfos;
   ShaderHash _shaders;
   GeomtryHash _meshes;
   AreaHash _areas;

@@ -25,9 +25,20 @@ public:
     assign(data);
     }
 
+  XWeakSharedPointerData(const XWeakSharedPointerData &data) : _data(0), _next(0)
+    {
+    assign(data._data);
+    }
+
   ~XWeakSharedPointerData()
     {
     clear();
+    }
+
+  XWeakSharedPointerData &operator=(const XWeakSharedPointerData &cpy)
+    {
+    assign(cpy._data);
+    return *this;
     }
 
   void clear()

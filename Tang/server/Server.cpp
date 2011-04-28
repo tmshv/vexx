@@ -136,7 +136,7 @@ QByteArray Server::getSpecialData(const XEnvironmentRequest &request) const
     xAssert(prepareItemDirectory(dir));
     str << firstFreeId;
 
-    QString filename = getItemFilename(request.subType());
+    QString filename = getItemFilename(0);
 
     QFile file(dir + filename);
     if(file.open(QIODevice::WriteOnly))

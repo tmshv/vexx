@@ -17,6 +17,7 @@ public:
   Application();
 
   void createContainer(XEnvironment::ItemID parent);
+  void createTexture(XEnvironment::ItemID parent);
 
 signals:
   void dataChanged(const XEnvironment::Request &request);

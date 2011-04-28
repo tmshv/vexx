@@ -113,6 +113,20 @@ void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)
   _data[k].setValue(v);
   }
 
+bool SPropertyInformation::inheritsFromType(SPropertyType match) const
+  {
+  const SPropertyInformation *type = this;
+  while(type)
+    {
+    if(type->typeId() == match)
+      {
+      return true;
+      }
+    type = type->parentTypeInformation();
+    }
+  return false;
+  }
+
 xsize SPropertyInformation::completeChildCount() const
   {
   return propertyOffset() + children().size();

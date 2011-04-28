@@ -13,7 +13,10 @@ HEADERS += GCGlobal.h \
     GraphicsCore.h \
     GCImage.h \
     GCImageChannel.h \
-    GCSingleLevelRenderModel.h
+    GCSingleLevelRenderModel.h \
+    GCAbstractNodeDelegate.h \
+    GCAbstractNodeIterator.h \
+    GCNodeController.h
 
 INCLUDEPATH += ../../EksCore ../../Eks3D/include ../../Shift
 
@@ -25,4 +28,6 @@ SOURCES += \
     GraphicsCore.cpp \
     GCImage.cpp \
     GCImageChannel.cpp \
-    GCSingleLevelRenderModel.cpp
+    GCSingleLevelRenderModel.cpp \
+    GCAbstractNodeDelegate.cpp \
+    GCNodeController.cpp

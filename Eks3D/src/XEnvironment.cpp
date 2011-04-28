@@ -51,6 +51,13 @@ QByteArray XEnvironment::getData(const Request &req, bool *correct) const
 
     correct ? *correct = true : true;
     }
+  else if(req.type() == TextureType && req.subType() == InfoSubType && _textureInfos.contains(req.ID()))
+    {
+    QDataStream str(&arr, QIODevice::WriteOnly);
+    str << *_textureInfos[req.ID()];
+
+    correct ? *correct = true : true;
+    }
   else if(req.type() == SpecialType && _specials.contains(req.ID()))
     {
     arr = *_specials[req.ID()];
@@ -73,6 +80,22 @@ void XEnvironment::setData(const Request &req, const QByteArray &arr)
     if(!ctr)
       {
       ctr = new Container(req.ID());
+      }
+
+    if(arr.length())
+      {
+      // cast because we are not going to change to contents due to ReadOnly, but IODevice expects a non-const ptr.
+      QDataStream str((QByteArray*)&arr, QIODevice::ReadOnly);
+
+      str >> *ctr;
+      }
+    }
+  else if(req.type() == TextureType && req.subType() == InfoSubType)
+    {
+    TextureInfo *&ctr = _textureInfos[req.ID()];
+    if(!ctr)
+      {
+      ctr = new TextureInfo(req.ID());
       }
 
     if(arr.length())
@@ -164,9 +187,10 @@ void XEnvironment::Container::reparent(Container *oldParent, Container *parent)
   {
   xAssert(oldParent);
   xAssert(parent);
-  oldParent->items().removeAll(ID());
+  xAssertFail();
+  //oldParent->items().removeAll(ID());
   _parentID = parent->ID();
-  parent->items() << ID();
+  //parent->items() << ID();
   }
 
 QDataStream &operator<<(QDataStream &stream, const XEnvironment::Container &c)
@@ -177,4 +201,28 @@ QDataStream &operator<<(QDataStream &stream, const XEnvironment::Container &c)
 QDataStream &operator>>(QDataStream &stream, XEnvironment::Container &c)
   {
   return stream >> c._items >> c._name >> c._parentID;
+  }
+
+XEnvironment::TextureInfo::TextureInfo(ItemID id) : _parentID(0), _ID(id)
+  {
+  }
+
+void XEnvironment::TextureInfo::reparent(Container *oldParent, Container *parent)
+  {
+  xAssert(oldParent);
+  xAssert(parent);
+  xAssertFail();
+  //oldParent->items().removeAll(ID());
+  _parentID = parent->ID();
+  //parent->items() << ID();
+  }
+
+QDataStream &operator<<(QDataStream &stream, const XEnvironment::TextureInfo &c)
+  {
+  return stream << c._name << c._parentID;
+  }
+
+QDataStream &operator>>(QDataStream &stream, XEnvironment::TextureInfo &c)
+  {
+  return stream >> c._name >> c._parentID;
   }

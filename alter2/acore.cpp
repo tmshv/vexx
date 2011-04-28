@@ -82,7 +82,14 @@ void ACore::quit()
 
 int ACore::execute()
   {
-  return _priv->app.exec();
+  try
+    {
+    return _priv->app.exec();
+    }
+  catch(...)
+    {
+    xAssertFail();
+    }
   }
 
 bool ACore::isLoaded( const QString &name ) const

@@ -22,7 +22,7 @@ public:
     }
 
   SProperty *operator[](xsize i) { return at(i); }
-  SProperty *at(xsize i);
+  using SPropertyContainer::at;
   void clear();
 
   void remove(SProperty *);

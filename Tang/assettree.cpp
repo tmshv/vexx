@@ -6,9 +6,12 @@
 #include "XEnvironment.h"
 #include "application.h"
 #include "QMenu"
+#include "QTimerEvent"
 #include "QAction"
 
-AssetTree::AssetTree(Application *app) : UISurface("Assets", new QWidget(0), UISurface::Dock), _app(app)
+AssetTree::AssetTree(Application *app) : UISurface("Assets", new QWidget(0), UISurface::Dock), _app(app),
+    _containerIcon(":/tang/resources/Folder.svg"), _textureIcon(":/tang/resources/Texture.svg"),
+    _cleanupTimerID(-1)
   {
   QVBoxLayout *layout = new QVBoxLayout(widget());
   layout->setContentsMargins(2,2,2,2);
@@ -19,8 +22,6 @@ AssetTree::AssetTree(Application *app) : UISurface("Assets", new QWidget(0), UIS
   _treeView->setModel(this);
 
   _treeView->header()->hide();
-  //_treeView->setItemDelegate(&_delegate);
-  //_treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   _treeView->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(_treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
 
@@ -36,23 +37,23 @@ void AssetTree::updateFromRequest(const XEnvironment::Request &r)
     if(cont)
       {
       const XEnvironment::Container *parent = 0;
-      xuint32 index = 0;
+      xuint32 idx = 0;
       if(r.ID() != 0)
         {
         parent = _app->environment().container(cont->parentID());
         xAssert(parent);
         if(parent)
           {
-          index = parent->indexOf(cont);
+          idx = parent->indexOf(cont);
           }
         }
 
-      if(index == X_SIZE_SENTINEL)
+      if(idx == X_SIZE_SENTINEL)
         {
         return;
         }
 
-      QModelIndex changedIndex = createIndex(index, 0, (void *)r.ID());
+      QModelIndex changedIndex = createIndex(idx, 0, indexForID(r.type(), r.ID()));
 
       emit layoutAboutToBeChanged();
       emit layoutChanged();
@@ -68,12 +69,16 @@ void AssetTree::contextMenu(QPoint p)
   QModelIndex index = _treeView->indexAt(p);
   if(index.isValid())
     {
-    parent = index.internalId();
+    parent = containerID(index);
     }
 
   QMenu menu;
-  QAction *act = menu.addAction(QIcon(":/tang/resources/Folder.svg"), "New Folder");
-  act->setData(parent);
+
+  QAction *folder = menu.addAction(_containerIcon, "New Folder");
+  folder->setData(parent);
+
+  QAction *texture = menu.addAction(_textureIcon, "New Texture");
+  texture->setData(parent);
 
   connect(&menu, SIGNAL(triggered(QAction*)), this, SLOT(contextMentTriggered(QAction*)));
   menu.exec(_treeView->mapToGlobal(p));
@@ -85,6 +90,10 @@ void AssetTree::contextMentTriggered(QAction *act)
     {
     _app->createContainer(act->data().toULongLong());
     }
+  else if(act->text() == "New Texture")
+    {
+    _app->createTexture(act->data().toULongLong());
+    }
   }
 
 void AssetTree::requestContainer(XEnvironment::ItemID id) const
@@ -95,7 +104,6 @@ void AssetTree::requestContainer(XEnvironment::ItemID id) const
 
 int AssetTree::rowCount(const QModelIndex &parent) const
   {
-  bool request = false;
   if(!parent.isValid())
     {
     const XEnvironment::Container *cont = _app->environment().container(0);
@@ -105,51 +113,135 @@ int AssetTree::rowCount(const QModelIndex &parent) const
       }
     else
       {
-      request = true;
+      requestContainer(0);
+      return 0;
       }
     }
 
-  if(!request)
+  if(!isContainer(parent))
     {
-    const XEnvironment::Container *cont = _app->environment().container(parent.internalId());
-    if(cont)
+    return 0;
+    }
+
+  const XEnvironment::Container *cont = _app->environment().container(containerID(parent));
+  if(cont)
+    {
+    bool allLoaded = true;
+    foreach(XEnvironment::ItemID id, cont->items())
       {
-      bool allLoaded = true;
-      foreach(XEnvironment::ItemID id, cont->items())
+      const XEnvironment::Container *child = _app->environment().container(id);
+      if(!child)
         {
-        const XEnvironment::Container *child = _app->environment().container(id);
-        if(!child)
-          {
-          requestContainer(id);
-          allLoaded = false;
-          }
+        requestContainer(id);
+        allLoaded = false;
         }
+      }
 
-      if(!allLoaded)
-        {
-        return 0;
-        }
-      else
-        {
-        return cont->items().size();
-        }
+    if(!allLoaded)
+      {
+      return 0;
+      }
+    else
+      {
+      return cont->items().size();
       }
     }
 
-  if(request)
+  requestContainer(containerID(parent));
+  return 0;
+  }
+
+XEnvironment::ItemID AssetTree::containerID(const QModelIndex &index) const
+  {
+  xAssert(index.internalId() < _indexMap.size());
+  if(index.internalId() < _indexMap.size())
     {
-    requestContainer(parent.internalId());
+    return _indexMap[index.internalId()].id;
     }
   return 0;
   }
 
+bool AssetTree::isContainer(const QModelIndex &index) const
+  {
+  xAssert(index.internalId() < _indexMap.size());
+  if(index.internalId() < _indexMap.size())
+    {
+    return _indexMap[index.internalId()].type == XEnvironment::ContainerType;
+    }
+  return false;
+  }
+
+bool AssetTree::isTexture(const QModelIndex &index) const
+  {
+  xAssert(index.internalId() < _indexMap.size());
+  if(index.internalId() < _indexMap.size())
+    {
+    return _indexMap[index.internalId()].type == XEnvironment::TextureType;
+    }
+  return false;
+  }
+
+quint32 AssetTree::indexForID(xuint16 type, XEnvironment::ItemID id) const
+  {
+  Index index;
+  index.id = id;
+  index.type = type;
+
+  int i = _indexMap.indexOf(index);
+  if(i == -1)
+    {
+    i = _indexMap.size();
+    _indexMap << index;
+
+    if(_cleanupTimerID != -1)
+      {
+      ((AssetTree*)this)->killTimer(_cleanupTimerID);
+      }
+    _cleanupTimerID = ((AssetTree*)this)->startTimer(60000);
+    }
+  return i;
+  }
+
+void AssetTree::timerEvent(QTimerEvent *event)
+  {
+  if(event->timerId() == _cleanupTimerID)
+    {
+    killTimer(_cleanupTimerID);
+    _cleanupTimerID = -1;
+
+    emit layoutAboutToBeChanged();
+
+    QModelIndexList	pers = persistentIndexList();
+    for(int i=0, s=_indexMap.size(); i<s; ++i)
+      {
+      bool found = false;
+
+      foreach(const QModelIndex &idx, pers)
+        {
+        if(idx.internalId() == i)
+          {
+          found = true;
+          }
+        }
+
+      if(!found)
+        {
+        _indexMap.erase(_indexMap.begin()+i);
+        --i;
+        --s;
+        }
+      }
+
+    emit layoutChanged();
+    }
+  }
+
 QModelIndex AssetTree::index(int row, int column, const QModelIndex &parent) const
   {
-  bool request = false;
-
   if(parent.isValid())
     {
-    const XEnvironment::Container *cont = _app->environment().container(parent.internalId());
+    xAssert(isContainer(parent));
+    const XEnvironment::Container *cont = _app->environment().container(containerID(parent));
     xAssert(cont);
     if(cont)
       {
@@ -159,12 +251,12 @@ QModelIndex AssetTree::index(int row, int column, const QModelIndex &parent) con
         const XEnvironment::Container *child = _app->environment().container(cont->items()[row]);
         xAssert(child);
 
-        return createIndex(row, column, (void*)cont->items()[row]);
+        return createIndex(row, column, indexForID(XEnvironment::ContainerType, cont->items()[row]));
         }
       }
     else
       {
-      request = true;
+      requestContainer(containerID(parent));
       }
     }
   else
@@ -172,17 +264,12 @@ QModelIndex AssetTree::index(int row, int column, const QModelIndex &parent) con
     const XEnvironment::Container *cont = _app->environment().container(0);
     if(cont)
       {
-      return createIndex(row, column, (void*)0);
+      return createIndex(row, column, indexForID(XEnvironment::ContainerType, 0));
       }
     else
       {
-      request = true;
+      requestContainer(0);
       }
-    }
-
-  if(request)
-    {
-    requestContainer(parent.isValid() ? parent.internalId() : 0);
     }
 
   return QModelIndex();
@@ -191,12 +278,13 @@ QModelIndex AssetTree::index(int row, int column, const QModelIndex &parent) con
 QModelIndex AssetTree::parent(const QModelIndex &child) const
   {
   xAssert(child.isValid());
-  if(!child.isValid() || child.internalId() == 0)
+  if(!child.isValid() || (isContainer(child) && containerID(child) == 0))
     {
     return QModelIndex();
     }
 
-  const XEnvironment::Container *cont = _app->environment().container(child.internalId());
+  xAssert(isContainer(child));
+  const XEnvironment::Container *cont = _app->environment().container(containerID(child));
   if(cont)
     {
     const XEnvironment::Container *parent = _app->environment().container(cont->parentID());
@@ -219,7 +307,7 @@ QModelIndex AssetTree::parent(const QModelIndex &child) const
         }
       }
 
-    return createIndex(row, child.column(), (void *)parent->ID());
+    return createIndex(row, child.column(), indexForID(XEnvironment::ContainerType, parent->ID()));
     }
 
   return QModelIndex();
@@ -227,7 +315,6 @@ QModelIndex AssetTree::parent(const QModelIndex &child) const
 
 int AssetTree::columnCount(const QModelIndex &parent) const
   {
-  bool request = false;
   if(!parent.isValid())
     {
     const XEnvironment::Container *cont = _app->environment().container(0);
@@ -237,27 +324,23 @@ int AssetTree::columnCount(const QModelIndex &parent) const
       }
     else
       {
-      request = true;
+      requestContainer(0);
+      return 0;
       }
     }
 
-  if(!request)
+  if(!isContainer(parent))
     {
-    const XEnvironment::Container *cont = _app->environment().container(parent.internalId());
-    if(cont)
-      {
-      return 1;
-      }
-    else
-      {
-      request = true;
-      }
+    return 1;
     }
 
-  if(request)
+  const XEnvironment::Container *cont = _app->environment().container(containerID(parent));
+  if(cont)
     {
-    requestContainer(parent.internalId());
+    return 1;
     }
+
+  requestContainer(containerID(parent));
   return 0;
   }
 
@@ -270,10 +353,33 @@ QVariant AssetTree::data(const QModelIndex &index, int role) const
         return "";
         }
 
-      const XEnvironment::Container *cont = _app->environment().container(index.internalId());
-      if(cont)
+      if(isContainer(index))
         {
-        return cont->name();
+        const XEnvironment::Container *cont = _app->environment().container(containerID(index));
+        if(cont)
+          {
+          return cont->name();
+          }
+        }
+      else
+        {
+        return "NUTS";
+        }
+    }
+  else if(role == Qt::DecorationRole && index.column() == 0)
+    {
+    if(!index.isValid())
+        {
+        return QIcon();
+        }
+
+      if(isContainer(index))
+        {
+        return _containerIcon;
+        }
+      else if(isTexture(index))
+        {
+        return _textureIcon;
         }
     }
 

@@ -115,7 +115,7 @@ public:
     return 0;
     }
 
-  SProperty *firstChild() const {preGet(); return _child;}
+  SProperty *firstChild() const { preGet(); return _child; }
 
   const SProperty *findChild(const QString &name) const;
   SProperty *findChild(const QString &name);
@@ -133,6 +133,9 @@ protected:
   // move a property from this to newParent
   void moveProperty(SPropertyContainer *newParent, SProperty *property);
   void removeProperty(SProperty *);
+
+  SProperty *at(xsize i);
+  const SProperty *at(xsize i) const;
 
   static void assignContainer(const SProperty *, SProperty *);
   static void saveContainer(const SProperty *, SPropertyData &, SPropertyData::Mode);
