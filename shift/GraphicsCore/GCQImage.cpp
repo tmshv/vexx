@@ -28,6 +28,7 @@ IMPLEMENT_POD_PROPERTY(GCQImage, QImage)
 
 void GCQImage::assignPOD(const SProperty *f, SProperty *t)
   {
+  SProfileFunction
   GCQImage *to = t->uncheckedCastTo<GCQImage>();
 
   const GCQImage *qImageProp = f->castTo<GCQImage>();

@@ -590,7 +590,6 @@ void SProperty::preGet() const
     else if(input())
       {
       prop->assign(input());
-      xAssert(!_flags.hasFlag(Dirty));
       }
 
     // dirty can be set again in compute functions.

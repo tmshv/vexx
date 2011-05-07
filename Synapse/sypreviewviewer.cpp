@@ -20,6 +20,7 @@ const XAbstractDelegate *SyPreviewViewer::delegateFor(XAbstractRenderModel::Iter
 
 void SyPreviewViewer::paint(xuint32 pass, XAbstractCanvas *c, const XAbstractRenderModel::Iterator *it, const XAbstractRenderModel *) const
   {
+  SProfileFunction
   const GCShiftRenderModel::Iterator *slIt = static_cast<const GCShiftRenderModel::Iterator*>(it);
 
   X2DCanvas* canvas = static_cast<X2DCanvas*>(c);

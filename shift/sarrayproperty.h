@@ -123,6 +123,16 @@ public:
     return mData.rows();
     }
 
+  void set(xsize width, xsize height, const XVector<T> &val)
+    {
+    resize(width, height);
+    if(width != 0 && height != 0)
+      {
+      memcpy(mData.data(), &val.front(), sizeof(T)*width*height);
+      }
+    postSet();
+    }
+
   void setIndex(xsize x, xsize y, const T &val)
     {
     mData(y, x) = val;

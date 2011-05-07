@@ -11,18 +11,24 @@ SyImageBase::SyImageBase()
 
 void SyImageBase::loadQImage(const QImage &imageIn)
   {
+  SProfileFunction
   int width = imageIn.width();
   int height = imageIn.height();
 
-  image.resize(width, height);
+  XVector<float> data;
+  data.resize(width * height);
 
   for(int i = 0; i < height; ++i )
     {
+    int rowPos = i*width;
     for(int j = 0; j < width; ++j)
       {
-      image.setIndex(j, i, (float)qRed(imageIn.pixel(j, i))/255.0f);
+      data[rowPos+j] = (float)qRed(imageIn.pixel(j, i))/255.0f;
       }
     }
+
+  image.set(width, height, data);
+
   postSet();
   }
 
