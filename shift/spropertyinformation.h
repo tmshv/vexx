@@ -19,6 +19,7 @@ class SHIFT_EXPORT SPropertyInstanceInformation
   {
 public:
   typedef void (*ComputeFunction)( const SPropertyInstanceInformation *, SPropertyContainer * );
+  typedef void (*QueueComputeFunction)( const SPropertyInstanceInformation *, const SPropertyContainer *, SProperty **, xsize &numJobs );
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
@@ -28,6 +29,7 @@ XProperties:
   XRefProperty(QString, name);
   XProperty(SProperty SPropertyContainer::*, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
+  XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
   XProperty(SProperty SPropertyContainer::* *, affects, setAffects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
@@ -59,6 +61,8 @@ public:
 private:
   friend class SProperty;
   friend class SPropertyContainer;
+
+  static void defaultQueue(const SPropertyInstanceInformation *, const SPropertyContainer *, SProperty **, xsize &numJobs);
   };
 
 class SHIFT_EXPORT SPropertyInformation

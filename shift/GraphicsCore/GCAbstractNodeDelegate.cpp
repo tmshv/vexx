@@ -1,5 +1,5 @@
 #include "GCAbstractNodeDelegate.h"
-#include "GCAbstractNodeIterator.h"
+#include "GCShiftRenderModel.h"
 #include "X2DCanvas.h"
 #include "QPen"
 #include "QPainter"
@@ -103,7 +103,7 @@ void GCSimpleNodeDelegate::update(const XAbstractCanvas *,
                     const XAbstractRenderModel::Iterator *aIt,
                     const XAbstractRenderModel *) const
   {
-  const GCAbstractNodeIterator *it = static_cast<const GCAbstractNodeIterator*>(aIt);
+  const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(aIt);
   const SEntity *ent = it->entity();
   xAssert(ent);
 
@@ -115,7 +115,7 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
                                 const XAbstractRenderModel::Iterator *aIt,
                                 const XAbstractRenderModel *) const
   {
-  const GCAbstractNodeIterator *it = static_cast<const GCAbstractNodeIterator*>(aIt);
+  const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(aIt);
   const SEntity *ent = it->entity();
   xAssert(ent);
 

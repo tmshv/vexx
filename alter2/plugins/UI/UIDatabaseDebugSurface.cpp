@@ -5,7 +5,8 @@
 #include "QHeaderView"
 #include "QMenu"
 
-UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db) : UISurface("Database Debug", new QWidget(), UISurface::Dock),
+UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
+    : UISurface("Database Debug", new QWidget(), UISurface::Dock),
     _db(db), _model(_db, _db, SDatabaseModel::ShowValues)
   {
   QVBoxLayout *layout = new QVBoxLayout(widget());

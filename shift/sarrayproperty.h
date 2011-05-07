@@ -111,13 +111,25 @@ public:
     postSet();
     }
 
+  xsize width() const
+    {
+    preGet();
+    return mData.cols();
+    }
+
+  xsize height() const
+    {
+    preGet();
+    return mData.rows();
+    }
+
   void setIndex(xsize x, xsize y, const T &val)
     {
     mData(y, x) = val;
     postSet();
     }
 
-  const T &atIndex(xsize x, xsize y)
+  const T &atIndex(xsize x, xsize y) const
     {
     preGet();
     return mData(y, x);

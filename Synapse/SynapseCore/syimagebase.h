@@ -14,7 +14,9 @@ public:
   SyImageBase();
 
   SFloatArrayProperty image;
-  void loadImage(const QImage& );
+
+  void loadQImage(const QImage &);
+  QImage asQImage() const;
   };
 
 #endif // SYIMAGEBASE_H

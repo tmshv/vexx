@@ -258,6 +258,7 @@ private:
   friend class SEntity;
   friend class SDatabase;
   friend class SPropertyContainer;
+  friend class SProcessManager;
   };
 
 #endif // SPROPERTY_H

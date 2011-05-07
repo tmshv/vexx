@@ -26,7 +26,7 @@ void X2DCanvas::mouseDoubleClickEvent(QMouseEvent *event)
   {
   if(controller())
     {
-    int result = controller()->mouseEvent(XAbstractCanvasController::DoubleClick,
+    int result = controller()->triggerMouseEvent(XAbstractCanvasController::DoubleClick,
                                                   event->pos(),
                                                   event->button(),
                                                   event->buttons(),
@@ -50,7 +50,7 @@ void X2DCanvas::mouseMoveEvent(QMouseEvent *event)
   {
   if(controller())
     {
-    int result = controller()->mouseEvent(XAbstractCanvasController::Move,
+    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Move,
                                                   event->pos(),
                                                   event->button(),
                                                   event->buttons(),
@@ -74,7 +74,7 @@ void X2DCanvas::mousePressEvent(QMouseEvent *event)
   {
   if(controller())
     {
-    int result = controller()->mouseEvent(XAbstractCanvasController::Press,
+    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Press,
                                                   event->pos(),
                                                   event->button(),
                                                   event->buttons(),
@@ -98,7 +98,7 @@ void X2DCanvas::mouseReleaseEvent(QMouseEvent *event)
   {
   if(controller())
     {
-    int result = controller()->mouseEvent(XAbstractCanvasController::Release,
+    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Release,
                                                   event->pos(),
                                                   event->button(),
                                                   event->buttons(),
@@ -122,4 +122,17 @@ void X2DCanvas::update(XAbstractRenderModel::UpdateMode c)
   {
   XAbstractCanvas::update(c);
   QWidget::update();
+  }
+
+XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XAbstractCanvasController(canvas)
+  {
+  }
+
+int XSimple2DCanvasController::mouseEvent(MouseEventType type,
+                        QPoint point,
+                        Qt::MouseButton triggerButton,
+                        Qt::MouseButtons buttonsDown,
+                        Qt::KeyboardModifiers modifiers)
+  {
+  return NotUsed;
   }

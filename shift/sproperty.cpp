@@ -3,6 +3,7 @@
 #include "sdatabase.h"
 #include "schange.h"
 #include "QString"
+#include "sprocessmanager.h"
 #include "XProfiler"
 
 inline void setDependantsDirty(SProperty* prop, bool force)
@@ -118,7 +119,10 @@ void SProperty::setName(const QString &in)
 
 SProperty *SProperty::nextSibling() const
   {
-  parent()->preGet();
+  if(parent())
+    {
+    parent()->preGet();
+    }
   return _nextSibling;
   }
 
@@ -580,6 +584,7 @@ void SProperty::preGet() const
     if(child && child->compute())
       {
       xAssert(parent());
+      SProcessManager::preCompute(child, parent());
       child->compute()(child, parent());
       }
     else if(input())

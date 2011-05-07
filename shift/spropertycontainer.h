@@ -32,9 +32,9 @@ class SPropertyContainer;
     xsize index = 0; \
     XList<SPropertyInstanceInformation*> childDataArray;
 
-#define S_COMPUTE_INPUTS(name) static SProperty SPropertyContainer::* name[] = {
-#define S_INPUT(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
-#define S_COMPUTE_INPUTS_END() 0 };
+#define S_COMPUTE_GROUP(name) static SProperty SPropertyContainer::* name[] = {
+#define S_AFFECTS(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
+#define S_COMPUTE_GROUP_END() 0 };
 
 #define S_PROPERTY_DEFINITION(type, name, ...) \
     static type::InstanceInformation name##InstanceData(type :: staticTypeInformation(), \

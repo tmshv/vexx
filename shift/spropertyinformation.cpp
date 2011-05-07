@@ -1,4 +1,5 @@
 #include "spropertyinformation.h"
+#include "spropertycontainer.h"
 
 SPropertyInstanceInformation::SPropertyInstanceInformation(const SPropertyInformation *info,
                  const QString &name,
@@ -8,14 +9,14 @@ SPropertyInstanceInformation::SPropertyInstanceInformation(const SPropertyInform
                  SProperty SPropertyContainer::* *affects,
                  bool entityChild,
                  bool extra)
-    : _childInformation(info), _name(name), _location(location), _compute(computeFn),
+    : _childInformation(info), _name(name), _location(location), _compute(computeFn), _queueCompute(defaultQueue),
       _affects(affects), _index(index), _entityChild(entityChild), _extra(extra), _dynamic(false)
   {
   xAssert(location != 0);
   }
 
 SPropertyInstanceInformation::SPropertyInstanceInformation(bool dynamic)
-  : _childInformation(0), _name(""), _location(0), _compute(0),
+  : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
     _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(dynamic)
   {
   }
@@ -111,6 +112,29 @@ void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)
   {
   xAssert(k < g_maxChildKey);
   _data[k].setValue(v);
+  }
+
+void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformation *info, const SPropertyContainer *cont, SProperty **jobs, xsize &numJobs)
+  {
+  SProfileFunction
+  for(SProperty *prop=cont->firstChild(); prop; prop=prop->nextSibling())
+    {
+    const SPropertyInstanceInformation *siblingInfo = prop->instanceInformation();
+    if(siblingInfo->affects())
+      {
+      xsize i=0;
+      while(siblingInfo->affects()[i])
+        {
+        SProperty *thisProp = (SProperty*)&(cont->*(siblingInfo->affects()[i]));
+        const SPropertyInstanceInformation *thisInfo = thisProp->instanceInformation();
+        if(thisInfo == info)
+          {
+          jobs[numJobs++] = prop;
+          }
+        ++i;
+        }
+      }
+    }
   }
 
 bool SPropertyInformation::inheritsFromType(SPropertyType match) const

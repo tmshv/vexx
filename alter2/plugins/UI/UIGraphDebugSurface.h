@@ -3,7 +3,7 @@
 
 #include "UISurface.h"
 #include "X2DCanvas.h"
-#include "GCSingleLevelRenderModel.h"
+#include "GCShiftRenderModel.h"
 #include "XAbstractDelegate.h"
 #include "XAbstractCanvasController.h"
 #include "aplugin.h"
@@ -16,7 +16,7 @@
 class QMenu;
 class UIPlugin;
 
-class UIGraphDebugSurface : public QObject, public UISurface, public GCSingleLevelRenderModel
+class UIGraphDebugSurface : public QObject, public UISurface, public GCShiftRenderModel
   {
   Q_OBJECT
 public:

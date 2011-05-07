@@ -3,6 +3,9 @@
 #include "ScPlugin.h"
 #include "splugin.h"
 #include "syimagenode.h"
+#include "syviewernode.h"
+#include "UIPlugin.h"
+#include "sypreviewviewer.h"
 
 int main(int argc, char *argv[])
   {
@@ -19,6 +22,13 @@ int main(int argc, char *argv[])
   if(shift.isValid())
   {
     shift->db().addType<SyImageNode>();
+    shift->db().addType<SyViewerNode>();
+
+    APlugin<UIPlugin> ui(app, "ui");
+    if(ui.isValid())
+    {
+      ui->addSurface(new SyPreviewViewer(&shift->db()));
+    }
   }
 
   APlugin<ScPlugin> script(app, "script");
@@ -29,6 +39,7 @@ int main(int argc, char *argv[])
 
     script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
   }
+
 
   return app.execute();
   }

@@ -27,7 +27,9 @@ SOURCES += \
     spropertyinformation.cpp \
     sarrayproperty.cpp \
     sdatabasemodel.cpp \
-    sdynamicpropertyinformation.cpp
+    sdynamicpropertyinformation.cpp \
+    sprocessmanager.cpp \
+    siterator.cpp
 HEADERS += \
     sglobal.h \
     sentity.h \
@@ -47,7 +49,9 @@ HEADERS += \
     sarrayproperty.h \
     sdatabasemodel.h \
     sdynamicpropertyinformation.h \
-    sentityweakpointer.h
+    sentityweakpointer.h \
+    sprocessmanager.h \
+    siterator.h
 DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -Wall

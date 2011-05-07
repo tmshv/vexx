@@ -4,6 +4,7 @@
 #include "QMenu"
 
 UIGraphDebugSurface::UIGraphDebugSurface() : UISurface("Graph Debug", _canvas = new X2DCanvas(), UISurface::Dock),
+    GCShiftRenderModel(0, SIterator::createFilter<DirectEntityChildren>()),
     _iterator(0), _controller(_canvas)
   {
   _canvas->setBackgroundColour(QColor(128, 128, 128));

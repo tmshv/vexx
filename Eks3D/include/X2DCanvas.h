@@ -4,6 +4,7 @@
 #include "X3DGlobal.h"
 #include "QWidget"
 #include "XAbstractCanvas.h"
+#include "XAbstractCanvasController.h"
 
 class QPainter;
 
@@ -29,6 +30,17 @@ public:
 
 protected:
   virtual void paintEvent(QPaintEvent *);
+  };
+
+class EKS3D_EXPORT XSimple2DCanvasController : public XAbstractCanvasController
+  {
+public:
+  XSimple2DCanvasController(X2DCanvas *canvas);
+  virtual int mouseEvent(MouseEventType type,
+                          QPoint point,
+                          Qt::MouseButton triggerButton,
+                          Qt::MouseButtons buttonsDown,
+                          Qt::KeyboardModifiers modifiers);
   };
 
 #endif // X2DCANVAS_H

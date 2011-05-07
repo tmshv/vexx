@@ -11,8 +11,8 @@
 #include "schange.h"
 #include "sobserver.h"
 
-#define DEFINE_POD_PROPERTY(name, type, defaultDefault) \
-class SHIFT_EXPORT name : public SProperty \
+#define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
+class EXPORT_MODE name : public SProperty \
   { \
 public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
@@ -122,20 +122,20 @@ void name::loadPOD(SProperty *p, const SPropertyData &data, xuint32 v, SProperty
       QTextStream str(&arr, QIODevice::ReadOnly); \
       str >> ptr->_value; } } }
 
-DEFINE_POD_PROPERTY(BoolProperty, int, 0);
-DEFINE_POD_PROPERTY(IntProperty, xint32, 0);
-DEFINE_POD_PROPERTY(LongIntProperty, xint64, 0);
-DEFINE_POD_PROPERTY(UnsignedIntProperty, xuint32, 0);
-DEFINE_POD_PROPERTY(LongUnsignedIntProperty, xuint64, 0);
-DEFINE_POD_PROPERTY(FloatProperty, float, 0.0f);
-DEFINE_POD_PROPERTY(DoubleProperty, double, 0.0);
-DEFINE_POD_PROPERTY(Vector2DProperty, XVector2D, XVector2D(0.0f, 0.0f));
-DEFINE_POD_PROPERTY(Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f));
-DEFINE_POD_PROPERTY(Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f));
-DEFINE_POD_PROPERTY(QuaternionProperty, XQuaternion, XQuaternion());
-DEFINE_POD_PROPERTY(StringProperty, XString, "");
-DEFINE_POD_PROPERTY(ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
-DEFINE_POD_PROPERTY(LongStringProperty, XString, "");
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, int, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongIntProperty, xint64, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, UnsignedIntProperty, xuint32, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongUnsignedIntProperty, xuint64, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, FloatProperty, float, 0.0f);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, DoubleProperty, double, 0.0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector2DProperty, XVector2D, XVector2D(0.0f, 0.0f));
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f));
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f));
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion());
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongStringProperty, XString, "");
 
 class SHIFT_EXPORT Pointer : public SProperty
   {

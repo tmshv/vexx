@@ -92,6 +92,7 @@ void XProfiler::end(const ProfileHandle &handle)
   XTimeStatistics &stats = handle._context->timeStats();
   stats.append(XTime::now() - handle._start);
 
+  xAssert(QThread::currentThread());
   ProfilingContext *&currentCtx = g_instance->_currentContexts[QThread::currentThread()];
   xAssert(currentCtx);
   currentCtx = currentCtx->parent();
