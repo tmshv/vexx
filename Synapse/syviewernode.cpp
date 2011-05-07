@@ -15,5 +15,6 @@ SyViewerNode::SyViewerNode()
 void SyViewerNode::computePreview(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
   {
   SyViewerNode *viewer = cont->uncheckedCastTo<SyViewerNode>();
+
   viewer->preview = viewer->input.asQImage();
   }

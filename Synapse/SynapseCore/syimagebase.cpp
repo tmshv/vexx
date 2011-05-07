@@ -44,4 +44,5 @@ QImage SyImageBase::asQImage() const
       pixel[0] = image.atIndex(j, i) * 255.0f;
       }
     }
+  return im;
   }
