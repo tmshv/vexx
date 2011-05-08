@@ -123,6 +123,12 @@ public:
     return mData.rows();
     }
 
+  const T *get() const
+    {
+    preGet();
+    return mData.data();
+    }
+
   void set(xsize width, xsize height, const XVector<T> &val)
     {
     resize(width, height);

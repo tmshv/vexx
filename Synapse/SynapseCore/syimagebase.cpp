@@ -18,12 +18,15 @@ void SyImageBase::loadQImage(const QImage &imageIn)
   XVector<float> data;
   data.resize(width * height);
 
+  xsize bytesPerPixel = imageIn.depth()/8;
+  const quint8 *pixel = imageIn.bits();
   for(int i = 0; i < height; ++i )
     {
-    int rowPos = i*width;
+    xsize rowPos = i * width;
     for(int j = 0; j < width; ++j)
       {
-      data[rowPos+j] = (float)qRed(imageIn.pixel(j, i))/255.0f;
+      data[rowPos+j] = (float)*pixel/255.0f;
+      pixel += bytesPerPixel;
       }
     }
 
@@ -41,13 +44,16 @@ QImage SyImageBase::asQImage() const
   QImage im(width, height, QImage::Format_ARGB32);
   im.fill(qRgba(0,0,0,255));
 
-  quint8 *data = im.bits();
+  xsize bytesPerPixel = im.depth()/8;
+  quint8 *pixel = im.bits();
+  const float *constData = image.get();
   for(int i = 0; i < height; ++i )
     {
+    int rowPos = i*width;
     for(int j = 0; j < width; ++j)
       {
-      quint8 *pixel(data + (i*width) + j);
-      pixel[0] = image.atIndex(j, i) * 255.0f;
+      pixel[0] = constData[rowPos+j] * 255.0f;
+      pixel += bytesPerPixel;
       }
     }
   return im;

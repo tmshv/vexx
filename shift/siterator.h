@@ -105,13 +105,19 @@ public:
         {
         ret = previous->nextSibling();
         }
-      else if(previous->parent() != cache.output(INDEX-1))
-        {
-        ret = previous->parent()->nextSibling();
-        }
       else
         {
-        ret = CHILD(cache);
+        // iterate up until we reach the start point or an unvisited sibling.
+        SProperty parent = previous->parent();
+        while(parent != cache.output(INDEX-1) && !parent->nextSibling())
+          {
+          ret = parent->nextSibling();
+          }
+
+        if(!ret)
+          {
+          ret = CHILD(cache);
+          }
         }
       }
 
