@@ -108,7 +108,7 @@ public:
       else
         {
         // iterate up until we reach the start point or an unvisited sibling.
-        SProperty parent = previous->parent();
+        SProperty *parent = previous->parent();
         while(parent != cache.output(INDEX-1) && !parent->nextSibling())
           {
           ret = parent->nextSibling();
