@@ -1,6 +1,8 @@
 #ifndef ASSETTREE_H
 #define ASSETTREE_H
 
+#if 0
+
 #include "UISurface.h"
 #include "QAbstractItemModel"
 #include "XEnvironment.h"
@@ -54,5 +56,7 @@ private:
   mutable QVector<Index> _indexMap;
   mutable int _cleanupTimerID;
   };
+
+#endif
 
 #endif // ASSETTREE_H

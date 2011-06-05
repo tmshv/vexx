@@ -36,6 +36,26 @@ SEntity *SEntity::parentEntity() const
   return 0;
   }
 
+SEntity *SEntity::findChildEntity(const QString &n)
+  {
+  SProperty *prop = children.findChild(n);
+  if(!prop)
+    {
+    return 0;
+    }
+  return prop->castTo<SEntity>();
+  }
+
+const SEntity *SEntity::findChildEntity(const QString &n) const
+  {
+  const SProperty *prop = children.findChild(n);
+  if(!prop)
+    {
+    return 0;
+    }
+  return prop->castTo<SEntity>();
+  }
+
 SEntity *SEntity::firstChildEntity() const
   {
   if(children.firstChild())

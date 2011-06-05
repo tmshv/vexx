@@ -13,29 +13,23 @@ XLDRColour operator+( const XLDRColour &, const XLDRColour & );
 XLDRColour operator*( xReal, const XLDRColour & );
 
 class EKSCORE_EXPORT XColour : public XVector4D
-    {
+  {
 public:
-    inline xReal r( ) const { return x(); }
-    inline xReal g( ) const { return y(); }
-    inline xReal b( ) const { return z(); }
-    inline xReal a( ) const { return w(); }
+  XColour();
+  XColour( float * );
+  XColour( double * );
+  XColour( xReal, xReal, xReal );
+  XColour( xReal, xReal, xReal, xReal );
+  XColour( const XVector4D & );
+  XColour( const XLDRColour & );
 
-    inline void setR( xReal in ) { setX( in ); }
-    inline void setG( xReal in ) { setY( in ); }
-    inline void setB( xReal in ) { setZ( in ); }
-    inline void setA( xReal in ) { setW( in ); }
+  template <typename T, xint32 NUM> XColour(const Eigen::VectorBlock<T, NUM> &in) : XVector4D(in) { }
 
-    XColour();
-    XColour( float * );
-    XColour( double * );
-    XColour( xReal, xReal, xReal );
-    XColour( xReal, xReal, xReal, xReal );
-    XColour( const XVector4D & );
-    XColour( const XLDRColour & );
-
-    XLDRColour toLDRColour( ) const;
-    };
+  XLDRColour toLDRColour( ) const;
+  };
 
 X_DECLARE_SERIALISABLE_METATYPE(XColour);
+
+Q_DECLARE_METATYPE(XColour);
 
 #endif // XCOLOUR_H

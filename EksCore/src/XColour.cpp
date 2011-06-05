@@ -30,7 +30,7 @@ XColour::XColour( const XLDRColour &col ) : XVector4D( col.redF(), col.greenF(),
 
 XLDRColour XColour::toLDRColour( ) const
     {
-    return XLDRColour::fromRgbF( r(), g(), b(), a() );
+    return XLDRColour::fromRgbF( coeff(0), coeff(1), coeff(2), coeff(3) );
     }
 
 

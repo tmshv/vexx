@@ -30,6 +30,8 @@ public:
   void mousePressEvent( QMouseEvent *event );
   void showEvent(QShowEvent *);
 
+  X_ALIGNED_OPERATOR_NEW
+
 private slots:
   void newItem();
 

@@ -43,10 +43,10 @@ QDataStream &operator>>(QDataStream &stream, XEnvironmentArea::ShadingGroup &s)
 
 QDataStream &operator<<(QDataStream &stream, const XEnvironmentArea::MeshPair &m)
   {
-  return stream << m._mesh << m._transform;
+  return stream << m._mesh << m._transform.matrix();
   }
 
 QDataStream &operator>>(QDataStream &stream, XEnvironmentArea::MeshPair &m)
   {
-  return stream >> m._mesh >> m._transform;
+  return stream >> m._mesh >> m._transform.matrix();
   }

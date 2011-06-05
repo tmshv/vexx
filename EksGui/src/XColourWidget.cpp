@@ -78,7 +78,7 @@ void XColourWidget::rgbChanged( XVector3D col )
 void XColourWidget::setAlpha( double in )
     {
     XColour s( colour() );
-    s.setW( in );
+    s.w() = in;
     setColour( s );
     }
 
@@ -88,7 +88,7 @@ void XColourWidget::setColour( XColour col )
         {
         _setting = true;
 
-        col.setW( alpha() );
+        col.w() = alpha();
 
         _slider->setValue( XVector3D( col.x(), col.y(), col.z() ) );
         _picker->setColor( QColor::fromRgbF( col.x(), col.y(), col.z(), col.w() ) );

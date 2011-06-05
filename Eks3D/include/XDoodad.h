@@ -30,6 +30,8 @@ public:
 public:
     XDoodad( );
 
+    X_ALIGNED_OPERATOR_NEW
+
     virtual void render( );
 
     XCuboid bounds() const;

@@ -14,7 +14,7 @@ template <typename T> class XAbstractCurve;
 class EKS3D_EXPORT XModeller
     {
 public:
-    XModeller( XGeometry * );
+    XModeller( XGeometry *, xsize initialSize );
     ~XModeller( );
 
     void flush( );
@@ -46,7 +46,7 @@ public:
     void drawQuad( XVector3D horizontal, XVector3D vertical );
     void drawLocator( XSize size=XSize(1,1,1), XVector3D center=XVector3D() );
 
-    void drawCurve( const XAbstractCurve <XVector3D> &, int segments );
+    void drawCurve( const XAbstractCurve <XVector3D> &, xsize segments );
 
     void setTransform( XTransform );
     XTransform transform( ) const;
@@ -56,34 +56,30 @@ public:
 
 private:
     inline XVector3D transformPoint( XVector3D );
-    inline XGeometry::Vertex3D transformPoint( XGeometry::Vertex3D );
     inline XVector <XVector3D> transformPoints( const XVector <XVector3D> & );
-    inline XVector <XGeometry::Vertex3D> transformPoints( const XVector <XGeometry::Vertex3D> & );
 
     inline XVector3D transformNormal( XVector3D );
-    inline XGeometry::Vertex3D transformNormal( XGeometry::Vertex3D );
     inline XVector <XVector3D> transformNormals( const XVector <XVector3D> & );
-    inline XVector <XGeometry::Vertex3D> transformNormals( const XVector <XGeometry::Vertex3D> & );
 
     XGeometry *_geo;
-    XList <unsigned int> _triIndices;
-    XList <unsigned int> _linIndices;
-    XList <unsigned int> _poiIndices;
-    XList <XGeometry::Vertex3D> _vertex;
-    XList <XGeometry::Vertex2D> _texture;
-    XList <XGeometry::Vertex3D> _normals;
-    XList <XGeometry::Vertex4D> _colours;
+    XVector <xuint32> _triIndices;
+    XVector <xuint32> _linIndices;
+    XVector <xuint32> _poiIndices;
+    XVector <XVector3D> _vertex;
+    XVector <XVector2D> _texture;
+    XVector <XVector3D> _normals;
+    XVector <XVector4D> _colours;
 
     struct State
         {
         State() : type( None ), normalsAutomatic( false ) { }
-        XGeometry::Vertex3D normal;
-        XGeometry::Vertex2D texture;
-        XGeometry::Vertex4D colour;
+        XVector3D normal;
+        XVector2D texture;
+        XVector4D colour;
         Type type;
         bool normalsAutomatic;
         };
-    QList <State> _states;
+    XVector <State> _states;
 
     XTransform _transform;
     int _quadCount;

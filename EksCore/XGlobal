@@ -27,6 +27,10 @@
 # define xAssert( arg ) Q_ASSERT( arg )
 #endif
 
+#include "Eigen/Core"
+
+#define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 #ifndef QT_NO_DEBUG
 # define X_DEBUG
 # define X_PROFILING_ENABLED

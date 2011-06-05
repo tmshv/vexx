@@ -9,6 +9,8 @@
 #include "QTimerEvent"
 #include "QAction"
 
+#if 0
+
 AssetTree::AssetTree(Application *app) : UISurface("Assets", new QWidget(0), UISurface::Dock), _app(app),
     _containerIcon(":/tang/resources/Folder.svg"), _textureIcon(":/tang/resources/Texture.svg"),
     _cleanupTimerID(-1)
@@ -385,3 +387,5 @@ QVariant AssetTree::data(const QModelIndex &index, int role) const
 
   return QVariant();
   }
+
+#endif

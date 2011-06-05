@@ -21,14 +21,14 @@ XFrustum::XFrustum( const XVector3D &point, const XVector3D &look, const XVector
   _planes[FarPlane] = XPlane(point+(lookNorm*farPlane), lookNorm);
 
   // top plane
-  _planes[TopPlane] = XPlane(point, XVector3D::crossProduct(lookNorm+(fovUpY*upNorm), across) );
+  _planes[TopPlane] = XPlane(point, (lookNorm + (fovUpY * upNorm)).cross(across) );
   // bottom plane
-  _planes[BottomPlane] = XPlane(point, XVector3D::crossProduct(across, lookNorm-(fovUpY*upNorm)) );
+  _planes[BottomPlane] = XPlane(point, across.cross(lookNorm - (fovUpY * upNorm)) );
 
   // left plane
-  _planes[LeftPlane] = XPlane(point, XVector3D::crossProduct(up, lookNorm+(fovUpX*acrossNorm)) );
+  _planes[LeftPlane] = XPlane(point, up.cross(lookNorm+(fovUpX * acrossNorm)) );
   // right plane
-  _planes[RightPlane] = XPlane(point, XVector3D::crossProduct(lookNorm-(fovUpX*acrossNorm), up) );
+  _planes[RightPlane] = XPlane(point, (lookNorm - (fovUpX * acrossNorm)).cross(up) );
 
   }
 
@@ -38,18 +38,18 @@ XFrustum::IntersectionResult XFrustum::intersects( const XCuboid &cuboid ) const
   XVector3D vec;
   for( size_t i=0; i<6; ++i )
     {
-    vec.setX( (_planes[i].normal().x() >= 0.0f) ? cuboid.maximum().x() : cuboid.minimum().x() );
-    vec.setY( (_planes[i].normal().y() >= 0.0f) ? cuboid.maximum().y() : cuboid.minimum().y() );
-    vec.setZ( (_planes[i].normal().z() >= 0.0f) ? cuboid.maximum().z() : cuboid.minimum().z() );
+    vec.x() = (_planes[i].normal().x() >= 0.0f) ? cuboid.maximum().x() : cuboid.minimum().x();
+    vec.y() = (_planes[i].normal().y() >= 0.0f) ? cuboid.maximum().y() : cuboid.minimum().y();
+    vec.z() = (_planes[i].normal().z() >= 0.0f) ? cuboid.maximum().z() : cuboid.minimum().z();
 
     if( _planes[i].distanceToPlane(vec) < 0.0f )
       {
       return Outside;
       }
 
-    vec.setX( (_planes[i].normal().x() >= 0.0f) ? cuboid.minimum().x() : cuboid.maximum().x() );
-    vec.setY( (_planes[i].normal().y() >= 0.0f) ? cuboid.minimum().y() : cuboid.maximum().y() );
-    vec.setZ( (_planes[i].normal().z() >= 0.0f) ? cuboid.minimum().z() : cuboid.maximum().z() );
+    vec.x() = (_planes[i].normal().x() >= 0.0f) ? cuboid.minimum().x() : cuboid.maximum().x();
+    vec.y() = (_planes[i].normal().y() >= 0.0f) ? cuboid.minimum().y() : cuboid.maximum().y();
+    vec.z() = (_planes[i].normal().z() >= 0.0f) ? cuboid.minimum().z() : cuboid.maximum().z();
 
     if( _planes[i].distanceToPlane(vec) < 0.0f )
       {

@@ -50,6 +50,25 @@ public:
     return ent;
     }
 
+  template <typename T>T *addProperty(const QString& name)
+    {
+    SProperty *p = addProperty(T::Type, name);
+    xAssert(p);
+    return p->uncheckedCastTo<T>();
+    }
+
+  SProperty *addProperty(SPropertyType t, const QString& name)
+    {
+    SProperty *p = addProperty(t, name);
+    xAssert(p);
+    return p;
+    }
+
+  void removeProperty(SProperty *prop)
+    {
+    removeProperty(prop);
+    }
+
   // accessing child properties by index
   using SPropertyContainer::at;
 
@@ -71,6 +90,9 @@ public:
   void informDataObservers(int m, const DataChange *event, SObservers &obs);
   void informTreeObservers(int m, const SChange *event, SObservers &obs);
   void informConnectionObservers(int m, const SChange *event, SObservers &obs);
+
+  SEntity *findChildEntity(const QString &);
+  const SEntity *findChildEntity(const QString &) const;
 
 protected:
   static void saveEntity(const SProperty *, SPropertyData &, SPropertyData::Mode);

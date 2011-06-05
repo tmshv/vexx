@@ -61,6 +61,7 @@ S_CORE_TYPE(LongStringProperty, 33);
 S_CORE_TYPE(Pointer, 34);
 S_CORE_TYPE(PointerArray, 35);
 S_CORE_TYPE(SDatabase, 36);
+S_CORE_TYPE(ByteArrayProperty, 37);
 
 S_CORE_TYPE(SArrayProperty, 40);
 S_CORE_TYPE(SFloatArrayProperty, 41);

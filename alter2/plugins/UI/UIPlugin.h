@@ -18,6 +18,8 @@ public:
   void removeSurface(QString name);
   void removeSurface(UISurface *s);
 
+  void show();
+
 signals:
   void aboutToClose();
 

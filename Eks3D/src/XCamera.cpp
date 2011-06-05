@@ -35,17 +35,17 @@ void XCamera::setAimPosition( XVector3D aim )
 
 XVector3D XCamera::aimDirection() const
     {
-    return _viewTransform.row( 2 ).toVector3D();
+    return _viewTransform.matrix().row( 2 ).head<3>();
     }
 
 XVector3D XCamera::vertical() const
     {
-    return _viewTransform.row( 1 ).toVector3D();
+    return _viewTransform.matrix().row( 1 ).head<3>();
     }
 
 XVector3D XCamera::horizontal() const
     {
-    return _viewTransform.row( 0 ).toVector3D();
+    return _viewTransform.matrix().row( 0 ).head<3>();
     }
 
 void XCamera::pan( xReal x, xReal y )
@@ -76,13 +76,14 @@ XVector3D XCamera::screenToWorld( const QPoint &pos ) const
 
     if(!_invertedTransformIsValid)
       {
-      _inverted = viewTransform().inverted() * projectionTransform().inverted();
+      _inverted = viewTransform().inverse() * projectionTransform().inverse();
       }
 
-    return _inverted * XVector3D(posRatio);
+    xAssertFail();
+    return (_inverted * XVector4D(posRatio.x(), posRatio.y(), 0, 1)).head<3>();
     }
 
-void XCamera::setProjectionTransform( XTransform proj )
+void XCamera::setProjectionTransform( const XComplexTransform &proj )
     {
     _projectionTransform = proj;
 
@@ -104,9 +105,7 @@ void XCamera::viewTransformChanged()
 
 void XCamera::setTransform()
     {
-    _viewTransform = XTransform();
-
-    _viewTransform.lookAt( position(), aimPosition(), upDirection() );
+    _viewTransform = XTransformUtilities::lookAt(position(), aimPosition(), upDirection());
 
     _invertedTransformIsValid = false;
     viewTransformChanged();
@@ -153,7 +152,5 @@ void XPerspectiveCamera::viewTransformChanged()
 
 void XPerspectiveCamera::updateProjectionTransform()
     {
-    XTransform mat;
-    mat.perspective( viewAngle(), aspectRatio(), nearClipPlane(), farClipPlane() );
-    setProjectionTransform( mat );
+    setProjectionTransform(XTransformUtilities::perspective( viewAngle(), aspectRatio(), nearClipPlane(), farClipPlane() ));
     }

@@ -29,8 +29,39 @@ public:
 
   virtual void closeEvent(QCloseEvent *event)
     {
+    saveState();
+
     emit _plugin->aboutToClose();
     event->accept();
+    }
+
+  void saveState()
+    {
+    APlugin<SPlugin> shift(_plugin, "db");
+    if(shift.isValid())
+      {
+      QByteArray layoutData = _mainWindow->saveState();
+      QByteArray geometryData = _mainWindow->saveGeometry();
+
+      ByteArrayProperty *layout = shift->setting<ByteArrayProperty>("ui", "layout");
+      layout->assign(layoutData);
+
+      ByteArrayProperty *geometry = shift->setting<ByteArrayProperty>("ui", "geometry");
+      geometry->assign(geometryData);
+      }
+    }
+
+  void restoreState()
+    {
+    APlugin<SPlugin> shift(_plugin, "db");
+    if(shift.isValid())
+      {
+      ByteArrayProperty *layout = shift->setting<ByteArrayProperty>("ui", "layout");
+      ByteArrayProperty *geometry = shift->setting<ByteArrayProperty>("ui", "geometry");
+
+      _mainWindow->restoreState(layout->value());
+      _mainWindow->restoreGeometry(geometry->value());
+      }
     }
 
   XList <UISurface*> _surfaces;
@@ -50,8 +81,6 @@ UIPlugin::UIPlugin() : _priv(new UIPluginPrivate())
 
 void UIPlugin::load()
   {
-  _priv->show();
-
   _priv->_preferences = new QDialog(_priv);
   _priv->_preferences->setModal(true);
 
@@ -90,6 +119,12 @@ void UIPlugin::load()
     addSurface(&_priv->_profiler);
 #endif
     }
+  }
+
+void UIPlugin::show()
+  {
+  _priv->restoreState();
+  _priv->show();
   }
 
 void UIPlugin::unload()

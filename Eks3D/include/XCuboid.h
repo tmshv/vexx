@@ -47,7 +47,7 @@ public:
     friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, XCuboid &itemRequest);
     };
 
-inline XCuboid operator *( const XMatrix4x4 &mat, const XCuboid &cub )
+inline XCuboid operator *( const XTransform &mat, const XCuboid &cub )
   {
   XVector3D min = mat * cub.minimum();
   XVector3D max = mat * cub.maximum();

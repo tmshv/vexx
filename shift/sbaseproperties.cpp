@@ -15,6 +15,7 @@ IMPLEMENT_POD_PROPERTY(QuaternionProperty, XQuaternion);
 IMPLEMENT_POD_PROPERTY(StringProperty, XString);
 IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
 IMPLEMENT_POD_PROPERTY(LongStringProperty, XString);
+IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
 
 void BoolProperty::assignPOD(const SProperty *f, SProperty *t)
   {
@@ -408,28 +409,28 @@ void Vector2DProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().toVector2D());
+    to->assign(bProp->value().head<2>());
     return;
     }
 
   const Vector4DProperty *cProp = f->castTo<Vector4DProperty>();
   if(cProp)
     {
-    to->assign(cProp->value().toVector2D());
+    to->assign(cProp->value().head<2>());
     return;
     }
 
   const ColourProperty *colProp = f->castTo<ColourProperty>();
   if(colProp)
     {
-    to->assign(colProp->value().toVector2D());
+    to->assign(colProp->value().head<2>());
     return;
     }
 
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().toVector4D().toVector2D());
+    to->assign(qProp->value().coeffs().head<2>());
     return;
     }
   }
@@ -441,7 +442,7 @@ void Vector3DProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().toVector3D());
+    to->assign(aProp->value().head<3>());
     return;
     }
 
@@ -455,21 +456,21 @@ void Vector3DProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector4DProperty *cProp = f->castTo<Vector4DProperty>();
   if(cProp)
     {
-    to->assign(cProp->value().toVector3D());
+    to->assign(cProp->value().head<3>());
     return;
     }
 
   const ColourProperty *colProp = f->castTo<ColourProperty>();
   if(colProp)
     {
-    to->assign(colProp->value().toVector3D());
+    to->assign(colProp->value().head<3>());
     return;
     }
 
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().toVector4D().toVector3D());
+    to->assign(qProp->value().coeffs().head<3>());
     return;
     }
   }
@@ -481,14 +482,15 @@ void Vector4DProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().toVector4D());
+    const XColour &col = aProp->value().head<4>();
+    to->assign(col);
     return;
     }
 
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().toVector4D());
+    to->assign(bProp->value().head<4>());
     return;
     }
 
@@ -509,7 +511,7 @@ void Vector4DProperty::assignPOD(const SProperty *f, SProperty *t)
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().toVector4D());
+    to->assign(qProp->value().coeffs());
     return;
     }
   }
@@ -521,14 +523,14 @@ void QuaternionProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().toVector4D());
+    to->assign(aProp->value().head<4>());
     return;
     }
 
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().toVector4D());
+    to->assign(bProp->value().head<4>());
     return;
     }
 
@@ -549,7 +551,7 @@ void QuaternionProperty::assignPOD(const SProperty *f, SProperty *t)
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().toVector4D());
+    to->assign(qProp->value().coeffs().head<4>());
     return;
     }
   }
@@ -561,14 +563,14 @@ void ColourProperty::assignPOD(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().toVector4D());
+    to->assign(aProp->value().head<4>());
     return;
     }
 
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().toVector4D());
+    to->assign(bProp->value().head<4>());
     return;
     }
 
@@ -589,7 +591,7 @@ void ColourProperty::assignPOD(const SProperty *f, SProperty *t)
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().toVector4D());
+    to->assign(qProp->value().coeffs().head<4>());
     return;
     }
   }
@@ -630,6 +632,10 @@ void LongStringProperty::assignPOD(const SProperty *f, SProperty *t)
     to->assign(sProp->value());
     return;
     }
+  }
+
+void ByteArrayProperty::assignPOD(const SProperty *f, SProperty *t)
+  {
   }
 
 void PointerArray::addPointer(SProperty *prop)

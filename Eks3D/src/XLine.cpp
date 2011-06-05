@@ -20,5 +20,5 @@ XVector3D XLine::sample( float t ) const
 
 XLine operator*( const XTransform &tx, const XLine &line )
   {
-  return XLine( tx.map(line.position()), tx.mapVector(line.direction()), XLine::PointAndDirection );
+  return XLine( tx * line.position(), tx.linear() * line.direction(), XLine::PointAndDirection );
   }

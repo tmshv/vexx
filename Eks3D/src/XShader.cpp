@@ -66,25 +66,25 @@ void XShaderVariable::setValue( unsigned int value )
 
 void XShaderVariable::setValue( const XColour &value )
   {
-  _value.setValue((QVector4D)value);
+  _value.setValue(value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
 void XShaderVariable::setValue( const XVector2D &value )
   {
-  _value.setValue((QVector2D)value);
+  _value.setValue(value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
 void XShaderVariable::setValue( const XVector3D &value )
   {
-  _value.setValue((QVector3D)value);
+  _value.setValue(value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
 void XShaderVariable::setValue( const XVector4D &value )
   {
-  _value.setValue((QVector4D)value);
+  _value.setValue(value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
@@ -255,12 +255,12 @@ void XShaderVariable::setVariantValue( const QVariant &value )
       setValue( value.toFloat() );
     else if( value.type() == QVariant::UInt )
       setValue( value.toUInt() );
-    else if( value.type() == QVariant::Vector2D )
-      setValue( value.value<QVector2D>() );
-    else if( value.type() == QVariant::Vector3D )
-      setValue( value.value<QVector3D>() );
-    else if( value.type() == QVariant::Vector4D )
-      setValue( value.value<QVector4D>() );
+    else if( value.canConvert<XVector2D>() )
+      setValue( value.value<XVector2D>() );
+    else if( value.canConvert<XVector3D>())
+      setValue( value.value<XVector3D>() );
+    else if( value.canConvert<XVector4D>() )
+      setValue( value.value<XVector4D>() );
     else if( value.canConvert<QMatrix2x2>() )
       setValue( value.value<QMatrix2x2>() );
     else if( value.canConvert<QMatrix2x3>() )
@@ -294,12 +294,12 @@ void XShaderVariable::setVariantValue( const QVariant &value )
         setValueArray( toVector<float>(list) );
       else if( list.front().type() == QVariant::UInt )
         setValueArray( toVector<unsigned int>(list) );
-      else if( list.front().type() == QVariant::Vector2D )
-        setValueArray( toVector<QVector2D>(list) );
-      else if( list.front().type() == QVariant::Vector3D )
-        setValueArray( toVector<QVector3D>(list) );
-      else if( list.front().type() == QVariant::Vector4D )
-        setValueArray( toVector<QVector4D>(list) );
+      else if( list.front().canConvert<XVector2D>() )
+        setValueArray( toVector<XVector2D>(list) );
+      else if( list.front().canConvert<XVector3D>() )
+        setValueArray( toVector<XVector3D>(list) );
+      else if( list.front().canConvert<XVector4D>() )
+        setValueArray( toVector<XVector4D>(list) );
       else if( list.front().canConvert<QMatrix2x2>() )
         setValueArray( toVector<QMatrix2x2>(list) );
       else if( list.front().canConvert<QMatrix2x3>() )

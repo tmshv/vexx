@@ -2,6 +2,7 @@
 #define XSCENE_H
 
 #include "X3DGlobal.h"
+#include "QSize"
 #include "XObject"
 #include "XDoodad.h"
 

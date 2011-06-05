@@ -4,7 +4,6 @@
 #include "XProperty"
 #include "XVector3D"
 
-class XTransform;
 class XLine;
 
 class XTriangle

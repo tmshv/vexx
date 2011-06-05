@@ -10,9 +10,7 @@ SOURCES += ../src/XObject.cpp \
     ../src/XMessageHandler.cpp \
     ../src/XVariant.cpp \
     ../src/XColour.cpp \
-    ../src/XVectorXD.cpp \
     ../src/XFileSequence.cpp \
-    ../src/XMatrixXxX.cpp \
     ../src/XChildEvent.cpp \
     ../src/XBaseObject.cpp \
     ../src/XSize.cpp \

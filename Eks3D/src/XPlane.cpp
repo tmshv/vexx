@@ -18,8 +18,8 @@ XPlane::XPlane( const XVector3D &point, const XVector3D &normal )
 
 XPlane::XPlane( const XVector3D &point, const XVector3D &liesOnPlaneA, const XVector3D &liesOnPlaneB )
   {
-  XVector3D c = XVector3D::crossProduct(liesOnPlaneA-point,liesOnPlaneB-point);
-  if( XVector3D::dotProduct( c, point ) < 0 )
+  XVector3D c = (liesOnPlaneA - point).cross(liesOnPlaneB - point);
+  if(c.dot(point) < 0)
     {
     c *= -1;
     }
@@ -34,7 +34,7 @@ XVector3D XPlane::position() const
 void XPlane::set( const XVector3D &point, const XVector3D &n )
   {
   setNormal(n);
-  setD( XVector3D::dotProduct( point, normal() ) );
+  setD(point.dot(normal()));
   }
 
 void XPlane::setNormal( const XVector3D &normal )
@@ -44,15 +44,15 @@ void XPlane::setNormal( const XVector3D &normal )
 
 float XPlane::distanceToPlane( const XVector3D &in ) const
   {
-  return XVector3D::dotProduct( in, _normal ) + d();
+  return in.dot(normal()) + d();
   }
 
 float XPlane::intersection( const XLine &a ) const
   {
-  xReal denominator = XVector3D::dotProduct( normal(), a.direction() );
+  xReal denominator = normal().dot(a.direction());
   if( !qFuzzyCompare( denominator, 0.0f ) )
     {
-    return XVector3D::dotProduct( normal(), position() - a.position() ) / denominator;
+    return normal().dot(position() - a.position()) / denominator;
     }
   return HUGE_VAL;
   }

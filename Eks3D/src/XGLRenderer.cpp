@@ -191,9 +191,9 @@ public:
     virtual void setAttributesSize( int, int, int, int, int );
 
     virtual void setAttribute( QString, const XVector<xReal> & );
-    virtual void setAttribute( QString, const XVector<XGeometry::Vertex2D> & );
-    virtual void setAttribute( QString, const XVector<XGeometry::Vertex3D> & );
-    virtual void setAttribute( QString, const XVector<XGeometry::Vertex4D> & );
+    virtual void setAttribute( QString, const XVector<XVector2D> & );
+    virtual void setAttribute( QString, const XVector<XVector3D> & );
+    virtual void setAttribute( QString, const XVector<XVector4D> & );
 
 private:
     unsigned int _vertexArray;
@@ -256,7 +256,7 @@ void XGLRenderer::pushTransform( const XTransform &trans )
     {
     glMatrixMode( GL_MODELVIEW ) GLE;
     glPushMatrix() GLE;
-    glMultMatrixd( trans.constData() ) GLE;
+    glMultMatrixf( trans.data() ) GLE;
     }
 
 void XGLRenderer::popTransform( )
@@ -314,21 +314,21 @@ void XGLRenderer::setViewportSize( QSize size )
     glViewport( 0, 0, size.width(), size.height() ) GLE;
     }
 
-void XGLRenderer::setProjectionTransform( const XTransform &trans )
+void XGLRenderer::setProjectionTransform( const XComplexTransform &trans )
     {
     glMatrixMode( GL_PROJECTION ) GLE;
     glLoadIdentity() GLE;
-    glMultMatrixd( trans.constData() ) GLE;
+    glMultMatrixf( trans.data() ) GLE;
     }
 
-QDebug operator<<( QDebug dbg, XGeometry::Vertex2D v )
+QDebug operator<<( QDebug dbg, XVector2D v )
     {
-    return dbg << "Vertex2D(" <<v.a << "," << v.b << ")";
+    return dbg << "Vertex2D(" << v.x() << "," << v.y() << ")";
     }
 
-QDebug operator<<( QDebug dbg, XGeometry::Vertex3D v )
+QDebug operator<<( QDebug dbg, XVector3D v )
     {
-    return dbg << "Vertex2D(" <<v.a << "," << v.b << "," << v.c << ")";
+    return dbg << "Vertex2D(" <<v.x() << "," << v.y() << "," << v.z() << ")";
     }
 
 void XGLRenderer::drawGeometry( const XGeometry &cache )
@@ -777,25 +777,25 @@ void XGLShaderVariable::setValue( unsigned int value )
 void XGLShaderVariable::setValue( const XColour &value )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector2D &value )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector3D &value )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector4D &value )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix2x2 &value )
@@ -881,25 +881,25 @@ void XGLShaderVariable::setValueArray( const XVector<unsigned int> &values )
 void XGLShaderVariable::setValueArray( const XVector<XColour> &values )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, &(values.front()), values.size() ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, values.front().data(), values.size(), 4 ) GLE;
   }
 
 void XGLShaderVariable::setValueArray( const XVector<XVector2D> &values )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, &(values.front()), values.size() ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, values.front().data(), values.size(), 2 ) GLE;
   }
 
 void XGLShaderVariable::setValueArray( const XVector<XVector3D> &values )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, &(values.front()), values.size() ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, values.front().data(), values.size(), 3 ) GLE;
   }
 
 void XGLShaderVariable::setValueArray( const XVector<XVector4D> &values )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, &(values.front()), values.size() ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValueArray( _location, values.front().data(), values.size(), 4 ) GLE;
   }
 
 void XGLShaderVariable::setValueArray( const XVector<QMatrix2x2> &values )
@@ -1102,7 +1102,7 @@ void XGLGeometryCache::setAttribute( QString name, const XVector<xReal> &attr )
     glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
     }
 
-void XGLGeometryCache::setAttribute( QString name, const XVector<XGeometry::Vertex2D> &attr )
+void XGLGeometryCache::setAttribute( QString name, const XVector<XVector2D> &attr )
     {
     int offset( getCacheOffset( name, 2, attr.size() ) );
 
@@ -1112,7 +1112,7 @@ void XGLGeometryCache::setAttribute( QString name, const XVector<XGeometry::Vert
     glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
     }
 
-void XGLGeometryCache::setAttribute( QString name, const XVector<XGeometry::Vertex3D> &attr )
+void XGLGeometryCache::setAttribute( QString name, const XVector<XVector3D> &attr )
     {
     int offset( getCacheOffset( name, 3, attr.size() ) );
 
@@ -1122,7 +1122,7 @@ void XGLGeometryCache::setAttribute( QString name, const XVector<XGeometry::Vert
     glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
     }
 
-void XGLGeometryCache::setAttribute( QString name, const XVector<XGeometry::Vertex4D> &attr )
+void XGLGeometryCache::setAttribute( QString name, const XVector<XVector4D> &attr )
     {
     int offset( getCacheOffset( name, 4, attr.size() ) );
 

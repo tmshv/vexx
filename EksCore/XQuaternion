@@ -1,26 +1,31 @@
 #ifndef XQUATERNION_H
 #define XQUATERNION_H
 
-#include "QQuaternion"
+#include "Eigen/Geometry"
 #include "XMetaType"
 #include "QTextStream"
+#include "QDataStream"
 
-typedef QQuaternion XQuaternion;
+typedef Eigen::Quaternion<xReal> XQuaternion;
 
 inline QTextStream &operator<<(QTextStream &str, const XQuaternion &quat)
   {
-  return str << (xReal)quat.x() << (xReal)quat.y() << (xReal)quat.z() << (xReal)quat.scalar();
+  return str << quat.x() << " " << quat.y() << " " << quat.z() << " " << quat.w();
   }
 
 inline QTextStream &operator>>(QTextStream &str, XQuaternion &quat)
   {
-  xReal x, y, z, w;
-  str >> x >> y >> z >> w;
-  quat.setX(x);
-  quat.setY(y);
-  quat.setZ(z);
-  quat.setScalar(w);
-  return str;
+  return str >> quat.x() >> quat.y() >> quat.z() >> quat.w();
+  }
+
+inline QDataStream &operator<<(QDataStream &str, const XQuaternion &quat)
+  {
+  return str << quat.x() << quat.y() << quat.z() << quat.w();
+  }
+
+inline QDataStream &operator>>(QDataStream &str, XQuaternion &quat)
+  {
+  return str >> quat.x() >> quat.y() >> quat.z() >> quat.w();
   }
 
 X_DECLARE_SERIALISABLE_METATYPE(XQuaternion);

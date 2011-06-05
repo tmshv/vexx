@@ -11,6 +11,7 @@ class SAppDatabase : public SDatabase
 
 public:
   SEntity document;
+  SEntity settings;
 
   SAppDatabase();
   };

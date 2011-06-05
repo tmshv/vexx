@@ -10,6 +10,7 @@
 #include "sentity.h"
 #include "schange.h"
 #include "sobserver.h"
+#include "QByteArray"
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
 class EXPORT_MODE name : public SProperty \
@@ -136,6 +137,7 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion()
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongStringProperty, XString, "");
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
 class SHIFT_EXPORT Pointer : public SProperty
   {

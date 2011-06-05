@@ -6,7 +6,6 @@
 #include "XVector3D"
 #include "XVector4D"
 #include "XMatrix4x4"
-#include "QGenericMatrix"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //                                                      XAbstractCurve Implementation
@@ -25,7 +24,7 @@ public:
 //                                                      XGenericCurveSegment Definition
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE, 1> ), XMatrix<xReal, SIZE, 1> (*FROMRETURN)( RETURN )>
 class XGenericCurveSegment : public XAbstractCurve<RETURN>
     {
 public:
@@ -44,16 +43,16 @@ public:
     RETURN sample( xReal t ) const;
 
 private:
-    QGenericMatrix <4,4,qreal> _basis;
-    QGenericMatrix <SIZE,4,qreal> _geom;
-    QGenericMatrix <SIZE,4,qreal> _preMult;
+    XMatrix <xReal, 4, 4> _basis;
+    XMatrix <xReal, SIZE, 4> _geom;
+    XMatrix <xReal, SIZE, 4> _preMult;
     };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //                                                      XGenericCurve Definition
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE, 1> (*FROMRETURN)( RETURN )>
 class XGenericCurve : public XAbstractCurve<RETURN>
     {
 public:
@@ -73,7 +72,7 @@ private:
 //                                                      XKBSpline Definition
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 class XKBSpline : public XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>
     {
 public:
@@ -97,23 +96,23 @@ private:
 //                                                      XGenericCurveSegment Implementation
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::XGenericCurveSegment( BasisMode mode )
     {
     _geom.fill(0.0);
     setBasis( mode );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setGeometricConstraints( RETURN oneGeneric,
                                                     RETURN twoGeneric,
                                                     RETURN thrGeneric,
                                                     RETURN fouGeneric )
     {
-    QGenericMatrix<SIZE,1,qreal> one( FROMRETURN( oneGeneric ) );
-    QGenericMatrix<SIZE,1,qreal> two( FROMRETURN( twoGeneric ) );
-    QGenericMatrix<SIZE,1,qreal> thr( FROMRETURN( thrGeneric ) );
-    QGenericMatrix<SIZE,1,qreal> fou( FROMRETURN( fouGeneric ) );
+    XMatrix<xReal, SIZE,1> one( FROMRETURN( oneGeneric ) );
+    XMatrix<xReal, SIZE,1> two( FROMRETURN( twoGeneric ) );
+    XMatrix<xReal, SIZE,1> thr( FROMRETURN( thrGeneric ) );
+    XMatrix<xReal, SIZE,1> fou( FROMRETURN( fouGeneric ) );
     for( int x=0; x<SIZE; x++ )
         {
         _geom(0,x) = one(0,x);
@@ -127,10 +126,10 @@ void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setGeometricConstrai
     _preMult = _basis * _geom;
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setGeometricConstraint( int geo, RETURN constraint )
     {
-    QGenericMatrix<SIZE,1,qreal> one( FROMRETURN( constraint ) );
+    XMatrix<xReal, SIZE,1> one( FROMRETURN( constraint ) );
     for( int x=0; x<SIZE; x++ )
         {
         _geom(geo,x) = one(0,x);
@@ -138,10 +137,10 @@ void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setGeometricConstrai
     _preMult = _basis * _geom;
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 RETURN XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::geometricConstraint( int geo ) const
     {
-    QGenericMatrix<SIZE,1,qreal> ret;
+    XMatrix<xReal, SIZE,1> ret;
     for( int x=0; x<SIZE; x++ )
         {
         ret(0,x) = _geom(geo,x);
@@ -149,32 +148,32 @@ RETURN XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::geometricConstrain
     return TORETURN( ret );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setBasis( const XMatrix4x4 &in )
     {
-    _basis = in.toGenericMatrix<4,4>();
+    _basis = in;
     _preMult = _basis * _geom;
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setBasis( BasisMode mode )
     {
     if( mode == Bezier )
         {
         XMatrix4x4 mat;
-        mat.setRow( 0, XVector4D( -1, 3, -3, 1 ) );
-        mat.setRow( 1, XVector4D( 3, -6, 3, 0 ) );
-        mat.setRow( 2, XVector4D( -3, 3, 0, 0 ) );
-        mat.setRow( 3, XVector4D( 1, 0, 0, 0 ) );
+        mat.row(0) = XVector4D( -1, 3, -3, 1 );
+        mat.row(1) = XVector4D( 3, -6, 3, 0 );
+        mat.row(2) = XVector4D( -3, 3, 0, 0 );
+        mat.row(3) = XVector4D( 1, 0, 0, 0 );
         setBasis( mat );
         }
     else if( mode == Hermite )
         {
         XMatrix4x4 mat;
-        mat.setRow( 0, XVector4D( 2, -2, 1, 1 ) );
-        mat.setRow( 1, XVector4D( -3, 3, -2, -1 ) );
-        mat.setRow( 2, XVector4D( 0, 0, 1, 0 ) );
-        mat.setRow( 3, XVector4D( 1, 0, 0, 0 ) );
+        mat.row(0) = XVector4D( 2, -2, 1, 1 );
+        mat.row(1) = XVector4D( -3, 3, -2, -1 );
+        mat.row(2) = XVector4D( 0, 0, 1, 0 );
+        mat.row(3) = XVector4D( 1, 0, 0, 0 );
         setBasis( mat );
         }
     else
@@ -183,11 +182,11 @@ void XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::setBasis( BasisMode 
         }
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 RETURN XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::sample( xReal t ) const
     {
     float tMult( t );
-    QGenericMatrix<4,1,qreal> tMat;
+    XMatrix<xReal, 4, 1> tMat;
     tMat(0,3) = 1;
     tMat(0,2) = tMult;
     tMult *= t;
@@ -202,19 +201,19 @@ RETURN XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN>::sample( xReal t ) 
 //                                                      XGenericCurve Implementation
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 xReal XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::minimumT() const
     {
     return 0.0;
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 xReal XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::maximumT() const
     {
     return _segments.size();
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 RETURN XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::sample( xReal t ) const
     {
     if( t >= 0 && t < _segments.size() )
@@ -233,18 +232,18 @@ RETURN XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::sample( xReal t ) const
             }
         }
 
-    QGenericMatrix<SIZE,1,qreal> ret;
+    XMatrix<xReal, SIZE,1> ret;
     ret.fill( 0.0 );
     return TORETURN( ret );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 const XList <XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN> > &XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::segments() const
     {
     return _segments;
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::setSegments( const XList <XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN> > &seg )
     {
     _segments = seg;
@@ -254,19 +253,19 @@ void XGenericCurve<SIZE,RETURN,TORETURN,FROMRETURN>::setSegments( const XList <X
 //                                                      XKBSpline Implementation
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::XKBSpline( uint size )
     {
     resize( size );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 uint XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::size() const
     {
     return this->segments().size();
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::resize( uint x )
     {
     int size = x - 1;
@@ -297,7 +296,7 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::resize( uint x )
     setSegments( segs );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setPosition( uint index, RETURN pos )
     {
     XList <XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN> > segs( this->segments() );
@@ -315,7 +314,7 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setPosition( uint index, RETURN
     setSegments( segs );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setT( uint index, xReal t )
     {
     _tcb[index].t = t;
@@ -324,7 +323,7 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setT( uint index, xReal t )
     setSegments( segs );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setC( uint index, xReal c )
     {
     _tcb[index].c = c;
@@ -333,7 +332,7 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setC( uint index, xReal c )
     setSegments( segs );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setB( uint index, xReal b )
     {
     _tcb[index].b = b;
@@ -342,7 +341,7 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::setB( uint index, xReal b )
     setSegments( segs );
     }
 
-template <int SIZE, typename RETURN, RETURN (*TORETURN)( QGenericMatrix<SIZE,1,qreal> ), QGenericMatrix<SIZE,1,qreal> (*FROMRETURN)( RETURN )>
+template <int SIZE, typename RETURN, RETURN (*TORETURN)( XMatrix<xReal, SIZE,1> ), XMatrix<xReal, SIZE,1> (*FROMRETURN)( RETURN )>
 void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::updateSegment( XList <XGenericCurveSegment<SIZE,RETURN,TORETURN,FROMRETURN> > &seg, uint index )
     {
     if( index > (uint)seg.size() )
@@ -380,36 +379,39 @@ void XKBSpline<SIZE,RETURN,TORETURN,FROMRETURN>::updateSegment( XList <XGenericC
         }
     }
 
-XVector3D toVector3D( QGenericMatrix<3,1,qreal> vec )
+XVector3D toVector3D( XMatrix<xReal, 3, 1> vec )
     {
     return XVector3D( vec(0,0), vec(0,1), vec(0,2) );
     }
-QGenericMatrix<3,1,qreal> fromVector3D( XVector3D vec )
+
+ XMatrix<xReal, 3, 1> fromVector3D( XVector3D vec )
     {
-    QGenericMatrix<3,1,qreal> ret;
+    XMatrix<xReal, 3, 1> ret;
     ret(0,0) = vec.x();
     ret(0,1) = vec.y();
     ret(0,2) = vec.z();
     return ret;
     }
-XVector2D toVector2D( QGenericMatrix<2,1,qreal> vec )
+
+XVector2D toVector2D( XMatrix<xReal, 2, 1> vec )
     {
     return XVector2D( vec(0,0), vec(0,1) );
     }
-QGenericMatrix<2,1,qreal> fromVector2D( XVector2D vec )
+
+ XMatrix<xReal, 2, 1> fromVector2D( XVector2D vec )
     {
-    QGenericMatrix<2,1,qreal> ret;
+    XMatrix<xReal, 2, 1> ret;
     ret(0,0) = vec.x();
     ret(0,1) = vec.y();
     return ret;
     }
-xReal toXReal( QGenericMatrix<1,1,qreal> vec )
+xReal toXReal( XMatrix<xReal, 1, 1> vec )
     {
     return vec(0,0);
     }
-QGenericMatrix<1,1,qreal> fromXReal( xReal vec )
+XMatrix<xReal, 1, 1> fromXReal( xReal vec )
     {
-    QGenericMatrix<1,1,qreal> ret;
+    XMatrix<xReal, 1, 1> ret;
     ret(0,0) = vec;
     return ret;
     }

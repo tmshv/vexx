@@ -31,27 +31,27 @@ void XCuboid::unite( const XVector3D &in )
       {
       if( in.x() < _minimum.x() )
           {
-          _minimum.setX( in.x() );
+          _minimum(0) = in.x();
           }
       if( in.x() > _maximum.x() )
           {
-          _maximum.setX( in.x() );
+          _maximum(0) = in.x();
           }
       if( in.y() < _minimum.y() )
           {
-          _minimum.setY( in.y() );
+          _minimum(1) = in.y();
           }
       if( in.y() > _maximum.y() )
           {
-          _maximum.setY( in.y() );
+          _maximum(1) = in.y();
           }
       if( in.z() < _minimum.z() )
           {
-          _minimum.setZ( in.z() );
+          _minimum(2) = in.z();
           }
       if( in.z() > _maximum.z() )
           {
-          _maximum.setZ( in.z() );
+          _maximum(2) = in.z();
           }
       }
   }
@@ -106,7 +106,7 @@ xReal XCuboid::maximumDistanceSquared() const
     {
     return XVector3D( xMax(_maximum.x(), -_minimum.x()),
                       xMax(_maximum.y(), -_minimum.y()),
-                      xMax(_maximum.z(), -_minimum.z())).lengthSquared();
+                      xMax(_maximum.z(), -_minimum.z())).squaredNorm();
     }
 
 bool XCuboid::intersects( const XCuboid &in ) const

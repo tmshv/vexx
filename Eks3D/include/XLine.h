@@ -4,8 +4,7 @@
 #include "X3DGlobal.h"
 #include "XVector3D"
 #include "XProperty"
-
-class XTransform;
+#include "XTransform.h"
 
 class EKS3D_EXPORT XLine
   {

@@ -1,37 +1,20 @@
 #ifndef XTRANSFORM_H
 #define XTRANSFORM_H
 
-#include "XMatrix4x4"
-#include "XVector3D"
-#include "XVector4D"
+#include "XGlobal"
 #include "XList"
+#include "Eigen/Geometry"
+#include "XVector3D"
+#include "XMatrix4x4"
 
-class XTransform : public XMatrix4x4
-  {
-public:
-  XTransform()
-    {
-    }
-  XTransform( const XVector3D &pos )
-    {
-    translate(pos);
-    }
-  XTransform( const XMatrix4x4 &cpy ) : XMatrix4x4(cpy)
-    {
-    }
-  XTransform &operator=( const XMatrix4x4 &cpy )
-    {
-    return *this = XTransform(cpy);
-    }
-  XVector3D translation() const
-    {
-    return column(3).toVector3D();
-    }
-  void setTranslation(const XVector3D &in)
-    {
-    setColumn(3, XVector4D(in, 1.0f));
-    }
-  };
+typedef Eigen::Affine3f XTransform;
+typedef Eigen::Projective3f XComplexTransform;
+
+namespace XTransformUtilities
+{
+XTransform lookAt(const XVector3D &eye, const XVector3D &aim, const XVector3D &up);
+XComplexTransform perspective(xReal angle, xReal aspect, xReal nearPlane, xReal farPlane);
+}
 
 typedef XList <XTransform> XTransformList;
 

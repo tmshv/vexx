@@ -49,6 +49,7 @@ void SDatabase::initiate()
   addType<StringProperty>();
   addType<ColourProperty>();
   addType<LongStringProperty>();
+  addType<ByteArrayProperty>();
 
   addType<Pointer>();
   addType<PointerArray>();

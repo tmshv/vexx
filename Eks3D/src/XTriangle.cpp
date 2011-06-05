@@ -22,11 +22,11 @@ bool XTriangle::liesOn( const XVector3D &p ) const
     XVector3D v1 = pointB() - pointA();
     XVector3D v2 = p - pointA();
 
-    xReal dot00 = XVector3D::dotProduct( v0, v0 );
-    xReal dot01 = XVector3D::dotProduct( v0, v1 );
-    xReal dot02 = XVector3D::dotProduct( v0, v2 );
-    xReal dot11 = XVector3D::dotProduct( v1, v1 );
-    xReal dot12 = XVector3D::dotProduct( v1, v2 );
+    xReal dot00 = v0.dot(v0);
+    xReal dot01 = v0.dot(v1);
+    xReal dot02 = v0.dot(v2);
+    xReal dot11 = v1.dot(v1);
+    xReal dot12 = v1.dot(v2);
 
     xReal invDenominator = 1.0f / ( dot00 * dot11 - dot01 * dot01 );
     xReal u = ( dot11 * dot02 - dot01 * dot12 ) * invDenominator;

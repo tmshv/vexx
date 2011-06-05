@@ -66,17 +66,17 @@ const XHash <QString, XVector<xReal> > &XGeometry::attributes1D() const
   return _attr1;
   }
 
-const XHash <QString, XVector<XGeometry::Vertex2D> > &XGeometry::attributes2D() const
+const XHash <QString, XVector<XVector2D> > &XGeometry::attributes2D() const
   {
   return _attr2;
   }
 
-const XHash <QString, XVector<XGeometry::Vertex3D> > &XGeometry::attributes3D() const
+const XHash <QString, XVector<XVector3D> > &XGeometry::attributes3D() const
   {
   return _attr3;
   }
 
-const XHash <QString, XVector<XGeometry::Vertex4D> > &XGeometry::attributes4D() const
+const XHash <QString, XVector<XVector4D> > &XGeometry::attributes4D() const
   {
   return _attr4;
   }
@@ -117,7 +117,7 @@ void XGeometry::setAttribute( QString n, const XVector<xReal> &v )
   _changedA1 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<Vertex2D> &v )
+void XGeometry::setAttribute( QString n, const XVector<XVector2D> &v )
   {
   if( v.size() )
     {
@@ -135,7 +135,7 @@ void XGeometry::setAttribute( QString n, const XVector<Vertex2D> &v )
   _changedA2 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<Vertex3D> &v )
+void XGeometry::setAttribute( QString n, const XVector<XVector3D> &v )
   {
   if( v.size() )
     {
@@ -153,7 +153,7 @@ void XGeometry::setAttribute( QString n, const XVector<Vertex3D> &v )
   _changedA3 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<Vertex4D> &v )
+void XGeometry::setAttribute( QString n, const XVector<XVector4D> &v )
   {
   if( v.size() )
     {
@@ -201,12 +201,12 @@ void XGeometry::removeAttribute( QString in )
 
 XCuboid XGeometry::computeBounds() const
   {
-  const XVector<XGeometry::Vertex3D> &vtxList = _attr3["vertex"];
+  const XVector<XVector3D> &vtxList = _attr3["XVector"];
 
   XCuboid ret;
-  foreach( const XGeometry::Vertex3D &vtx, vtxList )
+  foreach( const XVector3D &vtx, vtxList )
     {
-    ret.unite(XVector3D(vtx.a, vtx.b, vtx.c));
+    ret.unite(vtx);
     }
   return ret;
   }
@@ -216,35 +216,35 @@ void XGeometry::setAttribute( QString name, const XList<xReal> &in )
   setAttribute( name, in.toVector() );
   }
 
-void XGeometry::setAttribute( QString name, const XList<QVector2D> &in )
+void XGeometry::setAttribute( QString name, const XList<XVector2D> &in )
   {
-  XVector<Vertex2D> ver;
+  XVector<XVector2D> ver;
   ver.reserve( in.size() );
-  foreach( QVector2D v, in )
+  foreach( const XVector2D &v, in )
     {
-    ver << Vertex2D( v );
+    ver << v;
     }
   setAttribute( name, ver );
   }
 
-void XGeometry::setAttribute( QString name, const XList<QVector3D> &in )
+void XGeometry::setAttribute( QString name, const XList<XVector3D> &in )
   {
-  XVector<Vertex3D> ver;
+  XVector<XVector3D> ver;
   ver.reserve( in.size() );
-  foreach( QVector3D v, in )
+  foreach( const XVector3D &v, in )
     {
-    ver << Vertex3D( v );
+    ver << v;
     }
   setAttribute( name, ver );
   }
 
-void XGeometry::setAttribute( QString name, const XList<QVector4D> &in )
+void XGeometry::setAttribute( QString name, const XList<XVector4D> &in )
   {
-  XVector<Vertex4D> ver;
+  XVector<XVector4D> ver;
   ver.reserve( in.size() );
-  foreach( QVector4D v, in )
+  foreach( const XVector4D &v, in )
     {
-    ver << Vertex4D( v );
+    ver << v;
     }
   setAttribute( name, ver );
   }
@@ -366,36 +366,6 @@ XAbstractGeometry *XGeometry::internal() const
   return _internal;
   }
 
-QDataStream &operator<<( QDataStream &s, const XGeometry::Vertex2D &geo )
-  {
-  return s << geo.a << geo.b;
-  }
-
-QDataStream &operator>>( QDataStream &s, XGeometry::Vertex2D &geo )
-  {
-  return s >> geo.a >> geo.b;
-  }
-
-QDataStream &operator<<( QDataStream &s, const XGeometry::Vertex3D &geo )
-  {
-  return s << geo.a << geo.b << geo.c;
-  }
-
-QDataStream &operator>>( QDataStream &s, XGeometry::Vertex3D &geo )
-  {
-  return s >> geo.a >> geo.b >> geo.c;
-  }
-
-QDataStream &operator<<( QDataStream &s, const XGeometry::Vertex4D &geo )
-  {
-  return s << geo.a << geo.b << geo.c << geo.d;
-  }
-
-QDataStream &operator>>( QDataStream &s, XGeometry::Vertex4D &geo )
-  {
-  return s >> geo.a >> geo.b >> geo.c >> geo.d;
-  }
-
 QDataStream EKS3D_EXPORT &operator<<( QDataStream &s, const XGeometry &geo )
   {
   return s << geo._attr1 << geo._attr2 << geo._attr3 << geo._attr4 << geo._points << geo._lines << geo._triangles;
@@ -423,17 +393,17 @@ QDataStream EKS3D_EXPORT &operator>>( QDataStream &s, XGeometry &geo )
     xAssert( geo._attributeSize == -1 || ( geo._attributeSize == vec.size() ) );
     geo._attributeSize = vec.size();
     }
-  foreach( const XVector<XGeometry::Vertex2D> &vec, geo._attr2 )
+  foreach( const XVector<XVector2D> &vec, geo._attr2 )
     {
     xAssert( geo._attributeSize == -1 || ( geo._attributeSize == vec.size() ) );
     geo._attributeSize = vec.size();
     }
-  foreach( const XVector<XGeometry::Vertex3D> &vec, geo._attr3 )
+  foreach( const XVector<XVector3D> &vec, geo._attr3 )
     {
     xAssert( geo._attributeSize == -1 || ( geo._attributeSize == vec.size() ) );
     geo._attributeSize = vec.size();
     }
-  foreach( const XVector<XGeometry::Vertex4D> &vec, geo._attr4 )
+  foreach( const XVector<XVector4D> &vec, geo._attr4 )
     {
     xAssert( geo._attributeSize == -1 || ( geo._attributeSize == vec.size() ) );
     geo._attributeSize = vec.size();
@@ -458,21 +428,19 @@ bool intersect( QString semantic,
                 XList <unsigned int> &triOut )
   {
   xAssert( geo.attributes3D().contains(semantic) );
-  const XVector<XGeometry::Vertex3D> &positions = geo.attributes3D()[semantic];
+  const XVector<XVector3D> &positions = geo.attributes3D()[semantic];
   const XVector<unsigned int> &tris = geo.triangles();
 
   xAssert( tris.size()%3 == 0 );
   unsigned int trianglesSize = tris.size()/3;
   for( unsigned int index=0; index<trianglesSize; ++index )
     {
-    const XGeometry::Vertex3D &a(positions[tris[index*3]]),
+    const XVector3D &a(positions[tris[index*3]]),
                               &b(positions[tris[(index*3)+1]]),
                               &c(positions[tris[(index*3)+2]]);
 
     XVector3D pos;
-    if( XTriangle( XVector3D( a.a, a.b, a.c ),
-                   XVector3D( b.a, b.b, b.c ),
-                   XVector3D( c.a, c.b, c.c ) ).intersects( ray, pos ) )
+    if( XTriangle(a, b, c).intersects(ray, pos) )
       {
       posOut << pos;
       triOut << index;

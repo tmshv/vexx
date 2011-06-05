@@ -6,7 +6,9 @@
 #include "XObject"
 #include "XProperty"
 #include "XVector3D"
-#include "XTransform.h"
+#include "XMatrix4x4"
+#include "QSize"
+#include "QPoint"
 
 class XScene;
 
@@ -14,16 +16,15 @@ class EKS3D_EXPORT XCamera : public XObject
     {
     X_OBJECT( XCamera, XObject, 5 )
 public:
-    XROProperty( XVector3D, position );
-    XROProperty( XVector3D, aimPosition );
-    XROProperty( XVector3D, upDirection );
+    XRORefProperty( XTransform, viewTransform );
+    XRORefProperty( XComplexTransform, projectionTransform );
+
+    XRORefProperty( XVector3D, position );
+    XRORefProperty( XVector3D, aimPosition );
+    XRORefProperty( XVector3D, upDirection );
 
     XROProperty( QSize, viewportSize );
-
     XROProperty( xReal, aspectRatio );
-
-    XROProperty( XTransform, projectionTransform );
-    XROProperty( XTransform, viewTransform );
 
     XProperty( XScene *, currentScene, setCurrentScene );
 
@@ -49,17 +50,19 @@ public:
     X_SIGNAL( viewChanged );
     X_SIGNAL( projectionChanged );
 
+    X_ALIGNED_OPERATOR_NEW
+
 protected:
     void update();
 
-    void setProjectionTransform( XTransform );
+    void setProjectionTransform( const XComplexTransform & );
     virtual void aspectRatioChanged();
     virtual void viewTransformChanged();
 
 private:
     void setTransform();
     bool _invertedTransformIsValid;
-    mutable XMatrix4x4 _inverted;
+    mutable XComplexTransform _inverted;
     };
 
 class EKS3D_EXPORT XPerspectiveCamera : public XCamera

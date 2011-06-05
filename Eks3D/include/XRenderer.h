@@ -50,7 +50,7 @@ public:
     virtual int renderFlags() const;
 
     virtual void setViewportSize( QSize ) = 0;
-    virtual void setProjectionTransform( const XTransform & ) = 0;
+    virtual void setProjectionTransform( const XComplexTransform & ) = 0;
 
     // set the current shader
     virtual void setShader( const XShader * ) = 0;

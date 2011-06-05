@@ -2,6 +2,7 @@
 #define XGLRENDERER_H
 
 #include "XRenderer.h"
+#include "QSize"
 
 class QGLContext;
 class XGLShader;
@@ -37,7 +38,7 @@ public:
     virtual int enabledFeatures( ) const;
 
     virtual void setViewportSize( QSize );
-    virtual void setProjectionTransform( const XTransform & );
+    virtual void setProjectionTransform( const XComplexTransform & );
 
     virtual void setShader( const XShader * );
 
