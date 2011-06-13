@@ -16,10 +16,13 @@ public:
     XFileSequence( XString="", stringMode=Auto );
     // construct a sequence sequence from the name of a file in the sequence
     XFileSequence( const char *, stringMode=Auto );
+#if 0
     // construct a sequence from a variant
     explicit XFileSequence( XVariant );
+
     // compress a sequence to a variant
     operator XVariant();
+#endif
 
     // set the sequence
     void setSequence( XString, stringMode=Auto );

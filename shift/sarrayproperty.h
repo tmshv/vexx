@@ -3,8 +3,8 @@
 
 #include "spropertycontainer.h"
 #include "sbaseproperties.h"
-#include "spropertydata.h"
 #include "XList"
+#include "sloader.h"
 #include "Eigen/Core"
 
 // reimplement stream for QTextStream to allow it to work with template classes
@@ -153,8 +153,8 @@ public:
 
 protected:
   // called by parent
-  static void SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in); // Mode = Binary / ASCII
-  static void LoadFunction( SProperty* p_in, const SPropertyData& data_in, xuint32 v_in, SPropertyData::Mode mode_in, SLoader&); // Mode = Binary / ASCII
+  static void SaveFunction( const SProperty* p_in, SSaver &l); // Mode = Binary / ASCII
+  static SProperty *LoadFunction( SPropertyContainer* p_in, SLoader&); // Mode = Binary / ASCII
   template <typename U> static void AssignFunction(const SProperty *from, SProperty *to)
     {
     const U *f = from->castTo<U>();
@@ -171,50 +171,29 @@ private:
   Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
   };
 
-template <typename T> void SArrayProperty<T>::SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in) // Mode = Binary / ASCII
+template <typename T> void SArrayProperty<T>::SaveFunction( const SProperty* p_in, SSaver &l)
   {
-  SProperty::save(p_in, data_in, mode_in); // saves the data of the parent class (keeps connections)
+  SProperty::save(p_in, l); // saves the data of the parent class (keeps connections)
 
   const SArrayProperty* ptr = p_in->castTo<SArrayProperty>(); // cast the input property to an SArrayProperty
   xAssert(ptr);
   if(ptr)
     {
-    QByteArray arr;
-    if(mode_in == SPropertyData::Binary) // Binary
-      {
-      QDataStream str(&arr, QIODevice::WriteOnly); // open a writeonly qstream, writes into arr
-      str << ptr->mData;
-      }
-    else // ASCII
-      {
-      QTextStream str(&arr, QIODevice::WriteOnly); // writes ascii into arr
-      const Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> &data = ptr->mData;
-      str << data;
-      }
-    data_in.setValue(arr); // set the data (this is written to disk later)
+    writeValue(l, ptr->mData);
     }
   }
 
-template <typename T> void SArrayProperty<T>::LoadFunction( SProperty* p_in, const SPropertyData& data_in, xuint32 v_in, SPropertyData::Mode mode_in, SLoader &l_in)
+template <typename T> SProperty *SArrayProperty<T>::LoadFunction( SPropertyContainer* p_in, SLoader &l)
   {
-  SProperty::load(p_in, data_in, v_in, mode_in, l_in);
+  SProperty *prop = SProperty::load(p_in, l);
 
-  SArrayProperty* ptr = p_in->castTo<SArrayProperty>();
+  SArrayProperty* ptr = prop->uncheckedCastTo<SArrayProperty>();
   xAssert(ptr);
   if(ptr)
     {
-    QByteArray arr = data_in.value();
-    if(mode_in == SPropertyData::Binary)
-      {
-      QDataStream str(&arr, QIODevice::ReadOnly);
-      str >> ptr->mData;
-      }
-    else
-      {
-      QTextStream str(&arr, QIODevice::ReadOnly);
-      str >> ptr->mData;
-      }
+    readValue(l, ptr->mData);
     }
+  return prop;
   }
 
 

@@ -24,13 +24,13 @@ public:
     void begin( Type = Triangles );
     void end( );
 
-    void vertex( XVector3D );
+    void vertex( const XVector3D & );
     inline void vertex( xReal, xReal, xReal );
-    void normal( XVector3D );
+    void normal( const XVector3D & );
     inline void normal( xReal, xReal, xReal );
-    void texture( XVector2D );
+    void texture( const XVector2D & );
     inline void texture( xReal, xReal );
-    void colour( XVector4D );
+    void colour( const XVector4D & );
     inline void colour( xReal, xReal, xReal, xReal = 1.0 );
 
     void setNormalsAutomatic( bool=true );

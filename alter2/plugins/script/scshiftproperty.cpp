@@ -147,9 +147,10 @@ QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *)
       return prop->uncheckedCastTo<LongStringProperty>()->value();
       }
 
-    SPropertyData data;
-    prop->database()->write(prop, data, SPropertyData::Ascii);
-    return QString::fromUtf8(data.value());
+    xAssertFail();
+    //SPropertyData data;
+    //prop->database()->write(prop, data, SPropertyData::Ascii);
+    return "";//QString::fromUtf8(data.value());
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
   return QScriptValue();

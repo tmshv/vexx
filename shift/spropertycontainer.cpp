@@ -219,58 +219,41 @@ void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
     }
   }
 
-void SPropertyContainer::saveContainer(const SProperty *p, SPropertyData &d, SPropertyData::Mode m)
+void SPropertyContainer::saveContainer(const SProperty *p, SSaver &l)
   {
-  const SPropertyContainer *c = p->castTo<SPropertyContainer>();
+  const SPropertyContainer *c = p->uncheckedCastTo<SPropertyContainer>();
   xAssert(c);
 
-  if(!c)
-    {
-    return;
-    }
+  SProperty::save(p, l);
 
-  const SDatabase *db = c->database();
-  xAssert(db);
-
-  if(!db)
-    {
-    return;
-    }
-
-  SProperty::save(p, d, m);
+  l.setChildCount(c->size());
   for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
     {
-    SPropertyData cData;
+    l.beginNextChild();
 
-    db->write(child, cData, m);
+    l.write(child);
 
-    d.append(cData);
+    l.endNextChild();
     }
   }
 
-void SPropertyContainer::loadContainer(SProperty *p, const SPropertyData &d, xuint32 v, SPropertyData::Mode m, SLoader &l)
+SProperty *SPropertyContainer::loadContainer(SPropertyContainer *parent, SLoader &l)
   {
-  SPropertyContainer *c = p->castTo<SPropertyContainer>();
-  xAssert(c);
+  xAssert(parent);
 
-  if(!c)
+  SProperty *prop = SProperty::load(parent, l);
+  xAssert(prop);
+
+  SPropertyContainer* container = prop->uncheckedCastTo<SPropertyContainer>();
+
+  for(xsize i=0, s=l.childCount(); i<s; ++i)
     {
-    return;
+    l.beginNextChild();
+    l.read(container);
+    l.endNextChild();
     }
 
-  SDatabase *db = c->database();
-  xAssert(db);
-
-  if(!db)
-    {
-    return;
-    }
-
-  SProperty::load(p, d, v, m, l);
-  foreach(const SPropertyData &cData, d.childData())
-    {
-    db->read(cData, c, m);
-    }
+  return prop;
   }
 
 

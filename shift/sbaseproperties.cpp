@@ -1,7 +1,20 @@
 #include "sbaseproperties.h"
 #include "sdatabase.h"
 
-IMPLEMENT_POD_PROPERTY(BoolProperty, int);
+QTextStream &operator<<(QTextStream &s, xuint8 v)
+  {
+  return s << (xuint32)v;
+  }
+
+QTextStream &operator>>(QTextStream &s, xuint8 &v)
+  {
+  xuint32 t;
+  s >> t;
+  v = t;
+  return s;
+  }
+
+IMPLEMENT_POD_PROPERTY(BoolProperty, xuint8);
 IMPLEMENT_POD_PROPERTY(IntProperty, xint32);
 IMPLEMENT_POD_PROPERTY(LongIntProperty, xint64);
 IMPLEMENT_POD_PROPERTY(UnsignedIntProperty, xuint32);

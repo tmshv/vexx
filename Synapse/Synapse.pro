@@ -15,7 +15,8 @@ LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lShiftGraphics
 SOURCES += main.cpp \
     syimagenode.cpp \
     sypreviewviewer.cpp \
-    syviewernode.cpp
+    syviewernode.cpp \
+    synodecanvas.cpp
 
 DESTDIR = ../bin
 
@@ -25,4 +26,5 @@ OTHER_FILES += scripts/startup.js \
 HEADERS += \
     syimagenode.h \
     sypreviewviewer.h \
-    syviewernode.h
+    syviewernode.h \
+    synodecanvas.h

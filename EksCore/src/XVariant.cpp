@@ -1,3 +1,5 @@
+#if 0
+
 #include "XVariant"
 #include "QDataStream"
 #include "XColour"
@@ -162,3 +164,5 @@ QDataStream &operator<<(QDataStream &str, const XVariant &var)
     }
   return str;
   }
+
+#endif

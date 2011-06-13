@@ -40,4 +40,4 @@ DESTDIR += ../../../bin
 
 INCLUDEPATH += ../../ ../../../EksCore ../../../Eks3D/include ../../../Alter2/plugins/ShiftAlter ../../../Shift ../../../Shift/GraphicsCore
 
-LIBS += -L../../../bin  -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
+LIBS += -L../../../bin -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore

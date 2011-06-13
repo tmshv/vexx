@@ -130,21 +130,87 @@ void SProperty::blankAssign(const SProperty *, SProperty *)
   {
   }
 
-void SProperty::save(const SProperty *p, SPropertyData &d, SPropertyData::Mode X_UNUSED(m))
+void SProperty::save(const SProperty *p, SSaver &l)
   {
+  const SPropertyInformation *type = p->typeInformation();
+
+  l.setType(type);
+
+  l.beginAttribute("name");
+  writeValue(l, p->name());
+  l.endAttribute("name");
+
+  xuint32 v(type->version());
+  if(v != 0)
+    {
+    l.beginAttribute("version");
+    writeValue(l, v);
+    l.endAttribute("version");
+    }
+
+  bool dyn(p->isDynamic());
+  if(dyn)
+    {
+    l.beginAttribute("dynamic");
+    writeValue(l, dyn ? 1 : 0);
+    l.endAttribute("dynamic");
+    }
+
   if(p->input())
     {
-    d.appendAttribute("input", p->input()->path(p).toUtf8());
+    l.beginAttribute("input");
+    writeValue(l, p->input()->path(p));
+    l.endAttribute("input");
     }
   }
 
-void SProperty::load(SProperty *p, const SPropertyData &d, xuint32, SPropertyData::Mode X_UNUSED(m), SLoader &loader)
+SProperty *SProperty::load(SPropertyContainer *parent, SLoader &l)
   {
-  if(d.hasAttribute("input"))
+  const SPropertyInformation *type = l.type();
+  xAssert(type);
+
+  l.beginAttribute("name");
+  QString name;
+  readValue(l, name);
+  l.endAttribute("name");
+
+  l.beginAttribute("dynamic");
+  xuint32 dynamic=false;
+  readValue(l, dynamic);
+  l.endAttribute("dynamic");
+
+  l.beginAttribute("version");
+  xuint32 version=0;
+  readValue(l, version);
+  l.endAttribute("version");
+
+  SProperty *prop = 0;
+  if(dynamic != 0)
     {
-    QString path();
-    loader.resolveInputAfterLoad(p, QString::fromUtf8(d.attribute("input")));
+    prop = parent->database()->createDynamicProperty(type->typeId());
+    xAssert(prop);
+
+    parent->internalInsertProperty(false, prop, X_SIZE_SENTINEL);
+    prop->setName(name);
     }
+  else
+    {
+    prop = parent->findChild(name);
+    xAssert(prop);
+    xAssert(prop->typeInformation()->typeId() == type->typeId());
+    }
+
+  l.beginAttribute("input");
+  QString input;
+  readValue(l, input);
+  l.endAttribute("input");
+
+  if(!input.isEmpty())
+    {
+    l.resolveInputAfterLoad(prop, input);
+    }
+
+  return prop;
   }
 
 bool SProperty::inheritsFromType(SPropertyType type) const

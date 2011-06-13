@@ -10,32 +10,17 @@ GCImageChannel::GCImageChannel()
 {
 }
 
-void GCImageChannelData::SaveFunction( const SProperty* p_in, SPropertyData& data_in, SPropertyData::Mode mode_in)
+void GCImageChannelData::SaveFunction( const SProperty* p_in, SSaver &s)
 {
-    SProperty::save(p_in, data_in, mode_in); // saves the data of the parent class (keeps connections)
-
-    const GCImageChannel* ptr = p_in->castTo<const GCImageChannel>(); // cast the input property to a GCImageChannel or 'name' (?)
-    xAssert(ptr);
-    if(ptr)
-    {
-        QByteArray arr;
-        if(mode_in == SPropertyData::Binary) // Binary
-        {
-            QDataStream str(&arr, QIODevice::WriteOnly); // open a writeonly qstream, writes into arr
-//            str << ptr->_value;
-        }
-        else // ASCII
-        {
-            QTextStream str(&arr, QIODevice::WriteOnly); // writes ascii into arr
-//            str << ptr->_value;
-        }
-        data_in.setValue(arr); // set the data (this is written to disk later)
-    }
+    SProperty::save(p_in, s); // saves the data of the parent class (keeps connections)
+    //writeValue(s, ptr->_value);
 }
 
-void GCImageChannelData::LoadFunction( SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader & )
-{
-}
+SProperty *GCImageChannelData::LoadFunction( SPropertyContainer *p_in, SLoader &l )
+  {
+  return SProperty::load(p_in, l);
+  // readValue(l, prop->_value);
+  }
 
 void GCImageChannelData::AssignFunction( const SProperty *, SProperty * )
 {

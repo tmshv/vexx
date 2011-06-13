@@ -43,17 +43,17 @@ public:
     void setLines( const XVector<unsigned int> & );
     void setTriangles( const XVector<unsigned int> & );
 
-    void setAttribute( QString, const XList<xReal> & );
-    void setAttribute( QString, const XList<XVector2D> & );
-    void setAttribute( QString, const XList<XVector3D> & );
-    void setAttribute( QString, const XList<XVector4D> & );
+    void setAttribute( const QString &, const XList<xReal> & );
+    void setAttribute( const QString &, const XList<XVector2D> & );
+    void setAttribute( const QString &, const XList<XVector3D> & );
+    void setAttribute( const QString &, const XList<XVector4D> & );
 
-    void setAttribute( QString, const XVector<xReal> & );
-    void setAttribute( QString, const XVector<XVector2D> & );
-    void setAttribute( QString, const XVector<XVector3D> & );
-    void setAttribute( QString, const XVector<XVector4D> & );
+    void setAttribute( const QString &, const XVector<xReal> & );
+    void setAttribute( const QString &, const XVector<XVector2D> & );
+    void setAttribute( const QString &, const XVector<XVector3D> & );
+    void setAttribute( const QString &, const XVector<XVector4D> & );
 
-    void removeAttribute( QString );
+    void removeAttribute( const QString & );
 
     XCuboid computeBounds() const;
 

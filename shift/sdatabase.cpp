@@ -2,7 +2,6 @@
 #include "sentity.h"
 #include "schange.h"
 #include "sentity.h"
-#include "spropertydata.h"
 #include "sarrayproperty.h"
 #include "sreferenceentity.h"
 #include "QFile"
@@ -15,7 +14,7 @@ S_ENTITY_DEFINITION(SDatabase, SEntity)
   S_PROPERTY_DEFINITION(UnsignedIntProperty, revision, 0)
 S_ENTITY_END_DEFINITION(SDatabase, SEntity)
 
-SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false), _readLevel(0)
+SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false)
   {
   _database = this;
   _info = staticTypeInformation();
@@ -249,7 +248,7 @@ const SPropertyInformation *SDatabase::findType(xuint32 i) const
   SProfileFunction
   if(_types.contains(i))
     {
-    return ((XHash <SPropertyType, SPropertyInformation*>&)_types)[i];
+    return _types.value(i);
     }
   return 0;
   }
@@ -262,13 +261,13 @@ const SPropertyInformation *SDatabase::findType(const QString &in) const
     {
     if(_types[keys[i]]->typeName() == in)
       {
-      return ((XHash <SPropertyType, SPropertyInformation*>&)_types)[keys[i]];
+      return _types.value(i);
       }
     }
   return 0;
   }
 
-void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData::Mode mode) const
+/*void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData::Mode mode) const
   {
   SProfileFunction
   if(!prop)
@@ -292,7 +291,7 @@ void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData:
   type->save()(prop, data, mode);
   }
 
-SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent, SPropertyData::Mode mode)
+SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent)
   {
   SProfileFunction
   if(_readLevel == 0)
@@ -333,7 +332,7 @@ SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent
     }
 
   xuint32 version = QString::fromUtf8(data.attribute("version")).toUInt();
-  type->load()(prop, data, version, mode, *this);
+  type->load()(prop, version, *this);
   _readLevel--;
 
   if(_readLevel == 0)
@@ -351,7 +350,7 @@ SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent
     }
 
   return prop;
-  }
+  }*/
 
 SBlock::SBlock(SDatabase *db) : _db(db)
   {
@@ -416,14 +415,4 @@ void SDatabase::inform()
     obs->actOnChanges();
     }
   _blockObservers.clear();
-  }
-
-void SDatabase::resolveInputAfterLoad(SProperty *prop, QString inputPath)
-  {
-  SProfileFunction
-  xAssert(_readLevel > 0);
-  if(_readLevel > 0)
-    {
-    _resolveAfterLoad.insert(prop, inputPath);
-    }
   }

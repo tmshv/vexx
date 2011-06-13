@@ -50,7 +50,7 @@ void XModeller::end( )
     _states.back().type = None;
     }
 
-void XModeller::vertex( XVector3D vec )
+void XModeller::vertex( const XVector3D &vec )
     {
     if( _normals.size() || _states.back().normal.isZero() )
         {
@@ -137,17 +137,17 @@ void XModeller::vertex( XVector3D vec )
         }
     }
 
-void XModeller::normal( XVector3D norm )
+void XModeller::normal( const XVector3D &norm )
     {
     _states.back().normal = norm;
     }
 
-void XModeller::texture( XVector2D tex )
+void XModeller::texture( const XVector2D &tex )
     {
     _states.back().texture = tex;
     }
 
-void XModeller::colour( XVector4D col )
+void XModeller::colour( const XVector4D &col )
     {
     _states.back().colour = col;
     }

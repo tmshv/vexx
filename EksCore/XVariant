@@ -1,3 +1,4 @@
+#if 0
 #ifndef XVARIANT_H
 #define XVARIANT_H
 
@@ -175,4 +176,5 @@ template <typename T>T XVariant::valueAs() const
   return ret;
   }
 
+#endif
 #endif

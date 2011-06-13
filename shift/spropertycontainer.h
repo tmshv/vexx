@@ -138,8 +138,8 @@ protected:
   const SProperty *at(xsize i) const;
 
   static void assignContainer(const SProperty *, SProperty *);
-  static void saveContainer(const SProperty *, SPropertyData &, SPropertyData::Mode);
-  static void loadContainer(SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader &);
+  static void saveContainer(const SProperty *, SSaver & );
+  static SProperty *loadContainer(SPropertyContainer *, SLoader &);
 
 private:
   SProperty *_child;
@@ -150,6 +150,7 @@ private:
 
   friend class TreeChange;
   friend class SEntity;
+  friend class SProperty;
   friend class SDatabase;
   };
 

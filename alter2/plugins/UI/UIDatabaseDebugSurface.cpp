@@ -79,7 +79,7 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
         menu.addSeparator();
         }
 
-      QMenu *createMenu = menu.addMenu("Create");
+      //QMenu *createMenu = menu.addMenu("Create");
       }
     }
 

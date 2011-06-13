@@ -99,7 +99,7 @@ void XGeometry::setTriangles( const XVector<unsigned int> &v )
   _changedT = true;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<xReal> &v )
+void XGeometry::setAttribute( const QString &n, const XVector<xReal> &v )
   {
   if( v.size() )
     {
@@ -117,7 +117,7 @@ void XGeometry::setAttribute( QString n, const XVector<xReal> &v )
   _changedA1 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<XVector2D> &v )
+void XGeometry::setAttribute( const QString &n, const XVector<XVector2D> &v )
   {
   if( v.size() )
     {
@@ -135,7 +135,7 @@ void XGeometry::setAttribute( QString n, const XVector<XVector2D> &v )
   _changedA2 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<XVector3D> &v )
+void XGeometry::setAttribute( const QString &n, const XVector<XVector3D> &v )
   {
   if( v.size() )
     {
@@ -153,7 +153,7 @@ void XGeometry::setAttribute( QString n, const XVector<XVector3D> &v )
   _changedA3 << n;
   }
 
-void XGeometry::setAttribute( QString n, const XVector<XVector4D> &v )
+void XGeometry::setAttribute( const QString &n, const XVector<XVector4D> &v )
   {
   if( v.size() )
     {
@@ -171,7 +171,7 @@ void XGeometry::setAttribute( QString n, const XVector<XVector4D> &v )
   _changedA4 << n;
   }
 
-void XGeometry::removeAttribute( QString in )
+void XGeometry::removeAttribute( const QString &in )
   {
   if( _attr1.contains(in) )
     {
@@ -211,12 +211,12 @@ XCuboid XGeometry::computeBounds() const
   return ret;
   }
 
-void XGeometry::setAttribute( QString name, const XList<xReal> &in )
+void XGeometry::setAttribute( const QString &name, const XList<xReal> &in )
   {
   setAttribute( name, in.toVector() );
   }
 
-void XGeometry::setAttribute( QString name, const XList<XVector2D> &in )
+void XGeometry::setAttribute( const QString &name, const XList<XVector2D> &in )
   {
   XVector<XVector2D> ver;
   ver.reserve( in.size() );
@@ -227,7 +227,7 @@ void XGeometry::setAttribute( QString name, const XList<XVector2D> &in )
   setAttribute( name, ver );
   }
 
-void XGeometry::setAttribute( QString name, const XList<XVector3D> &in )
+void XGeometry::setAttribute( const QString &name, const XList<XVector3D> &in )
   {
   XVector<XVector3D> ver;
   ver.reserve( in.size() );
@@ -238,7 +238,7 @@ void XGeometry::setAttribute( QString name, const XList<XVector3D> &in )
   setAttribute( name, ver );
   }
 
-void XGeometry::setAttribute( QString name, const XList<XVector4D> &in )
+void XGeometry::setAttribute( const QString &name, const XList<XVector4D> &in )
   {
   XVector<XVector4D> ver;
   ver.reserve( in.size() );

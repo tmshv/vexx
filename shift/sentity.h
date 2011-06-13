@@ -95,8 +95,8 @@ public:
   const SEntity *findChildEntity(const QString &) const;
 
 protected:
-  static void saveEntity(const SProperty *, SPropertyData &, SPropertyData::Mode);
-  static void loadEntity(SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader &);
+  static void saveEntity(const SProperty *, SSaver &);
+  static SProperty *loadEntity(SPropertyContainer *, SLoader &);
 
 private:
   struct ObserverStruct

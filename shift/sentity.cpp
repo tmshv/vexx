@@ -74,14 +74,14 @@ SEntity *SEntity::nextSiblingEntity() const
   return 0;
   }
 
-void SEntity::saveEntity(const SProperty *p, SPropertyData &d, SPropertyData::Mode m)
+void SEntity::saveEntity(const SProperty *p, SSaver &l)
   {
-  saveContainer(p, d, m);
+  saveContainer(p, l);
   }
 
-void SEntity::loadEntity(SProperty *p, const SPropertyData &d, xuint32 v, SPropertyData::Mode m, SLoader &l)
+SProperty *SEntity::loadEntity(SPropertyContainer *p, SLoader &l)
   {
-  loadContainer(p, d, v, m, l);
+  return loadContainer(p, l);
   }
 
 void SEntity::addDataObserver(SDataObserver *in)

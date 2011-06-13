@@ -44,14 +44,14 @@ public: \
   name(const type &def); \
   name &operator=(const type &in); \
   void assign(const type &in); \
-const type &value() const {preGet(); return _value;} \
+  const type &value() const {preGet(); return _value;} \
   const type &operator()() {preGet(); return _value;} \
 protected: \
   type _value; \
 private: \
   static void assignPOD(const SProperty *, SProperty * ); \
-  static void savePOD(const SProperty *p, SPropertyData &data, SPropertyData::Mode mode); \
-  static void loadPOD(SProperty *p, const SPropertyData &data, xuint32 v, SPropertyData::Mode mode, SLoader &l); \
+  static void savePOD(const SProperty *p, SSaver &l ); \
+  static SProperty *loadPOD(SPropertyContainer *parent, SLoader &l); \
   };
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
@@ -97,33 +97,16 @@ void name::assign(const type &in) \
   database()->submitChange(change); \
   postSet(); \
   } \
-void name::savePOD(const SProperty *p, SPropertyData &data, SPropertyData::Mode mode) { \
-  SProperty::save(p, data, mode); \
-  const name *ptr = p->castTo<const name>(); \
-  xAssert(ptr); \
-  if(ptr) { \
-    QByteArray arr; \
-    if(mode == SPropertyData::Binary) { \
-      QDataStream str(&arr, QIODevice::WriteOnly); \
-      str << ptr->_value; } \
-    else { \
-      QTextStream str(&arr, QIODevice::WriteOnly); \
-      str << ptr->_value; } \
-    data.setValue(arr); } } \
-void name::loadPOD(SProperty *p, const SPropertyData &data, xuint32 v, SPropertyData::Mode mode, SLoader &l) { \
-  SProperty::load(p, data, v, mode, l); \
-  name *ptr = p->castTo<name>(); \
-  xAssert(ptr); \
-  if(ptr) { \
-    QByteArray arr = data.value(); \
-    if(mode == SPropertyData::Binary) { \
-      QDataStream str(&arr, QIODevice::ReadOnly); \
-      str >> ptr->_value; } \
-    else { \
-      QTextStream str(&arr, QIODevice::ReadOnly); \
-      str >> ptr->_value; } } }
+void name::savePOD(const SProperty *p, SSaver &l ) { \
+  SProperty::save(p, l); \
+  const name *ptr = p->uncheckedCastTo<name>(); \
+  writeValue(l, ptr->_value); } \
+SProperty * name::loadPOD(SPropertyContainer *parent, SLoader &l) { \
+  SProperty *prop = SProperty::load(parent, l); \
+  name *ptr = prop->uncheckedCastTo<name>(); \
+  readValue(l, ptr->_value); return prop; }
 
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, int, 0);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongIntProperty, xint64, 0);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, UnsignedIntProperty, xuint32, 0);
@@ -149,8 +132,6 @@ public:
 
   void setPointed(SProperty *prop);
   Pointer &operator=(SProperty *prop) { setPointed(prop); return *this; }
-
-  static void assignPtr(const SProperty *, SProperty * );
   };
 
 class SHIFT_EXPORT PointerArray : public STypedPropertyArray<Pointer>

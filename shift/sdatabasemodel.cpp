@@ -1,7 +1,6 @@
 #include "sdatabasemodel.h"
 #include "sentity.h"
 #include "sdatabase.h"
-#include "spropertydata.h"
 #include "QPushButton"
 #include "QStyleOptionViewItem"
 
@@ -216,9 +215,10 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
     {
     if(_options.hasFlag(ShowValues) && index.column() == 1)
       {
-      SPropertyData data;
+      //SPropertyData data;
       //_db->write(prop, data, SPropertyData::Ascii);
-      return QString::fromUtf8(data.value());
+      //return QString::fromUtf8(data.value());
+      return "Not Yet Implemented";
       }
     else
       {

@@ -4,7 +4,6 @@
 #include "GCGlobal.h"
 #include "spropertycontainer.h"
 #include "sbaseproperties.h"
-#include "spropertydata.h"
 
 class GCImageChannelData : public SProperty
 {
@@ -13,8 +12,8 @@ class GCImageChannelData : public SProperty
 
 public:
    // called by parent
-   static void SaveFunction( const SProperty *, SPropertyData &, SPropertyData::Mode); // Mode = Binary / ASCII
-   static void LoadFunction( SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader & );
+   static void SaveFunction( const SProperty *, SSaver &); // Mode = Binary / ASCII
+   static SProperty *LoadFunction( SPropertyContainer *, SLoader & );
    static void AssignFunction( const SProperty *, SProperty * ); // typecheck this when implementing
 
    void WritePixel(int index, float value);

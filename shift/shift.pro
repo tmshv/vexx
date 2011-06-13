@@ -17,7 +17,6 @@ SOURCES += \
     sdatabase.cpp \
     schange.cpp \
     sobserver.cpp \
-    spropertydata.cpp \
     sentityui.cpp \
     spropertydefaultui.cpp \
     sreferenceentity.cpp \
@@ -29,7 +28,8 @@ SOURCES += \
     sdatabasemodel.cpp \
     sdynamicpropertyinformation.cpp \
     sprocessmanager.cpp \
-    siterator.cpp
+    siterator.cpp \
+    sxmlio.cpp
 HEADERS += \
     sglobal.h \
     sentity.h \
@@ -37,7 +37,6 @@ HEADERS += \
     sdatabase.h \
     schange.h \
     sobserver.h \
-    spropertydata.h \
     sentityui.h \
     spropertydefaultui.h \
     sreferenceentity.h \
@@ -51,7 +50,8 @@ HEADERS += \
     sdynamicpropertyinformation.h \
     sentityweakpointer.h \
     sprocessmanager.h \
-    siterator.h
+    siterator.h \
+    sxmlio.h
 DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -Wall

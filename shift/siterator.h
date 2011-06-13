@@ -5,10 +5,10 @@
 
 #define S_ITERATOR_STACK_SIZE 8
 
-class SIterator
+class SHIFT_EXPORT SIterator
   {
 public:
-  class DataCache
+  class SHIFT_EXPORT DataCache
     {
   public:
     DataCache(SProperty *input)

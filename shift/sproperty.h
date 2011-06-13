@@ -123,12 +123,12 @@ public:
 
   template <typename T>T *uncheckedCastTo()
     {
-    xAssert(dynamic_cast<T *>(this));
+    xAssert(castTo<T>());
     return static_cast<T *>(this);
     }
   template <typename T>const T *uncheckedCastTo() const
     {
-    xAssert(dynamic_cast<const T *>(this));
+    xAssert(castTo<T>());
     return static_cast<const T *>(this);
     }
 
@@ -225,8 +225,8 @@ protected:
     }
 
   static void blankAssign(const SProperty *, SProperty *);
-  static void save(const SProperty *, SPropertyData &, SPropertyData::Mode);
-  static void load(SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader &);
+  static void save(const SProperty *, SSaver & );
+  static SProperty *load(SPropertyContainer *, SLoader &);
 
 private:
   void setDirty(bool force=false);

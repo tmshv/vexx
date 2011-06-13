@@ -2,14 +2,14 @@
 #define SPROPERTYINFORMATION_H
 
 #include "QString"
-#include "XGlobal"
+#include "sglobal.h"
 #include "XProperty"
-#include "spropertydata.h"
 #include "XHash"
 #include "QVariant"
 
 class SProperty;
 class SLoader;
+class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
 
@@ -77,12 +77,12 @@ public:
                                                                             SProperty SPropertyContainer::* *affects,
                                                                             bool entityChild,
                                                                             bool extra);
-  typedef void (*SaveFunction)( const SProperty *, SPropertyData &, SPropertyData::Mode );
-  typedef void (*LoadFunction)( SProperty *, const SPropertyData &, xuint32, SPropertyData::Mode, SLoader & );
+  typedef void (*SaveFunction)( const SProperty *, SSaver & );
+  typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
 
   typedef xuint16 DataKey;
-  typedef XHash<DataKey, XVariant> DataHash;
+  typedef XHash<DataKey, QVariant> DataHash;
 
 XProperties:
   XROProperty(CreateFunction, create);

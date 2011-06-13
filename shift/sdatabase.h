@@ -5,13 +5,12 @@
 #include "XMap"
 #include "sentity.h"
 #include "sbaseproperties.h"
-#include "spropertydata.h"
 #include "XRandomAccessAllocator"
 #include "sloader.h"
 
 class SChange;
 
-class SHIFT_EXPORT SDatabase : public SEntity, private SLoader
+class SHIFT_EXPORT SDatabase : public SEntity
   {
   S_ENTITY(SDatabase, SEntity, 0);
 
@@ -49,8 +48,8 @@ public:
   void beginBlock();
   void endBlock();
 
-  void write(const SProperty *, SPropertyData &, SPropertyData::Mode mode) const;
-  SProperty *read(const SPropertyData &, SPropertyContainer *parent, SPropertyData::Mode mode);
+  //void write(const SProperty *, SPropertyData &, SPropertyData::Mode mode) const;
+  //SProperty *read(const SPropertyData &, SPropertyContainer *parent, SPropertyData::Mode mode);
 
   static QString pathSeparator();
   static QString propertySeparator();
@@ -93,11 +92,9 @@ private:
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 
-  virtual void resolveInputAfterLoad(SProperty *prop, QString inputPath);
-  PostLoadInputHash _resolveAfterLoad;
-  xsize _readLevel;
   XRandomAccessAllocator _memory;
 
+  friend class SProperty;
   friend class SPropertyContainer;
   friend class SPropertyContainer::TreeChange;
   };

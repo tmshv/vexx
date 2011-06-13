@@ -4,6 +4,7 @@
 #include "spropertydata.h"
 #include "QDir"
 #include "QDesktopServices"
+#include "sxmlio.h"
 
 S_ENTITY_EMPTY_DEFINITION(TaskDatabase, SDatabase)
 
@@ -53,11 +54,8 @@ void TaskDatabase::save() const
   QFile file(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "Tasks.db");
   if(file.open(QIODevice::WriteOnly))
     {
-    SPropertyData data;
-    write(0, data, SPropertyData::Binary);
-
-    QDataStream stream(&file);
-    stream << data;
+    SXMLSaver w;
+    w.writeToDevice(&file, this);
     }
   else
     {
@@ -70,13 +68,7 @@ void TaskDatabase::load()
   QFile file(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "Tasks.db");
   if(file.open(QIODevice::ReadOnly))
     {
-    SPropertyData data;
-    QDataStream stream(&file);
-    stream >> data;
-    children.clear();
-    read(data, 0, SPropertyData::Binary);
-    xAssert(children.firstChild());
-    _rootItem = children.findChild("Root Item")->castTo<Item>();
-    xAssert(_rootItem);
+    SXMLLoader r;
+    r.readFromDevice(&file, this);
     }
   }
