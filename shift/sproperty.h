@@ -175,7 +175,7 @@ public:
     QString _before;
     QString _after;
     SProperty *_property;
-    bool apply(int mode, SObservers &obs);
+    bool apply(int mode);
     };
 
   class ConnectionChange : public SChange
@@ -200,7 +200,7 @@ public:
     SProperty *_driver;
     SProperty *_driven;
     Mode _mode;
-    bool apply(int mode, SObservers &obs);
+    bool apply(int mode);
     void setParentHasInputConnection(SProperty *);
     void setParentHasOutputConnection(SProperty *);
     void clearParentHasInputConnection(SProperty *);

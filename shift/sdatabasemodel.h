@@ -52,7 +52,7 @@ public:
   bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-  virtual void onTreeChange(int m, const SChange *);
+  virtual void onTreeChange(const SChange *);
   virtual void actOnChanges();
 
   void setOptions(Options options);

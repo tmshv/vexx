@@ -84,10 +84,10 @@ SProperty *SEntity::loadEntity(SPropertyContainer *p, SLoader &l)
   return loadContainer(p, l);
   }
 
-void SEntity::addDataObserver(SDataObserver *in)
+void SEntity::addDirtyObserver(SDirtyObserver *in)
   {
   ObserverStruct s;
-  s.mode = ObserverStruct::Data;
+  s.mode = ObserverStruct::Dirty;
   s.observer = in;
   _observers << s;
   }
@@ -108,13 +108,13 @@ void SEntity::addConnectionObserver(SConnectionObserver *in)
   _observers << s;
   }
 
-void SEntity::removeDataObserver(SDataObserver *in)
+void SEntity::removeDirtyObserver(SDirtyObserver *in)
   {
   for(int x=0; x<_observers.size(); ++x)
     {
     if(_observers[x].observer == in)
       {
-      xAssert(_observers[x].mode == ObserverStruct::Data);
+      xAssert(_observers[x].mode == ObserverStruct::Dirty);
       _observers.removeAt(x);
       --x;
       }
@@ -147,46 +147,49 @@ void SEntity::removeConnectionObserver(SConnectionObserver *in)
     }
   }
 
-void SEntity::informDataObservers(int m, const DataChange *event, SObservers &obsList)
+void SEntity::informDirtyObservers(SProperty *prop)
   {
   SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
-    if(obs.mode == ObserverStruct::Data)
+    if(obs.mode == ObserverStruct::Dirty)
       {
-      ((SDataObserver*)obs.observer)->onDataChange(m, event);
-      obsList << obs.observer;
+      ((SDirtyObserver*)obs.observer)->onPropertyDirtied(prop);
+      database()->currentBlockObserverList() << obs.observer;
       }
     }
+
+  // todo: maybe inform up the tree?
   }
 
-void SEntity::informTreeObservers(int m, const SChange *event, SObservers &obsList)
+void SEntity::informTreeObservers(const SChange *event)
   {
   SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
     if(obs.mode == ObserverStruct::Tree)
       {
-      ((STreeObserver*)obs.observer)->onTreeChange(m, event);
-      obsList << obs.observer;
+      ((STreeObserver*)obs.observer)->onTreeChange(event);
+      database()->currentBlockObserverList() << obs.observer;
       }
     }
+
   SEntity *parentEnt = parentEntity();
   if(parentEnt)
     {
-    parentEnt->informTreeObservers(m, event, obsList);
+    parentEnt->informTreeObservers(event);
     }
   }
 
-void SEntity::informConnectionObservers(int m, const SChange *event, SObservers &obsList)
+void SEntity::informConnectionObservers(const SChange *event)
   {
   SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
     {
     if(obs.mode == ObserverStruct::Connection)
       {
-      ((SConnectionObserver*)obs.observer)->onConnectionChange(m, event);
-      obsList << obs.observer;
+      ((SConnectionObserver*)obs.observer)->onConnectionChange(event);
+      database()->currentBlockObserverList() << obs.observer;
       }
     }
   }

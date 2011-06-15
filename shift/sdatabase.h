@@ -61,6 +61,14 @@ public:
   const SPropertyInformation *findType(const QString &) const;
   const SPropertyInformation *findType(xuint32) const;
 
+  SObservers &currentBlockObserverList() { return _blockObservers; }
+
+  bool informingEnabled() const { return _informingEnabled; }
+  void setInformingEnabled(bool enable) { _informingEnabled = enable; }
+
+  bool stateStorageEnabled() const { return _stateStorageEnabled; }
+  void setStateStorageEnabled(bool enable) { _stateStorageEnabled = enable; }
+
 protected:
   void initiateInheritedDatabaseType(const SPropertyInformation *info);
 
@@ -80,9 +88,10 @@ private:
   void initiate();
 
   void inform();
-  SObservers _currentObservers;
   SObservers _blockObservers;
   bool _inSubmitChange;
+  bool _informingEnabled;
+  bool _stateStorageEnabled;
 
   XList <SChange*> _done;
   InstanceInformation _instanceInfoData;

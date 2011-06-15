@@ -29,7 +29,8 @@ SOURCES += \
     sdynamicpropertyinformation.cpp \
     sprocessmanager.cpp \
     siterator.cpp \
-    sxmlio.cpp
+    sxmlio.cpp \
+    sbinaryio.cpp
 HEADERS += \
     sglobal.h \
     sentity.h \
@@ -51,7 +52,8 @@ HEADERS += \
     sentityweakpointer.h \
     sprocessmanager.h \
     siterator.h \
-    sxmlio.h
+    sxmlio.h \
+    sbinaryio.h
 DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -Wall

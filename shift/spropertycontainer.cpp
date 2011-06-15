@@ -27,7 +27,7 @@ SPropertyContainer::TreeChange::~TreeChange()
     }
   }
 
-bool SPropertyContainer::TreeChange::apply(int mode, SObservers &obs)
+bool SPropertyContainer::TreeChange::apply(int mode)
   {
   if(mode&Forward)
     {
@@ -35,11 +35,13 @@ bool SPropertyContainer::TreeChange::apply(int mode, SObservers &obs)
       {
       _owner = true;
       before()->internalRemoveProperty(property());
+      before()->postSet();
       }
     if(after())
       {
       _owner = false;
       after()->internalInsertProperty(false, property(), _index);
+      after()->postSet();
       }
     }
   else if(mode&Backward)
@@ -48,21 +50,22 @@ bool SPropertyContainer::TreeChange::apply(int mode, SObservers &obs)
       {
       _owner = true;
       after()->internalRemoveProperty(property());
+      after()->postSet();
       }
     if(before())
       {
       _owner = false;
       before()->internalInsertProperty(false, property(), _index);
+      before()->postSet();
       }
     }
   if(mode&Inform)
     {
     xAssert(property()->entity());
-    obs.clear();
-    property()->entity()->informTreeObservers(mode, this, obs);
+    property()->entity()->informTreeObservers(this);
     if(before())
       {
-      before()->entity()->informTreeObservers(mode, this, obs);
+      before()->entity()->informTreeObservers(this);
       }
     }
   return true;
@@ -153,7 +156,6 @@ SProperty *SPropertyContainer::addProperty(xuint32 type, xsize index)
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(0, this, newProp, index);
   database()->submitChange(change);
-  postSet();
   return newProp;
   }
 
@@ -164,7 +166,6 @@ void SPropertyContainer::moveProperty(SPropertyContainer *c, SProperty *p)
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(this, c, p, p->index());
   database()->submitChange(change);
-  postSet();
   }
 
 void SPropertyContainer::removeProperty(SProperty *oldProp)
@@ -180,7 +181,6 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(this, 0, oldProp, oldProp->index());
   database()->submitChange(change);
-  postSet();
   }
 
 void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)

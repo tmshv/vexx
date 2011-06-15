@@ -94,7 +94,7 @@ public:
     SProperty *_property;
     xsize _index;
     bool _owner;
-    bool apply(int mode, SObservers &);
+    bool apply(int);
     };
 
   SPropertyContainer();

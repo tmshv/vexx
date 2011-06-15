@@ -38,7 +38,7 @@ public: \
   private: \
     type _before; \
     type _after; \
-    bool apply(int mode, SObservers &obs); \
+    bool apply(int mode); \
     }; \
   name(); \
   name(const type &def); \
@@ -58,21 +58,22 @@ private: \
 name::Change::Change(const type &b, const type &a, name *prop) \
   : SProperty::DataChange(prop), _before(b), _after(a) \
   { } \
-bool name::Change::apply(int mode, SObservers &obs) \
+bool name::Change::apply(int mode) \
   { \
   if(mode&Forward) \
     { \
     ((name*)property())->_value = after(); \
+    property()->postSet(); \
     } \
   else if(mode&Backward) \
     { \
     ((name*)property())->_value = before(); \
+    property()->postSet(); \
     } \
   if(mode&Inform) \
     { \
     xAssert(property()->entity()); \
-    obs.clear(); \
-    property()->entity()->informDataObservers(mode, this, obs); \
+    property()->entity()->informDirtyObservers(property()); \
     } \
   return true; \
   } \
@@ -87,7 +88,6 @@ name &name::operator=(const type &in) \
   void *changeMemory = getChange< Change >(); \
   Change *change = new(changeMemory) Change(_value, in, this); \
   database()->submitChange(change); \
-  postSet(); \
   return *this; \
   } \
 void name::assign(const type &in) \
@@ -95,7 +95,6 @@ void name::assign(const type &in) \
   void *changeMemory = getChange< Change >(); \
   Change *change = new(changeMemory) Change(_value, in, this); \
   database()->submitChange(change); \
-  postSet(); \
   } \
 void name::savePOD(const SProperty *p, SSaver &l ) { \
   SProperty::save(p, l); \

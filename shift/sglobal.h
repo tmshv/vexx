@@ -23,16 +23,16 @@ class SEntity;
 class SProperty;
 class SObserver;
 class STreeObserver;
-class SDataObserver;
+class SDirtyObserver;
 class SConnectionObserver;
 
-typedef XList<SObserver*> SObservers;
-typedef XList<STreeObserver*> STreeObservers;
-typedef XList<SDataObserver*> SDataObservers;
-typedef XList<SConnectionObserver*> SConnectionObservers;
+typedef XVector<SObserver*> SObservers;
+typedef XVector<STreeObserver*> STreeObservers;
+typedef XVector<SDirtyObserver*> SDirtyObservers;
+typedef XVector<SConnectionObserver*> SConnectionObservers;
 
-typedef XList<SEntity*> SEntities;
-typedef XList<const SEntity*> SConstEntities;
+typedef XVector<SEntity*> SEntities;
+typedef XVector<const SEntity*> SConstEntities;
 
 #define S_PROPERTY_TYPE(name, ns, id) namespace Types { static const SPropertyType name = ns + id; }
 

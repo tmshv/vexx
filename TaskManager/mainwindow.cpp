@@ -203,7 +203,7 @@ void MainWindow::removeDependancy()
     }
   }
 
-void MainWindow::onTreeChange(int m, const SChange *ev)
+void MainWindow::onTreeChange(const SChange *ev)
   {
   const SPropertyArray::TreeChange *treeChange = ev->castTo<SPropertyArray::TreeChange>();
   if(treeChange)
@@ -226,7 +226,7 @@ void MainWindow::onTreeChange(int m, const SChange *ev)
     }
   }
 
-void MainWindow::onConnectionChange(int m, const SChange *ev)
+void MainWindow::onConnectionChange(const SChange *ev)
   {
   _updateLinks = true;
   }

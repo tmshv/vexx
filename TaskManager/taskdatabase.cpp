@@ -1,7 +1,6 @@
 #include "taskdatabase.h"
 #include "item.h"
 #include "sdatabasemodel.h"
-#include "spropertydata.h"
 #include "QDir"
 #include "QDesktopServices"
 #include "sxmlio.h"

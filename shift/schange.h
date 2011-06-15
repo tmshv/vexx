@@ -21,7 +21,7 @@ public:
     };
 
   virtual ~SChange() { }
-  virtual bool apply(int, SObservers &obs) = 0;
+  virtual bool apply(int) = 0;
   };
 
 #endif // SCHANGE_H

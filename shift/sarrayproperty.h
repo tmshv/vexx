@@ -93,22 +93,20 @@ public:
 
   void add(const SArrayProperty <T> *in)
     {
-    #warning test that rows and cols are the same for both
+    #warning this should be in a changeFn
     mData += in->data();
-    postSet();
     }
 
   void add(const SArrayProperty <T> *inA, const SArrayProperty <T> *inB)
     {
-    #warning test that rows and cols are the same for both
+    #warning this should be in a changeFn
     mData = inA->data() + inB->data();
-    postSet();
     }
 
   void resize(xsize width, xsize height)
     {
+    #warning this should be in a changeFn
     mData.resize(height, width);
-    postSet();
     }
 
   xsize width() const
@@ -131,18 +129,18 @@ public:
 
   void set(xsize width, xsize height, const XVector<T> &val)
     {
+    #warning this should be in a changeFn
     resize(width, height);
     if(width != 0 && height != 0)
       {
       memcpy(mData.data(), &val.front(), sizeof(T)*width*height);
       }
-    postSet();
     }
 
   void setIndex(xsize x, xsize y, const T &val)
     {
+#warning this should be in a changeFn
     mData(y, x) = val;
-    postSet();
     }
 
   const T &atIndex(xsize x, xsize y) const

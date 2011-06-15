@@ -41,7 +41,7 @@ inline void setDependantsDirty(SProperty* prop, bool force)
     }
   }
 
-bool SProperty::NameChange::apply(int mode, SObservers& obs)
+bool SProperty::NameChange::apply(int mode)
   {
   SProfileFunction
   if(mode&Forward)
@@ -55,8 +55,7 @@ bool SProperty::NameChange::apply(int mode, SObservers& obs)
   if(mode&Inform)
     {
     xAssert(property()->entity());
-    obs.clear();
-    property()->entity()->informTreeObservers(mode, this, obs);
+    property()->entity()->informTreeObservers(this);
     }
   return true;
   }
@@ -325,7 +324,7 @@ void SProperty::disconnect() const
     }
   }
 
-bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
+bool SProperty::ConnectionChange::apply(int mode)
   {
   SProfileFunction
   if(mode&Forward)
@@ -343,6 +342,7 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
       clearParentHasInputConnection(_driven);
       clearParentHasOutputConnection(_driver);
       }
+    _driven->postSet();
     }
   else if(mode&Backward)
     {
@@ -359,14 +359,15 @@ bool SProperty::ConnectionChange::apply(int mode, SObservers &obs)
       setParentHasOutputConnection(_driver);
       setDependantsDirty(_driver, true);
       }
+    _driven->postSet();
     }
+
   if(mode&Inform)
     {
     xAssert(_driver->entity());
     xAssert(_driven->entity());
-    obs.clear();
-    _driver->entity()->informConnectionObservers(mode, this, obs);
-    _driven->entity()->informConnectionObservers(mode, this, obs);
+    _driver->entity()->informConnectionObservers(this);
+    _driven->entity()->informConnectionObservers(this);
     }
   return true;
   }
@@ -633,6 +634,11 @@ void SProperty::setDirty(bool force)
     _flags.setFlag(Dirty);
 
     setDependantsDirty(this, force);
+
+    if(entity())
+      {
+      entity()->informDirtyObservers(this);
+      }
     }
   }
 
@@ -641,6 +647,9 @@ void SProperty::preGet() const
   SProfileFunction
   if(_flags.hasFlag(Dirty))
     {
+    bool informingEnabled = database()->informingEnabled();
+    const_cast<SDatabase*>(database())->setInformingEnabled(false);
+
     // this is a const function, but because we delay computation we may need to assign here
     SProperty *prop = const_cast<SProperty*>(this);
     prop->_flags.clearFlag(Dirty);
@@ -661,6 +670,8 @@ void SProperty::preGet() const
     // dirty can be set again in compute functions.
     prop->_flags.clearFlag(Dirty);
     prop->_flags.clearFlag(PreGetting);
+
+    const_cast<SDatabase*>(database())->setInformingEnabled(informingEnabled);
 
     xAssert(!_flags.hasFlag(Dirty));
     return;

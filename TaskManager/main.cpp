@@ -4,8 +4,6 @@
 
 int main(int argc, char *argv[])
   {
-  xInitiateMetaTypes();
-
   SProcessManager::initiate(1);
 
   QApplication a(argc, argv);

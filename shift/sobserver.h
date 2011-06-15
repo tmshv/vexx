@@ -17,19 +17,19 @@ public:
 class SHIFT_EXPORT STreeObserver : public SObserver
   {
 public:
-  virtual void onTreeChange( int m, const SChange *) = 0;
+  virtual void onTreeChange(const SChange *) = 0;
   };
 
-class SHIFT_EXPORT SDataObserver : public SObserver
+class SHIFT_EXPORT SDirtyObserver : public SObserver
   {
 public:
-  virtual void onDataChange( int m, const SProperty::DataChange *) = 0;
+  virtual void onPropertyDirtied(const SProperty*) = 0;
   };
 
 class SHIFT_EXPORT SConnectionObserver : public SObserver
   {
 public:
-  virtual void onConnectionChange( int m, const SChange *) = 0;
+  virtual void onConnectionChange(const SChange *) = 0;
   };
 
 

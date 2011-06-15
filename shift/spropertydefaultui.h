@@ -17,7 +17,7 @@
 
 namespace SPropertyDefaultUI
 {
-template <typename T, typename U> class SUIBase : private SDataObserver
+template <typename T, typename U> class SUIBase : private SDirtyObserver
   {
 XProperties:
   XProperty(bool, isAlreadySetting, setAlreadySetting);
@@ -31,15 +31,11 @@ public:
   virtual void syncGUI() = 0;
 
 private:
-  virtual void onDataChange(int X_UNUSED(m), const SProperty::DataChange *ev)
+  virtual void onPropertyDirtied(const SProperty* prop)
     {
-    if(ev->type() == U::Type)
+    if(prop == _value)
       {
-      const U *change = static_cast<const U*>(ev);
-      if(change->property() == _value)
-        {
-        _dirty = true;
-        }
+      _dirty = true;
       }
     }
   virtual void actOnChanges()

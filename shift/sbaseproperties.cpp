@@ -706,5 +706,4 @@ void Pointer::setPointed(SProperty *prop)
     {
     prop->connect(this);
     }
-  postSet();
   }

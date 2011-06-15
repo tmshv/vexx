@@ -10,7 +10,7 @@
 class SProperty;
 class SDatabase;
 class STreeObserver;
-class SDataObserver;
+class SDirtyObserver;
 class SConnectionObserver;
 
 #define S_ENTITY(name, parent, version) S_PROPERTY_CONTAINER(name, parent, version)
@@ -79,17 +79,17 @@ public:
   virtual bool acceptsChild(const SEntity *) const;
   virtual bool acceptsParent(const SEntity *) const;
 
-  void addDataObserver(SDataObserver *);
+  void addDirtyObserver(SDirtyObserver *);
   void addTreeObserver(STreeObserver *);
   void addConnectionObserver(SConnectionObserver *);
 
-  void removeDataObserver(SDataObserver *);
+  void removeDirtyObserver(SDirtyObserver *);
   void removeTreeObserver(STreeObserver *);
   void removeConnectionObserver(SConnectionObserver *);
   
-  void informDataObservers(int m, const DataChange *event, SObservers &obs);
-  void informTreeObservers(int m, const SChange *event, SObservers &obs);
-  void informConnectionObservers(int m, const SChange *event, SObservers &obs);
+  void informDirtyObservers(SProperty *prop);
+  void informTreeObservers(const SChange *event);
+  void informConnectionObservers(const SChange *event);
 
   SEntity *findChildEntity(const QString &);
   const SEntity *findChildEntity(const QString &) const;
@@ -103,7 +103,7 @@ private:
     {
     enum
       {
-      Data,
+      Dirty,
       Tree,
       Connection
       };

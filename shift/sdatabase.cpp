@@ -259,98 +259,14 @@ const SPropertyInformation *SDatabase::findType(const QString &in) const
   QList <xuint32> keys(_types.keys());
   for(int i=0, s=keys.size(); i<s; ++i)
     {
-    if(_types[keys[i]]->typeName() == in)
+    SPropertyType key = keys[i];
+    if(_types[key]->typeName() == in)
       {
-      return _types.value(i);
+      return _types.value(key);
       }
     }
   return 0;
   }
-
-/*void SDatabase::write(const SProperty *prop, SPropertyData &data, SPropertyData::Mode mode) const
-  {
-  SProfileFunction
-  if(!prop)
-    {
-    prop = this;
-    }
-
-  xAssert(_types.contains(prop->type()));
-
-  if(!_types.contains(prop->type()))
-    {
-    return;
-    }
-
-  const SPropertyInformation *type = prop->typeInformation();
-
-  data.setName(type->typeName());
-  data.appendAttribute("name", prop->name().toUtf8());
-  data.appendAttribute("version", QString::number(type->version()).toUtf8());
-  data.appendAttribute("dynamic", QString::number(prop->isDynamic()).toUtf8());
-  type->save()(prop, data, mode);
-  }
-
-SProperty *SDatabase::read(const SPropertyData &data, SPropertyContainer *parent)
-  {
-  SProfileFunction
-  if(_readLevel == 0)
-    {
-    _resolveAfterLoad.clear();
-    }
-  _readLevel++;
-
-  const SPropertyInformation *type = findType(data.name());
-  xAssert(type);
-  xAssert(type->load());
-
-  if(!type)
-    {
-    return 0;
-    }
-
-  SProperty *prop = 0;
-
-  if(parent)
-    {
-    QString name(QString::fromUtf8(data.attribute("name")));
-    bool dynamic(QString::fromUtf8(data.attribute("dynamic")).toUInt());
-    if(dynamic)
-      {
-      prop = parent->addProperty(type->typeId());
-      prop->setName(name);
-      }
-    else
-      {
-      prop = parent->findChild(name);
-      xAssert(prop);
-      }
-    }
-  else
-    {
-    prop = this;
-    }
-
-  xuint32 version = QString::fromUtf8(data.attribute("version")).toUInt();
-  type->load()(prop, version, *this);
-  _readLevel--;
-
-  if(_readLevel == 0)
-    {
-    foreach(SProperty *prop, _resolveAfterLoad.keys())
-      {
-      SProperty* input = prop->resolvePath(_resolveAfterLoad.value(prop));
-
-      xAssert(input);
-      if(input)
-        {
-        input->connect(prop);
-        }
-      }
-    }
-
-  return prop;
-  }*/
 
 SBlock::SBlock(SDatabase *db) : _db(db)
   {
@@ -378,26 +294,39 @@ void SDatabase::destoryChangeMemory(SChange *ptr)
 void SDatabase::submitChange(SChange *ch)
   {
   SProfileFunction
+  bool oldStateStorageEnabled = _stateStorageEnabled;
+  setStateStorageEnabled(false);
   _inSubmitChange = true;
   try
     {
-    _currentObservers.clear();
-    bool result = ch->apply(SChange::Forward|SChange::Inform, _currentObservers);
-    _blockObservers << _currentObservers;
-
-    if(result)
+    int mode = SChange::Forward;
+    if(_informingEnabled)
       {
-      _done << ch;
+      mode |= SChange::Inform;
+      }
 
-      if(_blockLevel == 0)
+    bool result = ch->apply(mode);
+
+    if(_stateStorageEnabled)
+      {
+      if(result)
         {
-        inform();
+        _done << ch;
+
+        if(_blockLevel == 0)
+          {
+          inform();
+          }
+        }
+      else
+        {
+        qDebug() << "Failure in change";
+        destoryChangeMemory(ch);
         }
       }
     else
       {
-      qDebug() << "Failure in change";
-      delete ch;
+      destoryChangeMemory(ch);
       }
     }
   catch(...)
@@ -405,6 +334,7 @@ void SDatabase::submitChange(SChange *ch)
     xAssert(0 && "Unhandled exception");
     }
   _inSubmitChange = false;
+  setStateStorageEnabled(oldStateStorageEnabled);
   }
 
 void SDatabase::inform()

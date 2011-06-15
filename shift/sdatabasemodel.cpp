@@ -260,12 +260,12 @@ Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   return QAbstractItemModel::flags(index);
   }
 
-void SDatabaseModel::onTreeChange(int m, const SChange *c)
+void SDatabaseModel::onTreeChange(const SChange *c)
   {
   const SEntity::TreeChange *tC = c->castTo<SEntity::TreeChange>();
   if(tC)
     {
-    if(tC->property() == _root && m&SChange::Forward && tC->after() == 0)
+    if(tC->property() == _root && tC->after() == 0)
       {
       _root = 0;
       }

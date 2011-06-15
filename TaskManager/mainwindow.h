@@ -28,8 +28,8 @@ private slots:
   void removeDependancy();
 
 private:
-  virtual void onTreeChange(int m, const SChange *);
-  virtual void onConnectionChange(int m, const SChange *);
+  virtual void onTreeChange(const SChange *);
+  virtual void onConnectionChange(const SChange *);
   virtual void actOnChanges();
 
   void updateUIFromDB();
