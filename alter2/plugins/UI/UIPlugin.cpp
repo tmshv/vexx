@@ -29,26 +29,26 @@ public:
 
   virtual void closeEvent(QCloseEvent *event)
     {
-    saveState();
+    saveStateToDB();
 
     emit _plugin->aboutToClose();
     event->accept();
     }
 
-  void saveState()
+  void saveStateToDB()
     {
     APlugin<SPlugin> shift(_plugin, "db");
     if(shift.isValid())
       {
-      QByteArray layoutData = _mainWindow->saveState();
-      QByteArray geometryData = _mainWindow->saveGeometry();
+      QByteArray layoutData = saveState();
+      QByteArray geometryData = saveGeometry();
 
       shift->setSetting<QByteArray>("ui", "layout", layoutData);
       shift->setSetting<QByteArray>("ui", "geometry", geometryData);
       }
     }
 
-  void restoreState()
+  void restoreStateFromDB()
     {
     APlugin<SPlugin> shift(_plugin, "db");
     if(shift.isValid())
@@ -56,13 +56,12 @@ public:
       const QByteArray &layout = shift->setting<QByteArray>("ui", "layout");
       const QByteArray &geometry = shift->setting<QByteArray>("ui", "geometry");
 
-      _mainWindow->restoreState(layout);
-      _mainWindow->restoreGeometry(geometry);
+      restoreState(layout);
+      restoreGeometry(geometry);
       }
     }
 
   XList <UISurface*> _surfaces;
-  QMainWindow *_mainWindow;
   QDialog *_preferences;
   QTabWidget *_preferenceTabs;
   UIDatabaseDebugSurface _dbDebug;
@@ -120,7 +119,7 @@ void UIPlugin::load()
 
 void UIPlugin::show()
   {
-  _priv->restoreState();
+  _priv->restoreStateFromDB();
   _priv->show();
   }
 

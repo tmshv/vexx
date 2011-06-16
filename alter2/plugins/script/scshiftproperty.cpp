@@ -142,10 +142,6 @@ QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *)
       {
       return prop->uncheckedCastTo<StringProperty>()->value();
       }
-    else if(prop->inheritsFromType<LongStringProperty>())
-      {
-      return prop->uncheckedCastTo<LongStringProperty>()->value();
-      }
 
     xAssertFail();
     //SPropertyData data;

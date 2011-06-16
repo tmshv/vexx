@@ -59,14 +59,15 @@ public:
 
   SProperty *addProperty(SPropertyType t, const QString& name)
     {
-    SProperty *p = addProperty(t, name);
+    SProperty *p = SPropertyContainer::addProperty(t);
     xAssert(p);
+    p->setName(name);
     return p;
     }
 
   void removeProperty(SProperty *prop)
     {
-    removeProperty(prop);
+    SPropertyContainer::removeProperty(prop);
     }
 
   // accessing child properties by index

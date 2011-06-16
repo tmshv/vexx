@@ -16,7 +16,8 @@ HEADERS += GCGlobal.h \
     GCShiftRenderModel.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
-    GCQImage.h
+    GCQImage.h \
+    GCGeometry.h
 
 INCLUDEPATH += ../../EksCore ../../Eks3D/include ../../Shift
 
@@ -31,4 +32,5 @@ SOURCES += \
     GCShiftRenderModel.cpp \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
-    GCQImage.cpp
+    GCQImage.cpp \
+    GCGeometry.cpp
