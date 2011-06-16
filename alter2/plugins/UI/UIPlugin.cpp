@@ -43,11 +43,8 @@ public:
       QByteArray layoutData = _mainWindow->saveState();
       QByteArray geometryData = _mainWindow->saveGeometry();
 
-      ByteArrayProperty *layout = shift->setting<ByteArrayProperty>("ui", "layout");
-      layout->assign(layoutData);
-
-      ByteArrayProperty *geometry = shift->setting<ByteArrayProperty>("ui", "geometry");
-      geometry->assign(geometryData);
+      shift->setSetting<QByteArray>("ui", "layout", layoutData);
+      shift->setSetting<QByteArray>("ui", "geometry", geometryData);
       }
     }
 
@@ -56,11 +53,11 @@ public:
     APlugin<SPlugin> shift(_plugin, "db");
     if(shift.isValid())
       {
-      ByteArrayProperty *layout = shift->setting<ByteArrayProperty>("ui", "layout");
-      ByteArrayProperty *geometry = shift->setting<ByteArrayProperty>("ui", "geometry");
+      const QByteArray &layout = shift->setting<QByteArray>("ui", "layout");
+      const QByteArray &geometry = shift->setting<QByteArray>("ui", "geometry");
 
-      _mainWindow->restoreState(layout->value());
-      _mainWindow->restoreGeometry(geometry->value());
+      _mainWindow->restoreState(layout);
+      _mainWindow->restoreGeometry(geometry);
       }
     }
 

@@ -27,7 +27,6 @@ IMPLEMENT_POD_PROPERTY(Vector4DProperty, XVector4D);
 IMPLEMENT_POD_PROPERTY(QuaternionProperty, XQuaternion);
 IMPLEMENT_POD_PROPERTY(StringProperty, XString);
 IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
-IMPLEMENT_POD_PROPERTY(LongStringProperty, XString);
 IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
 
 void BoolProperty::assignPOD(const SProperty *f, SProperty *t)
@@ -612,32 +611,6 @@ void ColourProperty::assignPOD(const SProperty *f, SProperty *t)
 void StringProperty::assignPOD(const SProperty *f, SProperty *t)
   {
   StringProperty *to = t->uncheckedCastTo<StringProperty>();
-
-  const StringProperty *sProp = f->castTo<StringProperty>();
-  if(sProp)
-    {
-    to->assign(sProp->value());
-    return;
-    }
-
-  const LongStringProperty *lsProp = f->castTo<LongStringProperty>();
-  if(lsProp)
-    {
-    to->assign(lsProp->value());
-    return;
-    }
-  }
-
-void LongStringProperty::assignPOD(const SProperty *f, SProperty *t)
-  {
-  LongStringProperty *to = t->uncheckedCastTo<LongStringProperty>();
-
-  const LongStringProperty *lsProp = f->castTo<LongStringProperty>();
-  if(lsProp)
-    {
-    to->assign(lsProp->value());
-    return;
-    }
 
   const StringProperty *sProp = f->castTo<StringProperty>();
   if(sProp)

@@ -21,7 +21,6 @@ SEntityUI::SEntityUI(xuint32 options)
     setUIType(DoubleProperty::Type, addWidgetCreator<SPropertyDefaultUI::Double>() );
 
     setUIType(StringProperty::Type, addWidgetCreator<SPropertyDefaultUI::String>() );
-    setUIType(LongStringProperty::Type, addWidgetCreator<SPropertyDefaultUI::LongString>() );
 
     setUIType(Vector2DProperty::Type, addWidgetCreator<SPropertyDefaultUI::Vector2D>() );
     setUIType(Vector2DProperty::Type, addWidgetCreator<SPropertyDefaultUI::Vector3D>() );

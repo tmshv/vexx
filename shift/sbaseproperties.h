@@ -12,6 +12,11 @@
 #include "sobserver.h"
 #include "QByteArray"
 
+template <typename T>
+class SPODInterface
+  {
+  };
+
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
 class EXPORT_MODE name : public SProperty \
   { \
@@ -52,7 +57,10 @@ private: \
   static void assignPOD(const SProperty *, SProperty * ); \
   static void savePOD(const SProperty *p, SSaver &l ); \
   static SProperty *loadPOD(SPropertyContainer *parent, SLoader &l); \
-  };
+  }; \
+template <> class SPODInterface <type> { public: typedef name Type; \
+  static void assign(name* s, const type& val) { s->assign(val); } \
+  static const type& value(const name* s) { return s->value(); } };
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
 name::Change::Change(const type &b, const type &a, name *prop) \
@@ -118,7 +126,6 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion());
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongStringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
 class SHIFT_EXPORT Pointer : public SProperty

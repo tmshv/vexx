@@ -15,7 +15,45 @@ public:
   SAppDatabase &db();
   const SAppDatabase &db() const;
 
-  template <typename T> T *setting(const QString &ns, const QString &name)
+  template <typename T> const T &setting(const QString &ns, const QString &name)
+    {
+    typedef typename SPODInterface<T>::Type PropertyType;
+
+    PropertyType* prop = settingProperty<PropertyType>(ns, name);
+    xAssert(prop);
+
+    xAssert(prop);
+    return SPODInterface<T>::value(prop);
+    }
+
+  template <typename T> const T &setting(const QString &ns, const QString &name) const
+    {
+    typedef typename SPODInterface<T>::Type PropertyType;
+
+    PropertyType* prop = settingProperty<PropertyType>(ns, name);
+    xAssert(prop);
+
+    if(prop)
+      {
+      SPODInterface<T>::value(prop);
+      }
+    return 0;
+    }
+
+  template <typename T> void setSetting(const QString &ns, const QString &name, const T &val)
+    {
+    typedef typename SPODInterface<T>::Type PropertyType;
+
+    PropertyType* prop = settingProperty<PropertyType>(ns, name);
+    xAssert(prop);
+
+    if(prop)
+      {
+      SPODInterface<T>::assign(prop, val);
+      }
+    }
+
+  template <typename T> T *settingProperty(const QString &ns, const QString &name)
     {
     SEntity *nsEnt = _db.settings.findChildEntity(ns);
     if(nsEnt)
@@ -35,7 +73,7 @@ public:
     return nsEnt->addProperty<T>(name);
     }
 
-  template <typename T> const T *setting(const QString &ns, const QString &name) const
+  template <typename T> const T *settingProperty(const QString &ns, const QString &name) const
     {
     SEntity *nsEnt = _db.settings.findChildEntity(ns);
     if(nsEnt)

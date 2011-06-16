@@ -47,7 +47,6 @@ void SDatabase::initiate()
   addType<QuaternionProperty>();
   addType<StringProperty>();
   addType<ColourProperty>();
-  addType<LongStringProperty>();
   addType<ByteArrayProperty>();
 
   addType<Pointer>();

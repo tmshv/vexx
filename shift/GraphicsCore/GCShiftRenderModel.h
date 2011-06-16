@@ -55,8 +55,8 @@ public:
 
   virtual void resetIterator(XAbstractRenderModel::Iterator *) const;
 
-  void onConnectionChange(int m, const SChange *);
-  void onTreeChange(int m, const SChange *);
+  void onConnectionChange(const SChange *);
+  void onTreeChange(const SChange *);
   };
 
 #endif // GCSHIFTRENDERMODEL_H

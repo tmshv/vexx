@@ -2,6 +2,9 @@
 #include "sglobal.h"
 #include "sprocessmanager.h"
 #include "QThread"
+#include "QDesktopServices"
+#include "QFile"
+#include "sxmlio.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -34,9 +37,29 @@ void SPlugin::load()
     }
 
   SProcessManager::initiate(threadCount);
+
+  QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+  QFile file(dataLocation + "/settings.xml");
+  if(file.open(QIODevice::ReadOnly))
+    {
+    SXMLLoader loader;
+
+    loader.readFromDevice(&file, &_db.settings);
+    }
   }
 
 void SPlugin::unload()
   {
+  QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+  QFile file(dataLocation + "/settings.xml");
+  if(file.open(QIODevice::WriteOnly))
+    {
+    SXMLSaver saver;
+
+    saver.writeToDevice(&file, &_db.settings);
+    }
+
   SProcessManager::terminate();
   }

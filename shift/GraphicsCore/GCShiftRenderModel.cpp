@@ -74,12 +74,12 @@ void GCShiftRenderModel::resetIterator(XAbstractRenderModel::Iterator *it) const
   slIt->reset();
   }
 
-void GCShiftRenderModel::onConnectionChange(int m, const SChange *)
+void GCShiftRenderModel::onConnectionChange(const SChange *)
   {
   update(TreeChange);
   }
 
-void GCShiftRenderModel::onTreeChange(int m, const SChange *c)
+void GCShiftRenderModel::onTreeChange(const SChange *c)
   {
   update(TreeChange);
 
