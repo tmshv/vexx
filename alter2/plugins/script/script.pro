@@ -1,22 +1,25 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-06-09T14:26:27
 # -------------------------------------------------
+
+TARGET = script
+TEMPLATE = lib
+
+include("../../../EksCore/GeneralOptions.pri")
+
 QT += script scripttools
 INCLUDEPATH += ../../ \
-    ../../../EksCore \
-    ../../../shift \
-    ../../../alter2/plugins/UI/ \
-    ../../../alter2/plugins/ShiftAlter/
-DESTDIR = ../../../bin
-LIBS += -L../../../bin \
-    -lalter \
+    $$ROOT/EksCore \
+    $$ROOT/shift \
+    $$ROOT/alter2/plugins/UI/ \
+    $$ROOT/alter2/plugins/ShiftAlter/
+
+LIBS += -lalter \
     -lEksCore \
     -lUI \
     -lshift \
     -lShiftAlter
-TARGET = script
-TEMPLATE = lib
-DEFINES += SCRIPT_BUILD
+
 SOURCES += scplugin.cpp \
     scsurface.cpp \
     scshiftdynamicpropertyinformation.cpp \
@@ -26,6 +29,7 @@ SOURCES += scplugin.cpp \
     scshiftentity.cpp \
     scshiftdatabase.cpp \
     scshiftfloatarrayproperty.cpp
+
 HEADERS += scplugin.h \
     scglobal.h \
     scsurface.h \
@@ -43,3 +47,4 @@ RESOURCES += \
 
 OTHER_FILES += \
     CoreUtils.js
+

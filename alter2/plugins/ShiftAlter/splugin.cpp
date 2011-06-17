@@ -4,6 +4,7 @@
 #include "QThread"
 #include "QDesktopServices"
 #include "QFile"
+#include "QDir"
 #include "sxmlio.h"
 
 ALTER_PLUGIN(SPlugin);
@@ -52,6 +53,9 @@ void SPlugin::load()
 void SPlugin::unload()
   {
   QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+  QDir dir(QDir::root());
+  dir.mkpath(dataLocation);
 
   QFile file(dataLocation + "/settings.xml");
   if(file.open(QIODevice::WriteOnly))

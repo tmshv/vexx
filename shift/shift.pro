@@ -1,16 +1,19 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-06-09T09:04:56
 # -------------------------------------------------
+
 TARGET = shift
 TEMPLATE = lib
-DESTDIR += ../bin
+
+include("../EksCore/GeneralOptions.pri")
+
 INCLUDEPATH += ../alter2/ \
-    ../EksCore \
-    ../EksGui
-LIBS += -L../bin \
-    -lEksCore \
+    $$ROOT/EksCore \
+    $$ROOT/EksGui
+
+LIBS += -lEksCore \
     -lEksGui
-DEFINES += SHIFT_BUILD
+
 SOURCES += \
     sentity.cpp \
     sproperty.cpp \
@@ -31,6 +34,7 @@ SOURCES += \
     siterator.cpp \
     sxmlio.cpp \
     sbinaryio.cpp
+
 HEADERS += \
     sglobal.h \
     sentity.h \
@@ -54,6 +58,4 @@ HEADERS += \
     siterator.h \
     sxmlio.h \
     sbinaryio.h
-DESTDIR = ../bin
 
-QMAKE_CXXFLAGS += -Wall

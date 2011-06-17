@@ -15,6 +15,7 @@ void SXMLSaver::writeToDevice(QIODevice *device, const SEntity *ent)
   _writer.setDevice(device);
 
   _writer.setAutoFormatting(true);
+  _writer.setAutoFormattingIndent(2);
   _writer.writeStartDocument();
 
   write(_root);
@@ -192,9 +193,11 @@ void SXMLLoader::beginNextChild()
     _reader.text().appendTo(&_scratch);
     _currentValue = _scratch.toAscii();
     }
-  else
+  else if(!_reader.isWhitespace())
     {
     _hasNextElement = true;
+
+    QXmlStreamReader::TokenType t = _reader.tokenType();
     xAssert(_reader.isEndElement() || _reader.isStartElement());
     }
   }

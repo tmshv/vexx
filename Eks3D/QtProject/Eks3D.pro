@@ -1,11 +1,14 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-04-21T15:51:26
 # -------------------------------------------------
-QT += opengl \
-    xml
+
 TARGET = Eks3D
 TEMPLATE = lib
-DEFINES += EKS3D_BUILD
+
+include("../../EksCore/GeneralOptions.pri")
+
+QT += opengl \
+    xml
 SOURCES += ../src/XDoodad.cpp \
     ../src/XScene.cpp \
     ../src/XCuboid.cpp \
@@ -75,12 +78,13 @@ HEADERS += ../include/XDoodad.h \
     ../include/XAbstractDelegate.h \
     ../include/XAbstractCanvasController.h
 DEFINES += GLEW_STATIC
+
 INCLUDEPATH += ../include/ \
-    ../../EksCore/ \
+    $$ROOT/EksCore/ \
     ../3rdParty
-LIBS += -L../../bin/ \
-    -lEksCore
-DESTDIR = ../../bin
+
+LIBS += -lEksCore
 
 RESOURCES += \
     ../GLResources.qrc
+

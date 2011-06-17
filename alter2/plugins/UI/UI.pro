@@ -7,9 +7,7 @@
 TARGET = UI
 TEMPLATE = lib
 
-DEFINES += UI_BUILD
-
-QMAKE_CXXFLAGS += -Wall
+include("../../../EksCore/GeneralOptions.pri")
 
 SOURCES += UIPlugin.cpp \
     UISurface.cpp \
@@ -36,8 +34,8 @@ HEADERS += UIPlugin.h \
     UISurfacePrivate.h \
     UIProfilerSurface.h
 
-DESTDIR += ../../../bin
 
-INCLUDEPATH += ../../ ../../../EksCore ../../../Eks3D/include ../../../Alter2/plugins/ShiftAlter ../../../Shift ../../../Shift/GraphicsCore
+INCLUDEPATH += ../../ $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
 
-LIBS += -L../../../bin -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
+LIBS += -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
+

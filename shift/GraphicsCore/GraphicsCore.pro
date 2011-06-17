@@ -6,8 +6,7 @@
 TARGET = ShiftGraphicsCore
 TEMPLATE = lib
 
-DEFINES += SHIFTGRAPHICSCORE_BUILD
-QMAKE_CXXFLAGS += -Wall
+include("../../EksCore/GeneralOptions.pri")
 
 HEADERS += GCGlobal.h \
     GraphicsCore.h \
@@ -19,11 +18,9 @@ HEADERS += GCGlobal.h \
     GCQImage.h \
     GCGeometry.h
 
-INCLUDEPATH += ../../EksCore ../../Eks3D/include ../../Shift
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
-DESTDIR += ../../bin
-
-LIBS += -L../../bin -lshift -lEksCore -lEks3D
+LIBS += -lshift -lEksCore -lEks3D
 
 SOURCES += \
     GraphicsCore.cpp \

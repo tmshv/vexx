@@ -71,6 +71,7 @@ SProperty::~SProperty()
     {
     ((InstanceInformation*)instanceInformation())->~InstanceInformation();
     }
+  _database = 0;
   }
 
 bool SProperty::isDynamic() const

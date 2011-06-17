@@ -55,9 +55,13 @@ public:
     XList <QString> directories;
     };
 
-ACore::ACore( int argv, char **argc ) : _priv(new ACorePrivate(argv, argc))
+ACore::ACore( const QString &companyDomain, const QString &app, int argv, char **argc ) : _priv(new ACorePrivate(argv, argc))
     {
     _priv->directories << rootPath() + "/plugins/";
+
+    QCoreApplication::setApplicationName(app);
+    QCoreApplication::setOrganizationName(companyDomain);
+    QCoreApplication::setOrganizationDomain(companyDomain);
     }
 
 ACore::~ACore()

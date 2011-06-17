@@ -132,6 +132,8 @@ bool SPropertyContainer::contains(SProperty *child) const
 
 SPropertyContainer::~SPropertyContainer()
   {
+  xAssert(database());
+
   xsize propIndex = 0;
   SProperty *prop = _child;
   while(prop)
@@ -324,7 +326,6 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
 
     oldProp->_parent = this;
     oldProp->_entity = 0;
-    oldProp->_database = 0;
     ((SProperty::InstanceInformation*)oldProp->_instanceInfo)->_index = X_SIZE_SENTINEL;
     }
   else
@@ -339,7 +340,6 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
 
         oldProp->_parent = this;
         oldProp->_entity = 0;
-        oldProp->_database = 0;
         ((SProperty::InstanceInformation*)oldProp->_instanceInfo)->_index = X_SIZE_SENTINEL;
 
         prop->_nextSibling = oldProp->_nextSibling;

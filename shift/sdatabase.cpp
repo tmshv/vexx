@@ -63,7 +63,6 @@ SDatabase::~SDatabase()
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
-    prop->~SProperty();
     if(propIndex >= _containedProperties)
       {
       database()->deleteDynamicProperty(prop);

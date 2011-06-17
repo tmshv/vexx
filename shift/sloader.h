@@ -105,4 +105,31 @@ template <typename T> void readValue(SLoader &l, T &t)
     }
   }
 
+inline void writeValue(SSaver &s, const QByteArray &t)
+  {
+  if(s.streamMode() == SSaver::Text)
+    {
+    s.textStream() << t.toHex();
+    }
+  else
+    {
+    s.binaryStream() << t;
+    }
+  }
+
+inline void readValue(SLoader &l, QByteArray &t)
+  {
+  if(l.streamMode() == SLoader::Text)
+    {
+    QByteArray temp;
+    l.textStream() >> temp;
+    t = QByteArray::fromHex(temp);
+    }
+  else
+    {
+    l.binaryStream() >> t;
+    }
+  }
+
+
 #endif // SLOADER_H

@@ -1,15 +1,17 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-04-23T12:10:30
 # -------------------------------------------------
+
 TARGET = Tang
+TEMPLATE = app
+
+include("../EksCore/GeneralOptions.pri")
 
 QT += opengl \
     xml \
     network \
     webkit
 
-TEMPLATE = app
-DESTDIR = ../bin/
 SOURCES += main.cpp \
     Interface.cpp \
     viewport.cpp \
@@ -19,21 +21,23 @@ SOURCES += main.cpp \
     application.cpp \
     webview.cpp \
     objectid.cpp
-LIBS += -L../bin \
-    -lEksCore \
+
+LIBS += -lEksCore \
     -lEks3D \
     -lshift \
     -lalter \
     -lscript \
     -lUI
+
 INCLUDEPATH += ../include \
-    ../EksCore \
-    ../Eks3D/include \
-    ../Shift \
-    ../Alter2 \
-    ../EksCore \
-    ../Alter2/Plugins/UI \
-    ../Alter2/Plugins/Script
+    $$ROOT/EksCore \
+    $$ROOT/Eks3D/include \
+    $$ROOT/Shift \
+    $$ROOT/Alter2 \
+    $$ROOT/EksCore \
+    $$ROOT/Alter2/Plugins/UI \
+    $$ROOT/Alter2/Plugins/Script
+
 HEADERS += Interface.h \
     viewport.h \
     NewItemDialog.h \

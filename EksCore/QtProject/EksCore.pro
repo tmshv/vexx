@@ -3,8 +3,9 @@
 # -------------------------------------------------
 TARGET = EksCore
 TEMPLATE = lib
-QMAKE_CXXFLAGS += -Wall
-DEFINES += EKSCORE_LIBRARY
+
+include("../GeneralOptions.pri")
+
 SOURCES += ../src/XObject.cpp \
     ../src/XMessageRouter.cpp \
     ../src/XMessageHandler.cpp \
@@ -53,6 +54,3 @@ HEADERS += ../XObject \
     ../XTime \
     ../XProfiler
 INCLUDEPATH += ../
-DESTDIR = ../../bin
-
-include("../SIMD.pri")

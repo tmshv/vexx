@@ -7,18 +7,18 @@
 TARGET = ShiftAlter
 TEMPLATE = lib
 
-DEFINES += SHIFTALTER_BUILD
+include("../../../EksCore/GeneralOptions.pri")
+
 
 SOURCES += splugin.cpp \
     sappdatabase.cpp
-QMAKE_CXXFLAGS += -Wall
 
 HEADERS += splugin.h \
     saglobal.h \
     sappdatabase.h
 
-INCLUDEPATH += ../../../EksCore ../../../Shift ../../
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift ../../
 
-DESTDIR += ../../../bin
 
-LIBS += -L../../../bin -lshift -lEksCore -lalter
+LIBS += -lshift -lEksCore -lalter
+

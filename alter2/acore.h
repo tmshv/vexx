@@ -15,7 +15,7 @@ class ALTER_EXPORT ACore : public QObject
     Q_OBJECT
 
 public:
-    ACore( int argv, char **argc );
+    ACore( const QString &companyDomain, const QString &application, int argv, char **argc );
     ~ACore();
 
     void quit();
