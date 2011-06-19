@@ -25,6 +25,7 @@ class UIPluginPrivate : public QMainWindow
 public:
   UIPluginPrivate() : _plugin(0)
     {
+    setDockNestingEnabled(true);
     }
 
   virtual void closeEvent(QCloseEvent *event)
@@ -40,11 +41,11 @@ public:
     APlugin<SPlugin> shift(_plugin, "db");
     if(shift.isValid())
       {
-      QByteArray layoutData = saveState();
       QByteArray geometryData = saveGeometry();
-
-      shift->setSetting<QByteArray>("ui", "layout", layoutData);
       shift->setSetting<QByteArray>("ui", "geometry", geometryData);
+
+      QByteArray layoutData = saveState();
+      shift->setSetting<QByteArray>("ui", "layout", layoutData);
       }
     }
 
@@ -53,11 +54,11 @@ public:
     APlugin<SPlugin> shift(_plugin, "db");
     if(shift.isValid())
       {
-      const QByteArray &layout = shift->setting<QByteArray>("ui", "layout");
       const QByteArray &geometry = shift->setting<QByteArray>("ui", "geometry");
-
-      restoreState(layout);
       restoreGeometry(geometry);
+
+      const QByteArray &layout = shift->setting<QByteArray>("ui", "layout");
+      restoreState(layout);
       }
     }
 
@@ -147,9 +148,13 @@ void UIPlugin::addSurface(UISurface *surface)
 
     if(surface->type() == UISurface::Dock)
       {
-      surface->privateData()->setDock(new QDockWidget(surface->name(), _priv));
-      surface->privateData()->dock()->setWidget(surface->widget());
-      _priv->addDockWidget(Qt::LeftDockWidgetArea, surface->privateData()->dock());
+      QDockWidget* dock = new QDockWidget(surface->name(), _priv);
+
+      dock->setWidget(surface->widget());
+      dock->setObjectName(surface->name());
+
+      surface->privateData()->setDock(dock);
+      _priv->addDockWidget(Qt::LeftDockWidgetArea, dock);
       }
 
     if(surface->type() == UISurface::PropertiesPage)

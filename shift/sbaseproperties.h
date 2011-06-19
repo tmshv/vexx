@@ -128,6 +128,11 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
+// specific pod interface for bool because it is actually a uint8.
+template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
+  static void assign(BoolProperty* s, const bool &val) { s->assign(val); } \
+  static const xuint8 &value(const BoolProperty* s) { return s->value(); } };
+
 class SHIFT_EXPORT Pointer : public SProperty
   {
   S_PROPERTY(Pointer, SProperty, save, load, blankAssign, 0);
