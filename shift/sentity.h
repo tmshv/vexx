@@ -95,7 +95,6 @@ public:
   SEntity *findChildEntity(const QString &);
   const SEntity *findChildEntity(const QString &) const;
 
-protected:
   static void saveProperty(const SProperty *, SSaver &);
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
 

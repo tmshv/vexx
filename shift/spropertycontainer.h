@@ -116,6 +116,10 @@ public:
 
   bool contains(SProperty *) const;
 
+  static void assignProperty(const SProperty *, SProperty *);
+  static void saveProperty(const SProperty *, SSaver & );
+  static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+
 protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.
   // you cannot add another contained property once dynamic properties have been added, this bool
@@ -127,10 +131,6 @@ protected:
 
   SProperty *at(xsize i);
   const SProperty *at(xsize i) const;
-
-  static void assignProperty(const SProperty *, SProperty *);
-  static void saveProperty(const SProperty *, SSaver & );
-  static SProperty *loadProperty(SPropertyContainer *, SLoader &);
 
 private:
   SProperty *_child;
