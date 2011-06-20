@@ -1,6 +1,6 @@
 #include "UIStackedLayout.h"
 
-S_ENTITY_EMPTY_DEFINITION(UIStackedLayout, UILayout)
+S_ENTITY_EMPTY_DEFINITION(UIStackedLayout)
 
 UIStackedLayout::UIStackedLayout()
 {

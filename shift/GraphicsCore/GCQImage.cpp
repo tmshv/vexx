@@ -26,7 +26,7 @@ QTextStream &operator >>(QTextStream &str, QImage &data)
 IMPLEMENT_POD_PROPERTY(GCQImage, QImage)
 
 
-void GCQImage::assignPOD(const SProperty *f, SProperty *t)
+void GCQImage::assignProperty(const SProperty *f, SProperty *t)
   {
   SProfileFunction
   GCQImage *to = t->uncheckedCastTo<GCQImage>();

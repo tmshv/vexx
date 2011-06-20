@@ -29,7 +29,7 @@ IMPLEMENT_POD_PROPERTY(StringProperty, XString);
 IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
 IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
 
-void BoolProperty::assignPOD(const SProperty *f, SProperty *t)
+void BoolProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   BoolProperty *to = t->uncheckedCastTo<BoolProperty>();
 
@@ -83,7 +83,7 @@ void BoolProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void IntProperty::assignPOD(const SProperty *f, SProperty *t)
+void IntProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   IntProperty *to = t->uncheckedCastTo<IntProperty>();
 
@@ -137,7 +137,7 @@ void IntProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void LongIntProperty::assignPOD(const SProperty *f, SProperty *t)
+void LongIntProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   LongIntProperty *to = t->uncheckedCastTo<LongIntProperty>();
 
@@ -191,7 +191,7 @@ void LongIntProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void UnsignedIntProperty::assignPOD(const SProperty *f, SProperty *t)
+void UnsignedIntProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   UnsignedIntProperty *to = t->uncheckedCastTo<UnsignedIntProperty>();
 
@@ -245,7 +245,7 @@ void UnsignedIntProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void LongUnsignedIntProperty::assignPOD(const SProperty *f, SProperty *t)
+void LongUnsignedIntProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   LongUnsignedIntProperty *to = t->uncheckedCastTo<LongUnsignedIntProperty>();
 
@@ -299,7 +299,7 @@ void LongUnsignedIntProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void FloatProperty::assignPOD(const SProperty *f, SProperty *t)
+void FloatProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   FloatProperty *to = t->uncheckedCastTo<FloatProperty>();
 
@@ -353,7 +353,7 @@ void FloatProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void DoubleProperty::assignPOD(const SProperty *f, SProperty *t)
+void DoubleProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   DoubleProperty *to = t->uncheckedCastTo<DoubleProperty>();
 
@@ -407,7 +407,7 @@ void DoubleProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void Vector2DProperty::assignPOD(const SProperty *f, SProperty *t)
+void Vector2DProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   Vector2DProperty *to = t->uncheckedCastTo<Vector2DProperty>();
 
@@ -447,7 +447,7 @@ void Vector2DProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void Vector3DProperty::assignPOD(const SProperty *f, SProperty *t)
+void Vector3DProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   Vector3DProperty *to = t->uncheckedCastTo<Vector3DProperty>();
 
@@ -487,7 +487,7 @@ void Vector3DProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void Vector4DProperty::assignPOD(const SProperty *f, SProperty *t)
+void Vector4DProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   ColourProperty *to = t->uncheckedCastTo<ColourProperty>();
 
@@ -528,7 +528,7 @@ void Vector4DProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void QuaternionProperty::assignPOD(const SProperty *f, SProperty *t)
+void QuaternionProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   ColourProperty *to = t->uncheckedCastTo<ColourProperty>();
 
@@ -568,7 +568,7 @@ void QuaternionProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void ColourProperty::assignPOD(const SProperty *f, SProperty *t)
+void ColourProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   ColourProperty *to = t->uncheckedCastTo<ColourProperty>();
 
@@ -608,7 +608,7 @@ void ColourProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void StringProperty::assignPOD(const SProperty *f, SProperty *t)
+void StringProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   StringProperty *to = t->uncheckedCastTo<StringProperty>();
 
@@ -620,7 +620,7 @@ void StringProperty::assignPOD(const SProperty *f, SProperty *t)
     }
   }
 
-void ByteArrayProperty::assignPOD(const SProperty *f, SProperty *t)
+void ByteArrayProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   }
 
@@ -666,7 +666,7 @@ bool PointerArray::hasPointer(SProperty *prop) const
   return false;
   }
 
-S_PROPERTY_CONTAINER_EMPTY_DEFINITION(PointerArray, STypedPropertyArray<Pointer>, saveContainer, loadContainer)
+S_PROPERTY_CONTAINER_EMPTY_DEFINITION(PointerArray)
 
 void Pointer::setPointed(SProperty *prop)
   {

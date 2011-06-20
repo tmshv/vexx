@@ -84,20 +84,20 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
   }
 
 
-template <typename T> class SArrayProperty : public SProperty
+template <typename T, typename U> class SArrayProperty : public SProperty
   {
 public:
   typedef Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> EigenArray;
 
   const EigenArray &data() const { preGet(); return mData; }
 
-  void add(const SArrayProperty <T> *in)
+  void add(const SArrayProperty <T, U> *in)
     {
     #warning this should be in a changeFn
     mData += in->data();
     }
 
-  void add(const SArrayProperty <T> *inA, const SArrayProperty <T> *inB)
+  void add(const SArrayProperty <T, U> *inA, const SArrayProperty <T, U> *inB)
     {
     #warning this should be in a changeFn
     mData = inA->data() + inB->data();
@@ -149,11 +149,10 @@ public:
     return mData(y, x);
     }
 
-protected:
   // called by parent
-  static void SaveFunction( const SProperty* p_in, SSaver &l); // Mode = Binary / ASCII
-  static SProperty *LoadFunction( SPropertyContainer* p_in, SLoader&); // Mode = Binary / ASCII
-  template <typename U> static void AssignFunction(const SProperty *from, SProperty *to)
+  static void saveProperty( const SProperty* p_in, SSaver &l); // Mode = Binary / ASCII
+  static SProperty *loadProperty( SPropertyContainer* p_in, SLoader&); // Mode = Binary / ASCII
+  static void AssignFunction(const SProperty *from, SProperty *to)
     {
     const U *f = from->castTo<U>();
     U *t = to->castTo<U>();
@@ -169,9 +168,9 @@ private:
   Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
   };
 
-template <typename T> void SArrayProperty<T>::SaveFunction( const SProperty* p_in, SSaver &l)
+template <typename T, typename U> void SArrayProperty<T, U>::saveProperty( const SProperty* p_in, SSaver &l)
   {
-  SProperty::save(p_in, l); // saves the data of the parent class (keeps connections)
+  SProperty::saveProperty(p_in, l); // saves the data of the parent class (keeps connections)
 
   const SArrayProperty* ptr = p_in->castTo<SArrayProperty>(); // cast the input property to an SArrayProperty
   xAssert(ptr);
@@ -181,9 +180,9 @@ template <typename T> void SArrayProperty<T>::SaveFunction( const SProperty* p_i
     }
   }
 
-template <typename T> SProperty *SArrayProperty<T>::LoadFunction( SPropertyContainer* p_in, SLoader &l)
+template <typename T, typename U> SProperty *SArrayProperty<T, U>::loadProperty( SPropertyContainer* p_in, SLoader &l)
   {
-  SProperty *prop = SProperty::load(p_in, l);
+  SProperty *prop = SProperty::loadProperty(p_in, l);
 
   SArrayProperty* ptr = prop->uncheckedCastTo<SArrayProperty>();
   xAssert(ptr);
@@ -195,12 +194,18 @@ template <typename T> SProperty *SArrayProperty<T>::LoadFunction( SPropertyConta
   }
 
 
-
-class SHIFT_EXPORT SFloatArrayProperty : public SArrayProperty<float>
+class SHIFT_EXPORT SFloatArrayProperty : public SArrayProperty<float, SFloatArrayProperty>
   {
-  S_PROPERTY(SFloatArrayProperty, SProperty, SaveFunction, LoadFunction, AssignFunction<SFloatArrayProperty>, 0)
+  S_PROPERTY(SFloatArrayProperty, SProperty, 0)
 public:
   };
+
+class SHIFT_EXPORT SUIntArrayProperty : public SArrayProperty<xuint32, SUIntArrayProperty>
+  {
+  S_PROPERTY(SUIntArrayProperty, SProperty, 0)
+public:
+  };
+
 
 
 #endif // SARRAYPROPERTY_H

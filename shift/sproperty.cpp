@@ -126,11 +126,11 @@ SProperty *SProperty::nextSibling() const
   return _nextSibling;
   }
 
-void SProperty::blankAssign(const SProperty *, SProperty *)
+void SProperty::assignProperty(const SProperty *, SProperty *)
   {
   }
 
-void SProperty::save(const SProperty *p, SSaver &l)
+void SProperty::saveProperty(const SProperty *p, SSaver &l)
   {
   const SPropertyInformation *type = p->typeInformation();
 
@@ -164,7 +164,7 @@ void SProperty::save(const SProperty *p, SSaver &l)
     }
   }
 
-SProperty *SProperty::load(SPropertyContainer *parent, SLoader &l)
+SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
   const SPropertyInformation *type = l.type();
   xAssert(type);

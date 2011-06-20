@@ -30,11 +30,10 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      const QString &typeName,
                      xuint32 typeId,
                      const SPropertyInformation *parent,
-                     const XList<SPropertyInstanceInformation*> children,
                      xsize size,
                      xsize instanceInfoSize)
     : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
-    _version(version), _typeName(typeName), _typeId(typeId), _parentTypeInformation(parent), _children(children),
+    _version(version), _typeName(typeName), _typeId(typeId), _parentTypeInformation(parent),
     _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
   {
   if(_parentTypeInformation)
@@ -52,12 +51,11 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      xuint32 version,
                      const QString &typeName,
                      const SPropertyInformation *parent,
-                     const XList<SPropertyInstanceInformation*> children,
                      xsize size,
                      xsize instanceInfoSize)
     : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
     _version(version), _typeName(typeName), _typeId(g_maxDynamicCount++), _parentTypeInformation(parent),
-    _children(children), _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize),
+    _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize),
     _instances(0), _dynamic(false)
   {
   if(_parentTypeInformation)

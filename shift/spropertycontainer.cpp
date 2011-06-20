@@ -1,7 +1,7 @@
 #include "spropertycontainer.h"
 #include "sdatabase.h"
 
-S_PROPERTY_CONTAINER_EMPTY_DEFINITION(SPropertyContainer, SProperty, saveContainer, loadContainer)
+S_PROPERTY_CONTAINER_EMPTY_DEFINITION(SPropertyContainer)
 
 SPropertyContainer::TreeChange::TreeChange(SPropertyContainer *b, SPropertyContainer *a, SProperty *ent, xsize index)
   : _before(b), _after(a), _property(ent), _index(index), _owner(false)
@@ -226,7 +226,7 @@ void SPropertyContainer::saveContainer(const SProperty *p, SSaver &l)
   const SPropertyContainer *c = p->uncheckedCastTo<SPropertyContainer>();
   xAssert(c);
 
-  SProperty::save(p, l);
+  SProperty::saveProperty(p, l);
 
   l.setChildCount(c->size());
   for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
@@ -243,7 +243,7 @@ SProperty *SPropertyContainer::loadContainer(SPropertyContainer *parent, SLoader
   {
   xAssert(parent);
 
-  SProperty *prop = SProperty::load(parent, l);
+  SProperty *prop = SProperty::loadProperty(parent, l);
   xAssert(prop);
 
   SPropertyContainer* container = prop->uncheckedCastTo<SPropertyContainer>();

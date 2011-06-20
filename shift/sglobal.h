@@ -65,6 +65,7 @@ S_CORE_TYPE(ByteArrayProperty, 37);
 
 S_CORE_TYPE(SArrayProperty, 40);
 S_CORE_TYPE(SFloatArrayProperty, 41);
+S_CORE_TYPE(SUIntArrayProperty, 42);
 
 S_CORE_TYPE(SReferenceEntity, 50);
 

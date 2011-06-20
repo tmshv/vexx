@@ -8,11 +8,11 @@
 #include "QRegExp"
 #include "QDebug"
 
-S_ENTITY_DEFINITION(SDatabase, SEntity)
+S_ENTITY_DEFINITION(SDatabase)
   S_PROPERTY_DEFINITION(UnsignedIntProperty, majorVersion, 0)
   S_PROPERTY_DEFINITION(UnsignedIntProperty, minorVersion, 0)
   S_PROPERTY_DEFINITION(UnsignedIntProperty, revision, 0)
-S_ENTITY_END_DEFINITION(SDatabase, SEntity)
+S_ENTITY_END_DEFINITION(SDatabase)
 
 SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false)
   {

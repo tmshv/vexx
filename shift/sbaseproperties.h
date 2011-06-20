@@ -32,7 +32,7 @@ public: \
     void initiateFromDefinition(const type &def) { SProperty::InstanceInformation::initiateFromDefinition(); _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
       { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
-  S_PROPERTY(name, SProperty, savePOD, loadPOD, assignPOD, 0); \
+  S_PROPERTY(name, SProperty, 0); \
   class Change : public SProperty::DataChange \
     { \
     S_CHANGE( Change, SChange, Type); \
@@ -50,13 +50,12 @@ public: \
   name &operator=(const type &in); \
   void assign(const type &in); \
   const type &value() const {preGet(); return _value;} \
-  const type &operator()() {preGet(); return _value;} \
+  const type &operator()() const {preGet(); return _value;} \
+  static void assignProperty(const SProperty *, SProperty * ); \
+  static void saveProperty(const SProperty *p, SSaver &l ); \
+  static SProperty *loadProperty(SPropertyContainer *parent, SLoader &l); \
 protected: \
   type _value; \
-private: \
-  static void assignPOD(const SProperty *, SProperty * ); \
-  static void savePOD(const SProperty *p, SSaver &l ); \
-  static SProperty *loadPOD(SPropertyContainer *parent, SLoader &l); \
   }; \
 template <> class SPODInterface <type> { public: typedef name Type; \
   static void assign(name* s, const type& val) { s->assign(val); } \
@@ -104,12 +103,12 @@ void name::assign(const type &in) \
   Change *change = new(changeMemory) Change(_value, in, this); \
   database()->submitChange(change); \
   } \
-void name::savePOD(const SProperty *p, SSaver &l ) { \
-  SProperty::save(p, l); \
+void name::saveProperty(const SProperty *p, SSaver &l ) { \
+  SProperty::saveProperty(p, l); \
   const name *ptr = p->uncheckedCastTo<name>(); \
   writeValue(l, ptr->_value); } \
-SProperty * name::loadPOD(SPropertyContainer *parent, SLoader &l) { \
-  SProperty *prop = SProperty::load(parent, l); \
+SProperty * name::loadProperty(SPropertyContainer *parent, SLoader &l) { \
+  SProperty *prop = SProperty::loadProperty(parent, l); \
   name *ptr = prop->uncheckedCastTo<name>(); \
   readValue(l, ptr->_value); return prop; }
 
@@ -135,7 +134,7 @@ template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
 
 class SHIFT_EXPORT Pointer : public SProperty
   {
-  S_PROPERTY(Pointer, SProperty, save, load, blankAssign, 0);
+  S_PROPERTY(Pointer, SProperty, 0);
 
 public:
   SProperty *pointed() const { preGet(); return input(); }

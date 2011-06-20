@@ -8,13 +8,13 @@
 class GCImageChannelData : public SProperty
 {
     // registers type information for SPropertyInfo, including save / load functions
-   S_PROPERTY(GCImageChannelData, SProperty, SaveFunction, LoadFunction, AssignFunction, 0)
+   S_PROPERTY(GCImageChannelData, SProperty, 0)
 
 public:
    // called by parent
-   static void SaveFunction( const SProperty *, SSaver &); // Mode = Binary / ASCII
-   static SProperty *LoadFunction( SPropertyContainer *, SLoader & );
-   static void AssignFunction( const SProperty *, SProperty * ); // typecheck this when implementing
+   static void saveProperty( const SProperty *, SSaver &); // Mode = Binary / ASCII
+   static SProperty *loadProperty( SPropertyContainer *, SLoader & );
+   static void assignProperty( const SProperty *, SProperty * ); // typecheck this when implementing
 
    void WritePixel(int index, float value);
 

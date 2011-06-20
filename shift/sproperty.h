@@ -4,8 +4,8 @@
 #include "sglobal.h"
 #include "XObject"
 #include "schange.h"
-#include "XFlags"
 #include "spropertyinformation.h"
+#include "XFlags"
 
 class SEntity;
 class SProperty;
@@ -13,43 +13,42 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
 
-#define S_REGISTER_TYPE_FUNCTION(typeId, myName, createFn, saveFn, loadFn, assignFn, parentInfo, childData, version) \
+#define S_REGISTER_TYPE_FUNCTION(typeId, myName, parentInfo, childData, version) \
   static const SPropertyInformation * staticTypeInformation() { \
-  static SPropertyInformation info(myName::createFn, SProperty::createInstanceInformation<myName>, \
-                                   saveFn, loadFn, assignFn, \
-                                   version, #myName, typeId, parentInfo, \
-                                   childData, sizeof(myName), sizeof(myName::InstanceInformation) ); \
+  static SPropertyInformation info(SPropertyInformation::createNoParent<myName>(#myName)); \
   return &info;}
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
 
 #define S_ADD_STATIC_INFO(name, version) \
-  private: static void create##name(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
+  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
     name *prop = new(ptr) name(); \
     if(instanceInfo) { \
     *instanceInfo = (SPropertyInstanceInformation *)(prop + 1); \
     new(*instanceInfo) InstanceInformation(); \
     } } \
-  public: enum { Type = Types::name, Version = version }; \
+  public: enum { Type = Types::name, Version = version };
 
-#define S_PROPERTY_ROOT(myName, saveFn, loadFn, assignFn, version) \
+#define S_PROPERTY_ROOT(myName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version); \
   S_ADD_INSTANCE_INFORMATION(myName) \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, 0, XList<SPropertyInstanceInformation*>(), version )
+  typedef void ParentType; \
+  S_REGISTER_TYPE_FUNCTION(Type, myName, 0, XList<SPropertyInstanceInformation*>(), version )
 
-#define S_PROPERTY(myName, superName, saveFn, loadFn, assignFn, version) \
+#define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, create##myName, saveFn, loadFn, assignFn, superName::staticTypeInformation(), XList<SPropertyInstanceInformation*>(), version ) \
+  typedef superName ParentType; \
+  S_REGISTER_TYPE_FUNCTION(Type, myName, superName::staticTypeInformation(), XList<SPropertyInstanceInformation*>(), version ) \
 
 class SHIFT_EXPORT SProperty
   {
 public:
   typedef SPropertyInstanceInformation InstanceInformation;
-  S_PROPERTY_ROOT(SProperty, save, load, blankAssign, 0)
+  S_PROPERTY_ROOT(SProperty, 0)
 
 public:
   SProperty();
@@ -207,26 +206,15 @@ public:
     void clearParentHasOutputConnection(SProperty *);
     };
 
+  static void assignProperty(const SProperty *, SProperty *);
+  static void saveProperty(const SProperty *, SSaver & );
+  static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+
 protected:
   template <typename T> T *getChange() const
     {
     return reinterpret_cast<T*>(getChangeMemory(sizeof(T)));
     }
-
-  template <typename T> static InstanceInformation *createInstanceInformation(const SPropertyInformation *type, const QString &name,
-                                                                              xsize index,
-                                                                              SProperty SPropertyContainer::* location,
-                                                                              SPropertyInstanceInformation::ComputeFunction computeFn,
-                                                                              SProperty SPropertyContainer::* *affects,
-                                                                              bool entityChild,
-                                                                              bool extra)
-    {
-    return new typename T::InstanceInformation(type, name, index, location, computeFn, affects, entityChild, extra);
-    }
-
-  static void blankAssign(const SProperty *, SProperty *);
-  static void save(const SProperty *, SSaver & );
-  static SProperty *load(SPropertyContainer *, SLoader &);
 
 private:
   void setDirty(bool force=false);

@@ -11,26 +11,22 @@ class SPropertyContainer;
   public: \
   S_ADD_STATIC_INFO(myName, version); \
   static const SPropertyInformation * staticTypeInformation(); \
+  typedef superName ParentType; \
   S_ADD_INSTANCE_INFORMATION(myName)
 
-#define S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name, parent, saveFn, loadFn) \
+#define S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name) \
   const SPropertyInformation * name::staticTypeInformation() { \
-  const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
-  xAssert(parentMetaData); \
-  static SPropertyInformation info(create##name, SProperty::createInstanceInformation<name>, saveFn, \
-                                   loadFn, assignContainer, Version, #name, name::Type, parentMetaData, \
-                                   XList<SPropertyInstanceInformation*>(), \
-                                   sizeof(name), sizeof(name::InstanceInformation) ); \
+  static SPropertyInformation info(SPropertyInformation::create<name>(#name)); \
   return &info;}
 
 
-#define S_PROPERTY_CONTAINER_DEFINITION(name, parent) \
+#define S_PROPERTY_CONTAINER_DEFINITION(name) \
   const SPropertyInformation *name::staticTypeInformation() \
     { typedef name className; \
     static SPropertyInformation *infoPtr = 0; \
     if(!infoPtr) { \
     xsize index = 0; \
-    XList<SPropertyInstanceInformation*> childDataArray;
+    static SPropertyInformation info(SPropertyInformation::create<name>(#name)); \
 
 #define S_COMPUTE_GROUP(name) static SProperty SPropertyContainer::* name[] = {
 #define S_AFFECTS(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
@@ -42,7 +38,7 @@ class SPropertyContainer;
                                                         reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
                                                         0, 0, false, false); \
     name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
-    childDataArray << &name##InstanceData;
+    info.children() << &name##InstanceData;
 
 
 #define S_PROPERTY_ENTITY_CHILD_DEFINITION(type, name, ...) \
@@ -51,7 +47,7 @@ class SPropertyContainer;
                                                         reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
                                                         0, 0, true, false); \
     name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
-    childDataArray << &name##InstanceData;
+    info.children() << &name##InstanceData;
 
 #define S_COMPUTABLE_PROPERTY_DEFINITION(type, name, computeFn, computeVars, ...) \
     static type::InstanceInformation name##InstanceData(type :: staticTypeInformation(), \
@@ -59,14 +55,9 @@ class SPropertyContainer;
                                                         reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
                                                         computeFn, computeVars, false, false); \
     name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
-    childDataArray << &name##InstanceData;
+    info.children() << &name##InstanceData;
 
-#define S_PROPERTY_CONTAINER_END_DEFINITION(name, parent, saveFn, loadFn) \
-    const SPropertyInformation *parentMetaData = parent::staticTypeInformation(); \
-    xAssert(parentMetaData); \
-    static SPropertyInformation info(create##name, SProperty::createInstanceInformation<name>, saveFn, \
-                                     loadFn, assignContainer, Version, #name, name::Type, parentMetaData, \
-                                      childDataArray, sizeof(name), sizeof(name::InstanceInformation) ); \
+#define S_PROPERTY_CONTAINER_END_DEFINITION(name) \
     infoPtr = &info; } \
     return infoPtr; }
 

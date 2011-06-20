@@ -98,7 +98,7 @@ XProperties:
 
   XROProperty(const SPropertyInformation *, parentTypeInformation);
 
-  XRORefProperty(XList<SPropertyInstanceInformation*>, children);
+  XRefProperty(XList<SPropertyInstanceInformation*>, children);
   XROProperty(xsize, propertyOffset);
   XROProperty(xsize, size);
   XROProperty(xsize, instanceInformationSize);
@@ -108,6 +108,36 @@ XProperties:
   XRORefProperty(DataHash, data);
 
 public:
+  template <typename PropType> static SPropertyInformation create(const QString &typeName)
+    {
+    return SPropertyInformation(PropType::createProperty,
+                                createInstanceInformation<PropType>,
+                                PropType::saveProperty,
+                                PropType::loadProperty,
+                                PropType::assignProperty,
+                                PropType::Version,
+                                typeName,
+                                PropType::Type,
+                                PropType::ParentType::staticTypeInformation(),
+                                sizeof(PropType),
+                                sizeof(typename PropType::InstanceInformation));
+    }
+
+  template <typename PropType> static SPropertyInformation createNoParent(const QString &typeName)
+    {
+    return SPropertyInformation(PropType::createProperty,
+                                createInstanceInformation<PropType>,
+                                PropType::saveProperty,
+                                PropType::loadProperty,
+                                PropType::assignProperty,
+                                PropType::Version,
+                                typeName,
+                                PropType::Type,
+                                0,
+                                sizeof(PropType),
+                                sizeof(typename PropType::InstanceInformation));
+    }
+
   SPropertyInformation(CreateFunction createFn,
                        CreateInstanceInformationFunction createInstanceInfoFn,
                        SaveFunction saveFn,
@@ -117,7 +147,6 @@ public:
                        const QString &typeName,
                        xuint32 typeId,
                        const SPropertyInformation *parent,
-                       const XList<SPropertyInstanceInformation*> children,
                        xsize size,
                        xsize instanceInformationSize);
 
@@ -129,7 +158,6 @@ public:
                        xuint32 version,
                        const QString &typeName,
                        const SPropertyInformation *parent,
-                       const XList<SPropertyInstanceInformation*> children,
                        xsize size,
                        xsize instanceInformationSize);
 
@@ -156,10 +184,22 @@ public:
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize(); }
 
+  template <typename T> static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type, const QString &name,
+      xsize index,
+      SProperty SPropertyContainer::* location,
+      SPropertyInstanceInformation::ComputeFunction computeFn,
+      SProperty SPropertyContainer::* *affects,
+      bool entityChild,
+      bool extra)
+    {
+    return new typename T::InstanceInformation(type, name, index, location, computeFn, affects, entityChild, extra);
+    }
+
 private:
   void reference() const;
   void dereference() const;
   friend class SDatabase;
-  };
+};
+
 
 #endif // SPROPERTYINFORMATION_H

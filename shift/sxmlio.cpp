@@ -204,7 +204,11 @@ void SXMLLoader::beginNextChild()
 
 void SXMLLoader::endNextChild()
   {
+  qDebug() << _reader.tokenString();
+  QXmlStreamReader::TokenType t2 =_reader.tokenType();
   findNext(false);
+  qDebug() << _reader.tokenString() << _reader.name();
+  QXmlStreamReader::TokenType t = _reader.tokenType();
   xAssert(_reader.isEndElement());
   _typeName.clear();
   }
@@ -262,6 +266,7 @@ bool SXMLLoader::isValidElement() const
 
 void SXMLLoader::findNext(bool allowWhitespace)
   {
+  qDebug() << _hasNextElement << isValidElement();
   if(_hasNextElement && isValidElement())
     {
     _hasNextElement = false;
@@ -278,10 +283,13 @@ void SXMLLoader::findNext(bool allowWhitespace)
       }
     }
 
+  qDebug() << "start" << _reader.isWhitespace();
   do
     {
+    qDebug() << _reader.tokenString();
     _reader.readNext();
     } while(!isValidElement() && (!allowWhitespace && _reader.isWhitespace()));
+  qDebug() << "end";
 
   xAssert(isValidElement() || (allowWhitespace && _reader.isWhitespace()));
   }
