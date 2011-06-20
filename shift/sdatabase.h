@@ -25,7 +25,7 @@ public:
   const XHash <SPropertyType, const SPropertyInformation *> &types() const { return _types; }
   void addType(const SPropertyInformation *);
 
-  template <typename T> void addType()
+  template <typename T> static void addType()
     {
     SPropertyType id = static_cast<T*>(0)->Type;
     if(!_types.contains(id))
@@ -58,8 +58,8 @@ public:
 
   void submitChange(SChange *change);
 
-  const SPropertyInformation *findType(const QString &) const;
-  const SPropertyInformation *findType(xuint32) const;
+  static const SPropertyInformation *findType(const QString &);
+  static const SPropertyInformation *findType(xuint32);
 
   SObservers &currentBlockObserverList() { return _blockObservers; }
 
@@ -82,7 +82,7 @@ private:
     {
     return new T();
     }
-  XHash <SPropertyType, const SPropertyInformation *> _types;
+  static XHash <SPropertyType, const SPropertyInformation *> _types;
   xuint32 _blockLevel;
 
   void initiate();

@@ -23,11 +23,6 @@ class EXPORT_MODE name : public SProperty \
 public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
     InstanceInformation() : _defaultValue(defaultDefault) { } \
-    InstanceInformation(const SPropertyInformation *info, \
-     const QString &name, xsize index, SProperty SPropertyContainer::* location, \
-     ComputeFunction computeFn, SProperty SPropertyContainer::* *affects, bool entityChild, bool extra) \
-      : SProperty::InstanceInformation(info, name, index, location, computeFn, affects, entityChild, extra), \
-      _defaultValue(defaultDefault) { } \
     XProperties: XRORefProperty(type, defaultValue); \
     void initiateFromDefinition(const type &def) { SProperty::InstanceInformation::initiateFromDefinition(); _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
@@ -62,6 +57,9 @@ template <> class SPODInterface <type> { public: typedef name Type; \
   static const type& value(const name* s) { return s->value(); } };
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
+  S_IMPLEMENT_PROPERTY(SDatabase) \
+  const SPropertyInformation *name::createTypeInformation() { \
+    return SPropertyInformation::create<name>(#name); } \
 name::Change::Change(const type &b, const type &a, name *prop) \
   : SProperty::DataChange(prop), _before(b), _after(a) \
   { } \

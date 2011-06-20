@@ -1,7 +1,12 @@
 #include "spropertycontainer.h"
 #include "sdatabase.h"
 
-S_PROPERTY_CONTAINER_EMPTY_DEFINITION(SPropertyContainer)
+S_IMPLEMENT_PROPERTY(SPropertyContainer)
+
+const SPropertyInformation *SPropertyContainer::createTypeInformation()
+  {
+  return SPropertyInformation::create<SPropertyContainer>("SPropertyContainer");
+  }
 
 SPropertyContainer::TreeChange::TreeChange(SPropertyContainer *b, SPropertyContainer *a, SProperty *ent, xsize index)
   : _before(b), _after(a), _property(ent), _index(index), _owner(false)

@@ -6,6 +6,13 @@
 #include "sprocessmanager.h"
 #include "XProfiler"
 
+S_IMPLEMENT_PROPERTY(SEntity)
+
+const SPropertyInformation *SProperty::createTypeInformation()
+  {
+  return SPropertyInformation::createNoParent<SProperty>("SProperty");
+  }
+
 inline void setDependantsDirty(SProperty* prop, bool force)
   {
   for(SProperty *o=prop->output(); o; o = o->nextOutput())

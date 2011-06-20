@@ -2,9 +2,14 @@
 #include "QStringList"
 #include "sdatabase.h"
 
-S_ENTITY_DEFINITION(SEntity)
-  S_PROPERTY_DEFINITION(SPropertyArray, children)
-S_ENTITY_END_DEFINITION(SEntity)
+S_IMPLEMENT_PROPERTY(SEntity)
+
+const SPropertyInformation *SEntity::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
+  info->add(&SEntity::children, "children");
+  return info;
+  }
 
 SEntity::SEntity()
   {

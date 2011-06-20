@@ -81,8 +81,8 @@ public:
 
 template <typename T>const SPropertyInformation *STypedPropertyArray<T>::staticTypeInformation()
   {
-  static SPropertyInformation info(SPropertyInformation::create<STypedPropertyArray<T> >("STypedPropertyArray<T>"));
-  return &info;
+  static SPropertyInformation *info(SPropertyInformation::create<STypedPropertyArray<T> >("STypedPropertyArray<T>"));
+  return info;
   }
 
 #endif // SPROPERTYARRAY_H

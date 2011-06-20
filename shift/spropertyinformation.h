@@ -41,16 +41,9 @@ XProperties:
 public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
   // initiate or destroy them, and that the Database should handle this.
-  SPropertyInstanceInformation(const SPropertyInformation *info,
-                   const QString &name,
-                   xsize index,
-                   SProperty SPropertyContainer::* location,
-                   ComputeFunction computeFn,
-                   SProperty SPropertyContainer::* *affects,
-                   bool entityChild,
-                   bool extra);
+  SPropertyInstanceInformation(bool dynamic=false);
 
-  SPropertyInstanceInformation(bool dynamic=true);
+  void setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects);
 
   void initiateFromDefinition() { }
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
@@ -59,9 +52,14 @@ public:
   void setData(DataKey, const QVariant &);
 
 private:
+  void initiate(const SPropertyInformation *info,
+                const QString &name,
+                xsize index,
+                SProperty SPropertyContainer::* location);
+
   friend class SProperty;
   friend class SPropertyContainer;
-
+  friend class SPropertyInformation;
   static void defaultQueue(const SPropertyInstanceInformation *, const SPropertyContainer *, SProperty **, xsize &numJobs);
   };
 
@@ -72,11 +70,7 @@ public:
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const SPropertyInformation *type,
                                                                             const QString &name,
                                                                             xsize index,
-                                                                            SProperty SPropertyContainer::* location,
-                                                                            SPropertyInstanceInformation::ComputeFunction computeFn,
-                                                                            SProperty SPropertyContainer::* *affects,
-                                                                            bool entityChild,
-                                                                            bool extra);
+                                                                            SProperty SPropertyContainer::* location);
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
@@ -108,9 +102,9 @@ XProperties:
   XRORefProperty(DataHash, data);
 
 public:
-  template <typename PropType> static SPropertyInformation create(const QString &typeName)
+  template <typename PropType> static SPropertyInformation *create(const QString &typeName)
     {
-    return SPropertyInformation(PropType::createProperty,
+    return new SPropertyInformation(PropType::createProperty,
                                 createInstanceInformation<PropType>,
                                 PropType::saveProperty,
                                 PropType::loadProperty,
@@ -123,9 +117,9 @@ public:
                                 sizeof(typename PropType::InstanceInformation));
     }
 
-  template <typename PropType> static SPropertyInformation createNoParent(const QString &typeName)
+  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName)
     {
-    return SPropertyInformation(PropType::createProperty,
+    return new SPropertyInformation(PropType::createProperty,
                                 createInstanceInformation<PropType>,
                                 PropType::saveProperty,
                                 PropType::loadProperty,
@@ -184,15 +178,29 @@ public:
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize(); }
 
-  template <typename T> static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type, const QString &name,
-      xsize index,
-      SProperty SPropertyContainer::* location,
-      SPropertyInstanceInformation::ComputeFunction computeFn,
-      SProperty SPropertyContainer::* *affects,
-      bool entityChild,
-      bool extra)
+  template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0)
     {
-    return new typename T::InstanceInformation(type, name, index, location, computeFn, affects, entityChild, extra);
+    if(!def)
+      {
+      def = new typename U::InstanceInformation;
+      }
+
+    def->initiate(this, name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+
+    _children << def;
+    return def;
+    }
+
+private:
+  template <typename T>
+    static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
+      const QString &name,
+      xsize index,
+      SProperty SPropertyContainer::* location)
+    {
+    typename T::InstanceInformation* def = new typename T::InstanceInformation;
+    def->initiate(type, name, index, location);
+    return def;
     }
 
 private:

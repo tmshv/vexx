@@ -13,10 +13,9 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
 
-#define S_REGISTER_TYPE_FUNCTION(typeId, myName, parentInfo, childData, version) \
-  static const SPropertyInformation * staticTypeInformation() { \
-  static SPropertyInformation info(SPropertyInformation::createNoParent<myName>(#myName)); \
-  return &info;}
+#define S_REGISTER_TYPE_FUNCTION() \
+  private: static const SPropertyInformation *createTypeInformation(); \
+  public: static const SPropertyInformation *staticTypeInformation();
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
@@ -35,14 +34,21 @@ class SDatabase;
   S_ADD_STATIC_INFO(myName, version); \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef void ParentType; \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, 0, XList<SPropertyInstanceInformation*>(), version )
+  S_REGISTER_TYPE_FUNCTION()
+
+#define S_IMPLEMENT_PROPERTY(myName) \
+  const SPropertyInformation *myName::staticTypeInformation() { \
+  static const SPropertyInformation *info = 0; \
+  if(!info) { info = SDatabase::findType(#myName); \
+  if(!info) { info = createTypeInformation(); xAssert(info); } } \
+  return info;}
 
 #define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
-  S_REGISTER_TYPE_FUNCTION(Type, myName, superName::staticTypeInformation(), XList<SPropertyInstanceInformation*>(), version ) \
+  S_REGISTER_TYPE_FUNCTION()
 
 class SHIFT_EXPORT SProperty
   {

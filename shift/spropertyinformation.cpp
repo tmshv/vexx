@@ -1,20 +1,6 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
 
-SPropertyInstanceInformation::SPropertyInstanceInformation(const SPropertyInformation *info,
-                 const QString &name,
-                 xsize index,
-                 SProperty SPropertyContainer::* location,
-                 ComputeFunction computeFn,
-                 SProperty SPropertyContainer::* *affects,
-                 bool entityChild,
-                 bool extra)
-    : _childInformation(info), _name(name), _location(location), _compute(computeFn), _queueCompute(defaultQueue),
-      _affects(affects), _index(index), _entityChild(entityChild), _extra(extra), _dynamic(false)
-  {
-  xAssert(location != 0);
-  }
-
 SPropertyInstanceInformation::SPropertyInstanceInformation(bool dynamic)
   : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
     _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(dynamic)
@@ -104,6 +90,23 @@ SPropertyInstanceInformation::DataKey g_maxChildKey = 0;
 SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   {
   return g_maxChildKey++;
+  }
+
+void SPropertyInstanceInformation::setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects)
+  {
+  _compute = computeFn;
+  _affects = affects;
+  }
+
+void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
+                 const QString &name,
+                 xsize index,
+                 SProperty SPropertyContainer::* location)
+  {
+  _childInformation = info;
+  _name = name;
+  _location = location;
+  _index = index;
   }
 
 void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)

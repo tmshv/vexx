@@ -1,7 +1,12 @@
 #include "spropertyarray.h"
 #include "sdatabase.h"
 
-S_PROPERTY_CONTAINER_EMPTY_DEFINITION(SPropertyArray)
+S_IMPLEMENT_PROPERTY(SPropertyArray)
+
+const SPropertyInformation *SPropertyArray::createTypeInformation()
+  {
+  return SPropertyInformation::create<SPropertyArray>("SPropertyArray");
+  }
 
 SPropertyArray::SPropertyArray()
   {

@@ -8,11 +8,16 @@
 #include "QRegExp"
 #include "QDebug"
 
-S_ENTITY_DEFINITION(SDatabase)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, majorVersion, 0)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, minorVersion, 0)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, revision, 0)
-S_ENTITY_END_DEFINITION(SDatabase)
+S_IMPLEMENT_PROPERTY(SDatabase)
+
+const SPropertyInformation *SDatabase::createTypeInformation()
+  {
+  SPropertyInformation* info = SPropertyInformation::create<SReferenceEntity>("SReferenceEntity");
+  info->add(&SDatabase::majorVersion, "majorVersion")->initiateFromDefinition(0);
+  info->add(&SDatabase::minorVersion, "minorVersion")->initiateFromDefinition(0);
+  info->add(&SDatabase::revision, "revision")->initiateFromDefinition(0);
+  return info;
+  }
 
 SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false)
   {
@@ -241,7 +246,7 @@ QString SDatabase::propertySeparator()
   return ":";
   }
 
-const SPropertyInformation *SDatabase::findType(xuint32 i) const
+const SPropertyInformation *SDatabase::findType(xuint32 i)
   {
   SProfileFunction
   if(_types.contains(i))
@@ -251,7 +256,7 @@ const SPropertyInformation *SDatabase::findType(xuint32 i) const
   return 0;
   }
 
-const SPropertyInformation *SDatabase::findType(const QString &in) const
+const SPropertyInformation *SDatabase::findType(const QString &in)
   {
   SProfileFunction
   QList <xuint32> keys(_types.keys());
