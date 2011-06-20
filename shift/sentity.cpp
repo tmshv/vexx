@@ -74,14 +74,14 @@ SEntity *SEntity::nextSiblingEntity() const
   return 0;
   }
 
-void SEntity::saveEntity(const SProperty *p, SSaver &l)
+void SEntity::saveProperty(const SProperty *p, SSaver &l)
   {
-  saveContainer(p, l);
+  saveProperty(p, l);
   }
 
-SProperty *SEntity::loadEntity(SPropertyContainer *p, SLoader &l)
+SProperty *SEntity::loadProperty(SPropertyContainer *p, SLoader &l)
   {
-  return loadContainer(p, l);
+  return loadProperty(p, l);
   }
 
 void SEntity::addDirtyObserver(SDirtyObserver *in)

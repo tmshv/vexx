@@ -128,9 +128,9 @@ protected:
   SProperty *at(xsize i);
   const SProperty *at(xsize i) const;
 
-  static void assignContainer(const SProperty *, SProperty *);
-  static void saveContainer(const SProperty *, SSaver & );
-  static SProperty *loadContainer(SPropertyContainer *, SLoader &);
+  static void assignProperty(const SProperty *, SProperty *);
+  static void saveProperty(const SProperty *, SSaver & );
+  static SProperty *loadProperty(SPropertyContainer *, SLoader &);
 
 private:
   SProperty *_child;

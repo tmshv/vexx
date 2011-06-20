@@ -185,7 +185,7 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
   database()->submitChange(change);
   }
 
-void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
+void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
   {
   const SPropertyContainer *from = f->uncheckedCastTo<SPropertyContainer>();
   SPropertyContainer *to = t->uncheckedCastTo<SPropertyContainer>();
@@ -221,7 +221,7 @@ void SPropertyContainer::assignContainer(const SProperty *f, SProperty *t)
     }
   }
 
-void SPropertyContainer::saveContainer(const SProperty *p, SSaver &l)
+void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
   {
   const SPropertyContainer *c = p->uncheckedCastTo<SPropertyContainer>();
   xAssert(c);
@@ -239,7 +239,7 @@ void SPropertyContainer::saveContainer(const SProperty *p, SSaver &l)
     }
   }
 
-SProperty *SPropertyContainer::loadContainer(SPropertyContainer *parent, SLoader &l)
+SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
   xAssert(parent);
 
