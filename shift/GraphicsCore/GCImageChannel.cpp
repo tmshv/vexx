@@ -1,10 +1,24 @@
 #include "GCImageChannel.h"
+#include "styperegistry.h"
 
-S_PROPERTY_CONTAINER_DEFINITION(GCImageChannel) // registers these properties in the database
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, width, 0)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, height, 0)
-  S_PROPERTY_DEFINITION(GCImageChannelData, channelData)
-S_PROPERTY_CONTAINER_END_DEFINITION(GCImageChannel)
+S_IMPLEMENT_PROPERTY(GCImageChannelData)
+
+const SPropertyInformation *GCImageChannelData::createTypeInformation()
+  {
+  return SPropertyInformation::create<GCImageChannelData>("GCImageChannelData");
+  }
+
+
+S_IMPLEMENT_PROPERTY(GCImageChannel)
+
+const SPropertyInformation *GCImageChannel::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCImageChannel>("GCImageChannel");
+  info->add(&GCImageChannel::width, "width");
+  info->add(&GCImageChannel::height, "height");
+  info->add(&GCImageChannel::channelData, "channelData");
+  return info;
+  }
 
 GCImageChannel::GCImageChannel()
 {

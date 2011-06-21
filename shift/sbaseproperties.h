@@ -24,7 +24,7 @@ public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
     InstanceInformation() : _defaultValue(defaultDefault) { } \
     XProperties: XRORefProperty(type, defaultValue); \
-    void initiateFromDefinition(const type &def) { SProperty::InstanceInformation::initiateFromDefinition(); _defaultValue = def; } \
+    void initiateFromDefinition(const type &def) { _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
       { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
   S_PROPERTY(name, SProperty, 0); \
@@ -57,7 +57,7 @@ template <> class SPODInterface <type> { public: typedef name Type; \
   static const type& value(const name* s) { return s->value(); } };
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
-  S_IMPLEMENT_PROPERTY(SDatabase) \
+  S_IMPLEMENT_PROPERTY(name) \
   const SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); } \
 name::Change::Change(const type &b, const type &a, name *prop) \

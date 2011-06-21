@@ -1,6 +1,12 @@
 #include "UIWorkspace.h"
+#include "styperegistry.h"
 
-S_ENTITY_EMPTY_DEFINITION(UIWorkspace)
+S_IMPLEMENT_PROPERTY(UIWorkspace)
+
+const SPropertyInformation *UIWorkspace::createTypeInformation()
+  {
+  return SPropertyInformation::create<UIWorkspace>("UIWorkspace");
+  }
 
 UIWorkspace::UIWorkspace()
   {

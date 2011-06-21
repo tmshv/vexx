@@ -1,5 +1,5 @@
 #include "spropertyarray.h"
-#include "sdatabase.h"
+#include "styperegistry.h"
 
 S_IMPLEMENT_PROPERTY(SPropertyArray)
 

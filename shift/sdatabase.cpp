@@ -1,63 +1,29 @@
 #include "sdatabase.h"
 #include "sentity.h"
 #include "schange.h"
-#include "sentity.h"
-#include "sarrayproperty.h"
-#include "sreferenceentity.h"
 #include "QFile"
 #include "QRegExp"
 #include "QDebug"
+#include "styperegistry.h"
 
 S_IMPLEMENT_PROPERTY(SDatabase)
 
 const SPropertyInformation *SDatabase::createTypeInformation()
   {
-  SPropertyInformation* info = SPropertyInformation::create<SReferenceEntity>("SReferenceEntity");
+  SPropertyInformation* info = SPropertyInformation::create<SDatabase>("SDatabase");
   info->add(&SDatabase::majorVersion, "majorVersion")->initiateFromDefinition(0);
   info->add(&SDatabase::minorVersion, "minorVersion")->initiateFromDefinition(0);
   info->add(&SDatabase::revision, "revision")->initiateFromDefinition(0);
   return info;
   }
 
-SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0), _instanceInfoData(false)
+SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0)
   {
   _database = this;
   _info = staticTypeInformation();
   _instanceInfo = &_instanceInfoData;
 
-  initiate();
   initiatePropertyFromMetaData(this, staticTypeInformation());
-  }
-
-void SDatabase::initiate()
-  {
-  addType<SProperty>();
-  addType<SPropertyContainer>();
-  addType<SPropertyArray>();
-
-  addType<SEntity>();
-  addType<SDatabase>();
-  addType<SReferenceEntity>();
-
-  addType<BoolProperty>();
-  addType<IntProperty>();
-  addType<LongIntProperty>();
-  addType<UnsignedIntProperty>();
-  addType<LongUnsignedIntProperty>();
-  addType<FloatProperty>();
-  addType<DoubleProperty>();
-  addType<Vector2DProperty>();
-  addType<Vector3DProperty>();
-  addType<Vector4DProperty>();
-  addType<QuaternionProperty>();
-  addType<StringProperty>();
-  addType<ColourProperty>();
-  addType<ByteArrayProperty>();
-
-  addType<Pointer>();
-  addType<PointerArray>();
-
-  addType<SFloatArrayProperty>();
   }
 
 SDatabase::~SDatabase()
@@ -85,20 +51,13 @@ SDatabase::~SDatabase()
   xAssert(_memory.empty());
   }
 
-void SDatabase::addType(const SPropertyInformation *t)
-  {
-  xAssert(!_types.values().contains(t));
-  if(!_types.values().contains(t))
-    {
-    _types.insert(t->typeId(), t);
-    }
-  }
-
 SProperty *SDatabase::createDynamicProperty(xuint32 t)
   {
   SProfileFunction
-  xAssert(_types.contains(t));
-  const SPropertyInformation *type = _types[t];
+
+  const SPropertyInformation *type = STypeRegistry::findType(t);
+  xAssert(type);
+
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
   type->create()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
   prop->_database = this;
@@ -244,31 +203,6 @@ QString SDatabase::pathSeparator()
 QString SDatabase::propertySeparator()
   {
   return ":";
-  }
-
-const SPropertyInformation *SDatabase::findType(xuint32 i)
-  {
-  SProfileFunction
-  if(_types.contains(i))
-    {
-    return _types.value(i);
-    }
-  return 0;
-  }
-
-const SPropertyInformation *SDatabase::findType(const QString &in)
-  {
-  SProfileFunction
-  QList <xuint32> keys(_types.keys());
-  for(int i=0, s=keys.size(); i<s; ++i)
-    {
-    SPropertyType key = keys[i];
-    if(_types[key]->typeName() == in)
-      {
-      return _types.value(key);
-      }
-    }
-  return 0;
   }
 
 SBlock::SBlock(SDatabase *db) : _db(db)

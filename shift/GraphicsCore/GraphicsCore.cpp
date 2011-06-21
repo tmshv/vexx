@@ -2,11 +2,12 @@
 #include "GCImage.h"
 #include "GCQImage.h"
 #include "GCGeometry.h"
+#include "styperegistry.h"
 
 void initiateGraphicsCore(SDatabase *db)
   {
-  db->addType<GCImage>();
-  db->addType<GCQImage>();
-  db->addType<GCPolygonArray>();
-  db->addType<GCGeometry>();
+  STypeRegistry::addType(GCImage::staticTypeInformation());
+  STypeRegistry::addType(GCQImage::staticTypeInformation());
+  STypeRegistry::addType(GCPolygonArray::staticTypeInformation());
+  STypeRegistry::addType(GCGeometry::staticTypeInformation());
   }

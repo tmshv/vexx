@@ -6,6 +6,7 @@
 #include "QFile"
 #include "QDir"
 #include "sxmlio.h"
+#include "styperegistry.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -25,7 +26,8 @@ const SAppDatabase &SPlugin::db() const
 
 void SPlugin::load()
   {
-  _db.addType<SAppDatabase>();
+  STypeRegistry::initiate();
+  STypeRegistry::addType(SAppDatabase::staticTypeInformation());
 
   XProfiler::setStringForContext(ShiftCoreProfileScope, "ShiftCore");
   XProfiler::setStringForContext(ShiftDataModelProfileScope, "ShiftDataModel");

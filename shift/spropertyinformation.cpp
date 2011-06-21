@@ -1,9 +1,9 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
 
-SPropertyInstanceInformation::SPropertyInstanceInformation(bool dynamic)
+SPropertyInstanceInformation::SPropertyInstanceInformation()
   : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
-    _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(dynamic)
+    _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(false)
   {
   }
 
@@ -52,13 +52,10 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
 
 SPropertyInformation::~SPropertyInformation()
   {
-  if(dynamic())
+  for(xsize i=0; i<childCount(); ++i)
     {
-    for(xsize i=0; i<childCount(); ++i)
-      {
-      delete [] child(i)->affects();
-      delete child(i);
-      }
+    delete [] child(i)->affects();
+    delete child(i);
     }
   }
 

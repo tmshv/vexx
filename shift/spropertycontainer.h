@@ -14,44 +14,9 @@ class SPropertyContainer;
   S_ADD_INSTANCE_INFORMATION(myName) \
   S_REGISTER_TYPE_FUNCTION()
 
-#define S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name) \
-  const SPropertyInformation * name::staticTypeInformation() { \
-  static SPropertyInformation *info(SPropertyInformation::create<name>(#name)); \
-  return info;}
-
-
-#define S_PROPERTY_CONTAINER_DEFINITION(name) \
-  const SPropertyInformation *name::staticTypeInformation() \
-    { typedef name className; \
-    static SPropertyInformation *infoPtr = 0; \
-    if(!infoPtr) { \
-      infoPtr = SPropertyInformation::create<name>(#name); \
-
 #define S_COMPUTE_GROUP(name) static SProperty SPropertyContainer::* name[] = {
 #define S_AFFECTS(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
 #define S_COMPUTE_GROUP_END() 0 };
-
-#define S_PROPERTY_DEFINITION(type, name, ...) \
-    type::InstanceInformation* name##InstanceData = infoPtr->add(&className::name, #name); \
-    name##InstanceData->initiateFromDefinition(__VA_ARGS__);
-
-
-#define S_PROPERTY_ENTITY_CHILD_DEFINITION(type, name, ...) xAssertFail(); Not Implemented;
-/*  info.add(&className::name, #name); \
-    static type::InstanceInformation name##InstanceData(type :: staticTypeInformation(), \
-                                                        #name, index++, \
-                                                        reinterpret_cast<SProperty SPropertyContainer::*>(&className :: name), \
-                                                        0, 0, true, false); \
-    name##InstanceData.initiateFromDefinition(__VA_ARGS__); \
-    info.children() << &name##InstanceData;*/
-
-#define S_COMPUTABLE_PROPERTY_DEFINITION(type, name, computeFn, computeVars, ...) \
-    type::InstanceInformation* name##InstanceData = infoPtr->add(&className::name, #name); \
-    name##InstanceData->initiateFromDefinition(__VA_ARGS__); \
-    name##InstanceData->setComputable(computeFn, computeVars);
-
-#define S_PROPERTY_CONTAINER_END_DEFINITION(name) \
-    } return infoPtr; }
 
 class SHIFT_EXPORT SPropertyContainer : public SProperty
   {

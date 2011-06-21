@@ -5,8 +5,9 @@
 #include "QString"
 #include "sprocessmanager.h"
 #include "XProfiler"
+#include "styperegistry.h"
 
-S_IMPLEMENT_PROPERTY(SEntity)
+S_IMPLEMENT_PROPERTY(SProperty)
 
 const SPropertyInformation *SProperty::createTypeInformation()
   {

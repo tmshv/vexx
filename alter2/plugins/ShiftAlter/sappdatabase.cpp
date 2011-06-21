@@ -1,9 +1,15 @@
 #include "sappdatabase.h"
+#include "styperegistry.h"
 
-S_ENTITY_DEFINITION(SAppDatabase)
-  S_PROPERTY_ENTITY_CHILD_DEFINITION(SEntity, document)
-  S_PROPERTY_ENTITY_CHILD_DEFINITION(SEntity, settings)
-S_ENTITY_END_DEFINITION(SAppDatabase)
+S_IMPLEMENT_PROPERTY(SAppDatabase)
+
+const SPropertyInformation *SAppDatabase::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SAppDatabase>("SAppDatabase");
+  info->add(&SAppDatabase::document, "document");
+  info->add(&SAppDatabase::settings, "settings");
+  return info;
+  }
 
 SAppDatabase::SAppDatabase() : SDatabase()
   {

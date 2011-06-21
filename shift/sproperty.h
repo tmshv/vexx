@@ -26,6 +26,7 @@ class SDatabase;
     if(instanceInfo) { \
     *instanceInfo = (SPropertyInstanceInformation *)(prop + 1); \
     new(*instanceInfo) InstanceInformation(); \
+    (*instanceInfo)->setDynamic(true); \
     } } \
   public: enum { Type = Types::name, Version = version };
 
@@ -39,7 +40,7 @@ class SDatabase;
 #define S_IMPLEMENT_PROPERTY(myName) \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
-  if(!info) { info = SDatabase::findType(#myName); \
+  if(!info) { info = STypeRegistry::findType(#myName); \
   if(!info) { info = createTypeInformation(); xAssert(info); } } \
   return info;}
 

@@ -22,29 +22,6 @@ public:
   SDatabase();
   virtual ~SDatabase();
 
-  const XHash <SPropertyType, const SPropertyInformation *> &types() const { return _types; }
-  void addType(const SPropertyInformation *);
-
-  template <typename T> static void addType()
-    {
-    SPropertyType id = static_cast<T*>(0)->Type;
-    if(!_types.contains(id))
-      {
-      const SPropertyInformation *info = T::staticTypeInformation();
-      xAssert(info->assign());
-      xAssert(info->save());
-      xAssert(info->load());
-      xAssert(info->create());
-      xAssert(info->typeName().length());
-      _types.insert(id, info);
-      }
-    else
-      {
-      qDebug() << "Registering a type twice? or duplicate IDs. Already got type '" << _types[id]->typeName() << "', trying to register '" << T::staticTypeInformation()->typeName() << "'";
-      xAssertFail();
-      }
-    }
-
   void beginBlock();
   void endBlock();
 
@@ -57,9 +34,6 @@ public:
   void *allocateChangeMemory(xsize);
 
   void submitChange(SChange *change);
-
-  static const SPropertyInformation *findType(const QString &);
-  static const SPropertyInformation *findType(xuint32);
 
   SObservers &currentBlockObserverList() { return _blockObservers; }
 
@@ -82,10 +56,7 @@ private:
     {
     return new T();
     }
-  static XHash <SPropertyType, const SPropertyInformation *> _types;
   xuint32 _blockLevel;
-
-  void initiate();
 
   void inform();
   SObservers _blockObservers;

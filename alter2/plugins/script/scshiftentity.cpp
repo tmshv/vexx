@@ -2,6 +2,7 @@
 #include "sentity.h"
 #include "sdatabase.h"
 #include "scembeddedtypes.h"
+#include "styperegistry.h"
 
 ScShiftEntity::ScShiftEntity(QScriptEngine *eng, const QString &parent) : ScShiftPropertyContainer(eng, parent)
   {
@@ -35,7 +36,7 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
     SEntity *ent = (*propPtr)->uncheckedCastTo<SEntity>();
     if(ent)
       {
-      const SPropertyInformation *info = ent->database()->findType(ctx->argument(0).toString());
+      const SPropertyInformation *info = STypeRegistry::findType(ctx->argument(0).toString());
       if(info)
         {
         return ScEmbeddedTypes::packValue(ent->addChild(info->typeId(), name));

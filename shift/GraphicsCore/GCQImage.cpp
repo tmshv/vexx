@@ -1,5 +1,6 @@
 #include "GCQImage.h"
 #include "sdatabase.h"
+#include "styperegistry.h"
 
 
 QTextStream &operator <<(QTextStream &str, const QImage &data)

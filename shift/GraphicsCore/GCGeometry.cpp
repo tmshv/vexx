@@ -1,14 +1,25 @@
 #include "GCGeometry.h"
+#include "styperegistry.h"
 
-S_PROPERTY_CONTAINER_DEFINITION(GCGeometry)
-  S_PROPERTY_DEFINITION(GCPolygonArray, polygons)
-  S_PROPERTY_DEFINITION(SPropertyArray, attributes)
-S_PROPERTY_CONTAINER_END_DEFINITION(GCGeometry)
+S_IMPLEMENT_PROPERTY(GCGeometry)
 
-S_PROPERTY_CONTAINER_DEFINITION(GCPolygonArray)
-  S_PROPERTY_DEFINITION(SUIntArrayProperty, _data)
-  S_PROPERTY_DEFINITION(UnsignedIntProperty, _vertexSize, 0)
-S_PROPERTY_CONTAINER_END_DEFINITION(GCPolygonArray)
+const SPropertyInformation *GCGeometry::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
+  info->add(&GCGeometry::polygons, "polygons");
+  info->add(&GCGeometry::attributes, "attributes");
+  return info;
+  }
+
+S_IMPLEMENT_PROPERTY(GCPolygonArray)
+
+const SPropertyInformation *GCPolygonArray::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCPolygonArray>("GCPolygonArray");
+  info->add(&GCPolygonArray::_data, "_data");
+  info->add(&GCPolygonArray::_vertexSize, "_vertexSize");
+  return info;
+  }
 
 GCPolygonArray::GCPolygonArray()
   {

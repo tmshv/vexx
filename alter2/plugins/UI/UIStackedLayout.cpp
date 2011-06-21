@@ -1,6 +1,12 @@
 #include "UIStackedLayout.h"
+#include "styperegistry.h"
 
-S_ENTITY_EMPTY_DEFINITION(UIStackedLayout)
+S_IMPLEMENT_PROPERTY(UIStackedLayout)
+
+const SPropertyInformation *UIStackedLayout::createTypeInformation()
+  {
+  return SPropertyInformation::create<UIStackedLayout>("UIStackedLayout");
+  }
 
 UIStackedLayout::UIStackedLayout()
 {

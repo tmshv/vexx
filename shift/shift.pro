@@ -33,7 +33,8 @@ SOURCES += \
     sprocessmanager.cpp \
     siterator.cpp \
     sxmlio.cpp \
-    sbinaryio.cpp
+    sbinaryio.cpp \
+    styperegistry.cpp
 
 HEADERS += \
     sglobal.h \
@@ -57,5 +58,5 @@ HEADERS += \
     sprocessmanager.h \
     siterator.h \
     sxmlio.h \
-    sbinaryio.h
-
+    sbinaryio.h \
+    styperegistry.h

@@ -2,6 +2,7 @@
 #include "UIPlugin.h"
 #include "QPainter"
 #include "QMenu"
+#include "styperegistry.h"
 
 UIGraphDebugSurface::UIGraphDebugSurface() : UISurface("Graph Debug", _canvas = new X2DCanvas(), UISurface::Dock),
     GCShiftRenderModel(0, SIterator::createFilter<DirectEntityChildren>()),
@@ -111,7 +112,7 @@ void UIGraphDebugSurface::generatePropertyActions(SPropertyType mustInheritFrom,
       {
       QMap<QChar, QMap<QString, const SPropertyInformation *> > data;
 
-      foreach(const SPropertyInformation *type, db->types())
+      foreach(const SPropertyInformation *type, STypeRegistry::types())
         {
         if(type->inheritsFromType(mustInheritFrom))
           {
@@ -164,8 +165,7 @@ void UIGraphDebugSurface::createEntity(QAction *act)
   {
   if(entity())
     {
-    SDatabase *db = entity()->database();
-    const SPropertyInformation *type = db->findType(act->text());
+    const SPropertyInformation *type = STypeRegistry::findType(act->text());
 
     if(type)
       {

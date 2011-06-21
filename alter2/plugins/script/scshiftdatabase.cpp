@@ -1,5 +1,6 @@
 #include "scshiftdatabase.h"
 #include "sdatabase.h"
+#include "styperegistry.h"
 #include "scembeddedtypes.h"
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
@@ -49,7 +50,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
 
   tempObject = typeObject.property("name");
   QString name = tempObject.toString();
-  if(name == "" || db->findType(name) != 0)
+  if(name == "" || STypeRegistry::findType(name) != 0)
     {
     ctx->throwError(QScriptContext::SyntaxError, "Unique, non zero-lengthed string expected as 'name' property");
     return QScriptValue();
@@ -59,7 +60,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   const SPropertyInformation *parent = 0;
   if(tempObject.isString())
     {
-    parent = db->findType(tempObject.toString());
+    parent = STypeRegistry::findType(tempObject.toString());
     }
   if(parent == 0)
     {
@@ -93,7 +94,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
       const SPropertyInformation *propType = 0;
       if(tempArrayObject.isString())
         {
-        propType = db->findType(tempArrayObject.toString());
+        propType = STypeRegistry::findType(tempArrayObject.toString());
         }
       if(!propType)
         {
@@ -108,7 +109,10 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         computeFn = computeNode;
         }
 
-      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory), computeFn, 0, false, true);
+      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory));
+      info->setComputable(computeFn, 0);
+      info->setExtra(true);
+
       endOfUsedMemory += propType->size();
       properties << info;
 
@@ -179,7 +183,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
 
   newType->children() = properties;
 
-  db->addType(newType);
+  STypeRegistry::addType(newType);
 
   return QScriptValue();
   }

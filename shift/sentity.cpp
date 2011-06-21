@@ -1,5 +1,6 @@
 #include "sentity.h"
 #include "QStringList"
+#include "styperegistry.h"
 #include "sdatabase.h"
 
 S_IMPLEMENT_PROPERTY(SEntity)

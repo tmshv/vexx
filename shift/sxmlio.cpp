@@ -1,6 +1,6 @@
 #include "sxmlio.h"
 #include "sentity.h"
-#include "sdatabase.h"
+#include "styperegistry.h"
 
 SXMLSaver::SXMLSaver() : _writer(), _root(0)
   {
@@ -119,8 +119,6 @@ void SXMLLoader::readFromDevice(QIODevice *device, SEntity *parent)
 
       _currentAttributes = _reader.attributes();
 
-      qDebug() << "name" << _currentAttributes.value("name");
-
       xsize count = childCount();
       for(xsize i=0; i<count; ++i)
         {
@@ -161,7 +159,7 @@ const SPropertyInformation *SXMLLoader::type() const
   {
   xAssert(_root);
 
-  const SPropertyInformation *info = _root->database()->findType(_typeName);
+  const SPropertyInformation *info = STypeRegistry::findType(_typeName);
   xAssert(info);
   return info;
   }
@@ -184,8 +182,6 @@ void SXMLLoader::beginNextChild()
   _currentValue.clear();
   _currentAttributes = _reader.attributes();
 
-  qDebug() << "name" << _currentAttributes.value("name");
-
   findNext(true);
   if(_reader.isCharacters())
     {
@@ -197,18 +193,13 @@ void SXMLLoader::beginNextChild()
     {
     _hasNextElement = true;
 
-    QXmlStreamReader::TokenType t = _reader.tokenType();
     xAssert(_reader.isEndElement() || _reader.isStartElement());
     }
   }
 
 void SXMLLoader::endNextChild()
   {
-  qDebug() << _reader.tokenString();
-  QXmlStreamReader::TokenType t2 =_reader.tokenType();
   findNext(false);
-  qDebug() << _reader.tokenString() << _reader.name();
-  QXmlStreamReader::TokenType t = _reader.tokenType();
   xAssert(_reader.isEndElement());
   _typeName.clear();
   }
@@ -234,8 +225,6 @@ void SXMLLoader::beginAttribute(const char *attr)
   _scratch.clear();
   _currentAttributes.value(attr).appendTo(&_scratch);
   _currentAttributeValue = _scratch.toAscii();
-
-  qDebug() << attr << _currentAttributes.value(attr) << _currentAttributeValue;
 
   _buffer.close();
   _buffer.setBuffer(&_currentAttributeValue);
@@ -266,7 +255,6 @@ bool SXMLLoader::isValidElement() const
 
 void SXMLLoader::findNext(bool allowWhitespace)
   {
-  qDebug() << _hasNextElement << isValidElement();
   if(_hasNextElement && isValidElement())
     {
     _hasNextElement = false;
@@ -283,13 +271,10 @@ void SXMLLoader::findNext(bool allowWhitespace)
       }
     }
 
-  qDebug() << "start" << _reader.isWhitespace();
   do
     {
-    qDebug() << _reader.tokenString();
     _reader.readNext();
     } while(!isValidElement() && (!allowWhitespace && _reader.isWhitespace()));
-  qDebug() << "end";
 
   xAssert(isValidElement() || (allowWhitespace && _reader.isWhitespace()));
   }

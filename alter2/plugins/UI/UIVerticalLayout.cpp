@@ -1,6 +1,12 @@
 #include "UIVerticalLayout.h"
+#include "styperegistry.h"
 
-S_ENTITY_EMPTY_DEFINITION(UIVerticalLayout)
+S_IMPLEMENT_PROPERTY(UIVerticalLayout)
+
+const SPropertyInformation *UIVerticalLayout::createTypeInformation()
+  {
+  return SPropertyInformation::create<UIVerticalLayout>("UIVerticalLayout");
+  }
 
 UIVerticalLayout::UIVerticalLayout()
   {

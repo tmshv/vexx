@@ -12,6 +12,7 @@
 #include "QCloseEvent"
 #include "QPushButton"
 #include "splugin.h"
+#include "styperegistry.h"
 #include "aplugin.h"
 #include "UISurfacePrivate.h"
 #include "UIDatabaseDebugSurface.h"
@@ -98,11 +99,11 @@ void UIPlugin::load()
     {
     SDatabase &db = shift->db();
 
-    db.addType<UIWorkspace>();
-    db.addType<UILayout>();
-    db.addType<UIStackedLayout>();
-    db.addType<UIVerticalLayout>();
-    db.addType<UIHorizontalLayout>();
+    STypeRegistry::addType(UIWorkspace::staticTypeInformation());
+    STypeRegistry::addType(UILayout::staticTypeInformation());
+    STypeRegistry::addType(UIStackedLayout::staticTypeInformation());
+    STypeRegistry::addType(UIVerticalLayout::staticTypeInformation());
+    STypeRegistry::addType(UIHorizontalLayout::staticTypeInformation());
 
     if(core()->isDebugUIEnabled())
       {

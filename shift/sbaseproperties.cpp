@@ -1,4 +1,5 @@
 #include "sbaseproperties.h"
+#include "styperegistry.h"
 #include "sdatabase.h"
 
 QTextStream &operator<<(QTextStream &s, xuint8 v)
@@ -666,7 +667,19 @@ bool PointerArray::hasPointer(SProperty *prop) const
   return false;
   }
 
-S_PROPERTY_CONTAINER_EMPTY_DEFINITION(PointerArray)
+S_IMPLEMENT_PROPERTY(PointerArray)
+
+const SPropertyInformation *PointerArray::createTypeInformation()
+  {
+  return SPropertyInformation::create<PointerArray>("PointerArray");
+  }
+
+S_IMPLEMENT_PROPERTY(Pointer)
+
+const SPropertyInformation *Pointer::createTypeInformation()
+  {
+  return SPropertyInformation::create<Pointer>("Pointer");
+  }
 
 void Pointer::setPointed(SProperty *prop)
   {

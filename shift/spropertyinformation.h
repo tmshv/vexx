@@ -41,11 +41,10 @@ XProperties:
 public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
   // initiate or destroy them, and that the Database should handle this.
-  SPropertyInstanceInformation(bool dynamic=false);
+  SPropertyInstanceInformation();
 
   void setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects);
 
-  void initiateFromDefinition() { }
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
 
@@ -185,7 +184,7 @@ public:
       def = new typename U::InstanceInformation;
       }
 
-    def->initiate(this, name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+    def->initiate(U::staticTypeInformation(), name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
 
     _children << def;
     return def;

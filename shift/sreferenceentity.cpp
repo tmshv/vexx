@@ -1,9 +1,9 @@
 #include "sreferenceentity.h"
-#include "sdatabase.h"
+#include "styperegistry.h"
 
 S_IMPLEMENT_PROPERTY(SReferenceEntity)
 
-const SPropertyInformation *SPropertyContainer::createTypeInformation()
+const SPropertyInformation *SReferenceEntity::createTypeInformation()
   {
   return SPropertyInformation::create<SReferenceEntity>("SReferenceEntity");
   }
