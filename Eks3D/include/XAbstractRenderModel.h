@@ -33,7 +33,6 @@ public:
   void update(UpdateMode m) const;
 
   virtual Iterator *createIterator() const = 0;
-  virtual void destroyIterator(Iterator *) const = 0;
 
   virtual void resetIterator(Iterator *) const = 0;
 

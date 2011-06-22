@@ -51,7 +51,6 @@ public:
   void setEntity(SEntity *entity);
 
   virtual XAbstractRenderModel::Iterator *createIterator() const;
-  virtual void destroyIterator(XAbstractRenderModel::Iterator *) const;
 
   virtual void resetIterator(XAbstractRenderModel::Iterator *) const;
 

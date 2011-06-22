@@ -63,11 +63,6 @@ XAbstractRenderModel::Iterator *GCShiftRenderModel::createIterator() const
   return new GCShiftRenderModel::Iterator(this);
   }
 
-void GCShiftRenderModel::destroyIterator(XAbstractRenderModel::Iterator *it) const
-  {
-  delete it;
-  }
-
 void GCShiftRenderModel::resetIterator(XAbstractRenderModel::Iterator *it) const
   {
   GCShiftRenderModel::Iterator *slIt = static_cast<GCShiftRenderModel::Iterator*>(it);

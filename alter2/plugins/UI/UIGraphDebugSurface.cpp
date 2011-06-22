@@ -20,7 +20,7 @@ UIGraphDebugSurface::~UIGraphDebugSurface()
   {
   if(_iterator)
     {
-    destroyIterator(_iterator);
+    delete _iterator;
     }
   }
 

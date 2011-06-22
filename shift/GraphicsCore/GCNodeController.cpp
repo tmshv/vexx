@@ -16,7 +16,8 @@ GCNodeController::~GCNodeController()
   if(_iterator)
     {
     xAssert(canvas());
-    canvas()->model()->destroyIterator(_iterator);
+    delete _iterator;
+    _iterator = 0;
     }
   }
 

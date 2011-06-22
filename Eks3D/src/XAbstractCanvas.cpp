@@ -76,10 +76,7 @@ void XAbstractCanvas::setModel(XAbstractRenderModel *m)
   if(_iterator)
     {
     xAssert(_model);
-    if(_model)
-      {
-      _model->destroyIterator(_iterator);
-      }
+    delete _iterator;
     _iterator = 0;
     }
 
