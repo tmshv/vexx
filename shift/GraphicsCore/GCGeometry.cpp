@@ -25,11 +25,20 @@ GCPolygonArray::GCPolygonArray()
   {
   }
 
+void GCPolygonArray::addVertexAttribute(xuint32 index, xuint32 count)
+  {
+  }
+
+void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
+  {
+  }
+
+void GCPolygonArray::addPolygons(const xuint32 *sizes, xuint32 count)
+  {
+  }
+
+
 GCGeometry::GCGeometry()
   {
   }
 
-void setVertexSize(xuint32 size)
-  {
-  xAssertFail();
-  }
