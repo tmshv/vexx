@@ -87,6 +87,7 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
 template <typename T, typename U> class SArrayProperty : public SProperty
   {
 public:
+  typedef T ArrayElementType;
   typedef Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> EigenArray;
 
   const EigenArray &data() const { preGet(); return mData; }
@@ -107,6 +108,18 @@ public:
     {
     #warning this should be in a changeFn
     mData.resize(height, width);
+    }
+
+  void resize(xsize size)
+    {
+    #warning this should be in a changeFn
+    mData.resize(1, size);
+    }
+
+  xsize size() const
+    {
+    preGet();
+    return mData.cols();
     }
 
   xsize width() const
@@ -135,6 +148,23 @@ public:
       {
       memcpy(mData.data(), &val.front(), sizeof(T)*width*height);
       }
+    }
+
+  EigenArray &lockData(bool pG=true)
+    {
+    if(pG)
+      {
+      preGet();
+      }
+
+#warning this needs to cache the old value somewhere...? ref count memory...
+    return mData;
+    }
+
+  void unlockData()
+    {
+    #warning this should be in a changeFn
+#warning call post set...
     }
 
   void setIndex(xsize x, xsize y, const T &val)
