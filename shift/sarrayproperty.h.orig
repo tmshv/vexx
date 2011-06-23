@@ -87,7 +87,11 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
 template <typename T, typename U> class SArrayProperty : public SProperty
   {
 public:
+<<<<<<< HEAD
   typedef T ElementType;
+=======
+  typedef T ArrayElementType;
+>>>>>>> implement addVertexAttribute and some of removeVertexAttribute
   typedef Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> EigenArray;
 
   const EigenArray &data() const { preGet(); return mData; }
@@ -171,6 +175,13 @@ public:
   void setData(const EigenArray &result)
     {
     doChange(result);
+    }
+
+  EigenArray &lockData(bool pG=true)
+    {
+    if(pG)
+      {
+      preGet();
       }
 
 #warning this needs to cache the old value somewhere...? ref count memory...

@@ -96,13 +96,13 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
     const xuint32 polygonSize = *oldPolygonPtr;
     *newPolygonPtr = polygonSize;
 
-    oldPolygonPtr++;
-    newPolygonPtr++;
-
     for(xuint32 vert=0; vert<polygonSize; ++vert)
       {
-      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*index);
-      newPolygonPtr += index * polygonSize;
+#warning implement
+      }
+    }
+
+  _data.unlockData();
       oldPolygonPtr += index * polygonSize;
 
       oldPolygonPtr += count * polygonSize;
