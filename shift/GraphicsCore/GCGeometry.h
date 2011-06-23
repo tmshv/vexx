@@ -15,7 +15,7 @@ public:
   GCPolygonArray();
 
   xuint32 vertexSize() const { return _vertexSize(); }
-  void addVertexAttribute(xuint32 index, xuint32 count=1);
+  void addVertexAttribute(xuint32 count=1);
   void removeVertexAttribute(xuint32 index, xuint32 count=1);
 
   void addPolygon(xuint32 size) { addPolygons(&size, 1); }
@@ -40,7 +40,7 @@ public:
     {
     SBlock b(database());
     T* result = attributes.add<T>();
-    polygons.addVertexAttribute(X_UINT32_SENTINEL);
+    polygons.addVertexAttribute();
     }
 
   void removeAttribute(const QString &name)
