@@ -15,11 +15,17 @@ public:
   GCPolygonArray();
 
   xuint32 vertexSize() const { return _vertexSize(); }
-  void setVertexSize(xuint32 size);
+  void addVertexAttribute(xuint32 index, xuint32 count=1);
+  void removeVertexAttribute(xuint32 index, xuint32 count=1);
+
+  void addPolygon(xuint32 size) { addPolygons(&size, 1); }
+  void addPolygons(const XVector<xuint32> &sizes) { addPolygons(&sizes.front(), sizes.size()); }
+  void addPolygons(const xuint32 *sizes, xuint32 count);
 
 private:
   SUIntArrayProperty _data;
   UnsignedIntProperty _vertexSize;
+  UnsignedIntProperty _polygonCount;
   };
 
 class GCGeometry : public SPropertyContainer
@@ -34,7 +40,7 @@ public:
     {
     SBlock b(database());
     T* result = attributes.add<T>();
-    polygons.setVertexSize(polygons.vertexSize() + 1);
+    polygons.addVertexAttribute(X_UINT32_SENTINEL);
     }
 
   void removeAttribute(const QString &name)
@@ -43,8 +49,8 @@ public:
     if(prop)
       {
       SBlock b(database());
+      polygons.removeVertexAttribute(prop->index());
       attributes.remove(prop);
-      polygons.setVertexSize(polygons.vertexSize() - 1);
       }
     }
 
