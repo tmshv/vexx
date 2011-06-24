@@ -87,33 +87,36 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
 template <typename T, typename U> class SArrayProperty : public SProperty
   {
 public:
-  typedef T ArrayElementType;
+  typedef T ElementType;
   typedef Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> EigenArray;
 
   const EigenArray &data() const { preGet(); return mData; }
 
   void add(const SArrayProperty <T, U> *in)
     {
-    #warning this should be in a changeFn
-    mData += in->data();
+    EigenArray result = mData + in->data();
+    doChange(result);
     }
 
   void add(const SArrayProperty <T, U> *inA, const SArrayProperty <T, U> *inB)
     {
-    #warning this should be in a changeFn
-    mData = inA->data() + inB->data();
+    doChange(inA->data() + inB->data());
     }
 
   void resize(xsize width, xsize height)
     {
-    #warning this should be in a changeFn
-    mData.resize(height, width);
+    EigenArray result = mData;
+    result.resize(height, width);
+
+    doChange(result);
     }
 
   void resize(xsize size)
     {
-    #warning this should be in a changeFn
-    mData.resize(1, size);
+    EigenArray result = mData;
+    result.resize(1, width);
+
+    doChange(result);
     }
 
   xsize size() const
@@ -142,35 +145,28 @@ public:
 
   void set(xsize width, xsize height, const XVector<T> &val)
     {
-    #warning this should be in a changeFn
-    resize(width, height);
+    EigenArray result = mData;
+    result.resize(height, width);
+
     if(width != 0 && height != 0)
       {
-      memcpy(mData.data(), &val.front(), sizeof(T)*width*height);
-      }
-    }
-
-  EigenArray &lockData(bool pG=true)
-    {
-    if(pG)
-      {
-      preGet();
+      memcpy(result.data(), &val.front(), sizeof(T)*width*height);
       }
 
-#warning this needs to cache the old value somewhere...? ref count memory...
-    return mData;
+    doChange(result);
     }
 
-  void unlockData()
+  void setData(const EigenArray &result)
     {
-    #warning this should be in a changeFn
-#warning call post set...
+    doChange(result);
     }
 
   void setIndex(xsize x, xsize y, const T &val)
     {
-#warning this should be in a changeFn
-    mData(y, x) = val;
+    EigenArray result = mData;
+    result(y, x) = val;
+
+    doChange(result);
     }
 
   const T &atIndex(xsize x, xsize y) const
@@ -195,6 +191,50 @@ public:
     }
 
 private:
+  class Change : public SProperty::DataChange
+    {
+    S_CHANGE( Change, SChange, Type);
+  public:
+    Change(const EigenArray &b, const EigenArray &a, SProperty *prop)
+      : SProperty::DataChange(prop),
+      _before(b),
+      _after(a)
+      {
+      }
+    const EigenArray &before() const { return _before; }
+    const EigenArray &after() const { return _after; }
+
+  private:
+    EigenArray _before;
+    EigenArray _after;
+    bool apply(int mode)
+      {
+      if(mode&Forward)
+        {
+        ((U*)property())->mData = after();
+        property()->postSet();
+        }
+      else if(mode&Backward)
+        {
+        ((U*)property())->mData = before();
+        property()->postSet();
+        }
+      if(mode&Inform)
+        {
+        xAssert(property()->entity());
+        property()->entity()->informDirtyObservers(property());
+        }
+      return true;
+      }
+    };
+
+  void doChange(const EigenArray &arr)
+    {
+    void *changeMemory = getChange<Change>();
+    Change *change = new(changeMemory) Change(mData, arr, this);
+    database()->submitChange(change);
+    }
+
   Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
   };
 

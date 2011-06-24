@@ -37,9 +37,12 @@ void GCPolygonArray::addVertexAttribute(xuint32 count)
   xuint32 numVertices = ((oldData.size() - _polygonCount()) / (_polygonCount() * oldVertexSize));
   xAssert(((oldData.size() - _polygonCount()) % (_polygonCount() * oldVertexSize)) == 0);
 
+  SUIntArrayProperty::EigenArray newData;
+
   // old data size plus an extra count indices per polygon
-  _data.resize((numVertices * _vertexSize()) + _polygonCount());
-  xuint32* newPolygonPtr = _data.lockData(false).data();
+  newData.resize(1, (numVertices * _vertexSize()) + _polygonCount());
+
+  xuint32* newPolygonPtr = newData.data();
 
   // so the memory format of the indexes is
   // Data = | PolygonSize | PolygonData |
@@ -58,16 +61,16 @@ void GCPolygonArray::addVertexAttribute(xuint32 count)
 
     for(xuint32 vert=0; vert<polygonSize; ++vert)
       {
-      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ArrayElementType)*oldVertexSize);
-      newPolygonPtr += oldVertexSize;
-      oldPolygonPtr += oldVertexSize;
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*oldVertexSize*polygonSize);
+      newPolygonPtr += oldVertexSize * polygonSize;
+      oldPolygonPtr += oldVertexSize * polygonSize;
 
-      memset(newPolygonPtr, 0, sizeof(SUIntArrayProperty::ArrayElementType)*count);
-      newPolygonPtr += count;
+      memset(newPolygonPtr, 0, sizeof(SUIntArrayProperty::ElementType)*count*polygonSize);
+      newPolygonPtr += count * polygonSize;
       }
     }
 
-  _data.unlockData();
+  _data.setData(newData);
   }
 
 void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
@@ -81,9 +84,12 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
   xuint32 numVertices = ((oldData.size() - _polygonCount()) / (_polygonCount() * oldVertexSize));
   xAssert(((oldData.size() - _polygonCount()) % (_polygonCount() * oldVertexSize)) == 0);
 
+  SUIntArrayProperty::EigenArray newData;
+
   // old data size plus an extra count indices per polygon
-  _data.resize((numVertices * _vertexSize()) + _polygonCount());
-  xuint32* newPolygonPtr = _data.lockData(false).data();
+  newData.resize(1, (numVertices * _vertexSize()) + _polygonCount());
+
+  xuint32* newPolygonPtr = newData.data();
 
   for(xuint32 poly=0, polys=_polygonCount(); poly<polys; ++poly)
     {
@@ -95,11 +101,21 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
 
     for(xuint32 vert=0; vert<polygonSize; ++vert)
       {
-#warning implement
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*index);
+      newPolygonPtr += index * polygonSize;
+      oldPolygonPtr += index * polygonSize;
+
+      oldPolygonPtr += count * polygonSize;
+
+      xuint32 leftToCopy = oldVertexSize - count - index;
+
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*leftToCopy*polygonSize);
+      newPolygonPtr += leftToCopy * polygonSize;
+      oldPolygonPtr += leftToCopy * polygonSize;
       }
     }
 
-  _data.unlockData();
+  _data.setData(newData);
   }
 
 void GCPolygonArray::addPolygons(const xuint32 *sizes, xuint32 count)
