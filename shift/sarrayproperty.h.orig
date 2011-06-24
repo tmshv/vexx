@@ -87,11 +87,7 @@ template <typename T, int U, int V> QDataStream & operator >>(QDataStream &str, 
 template <typename T, typename U> class SArrayProperty : public SProperty
   {
 public:
-<<<<<<< HEAD
   typedef T ElementType;
-=======
-  typedef T ArrayElementType;
->>>>>>> implement addVertexAttribute and some of removeVertexAttribute
   typedef Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> EigenArray;
 
   const EigenArray &data() const { preGet(); return mData; }
@@ -113,6 +109,7 @@ public:
     result.resize(height, width);
 
     doChange(result);
+<<<<<<< HEAD
     }
 
   void resize(xsize size)
@@ -127,12 +124,16 @@ public:
     {
     preGet();
     return mData.cols();
+=======
+>>>>>>> implement remove attribute, also fix up some array methods
     }
 
   void resize(xsize size)
     {
-    #warning this should be in a changeFn
-    mData.resize(1, size);
+    EigenArray result = mData;
+    result.resize(1, width);
+
+    doChange(result);
     }
 
   xsize size() const
@@ -163,6 +164,7 @@ public:
     {
     EigenArray result = mData;
     result.resize(height, width);
+<<<<<<< HEAD
 
     if(width != 0 && height != 0)
       {
@@ -175,23 +177,20 @@ public:
   void setData(const EigenArray &result)
     {
     doChange(result);
-    }
+=======
 
-  EigenArray &lockData(bool pG=true)
-    {
-    if(pG)
+    if(width != 0 && height != 0)
       {
-      preGet();
+      memcpy(result.data(), &val.front(), sizeof(T)*width*height);
+>>>>>>> implement remove attribute, also fix up some array methods
       }
 
-#warning this needs to cache the old value somewhere...? ref count memory...
-    return mData;
+    doChange(result);
     }
 
-  void unlockData()
+  void setData(const EigenArray &result)
     {
-    #warning this should be in a changeFn
-#warning call post set...
+    doChange(result);
     }
 
   void setIndex(xsize x, xsize y, const T &val)

@@ -127,8 +127,10 @@ public:
 
   void resize(xsize size)
     {
-    #warning this should be in a changeFn
-    mData.resize(1, size);
+    EigenArray result = mData;
+    result.resize(1, width);
+
+    doChange(result);
     }
 
   xsize size() const
@@ -160,10 +162,14 @@ public:
     EigenArray result = mData;
     result.resize(height, width);
 
-    if(width != 0 && height != 0)
-      {
       memcpy(result.data(), &val.front(), sizeof(T)*width*height);
-      }
+
+    doChange(result);
+
+  void setData(const EigenArray &result)
+    {
+    doChange(result);
+    }
 
     doChange(result);
     }
@@ -171,16 +177,6 @@ public:
   void setData(const EigenArray &result)
     {
     doChange(result);
-      }
-
-#warning this needs to cache the old value somewhere...? ref count memory...
-    return mData;
-    }
-
-  void unlockData()
-    {
-    #warning this should be in a changeFn
-#warning call post set...
     }
 
   void setIndex(xsize x, xsize y, const T &val)

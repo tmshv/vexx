@@ -98,11 +98,21 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
 
     for(xuint32 vert=0; vert<polygonSize; ++vert)
       {
-#warning implement
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*index);
+      newPolygonPtr += index * polygonSize;
+      oldPolygonPtr += index * polygonSize;
+
+      oldPolygonPtr += count * polygonSize;
+
+      xuint32 leftToCopy = oldVertexSize - count - index;
+
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*leftToCopy*polygonSize);
+      newPolygonPtr += leftToCopy * polygonSize;
+      oldPolygonPtr += leftToCopy * polygonSize;
       }
     }
 
-  _data.unlockData();
+  _data.setData(newData);
       oldPolygonPtr += index * polygonSize;
 
       oldPolygonPtr += count * polygonSize;
