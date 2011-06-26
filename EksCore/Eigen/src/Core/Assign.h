@@ -526,23 +526,40 @@ template<typename Derived, typename OtherDerived,
                       |  // FIXME | instead of || to please GCC 4.4.0 stupid warning "suggest parentheses around &&".
                          // revert to || as soon as not needed anymore.
                     (int(Derived::ColsAtCompileTime) == 1 && int(OtherDerived::RowsAtCompileTime) == 1))
-                && int(Derived::SizeAtCompileTime) != 1>
+                && int(Derived::SizeAtCompileTime) != 1,
+         bool BothDynamic=false>
 struct assign_selector;
 
 template<typename Derived, typename OtherDerived>
-struct assign_selector<Derived,OtherDerived,false,false> {
+struct assign_selector<Derived,OtherDerived,false,false,false> {
   EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.derived()); }
 };
 template<typename Derived, typename OtherDerived>
-struct assign_selector<Derived,OtherDerived,true,false> {
+struct assign_selector<Derived,OtherDerived,false,false,true> {
+  EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyDynamicAssign(other.derived()); }
+};
+template<typename Derived, typename OtherDerived>
+struct assign_selector<Derived,OtherDerived,true,false,false> {
   EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.eval()); }
 };
 template<typename Derived, typename OtherDerived>
-struct assign_selector<Derived,OtherDerived,false,true> {
+struct assign_selector<Derived,OtherDerived,false,true,false> {
   EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.transpose()); }
 };
 template<typename Derived, typename OtherDerived>
-struct assign_selector<Derived,OtherDerived,true,true> {
+struct assign_selector<Derived,OtherDerived,true,true,false> {
+  EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.transpose().eval()); }
+};
+template<typename Derived, typename OtherDerived>
+struct assign_selector<Derived,OtherDerived,true,false,true> {
+  EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.eval()); }
+};
+template<typename Derived, typename OtherDerived>
+struct assign_selector<Derived,OtherDerived,false,true,true> {
+  EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.transpose()); }
+};
+template<typename Derived, typename OtherDerived>
+struct assign_selector<Derived,OtherDerived,true,true,true> {
   EIGEN_STRONG_INLINE static Derived& run(Derived& dst, const OtherDerived& other) { return dst.lazyAssign(other.transpose().eval()); }
 };
 

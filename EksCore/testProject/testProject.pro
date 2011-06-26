@@ -14,5 +14,3 @@ HEADERS += timeNow.h \
     TestClasses.h
 
 include("../EnableSIMD.pri")
-
-QMAKE_CXXFLAGS += -O3

@@ -273,6 +273,10 @@ template<typename Derived> class DenseBase
     /** Copies \a other into *this without evaluating other. \returns a reference to *this. */
     template<typename OtherDerived>
     Derived& lazyAssign(const DenseBase<OtherDerived>& other);
+
+    /** Copies \a other into *this by reference counting dynamic storage. \returns a reference to *this. */
+    template<typename OtherDerived>
+    Derived& lazyDynamicAssign(const DenseBase<OtherDerived>& other);
 #endif // not EIGEN_PARSED_BY_DOXYGEN
 
     CommaInitializer<Derived> operator<< (const Scalar& s);

@@ -371,6 +371,30 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       return Base::lazyAssign(other.derived());
     }
 
+    /** \sa MatrixBase::lazyAssign() */
+    template<typename OtherDerived>
+    EIGEN_STRONG_INLINE Derived& lazyDynamicAssign(const DenseBase<OtherDerived>& other)
+    {
+      enum{
+        SameType = internal::is_same<typename Derived::Scalar,typename OtherDerived::Scalar>::value
+      };
+
+      EIGEN_STATIC_ASSERT_LVALUE(Derived)
+      EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(Derived,OtherDerived)
+      EIGEN_STATIC_ASSERT(SameType,YOU_MIXED_DIFFERENT_NUMERIC_TYPES__YOU_NEED_TO_USE_THE_CAST_METHOD_OF_MATRIXBASE_TO_CAST_NUMERIC_TYPES_EXPLICITLY)
+
+    #ifdef EIGEN_DEBUG_ASSIGN
+      internal::assign_traits<Derived, OtherDerived>::debug();
+    #endif
+
+      m_storage.copy(other.derived().m_storage);
+
+    #ifndef EIGEN_NO_DEBUG
+      checkTransposeAliasing(other.derived());
+    #endif
+      return this->base().derived();
+    }
+
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& operator=(const ReturnByValue<OtherDerived>& func)
     {
@@ -571,12 +595,17 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& _set_noalias(const DenseBase<OtherDerived>& other)
     {
+      enum {
+        AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
+        BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
+        BothDynamic = AIsDynamic && BIsDynamic
+      };
       // I don't think we need this resize call since the lazyAssign will anyways resize
       // and lazyAssign will be called by the assign selector.
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
       // it wouldn't allow to copy a row-vector into a column-vector.
-      return internal::assign_selector<Derived,OtherDerived,false>::run(this->derived(), other.derived());
+      return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(this->derived(), other.derived());
     }
 
     template<typename T0, typename T1>

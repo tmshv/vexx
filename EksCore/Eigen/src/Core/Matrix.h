@@ -298,8 +298,7 @@ class Matrix
       Base::_set_noalias(other);
     }
     /** \brief Copy constructor */
-    EIGEN_STRONG_INLINE Matrix(const Matrix& other)
-            : Base(other.rows() * other.cols(), other.rows(), other.cols())
+    EIGEN_STRONG_INLINE Matrix(const Matrix& other) : Base()
     {
       Base::_check_template_params();
       Base::_set_noalias(other);
@@ -317,11 +316,9 @@ class Matrix
       * \sa MatrixBase::operator=(const EigenBase<OtherDerived>&)
       */
     template<typename OtherDerived>
-    EIGEN_STRONG_INLINE Matrix(const EigenBase<OtherDerived> &other)
-      : Base(other.derived().rows() * other.derived().cols(), other.derived().rows(), other.derived().cols())
+    EIGEN_STRONG_INLINE Matrix(const EigenBase<OtherDerived> &other) : Base()
     {
       Base::_check_template_params();
-      Base::resize(other.rows(), other.cols());
       // FIXME/CHECK: isn't *this = other.derived() more efficient. it allows to
       //              go for pure _set() implementations, right?
       *this = other;
