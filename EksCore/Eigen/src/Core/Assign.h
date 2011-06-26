@@ -569,26 +569,43 @@ template<typename Derived>
 template<typename OtherDerived>
 EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::operator=(const DenseBase<OtherDerived>& other)
 {
-  return internal::assign_selector<Derived,OtherDerived>::run(derived(), other.derived());
+  enum {
+    AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
+    BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
+    BothDynamic = AIsDynamic && BIsDynamic
+  };
+
+  return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::operator=(const DenseBase& other)
 {
-  return internal::assign_selector<Derived,Derived>::run(derived(), other.derived());
+  enum {
+    IsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
+  };
+  return internal::assign_selector<Derived,Derived,false,false,IsDynamic>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator=(const MatrixBase& other)
 {
-  return internal::assign_selector<Derived,Derived>::run(derived(), other.derived());
+  enum {
+    IsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
+  };
+  return internal::assign_selector<Derived,Derived,false,false,IsDynamic>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 template <typename OtherDerived>
 EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator=(const DenseBase<OtherDerived>& other)
 {
-  return internal::assign_selector<Derived,OtherDerived>::run(derived(), other.derived());
+  enum {
+    AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
+    BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
+    BothDynamic = AIsDynamic && BIsDynamic
+  };
+  return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(derived(), other.derived());
 }
 
 template<typename Derived>

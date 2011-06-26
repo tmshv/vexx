@@ -90,6 +90,8 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> m_storage;
 
   public:
+    const DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> &storage() const { return m_storage; }
+
     enum { NeedsToAlign = (!(Options&DontAlign))
                           && SizeAtCompileTime!=Dynamic && ((static_cast<int>(sizeof(Scalar))*SizeAtCompileTime)%16)==0 };
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)
@@ -387,7 +389,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       internal::assign_traits<Derived, OtherDerived>::debug();
     #endif
 
-      m_storage.copy(other.derived().m_storage);
+      m_storage.copy(other.derived().storage());
 
     #ifndef EIGEN_NO_DEBUG
       checkTransposeAliasing(other.derived());
@@ -430,7 +432,6 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& operator=(const EigenBase<OtherDerived> &other)
     {
-      _resize_to_match(other);
       Base::operator=(other.derived());
       return this->derived();
     }

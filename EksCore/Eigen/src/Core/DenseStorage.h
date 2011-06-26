@@ -192,11 +192,12 @@ template <typename T, int _Options> struct DynamicStorageData
   DenseIndex m_refCount;
   DenseIndex m_rows;
   DenseIndex m_cols;
+  DenseIndex m_padd;
   T m_data[1];
 
   static DynamicStorageData<T, _Options> *create(DenseIndex size, DenseIndex rows, DenseIndex cols)
     {
-    DynamicStorageData<T, _Options> *ret = (DynamicStorageData<T, _Options> *)internal::aligned_malloc(sizeof(DynamicStorageData<T, _Options>) + size - sizeof(T));
+    DynamicStorageData<T, _Options> *ret = (DynamicStorageData<T, _Options> *)internal::aligned_malloc(sizeof(DynamicStorageData<T, _Options>) + size*sizeof(T) - sizeof(T));
 
     ret->m_refCount = 1;
     ret->m_rows = rows;
@@ -255,7 +256,7 @@ template <typename T, int _Options> struct DynamicStorageData
     DenseIndex ref = --data->m_refCount;
     if(ref == 0)
       {
-      Eigen::internal::aligned_free(data);
+      internal::aligned_free(data);
       }
     }
   };
