@@ -1,0 +1,55 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2011-01-29T15:56:15
+#
+#-------------------------------------------------
+TARGET = ShiftGraphicsCore
+TEMPLATE = lib
+
+include("../../EksCore/GeneralOptions.pri")
+
+HEADERS += GCGlobal.h \
+    GraphicsCore.h \
+    GCImage.h \
+    GCImageChannel.h \
+    GCShiftRenderModel.h \
+    GCAbstractNodeDelegate.h \
+    GCNodeController.h \
+    GCQImage.h \
+    GCGeometry.h \
+<<<<<<< HEAD
+    3D/GCTransform.h \
+    3D/GCRenderToTexture.h \
+    3D/GCRenderToScreen.h \
+    3D/GCRenderer.h \
+    3D/GCGeometry.h \
+    3D/GCCamera.h
+=======
+    GCTransform3D.h \
+    GCCamera3D.h
+>>>>>>> adding transform and camera node classes
+
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
+
+LIBS += -lshift -lEksCore -lEks3D
+
+SOURCES += \
+    GraphicsCore.cpp \
+    GCImage.cpp \
+    GCImageChannel.cpp \
+    GCShiftRenderModel.cpp \
+    GCAbstractNodeDelegate.cpp \
+    GCNodeController.cpp \
+    GCQImage.cpp \
+    GCGeometry.cpp \
+<<<<<<< HEAD
+    3D/GCTransform.cpp \
+    3D/GCRenderToTexture.cpp \
+    3D/GCRenderToScreen.cpp \
+    3D/GCRenderer.cpp \
+    3D/GCGeometry.cpp \
+    3D/GCCamera.cpp
+=======
+    GCTransform3D.cpp \
+    GCCamera3D.cpp
+>>>>>>> adding transform and camera node classes
