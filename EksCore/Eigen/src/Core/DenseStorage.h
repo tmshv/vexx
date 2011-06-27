@@ -192,7 +192,7 @@ template <typename T, int _Options> struct DynamicStorageData
   DenseIndex m_refCount;
   DenseIndex m_rows;
   DenseIndex m_cols;
-  DenseIndex m_padd;
+  DenseIndex m_allocatedCount;
   T m_data[1];
 
   static DynamicStorageData<T, _Options> *create(DenseIndex size, DenseIndex rows, DenseIndex cols)
@@ -202,13 +202,20 @@ template <typename T, int _Options> struct DynamicStorageData
     ret->m_refCount = 1;
     ret->m_rows = rows;
     ret->m_cols = cols;
+    ret->m_allocatedCount = size;
 
     return ret;
     }
 
   static DynamicStorageData<T, _Options> *resize(DynamicStorageData<T, _Options> *oldData, DenseIndex size, DenseIndex rows, DenseIndex cols)
     {
-    // todo, dont resize if smaller?
+    if(oldData && oldData->m_refCount == 1 && oldData->m_allocatedCount >= size)
+      {
+      oldData->m_rows = rows;
+      oldData->m_cols = cols;
+      return oldData;
+      }
+
     DynamicStorageData<T, _Options> *data = create(size, rows, cols);
 
     if(oldData)

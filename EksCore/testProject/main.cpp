@@ -7,7 +7,10 @@ int main( )
   Eigen::VectorXf b(a);
   Eigen::VectorXf c(b);
 
-  c(2) = 1.0f;
+  a = Eigen::Vector3f(1, 2, 3);
+  b = Eigen::Vector3f(3, 2, 1);
+
+  c = a + b;
 
   Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> x(1,3);
   Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> y(3,1);
