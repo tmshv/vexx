@@ -16,7 +16,9 @@ HEADERS += GCGlobal.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
     GCQImage.h \
-    GCGeometry.h
+    GCGeometry.h \
+    GCTransform3D.h \
+    GCCamera3D.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -30,4 +32,6 @@ SOURCES += \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
     GCQImage.cpp \
-    GCGeometry.cpp
+    GCGeometry.cpp \
+    GCTransform3D.cpp \
+    GCCamera3D.cpp
