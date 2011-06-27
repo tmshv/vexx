@@ -155,7 +155,7 @@ SPropertyContainer::~SPropertyContainer()
   _child = 0;
   }
 
-SProperty *SPropertyContainer::addProperty(xuint32 type, xsize index)
+SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsize index)
   {
   xAssert(index >= _containedProperties);
 

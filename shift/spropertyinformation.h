@@ -87,7 +87,6 @@ XProperties:
   XROProperty(xuint32, version);
 
   XRORefProperty(QString, typeName);
-  XROProperty(xuint32, typeId);
 
   XROProperty(const SPropertyInformation *, parentTypeInformation);
 
@@ -110,7 +109,6 @@ public:
                                 PropType::assignProperty,
                                 PropType::Version,
                                 typeName,
-                                PropType::Type,
                                 PropType::ParentType::staticTypeInformation(),
                                 sizeof(PropType),
                                 sizeof(typename PropType::InstanceInformation));
@@ -125,23 +123,10 @@ public:
                                 PropType::assignProperty,
                                 PropType::Version,
                                 typeName,
-                                PropType::Type,
                                 0,
                                 sizeof(PropType),
                                 sizeof(typename PropType::InstanceInformation));
     }
-
-  SPropertyInformation(CreateFunction createFn,
-                       CreateInstanceInformationFunction createInstanceInfoFn,
-                       SaveFunction saveFn,
-                       LoadFunction loadFn,
-                       AssignFunction assignFn,
-                       xuint32 version,
-                       const QString &typeName,
-                       xuint32 typeId,
-                       const SPropertyInformation *parent,
-                       xsize size,
-                       xsize instanceInformationSize);
 
   SPropertyInformation(CreateFunction createFn,
                        CreateInstanceInformationFunction createInstanceInfoFn,
@@ -163,7 +148,7 @@ public:
     return inheritsFromType(T::Type);
     }
 
-  bool inheritsFromType(SPropertyType type) const;
+  bool inheritsFromType(SPropertyInformation *type) const;
 
   // this classes and all its inherited children count
   xsize completeChildCount() const;

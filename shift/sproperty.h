@@ -28,7 +28,7 @@ class SDatabase;
     new(*instanceInfo) InstanceInformation(); \
     (*instanceInfo)->setDynamic(true); \
     } } \
-  public: enum { Type = Types::name, Version = version };
+  public: enum { Version = version };
 
 #define S_PROPERTY_ROOT(myName, version) \
   public: \
@@ -103,12 +103,11 @@ public:
   const SDatabase *database() const { return _database; }
 
   bool inheritsFromType(const QString &type) const;
-  bool inheritsFromType(SPropertyType type) const;
-  template <typename T> bool inheritsFromType() const { return inheritsFromType(T::Type); }
+  bool inheritsFromType(const SPropertyInformation *type) const;
+  template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
 
   const SPropertyInformation *typeInformation() const { xAssert(_info); return _info; }
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
-  SPropertyType type() const;
 
   void postSet();
   void preGet() const;
@@ -140,7 +139,7 @@ public:
 
   template <typename T>T *castTo()
     {
-    if(inheritsFromType(T::Type))
+    if(inheritsFromType(T::staticTypeInformation()))
       {
       return static_cast<T *>(this);
       }
@@ -148,7 +147,7 @@ public:
     }
   template <typename T>const T *castTo() const
     {
-    if(inheritsFromType(T::Type))
+    if(inheritsFromType(T::staticTypeInformation()))
       {
       return static_cast<const T *>(this);
       }

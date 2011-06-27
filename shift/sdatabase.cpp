@@ -51,11 +51,9 @@ SDatabase::~SDatabase()
   xAssert(_memory.empty());
   }
 
-SProperty *SDatabase::createDynamicProperty(xuint32 t)
+SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   {
   SProfileFunction
-
-  const SPropertyInformation *type = STypeRegistry::findType(t);
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());

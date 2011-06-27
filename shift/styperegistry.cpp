@@ -49,10 +49,10 @@ const XHash <SPropertyType, const SPropertyInformation *> &STypeRegistry::types(
 
 void STypeRegistry::addType(const SPropertyInformation *t)
   {
-  xAssert(!_types.values().contains(t));
-  if(!_types.values().contains(t))
+  xAssert(!_types.contains(t));
+  if(!_types.contains(t))
     {
-    _types.insert(t->typeId(), t);
+    _types.insert(t);
     }
   }
 

@@ -2,7 +2,7 @@
 #define STYPEREGISTRY_H
 
 #include "sglobal.h"
-#include "XHash"
+#include "XSet"
 #include "spropertyinformation.h"
 
 class SHIFT_EXPORT STypeRegistry
@@ -10,7 +10,7 @@ class SHIFT_EXPORT STypeRegistry
 public:
   static void initiate();
 
-  static const XHash <SPropertyType, const SPropertyInformation *> &types();
+  static const XSet <const SPropertyInformation *> &types();
   static void addType(const SPropertyInformation *);
 
   static const SPropertyInformation *findType(const QString &);
