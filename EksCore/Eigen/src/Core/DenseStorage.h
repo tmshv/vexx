@@ -327,8 +327,9 @@ template<typename T, int _Rows, int _Options> class DenseStorage<T, Dynamic, _Ro
 // matrix with dynamic height and fixed width (so that matrix has dynamic size).
 template<typename T, int _Cols, int _Options> class DenseStorage<T, Dynamic, Dynamic, _Cols, _Options>
 {
+public:
     DynamicStorageData<T, _Options> *m_data;
-  public:
+
     inline explicit DenseStorage() : m_data(0) {}
     inline DenseStorage(internal::constructor_without_unaligned_array_assert) : m_data(0) {}
     inline DenseStorage(DenseIndex size, DenseIndex rows, DenseIndex) : m_data(DynamicStorageData<T, _Options>::create(size, rows, _Cols))

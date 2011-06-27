@@ -90,6 +90,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> m_storage;
 
   public:
+    enum { CanBeRefCountCopied = SizeAtCompileTime==Dynamic };
     const DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> &storage() const { return m_storage; }
 
     enum { NeedsToAlign = (!(Options&DontAlign))
@@ -597,16 +598,14 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     EIGEN_STRONG_INLINE Derived& _set_noalias(const DenseBase<OtherDerived>& other)
     {
       enum {
-        AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
-        BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
-        BothDynamic = AIsDynamic && BIsDynamic
+        ShouldRefCountCopy = Derived::CanBeRefCountCopied && OtherDerived::CanBeRefCountCopied
       };
       // I don't think we need this resize call since the lazyAssign will anyways resize
       // and lazyAssign will be called by the assign selector.
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
       // it wouldn't allow to copy a row-vector into a column-vector.
-      return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(this->derived(), other.derived());
+      return internal::assign_selector<Derived,OtherDerived,false,false,ShouldRefCountCopy>::run(this->derived(), other.derived());
     }
 
     template<typename T0, typename T1>

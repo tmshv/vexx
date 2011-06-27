@@ -4,6 +4,8 @@
 TARGET = EksCore
 TEMPLATE = lib
 
+INCLUDEPATH += ../
+
 include("../GeneralOptions.pri")
 
 SOURCES += ../src/XObject.cpp \

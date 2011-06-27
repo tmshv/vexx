@@ -50,6 +50,8 @@ template<typename Derived> class DenseBase
 #endif // not EIGEN_PARSED_BY_DOXYGEN
 {
   public:
+    enum { CanBeRefCountCopied = false };
+
     using internal::special_scalar_op_base<Derived,typename internal::traits<Derived>::Scalar,
                 typename NumTraits<typename internal::traits<Derived>::Scalar>::Real>::operator*;
 
