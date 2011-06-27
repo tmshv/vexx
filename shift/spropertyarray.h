@@ -35,7 +35,7 @@ template <typename T> class STypedPropertyArray : public SPropertyContainer
 public:
   T *add()
     {
-    return addProperty(T::Type)->castTo<T>();
+    return addProperty(T::staticTypeInformation())->castTo<T>();
     }
 
   void remove(SProperty *prop)

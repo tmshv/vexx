@@ -13,6 +13,10 @@ class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
 
+namespace std
+{
+  template <typename T> class initializer_list;
+}
 
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
@@ -30,7 +34,7 @@ XProperties:
   XProperty(SProperty SPropertyContainer::*, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
-  XProperty(SProperty SPropertyContainer::* *, affects, setAffects);
+  XROProperty(SProperty SPropertyContainer::* *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
   XProperty(bool, entityChild, setEntityChild);
@@ -43,7 +47,7 @@ public:
   // initiate or destroy them, and that the Database should handle this.
   SPropertyInstanceInformation();
 
-  void setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects);
+  void setAffects(SPropertyInstanceInformation *info);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
@@ -148,7 +152,7 @@ public:
     return inheritsFromType(T::Type);
     }
 
-  bool inheritsFromType(SPropertyInformation *type) const;
+  bool inheritsFromType(const SPropertyInformation *type) const;
 
   // this classes and all its inherited children count
   xsize completeChildCount() const;

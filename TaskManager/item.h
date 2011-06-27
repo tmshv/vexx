@@ -16,9 +16,9 @@ class Item : public SEntity
 public:
   Item();
 
-  LongStringProperty description;
-  FloatProperty priority;
+  StringProperty description;
   FloatProperty severity;
+  FloatProperty priority;
   PointerArray links;
 
   void addDependancy(Item *);

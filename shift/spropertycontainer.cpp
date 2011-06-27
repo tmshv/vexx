@@ -159,7 +159,7 @@ SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsi
   {
   xAssert(index >= _containedProperties);
 
-  SProperty *newProp = database()->createDynamicProperty(type);
+  SProperty *newProp = database()->createDynamicProperty(info);
 
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(0, this, newProp, index);
@@ -203,7 +203,7 @@ void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
     xsize index = 0;
     while(fChild)
       {
-      if(!tChild || tChild->type() != fChild->type())
+      if(!tChild || tChild->staticTypeInformation() != fChild->staticTypeInformation())
         {
         xAssert(tChild->isDynamic());
         if(tChild)
@@ -211,7 +211,7 @@ void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
           to->removeProperty(tChild);
           }
 
-        tChild = to->addProperty(fChild->type(), index);
+        tChild = to->addProperty(fChild->staticTypeInformation(), index);
         }
 
       tChild->assign(fChild);

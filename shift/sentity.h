@@ -15,14 +15,6 @@ class SConnectionObserver;
 
 #define S_ENTITY(name, parent, version) S_PROPERTY_CONTAINER(name, parent, version)
 
-#define S_ENTITY_DEFINITION S_PROPERTY_CONTAINER_DEFINITION
-#define S_ENTITY_END_DEFINITION S_PROPERTY_CONTAINER_END_DEFINITION
-
-#define S_ENTITY_EMPTY_DEFINITION(name) S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name)
-
-#define S_ENTITY_COMPUTATION(function, ...)
-
-
 class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
   {
   S_ENTITY(SEntity, SPropertyContainer, 0);

@@ -10,27 +10,27 @@ SEntityUI::SEntityUI(xuint32 options)
   {
   if((options&NoDefaultUIHandlers) != true)
     {
-    setUIType(BoolProperty::Type, addWidgetCreator<SPropertyDefaultUI::Bool>() );
+    setUIType(BoolProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Bool>() );
 
-    setUIType(IntProperty::Type, addWidgetCreator<SPropertyDefaultUI::Int32>() );
-    setUIType(UnsignedIntProperty::Type, addWidgetCreator<SPropertyDefaultUI::UInt32>() );
-    setUIType(LongIntProperty::Type, addWidgetCreator<SPropertyDefaultUI::Int64>() );
-    setUIType(LongUnsignedIntProperty::Type, addWidgetCreator<SPropertyDefaultUI::UInt64>() );
+    setUIType(IntProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Int32>() );
+    setUIType(UnsignedIntProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::UInt32>() );
+    setUIType(LongIntProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Int64>() );
+    setUIType(LongUnsignedIntProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::UInt64>() );
 
-    setUIType(FloatProperty::Type, addWidgetCreator<SPropertyDefaultUI::Float>() );
-    setUIType(DoubleProperty::Type, addWidgetCreator<SPropertyDefaultUI::Double>() );
+    setUIType(FloatProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Float>() );
+    setUIType(DoubleProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Double>() );
 
-    setUIType(StringProperty::Type, addWidgetCreator<SPropertyDefaultUI::String>() );
+    setUIType(StringProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::String>() );
 
-    setUIType(Vector2DProperty::Type, addWidgetCreator<SPropertyDefaultUI::Vector2D>() );
-    setUIType(Vector2DProperty::Type, addWidgetCreator<SPropertyDefaultUI::Vector3D>() );
-    setUIType(ColourProperty::Type, addWidgetCreator<SPropertyDefaultUI::Colour>() );
+    setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector2D>() );
+    setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector3D>() );
+    setUIType(ColourProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Colour>() );
     }
   }
 
 xuint64 SEntityUI::widgetType(const SProperty *property) const
   {
-  xuint32 actualType(property->type());
+  const SPropertyInformation *actualType(property->staticTypeInformation());
   if(_uiTypes.contains(actualType))
     {
     return _uiTypes[actualType];
@@ -80,7 +80,7 @@ int SEntityUI::addWidgetCreator(WidgetCreator fn)
   return _types.size()-1;
   }
 
-void SEntityUI::setUIType(XMetaType::Type type, int widgetType)
+void SEntityUI::setUIType(const SPropertyInformation *type, int widgetType)
   {
   if(widgetType >= 0 && widgetType < _types.size())
     {

@@ -1,4 +1,5 @@
 include($$PWD"/SIMD.pri")
+include($$PWD"/C++0x.pri")
 
 QMAKE_CXXFLAGS += -Wall
 
