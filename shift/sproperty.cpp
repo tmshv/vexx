@@ -195,7 +195,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   SProperty *prop = 0;
   if(dynamic != 0)
     {
-    prop = parent->database()->createDynamicProperty(type->typeId());
+    prop = parent->database()->createDynamicProperty(type);
     xAssert(prop);
 
     parent->internalInsertProperty(false, prop, X_SIZE_SENTINEL);
@@ -205,7 +205,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
     {
     prop = parent->findChild(name);
     xAssert(prop);
-    xAssert(prop->typeInformation()->typeId() == type->typeId());
+    xAssert(prop->typeInformation() == type);
     }
 
   l.beginAttribute("input");
@@ -221,14 +221,14 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   return prop;
   }
 
-bool SProperty::inheritsFromType(SPropertyType type) const
+bool SProperty::inheritsFromType(const SPropertyInformation *type) const
   {
   SProfileFunction
   const SPropertyInformation *current = typeInformation();
   xAssert(current);
   while(current)
     {
-    if(current->typeId() == type)
+    if(current == type)
       {
       return true;
       }
@@ -288,11 +288,6 @@ SEntity *SProperty::entity() const
 void *SProperty::getChangeMemory(size_t size) const
   {
   return parent()->database()->allocateChangeMemory(size);
-  }
-
-SPropertyType SProperty::type() const
-  {
-  return typeInformation()->typeId();
   }
 
 void SProperty::connect(SProperty *prop) const

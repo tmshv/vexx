@@ -42,9 +42,9 @@ public:
     return ent;
     }
 
-  SProperty *addChild(SPropertyType id, const QString& name)
+  SProperty *addChild(const SPropertyInformation *info, const QString& name)
     {
-    SProperty *ent = children.add(id);
+    SProperty *ent = children.add(info);
     xAssert(ent);
     ent->setName(name);
     return ent;
@@ -57,9 +57,9 @@ public:
     return p->uncheckedCastTo<T>();
     }
 
-  SProperty *addProperty(SPropertyType t, const QString& name)
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name)
     {
-    SProperty *p = SPropertyContainer::addProperty(t);
+    SProperty *p = SPropertyContainer::addProperty(info);
     xAssert(p);
     p->setName(name);
     return p;
