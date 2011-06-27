@@ -4,7 +4,7 @@
 #include "sreferenceentity.h"
 #include "sdatabase.h"
 
-static XHash <SPropertyType, const SPropertyInformation *> _types;
+static XSet <const SPropertyInformation *> _types;
 
 STypeRegistry::STypeRegistry()
   {
@@ -42,7 +42,7 @@ void STypeRegistry::initiate()
   addType(SUIntArrayProperty::staticTypeInformation());
   }
 
-const XHash <SPropertyType, const SPropertyInformation *> &STypeRegistry::types()
+const XSet <const SPropertyInformation *> &STypeRegistry::types()
   {
   return _types;
   }
@@ -56,26 +56,14 @@ void STypeRegistry::addType(const SPropertyInformation *t)
     }
   }
 
-const SPropertyInformation *STypeRegistry::findType(xuint32 i)
-  {
-  SProfileFunction
-  if(_types.contains(i))
-    {
-    return _types.value(i);
-    }
-  return 0;
-  }
-
 const SPropertyInformation *STypeRegistry::findType(const QString &in)
   {
   SProfileFunction
-  QList <xuint32> keys(_types.keys());
-  for(int i=0, s=keys.size(); i<s; ++i)
+  foreach(const SPropertyInformation *info, _types)
     {
-    SPropertyType key = keys[i];
-    if(_types[key]->typeName() == in)
+    if(info->typeName() == in)
       {
-      return _types.value(key);
+      return info;
       }
     }
   return 0;

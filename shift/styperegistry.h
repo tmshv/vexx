@@ -14,7 +14,6 @@ public:
   static void addType(const SPropertyInformation *);
 
   static const SPropertyInformation *findType(const QString &);
-  static const SPropertyInformation *findType(xuint32);
 
 private:
   STypeRegistry();
