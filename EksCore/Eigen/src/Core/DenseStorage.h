@@ -235,7 +235,7 @@ template <typename T, int _Options> struct DynamicStorageData
       }
 
     // todo, dont resize if smaller?
-    DynamicStorageData<T, _Options> *data = create(oldData->m_cols*oldData->m_cols, oldData->m_rows, oldData->m_cols);
+    DynamicStorageData<T, _Options> *data = create(oldData->m_cols*oldData->m_rows, oldData->m_rows, oldData->m_cols);
 
     memcpy(data->m_data, oldData->m_data, sizeof(T)*oldData->m_cols*oldData->m_rows);
 
