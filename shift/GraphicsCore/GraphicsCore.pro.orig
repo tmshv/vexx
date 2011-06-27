@@ -26,8 +26,11 @@ HEADERS += GCGlobal.h \
     3D/GCCamera.h
 =======
     GCTransform3D.h \
-    GCCamera3D.h
->>>>>>> adding transform and camera node classes
+    GCCamera3D.h \
+    GCRenderToScreen.h \
+    GCRenderer.h \
+    GCRenderToTexture.h
+>>>>>>> some rendering classes
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -51,5 +54,8 @@ SOURCES += \
     3D/GCCamera.cpp
 =======
     GCTransform3D.cpp \
-    GCCamera3D.cpp
->>>>>>> adding transform and camera node classes
+    GCCamera3D.cpp \
+    GCRenderToScreen.cpp \
+    GCRenderer.cpp \
+    GCRenderToTexture.cpp
+>>>>>>> some rendering classes
