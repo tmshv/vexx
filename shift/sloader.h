@@ -131,5 +131,29 @@ inline void readValue(SLoader &l, QByteArray &t)
     }
   }
 
+inline void writeValue(SSaver &s, const QString &t)
+  {
+  if(s.streamMode() == SSaver::Text)
+    {
+    s.textStream() << t;
+    }
+  else
+    {
+    s.binaryStream() << t;
+    }
+  }
+
+inline void readValue(SLoader &l, QString &t)
+  {
+  if(l.streamMode() == SLoader::Text)
+    {
+    t = l.textStream().readAll();
+    }
+  else
+    {
+    l.binaryStream() >> t;
+    }
+  }
+
 
 #endif // SLOADER_H
