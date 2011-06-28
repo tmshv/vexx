@@ -79,6 +79,12 @@ void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info
   _affects[1] = 0;
   }
 
+void SPropertyInstanceInformation::setAffects(SProperty SPropertyContainer::* *affects)
+  {
+  xAssert(!_affects);
+  _affects = affects;
+  }
+
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
                  const QString &name,
                  xsize index,

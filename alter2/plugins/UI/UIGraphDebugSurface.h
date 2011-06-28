@@ -34,7 +34,7 @@ private slots:
 
 private:
 
-  void generatePropertyActions(SPropertyType mustInheritFrom, QMenu *menuToAdd);
+  void generatePropertyActions(const SPropertyInformation *mustInheritFrom, QMenu *menuToAdd);
 
   X2DCanvas *_canvas;
 

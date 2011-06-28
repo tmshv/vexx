@@ -44,7 +44,7 @@ public:
 
   template <typename T>T *addProperty(const QString& name)
     {
-    SProperty *p = addProperty(T::Type, name);
+    SProperty *p = addProperty(T::staticTypeInformation(), name);
     xAssert(p);
     return p->uncheckedCastTo<T>();
     }

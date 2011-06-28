@@ -110,7 +110,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         }
 
       SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory));
-      info->setComputable(computeFn, 0);
+      info->setCompute(computeFn);
       info->setExtra(true);
 
       endOfUsedMemory += propType->size();

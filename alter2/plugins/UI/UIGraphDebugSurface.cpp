@@ -60,7 +60,7 @@ void UIGraphDebugSurface::onContextMenu(QPoint point)
   if(ent == 0)
     {
     menu.addAction("Create Entity")->setEnabled(false);
-    generatePropertyActions(SEntity::Type, &menu);
+    generatePropertyActions(SEntity::staticTypeInformation(), &menu);
 
     connect(&menu, SIGNAL(triggered(QAction*)), this, SLOT(createEntity(QAction*)));
     }
@@ -102,7 +102,7 @@ void UIGraphDebugSurface::onContextMenu(QPoint point)
     }
   }
 
-void UIGraphDebugSurface::generatePropertyActions(SPropertyType mustInheritFrom, QMenu *menuToAdd)
+void UIGraphDebugSurface::generatePropertyActions(const SPropertyInformation *mustInheritFrom, QMenu *menuToAdd)
   {
   if(entity())
     {
@@ -169,7 +169,7 @@ void UIGraphDebugSurface::createEntity(QAction *act)
 
     if(type)
       {
-      entity()->addChild(type->typeId(), "NewEntity");
+      entity()->addChild(type, "NewEntity");
       }
     }
   }
