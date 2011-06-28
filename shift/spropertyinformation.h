@@ -48,6 +48,7 @@ public:
   SPropertyInstanceInformation();
 
   void setAffects(SPropertyInstanceInformation *info);
+  void setAffects(SProperty SPropertyContainer::* *affects);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
