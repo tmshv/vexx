@@ -13,4 +13,4 @@ SOURCES += main.cpp \
 HEADERS += timeNow.h \
     TestClasses.h
 
-include("../EnableSIMD.pri")
+include("../GeneralOptions.pri")
