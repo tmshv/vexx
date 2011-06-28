@@ -1,7 +1,7 @@
 #include "GraphicsCore.h"
 #include "GCImage.h"
 #include "GCQImage.h"
-#include "GCGeometry.h"
+#include "3D/GCGeometry.h"
 #include "styperegistry.h"
 
 void initiateGraphicsCore(SDatabase *db)

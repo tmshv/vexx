@@ -17,11 +17,12 @@ HEADERS += GCGlobal.h \
     GCNodeController.h \
     GCQImage.h \
     GCGeometry.h \
-    GCTransform3D.h \
-    GCCamera3D.h \
-    GCRenderToScreen.h \
-    GCRenderer.h \
-    GCRenderToTexture.h
+    3D/GCTransform.h \
+    3D/GCRenderToTexture.h \
+    3D/GCRenderToScreen.h \
+    3D/GCRenderer.h \
+    3D/GCGeometry.h \
+    3D/GCCamera.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -36,8 +37,9 @@ SOURCES += \
     GCNodeController.cpp \
     GCQImage.cpp \
     GCGeometry.cpp \
-    GCTransform3D.cpp \
-    GCCamera3D.cpp \
-    GCRenderToScreen.cpp \
-    GCRenderer.cpp \
-    GCRenderToTexture.cpp
+    3D/GCTransform.cpp \
+    3D/GCRenderToTexture.cpp \
+    3D/GCRenderToScreen.cpp \
+    3D/GCRenderer.cpp \
+    3D/GCGeometry.cpp \
+    3D/GCCamera.cpp
