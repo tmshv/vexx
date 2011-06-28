@@ -15,6 +15,8 @@ public:
 
   static const SPropertyInformation *findType(const QString &);
 
+  static void internalAddType(const SPropertyInformation *);
+
 private:
   STypeRegistry();
   X_DISABLE_COPY(STypeRegistry)

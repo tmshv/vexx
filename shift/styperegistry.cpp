@@ -47,7 +47,12 @@ const XSet <const SPropertyInformation *> &STypeRegistry::types()
   return _types;
   }
 
-void STypeRegistry::addType(const SPropertyInformation *t)
+void STypeRegistry::addType(const SPropertyInformation *)
+  {
+  }
+
+
+void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
   xAssert(!_types.contains(t));
   if(!_types.contains(t))

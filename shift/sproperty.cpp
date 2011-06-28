@@ -79,7 +79,6 @@ SProperty::~SProperty()
     {
     ((InstanceInformation*)instanceInformation())->~InstanceInformation();
     }
-  _database = 0;
   }
 
 bool SProperty::isDynamic() const
@@ -91,7 +90,11 @@ bool SProperty::isDynamic() const
 xsize SProperty::index() const
   {
   SProfileFunction
-  preGet();
+  if(parent())
+    {
+    parent()->preGet();
+    }
+
   return _info->propertyOffset() + _instanceInfo->index();
   }
 

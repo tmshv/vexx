@@ -73,7 +73,22 @@ void TaskDatabase::load()
   QFile file(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "Tasks.db");
   if(file.open(QIODevice::ReadOnly))
     {
+    _rootItem = 0;
     SXMLLoader r;
+
+    children.clear();
     r.readFromDevice(&file, this);
+
+    SProperty *ent = children.findChild("Root Item");
+    xAssert(ent);
+    if(ent)
+      {
+      _rootItem = ent->castTo<Item>();
+      }
+    else
+      {
+      _rootItem = addItem(0, "Root Item");
+      }
+    xAssert(_rootItem);
     }
   }

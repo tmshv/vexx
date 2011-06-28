@@ -41,7 +41,7 @@ class SDatabase;
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); } } \
+  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
   return info;}
 
 #define S_PROPERTY(myName, superName, version) \
