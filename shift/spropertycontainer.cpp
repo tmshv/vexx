@@ -140,16 +140,14 @@ SPropertyContainer::~SPropertyContainer()
   {
   xAssert(database());
 
-  xsize propIndex = 0;
   SProperty *prop = _child;
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
-    if(propIndex >= _containedProperties)
+    if(prop->index() >= _containedProperties)
       {
       database()->deleteDynamicProperty(prop);
       }
-    propIndex++;
     prop = next;
     }
   _child = 0;
