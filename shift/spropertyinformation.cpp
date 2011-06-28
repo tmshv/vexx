@@ -74,8 +74,9 @@ void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info
   xAssert(!_affects);
   xAssert(info);
 
-  _affects = new SProperty SPropertyContainer::*[1];
+  _affects = new SProperty SPropertyContainer::*[2];
   _affects[0] = info->location();
+  _affects[1] = 0;
   }
 
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
