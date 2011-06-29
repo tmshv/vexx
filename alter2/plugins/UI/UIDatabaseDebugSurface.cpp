@@ -17,7 +17,8 @@ UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
 
   _treeView->setModel(&_model);
 
-  _treeView->setItemDelegate(&_delegate);
+  _delegate = new SDatabaseDelegate(this);
+  _treeView->setItemDelegate(_delegate);
   _treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   _treeView->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(_treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));

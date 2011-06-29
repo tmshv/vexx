@@ -22,9 +22,6 @@ ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
 
 ScPlugin::~ScPlugin()
   {
-  delete _debugger;
-  delete _engine;
-  delete _surface;
   delete _types;
 
   _debugger = 0;
