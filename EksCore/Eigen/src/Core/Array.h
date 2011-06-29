@@ -222,10 +222,9 @@ class Array
     /** \sa MatrixBase::operator=(const EigenBase<OtherDerived>&) */
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Array(const EigenBase<OtherDerived> &other)
-      : Base(other.derived().rows() * other.derived().cols(), other.derived().rows(), other.derived().cols())
+      : Base()
     {
       Base::_check_template_params();
-      Base::resize(other.rows(), other.cols());
       *this = other;
     }
 

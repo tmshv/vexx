@@ -13,6 +13,4 @@ SOURCES += main.cpp \
 HEADERS += timeNow.h \
     TestClasses.h
 
-include("../EnableSIMD.pri")
-
-QMAKE_CXXFLAGS += -O3
+include("../GeneralOptions.pri")

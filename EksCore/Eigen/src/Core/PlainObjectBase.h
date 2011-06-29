@@ -90,6 +90,9 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> m_storage;
 
   public:
+    enum { CanBeRefCountCopied = SizeAtCompileTime==Dynamic };
+    const DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> &storage() const { return m_storage; }
+
     enum { NeedsToAlign = (!(Options&DontAlign))
                           && SizeAtCompileTime!=Dynamic && ((static_cast<int>(sizeof(Scalar))*SizeAtCompileTime)%16)==0 };
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)
@@ -371,6 +374,30 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       return Base::lazyAssign(other.derived());
     }
 
+    /** \sa MatrixBase::lazyAssign() */
+    template<typename OtherDerived>
+    EIGEN_STRONG_INLINE Derived& lazyDynamicAssign(const DenseBase<OtherDerived>& other)
+    {
+      enum{
+        SameType = internal::is_same<typename Derived::Scalar,typename OtherDerived::Scalar>::value
+      };
+
+      EIGEN_STATIC_ASSERT_LVALUE(Derived)
+      EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(Derived,OtherDerived)
+      EIGEN_STATIC_ASSERT(SameType,YOU_MIXED_DIFFERENT_NUMERIC_TYPES__YOU_NEED_TO_USE_THE_CAST_METHOD_OF_MATRIXBASE_TO_CAST_NUMERIC_TYPES_EXPLICITLY)
+
+    #ifdef EIGEN_DEBUG_ASSIGN
+      internal::assign_traits<Derived, OtherDerived>::debug();
+    #endif
+
+      m_storage.copy(other.derived().storage());
+
+    #ifndef EIGEN_NO_DEBUG
+      checkTransposeAliasing(other.derived());
+    #endif
+      return this->base().derived();
+    }
+
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& operator=(const ReturnByValue<OtherDerived>& func)
     {
@@ -406,7 +433,6 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& operator=(const EigenBase<OtherDerived> &other)
     {
-      _resize_to_match(other);
       Base::operator=(other.derived());
       return this->derived();
     }
@@ -576,7 +602,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
       // it wouldn't allow to copy a row-vector into a column-vector.
-      return internal::assign_selector<Derived,OtherDerived,false>::run(this->derived(), other.derived());
+      return internal::assign_selector<Derived,OtherDerived>::run(this->derived(), other.derived());
     }
 
     template<typename T0, typename T1>
