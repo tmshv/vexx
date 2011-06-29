@@ -284,7 +284,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
           }
         else
           {
-          ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = propIndex;
+          ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = propIndex + 1;
           }
         // insert this prop into the list
         newProp->_nextSibling = prop->_nextSibling;

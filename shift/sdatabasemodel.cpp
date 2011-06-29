@@ -7,7 +7,7 @@
 #define SDataModelProfileFunction XProfileFunction(ShiftDataModelProfileScope)
 #define SDataModelProfileScopedBlock(mess) XProfileScopedBlock(ShiftDataModelProfileScope, mess)
 
-SDatabaseDelegate::SDatabaseDelegate() : _currentWidget(0)
+SDatabaseDelegate::SDatabaseDelegate(QObject *parent) : QItemDelegate(parent), _currentWidget(0)
   {
   }
 
