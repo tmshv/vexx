@@ -1,5 +1,6 @@
 #include "QDebug"
 #include "Eigen/Core"
+#include "Eigen/Geometry"
 
 int main( )
   {
@@ -12,7 +13,7 @@ int main( )
 
   c = a + b;
 
-  /*Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> x(1,3);
+  Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> x(1,3);
   Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> y(3,1);
 
   x = y;
@@ -28,11 +29,20 @@ int main( )
 
   c = a;
 
-  Eigen::Vector3f e = a.block<3, 1>(0, 0);*/
+  Eigen::Vector3f e = a.block<3, 1>(0, 0);
 
   Eigen::ArrayXf ddd = c;
 
   ddd = a;
+
+  Eigen::Matrix3f f;
+
+  f.row(0) = e;
+
+  Eigen::Affine3f m;
+
+
+  m.matrix().row(0).head<3>() = e;
 
   return EXIT_SUCCESS;
   }

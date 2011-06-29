@@ -597,15 +597,12 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     template<typename OtherDerived>
     EIGEN_STRONG_INLINE Derived& _set_noalias(const DenseBase<OtherDerived>& other)
     {
-      enum {
-        ShouldRefCountCopy = Derived::CanBeRefCountCopied && OtherDerived::CanBeRefCountCopied
-      };
       // I don't think we need this resize call since the lazyAssign will anyways resize
       // and lazyAssign will be called by the assign selector.
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
       // it wouldn't allow to copy a row-vector into a column-vector.
-      return internal::assign_selector<Derived,OtherDerived,false,false,ShouldRefCountCopy>::run(this->derived(), other.derived());
+      return internal::assign_selector<Derived,OtherDerived>::run(this->derived(), other.derived());
     }
 
     template<typename T0, typename T1>

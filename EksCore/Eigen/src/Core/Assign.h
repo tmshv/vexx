@@ -527,7 +527,7 @@ template<typename Derived, typename OtherDerived,
                          // revert to || as soon as not needed anymore.
                     (int(Derived::ColsAtCompileTime) == 1 && int(OtherDerived::RowsAtCompileTime) == 1))
                 && int(Derived::SizeAtCompileTime) != 1,
-         bool BothDynamic=false>
+         bool BothDynamic = Derived::CanBeRefCountCopied && OtherDerived::CanBeRefCountCopied>
 struct assign_selector;
 
 template<typename Derived, typename OtherDerived>
@@ -569,43 +569,26 @@ template<typename Derived>
 template<typename OtherDerived>
 EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::operator=(const DenseBase<OtherDerived>& other)
 {
-  enum {
-    AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
-    BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
-    BothDynamic = AIsDynamic && BIsDynamic
-  };
-
-  return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(derived(), other.derived());
+  return internal::assign_selector<Derived,OtherDerived>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::operator=(const DenseBase& other)
 {
-  enum {
-    IsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
-  };
-  return internal::assign_selector<Derived,Derived,false,false,IsDynamic>::run(derived(), other.derived());
+  return internal::assign_selector<Derived,Derived>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator=(const MatrixBase& other)
 {
-  enum {
-    IsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
-  };
-  return internal::assign_selector<Derived,Derived,false,false,IsDynamic>::run(derived(), other.derived());
+  return internal::assign_selector<Derived,Derived>::run(derived(), other.derived());
 }
 
 template<typename Derived>
 template <typename OtherDerived>
 EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator=(const DenseBase<OtherDerived>& other)
 {
-  enum {
-    AIsDynamic = Derived::MaxRowsAtCompileTime == Dynamic || Derived::MaxColsAtCompileTime == Dynamic,
-    BIsDynamic = OtherDerived::MaxRowsAtCompileTime == Dynamic || OtherDerived::MaxColsAtCompileTime == Dynamic,
-    BothDynamic = AIsDynamic && BIsDynamic
-  };
-  return internal::assign_selector<Derived,OtherDerived,false,false,BothDynamic>::run(derived(), other.derived());
+  return internal::assign_selector<Derived,OtherDerived>::run(derived(), other.derived());
 }
 
 template<typename Derived>
