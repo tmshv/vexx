@@ -22,6 +22,12 @@ ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
 
 ScPlugin::~ScPlugin()
   {
+  if(_debugger)
+    {
+    _debugger->detach();
+    delete _debugger;
+    }
+  delete _engine;
   delete _types;
 
   _debugger = 0;
@@ -29,12 +35,27 @@ ScPlugin::~ScPlugin()
   _surface = 0;
   }
 
+void ScPlugin::initDebugger()
+  {
+  if(_debugger)
+    {
+    return;
+    }
+
+  _debugger = new QScriptEngineDebugger(this);
+  _debugger->setAutoShowStandardWindow(true);
+
+  APlugin<UIPlugin> ui(this, "ui");
+  if(ui.isValid())
+    {
+    connect(ui.plugin(), SIGNAL(aboutToClose()), _debugger, SLOT(deleteLater()));
+    }
+  }
+
 void ScPlugin::load()
   {
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new QScriptEngine(this);
-  _debugger = new QScriptEngineDebugger(this);
-  _debugger->setAutoShowStandardWindow(true);
 
   _types = new ScEmbeddedTypes(_engine);
 
@@ -52,8 +73,6 @@ void ScPlugin::load()
     {
     _surface = new ScSurface(this);
     ui->addSurface(_surface);
-
-    connect(ui.plugin(), SIGNAL(aboutToClose()), this, SLOT(hideDebugger()));
     }
 
   includePath(":/Sc/CoreUtils.js");
@@ -61,6 +80,7 @@ void ScPlugin::load()
 
 void ScPlugin::enableDebugging(bool enable)
   {
+  initDebugger();
   emit debuggingStateChanged(enable);
   if(enable)
     {
@@ -74,12 +94,16 @@ void ScPlugin::enableDebugging(bool enable)
 
 void ScPlugin::showDebugger()
   {
+  initDebugger();
   _debugger->standardWindow()->show();
   }
 
 void ScPlugin::hideDebugger()
   {
-  _debugger->standardWindow()->hide();
+  if(_debugger)
+    {
+    _debugger->standardWindow()->hide();
+    }
   }
 
 bool ScPlugin::loadPlugin(const QString &plugin)
