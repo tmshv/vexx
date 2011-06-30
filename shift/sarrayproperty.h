@@ -178,6 +178,11 @@ public:
     {
     doChange(result);
     }
+    
+  void setData(const EigenArray &result)
+    {
+    doChange(result);
+    }
 
   void setIndex(xsize x, xsize y, const T &val)
     {

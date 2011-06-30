@@ -109,6 +109,9 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
       memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*leftToCopy*polygonSize);
       newPolygonPtr += leftToCopy * polygonSize;
       oldPolygonPtr += leftToCopy * polygonSize;
+      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*leftToCopy*polygonSize);
+      newPolygonPtr += leftToCopy * polygonSize;
+      oldPolygonPtr += leftToCopy * polygonSize;
       }
     }
 
