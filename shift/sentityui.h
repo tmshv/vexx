@@ -18,7 +18,7 @@ public:
 
 XProperties:
   typedef XList<WidgetCreator> TypeList;
-  typedef XMap<XMetaType::Type, int> LookupMap;
+  typedef XMap<const SPropertyInformation *, int> LookupMap;
   XRORefProperty(TypeList, types);
   XRORefProperty(LookupMap, uiTypes);
 
@@ -41,7 +41,7 @@ public:
     }
 
   int addWidgetCreator(WidgetCreator fn);
-  void setUIType(XMetaType::Type type, int widgetType);
+  void setUIType(const SPropertyInformation *type, int widgetType);
 
 private:
   template <typename T> static T *widgetCreatorHelper(SProperty *prop, bool readOnly, QWidget *parent)

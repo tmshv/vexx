@@ -39,7 +39,7 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
       const SPropertyInformation *info = STypeRegistry::findType(ctx->argument(0).toString());
       if(info)
         {
-        return ScEmbeddedTypes::packValue(ent->addChild(info->typeId(), name));
+        return ScEmbeddedTypes::packValue(ent->addChild(info, name));
         }
       else
         {

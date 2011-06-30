@@ -4,7 +4,7 @@
 #include "sreferenceentity.h"
 #include "sdatabase.h"
 
-static XHash <SPropertyType, const SPropertyInformation *> _types;
+static XSet <const SPropertyInformation *> _types;
 
 STypeRegistry::STypeRegistry()
   {
@@ -42,40 +42,33 @@ void STypeRegistry::initiate()
   addType(SUIntArrayProperty::staticTypeInformation());
   }
 
-const XHash <SPropertyType, const SPropertyInformation *> &STypeRegistry::types()
+const XSet <const SPropertyInformation *> &STypeRegistry::types()
   {
   return _types;
   }
 
-void STypeRegistry::addType(const SPropertyInformation *t)
+void STypeRegistry::addType(const SPropertyInformation *)
   {
-  xAssert(!_types.values().contains(t));
-  if(!_types.values().contains(t))
-    {
-    _types.insert(t->typeId(), t);
-    }
   }
 
-const SPropertyInformation *STypeRegistry::findType(xuint32 i)
+
+void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
-  SProfileFunction
-  if(_types.contains(i))
+  xAssert(!_types.contains(t));
+  if(!_types.contains(t))
     {
-    return _types.value(i);
+    _types.insert(t);
     }
-  return 0;
   }
 
 const SPropertyInformation *STypeRegistry::findType(const QString &in)
   {
   SProfileFunction
-  QList <xuint32> keys(_types.keys());
-  for(int i=0, s=keys.size(); i<s; ++i)
+  foreach(const SPropertyInformation *info, _types)
     {
-    SPropertyType key = keys[i];
-    if(_types[key]->typeName() == in)
+    if(info->typeName() == in)
       {
-      return _types.value(key);
+      return info;
       }
     }
   return 0;

@@ -29,16 +29,14 @@ SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0)
 SDatabase::~SDatabase()
   {
   // clear out our child elements before the allocator is destroyed.
-  xsize propIndex = 0;
   SProperty *prop = _child;
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
-    if(propIndex >= _containedProperties)
+    if(prop->index() >= _containedProperties)
       {
       database()->deleteDynamicProperty(prop);
       }
-    propIndex++;
     prop = next;
     }
   _child = 0;
@@ -48,14 +46,13 @@ SDatabase::~SDatabase()
     destoryChangeMemory(ch);
     }
 
+  this->~SEntity();
   xAssert(_memory.empty());
   }
 
-SProperty *SDatabase::createDynamicProperty(xuint32 t)
+SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   {
   SProfileFunction
-
-  const SPropertyInformation *type = STypeRegistry::findType(t);
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());

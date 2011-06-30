@@ -23,7 +23,7 @@ private:
   QTreeView *_treeView;
   SDatabase *_db;
   SDatabaseModel _model;
-  SDatabaseDelegate _delegate;
+  SDatabaseDelegate *_delegate;
   SProperty *_clickedItem;
   };
 
