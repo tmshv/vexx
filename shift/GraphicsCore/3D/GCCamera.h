@@ -1,9 +1,10 @@
 #ifndef GCCAMERA_H
 #define GCCAMERA_H
 
+#include "GCGlobal.h"
 #include "GCTransform.h"
 
-class GCCamera : public GCTransform
+class GRAPHICSCORE_EXPORT GCCamera : public GCTransform
   {
   S_ENTITY(GCCamera, GCTransform, 0)
 

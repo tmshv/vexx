@@ -13,6 +13,7 @@
 #include "XEnvironmentRenderer.h"
 #include "sentityui.h"
 #include "application.h"
+#include "3D/GCRenderToScreen.h"
 
 QGLContext *Viewport::initRenderer()
   {
@@ -20,11 +21,12 @@ QGLContext *Viewport::initRenderer()
   return _renderer->context();
   }
 
-Viewport::Viewport(Application *app) : QGLWidget( initRenderer() ),
+Viewport::Viewport(Application *app, SPlugin &db) : QGLWidget( initRenderer() ),
     UISurface("Tang", this, UISurface::Dock),
     _camera( 55, XVector3D( 0, 5, 10 ) ),
     _scene( _renderer, &_camera ), _initMouse( true ),
-    _app(app)
+    _app(app),
+    _db(0)
   {
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
@@ -33,6 +35,9 @@ Viewport::Viewport(Application *app) : QGLWidget( initRenderer() ),
   setMouseTracking( true );
 
   _move << 0 << 0 << 0;
+
+  _db = &db.db();
+  _db->addTreeObserver(this);
 
   /*_properties = new QWidget(0);
   _properties->show();
@@ -45,6 +50,38 @@ Viewport::Viewport(Application *app) : QGLWidget( initRenderer() ),
   connect(newItemAction, SIGNAL(triggered()), this, SLOT(newItem()));
   newItemAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
   addAction(newItemAction);*/
+  }
+
+Viewport::~Viewport()
+  {
+  _db->removeTreeObserver(this);
+  }
+
+void Viewport::onTreeChange(const SChange *c)
+  {
+  const SPropertyContainer::TreeChange* t = c->castTo<SPropertyContainer::TreeChange>();
+  if(!t)
+    {
+    return;
+    }
+
+  GCRenderToScreen *prop = t->property()->castTo<GCRenderToScreen>();
+  if(!prop)
+    {
+    return;
+    }
+
+  if(t->after())
+    {
+    if(!_screenRenderers.contains(prop))
+      {
+      _screenRenderers << prop;
+      }
+    }
+  else
+    {
+    _screenRenderers.removeAll(prop);
+    }
   }
 
 void Viewport::initializeGL()
@@ -76,8 +113,10 @@ void Viewport::resizeGL( int w, int h )
 
 void Viewport::paintGL()
   {
-  _camera.track( 0.5 * _move[0], 0.5 * _move[1], 0.5 * _move[2] );
-  _scene.renderScene( );
+  foreach(GCRenderToScreen *sc, _screenRenderers)
+    {
+    sc->render();
+    }
   }
 
 void Viewport::keyPressEvent( QKeyEvent *event )

@@ -1,9 +1,10 @@
 #ifndef GCRENDERTOTEXTURE_H
 #define GCRENDERTOTEXTURE_H
 
+#include "GCGlobal.h"
 #include "GCRenderTarget.h"
 
-class GCRenderToTexture : public GCRenderTarget
+class GRAPHICSCORE_EXPORT GCRenderToTexture : public GCRenderTarget
   {
   S_ENTITY(GCRenderToTexture, GCRenderTarget, 0)
 

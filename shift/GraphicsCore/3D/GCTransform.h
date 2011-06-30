@@ -1,9 +1,10 @@
 #ifndef GCTRANSFORM_H
 #define GCTRANSFORM_H
 
+#include "GCGlobal.h"
 #include "sentity.h"
 
-class GCTransform : public SEntity
+class GRAPHICSCORE_EXPORT GCTransform : public SEntity
   {
   S_ENTITY(GCTransform, SEntity, 0)
 

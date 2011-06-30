@@ -1,13 +1,13 @@
 #ifndef GCGEOMETRY_H
 #define GCGEOMETRY_H
 
-#include "../GCGlobal.h"
+#include "GCGlobal.h"
 #include "spropertycontainer.h"
 #include "spropertyarray.h"
 #include "sarrayproperty.h"
 #include "sdatabase.h"
 
-class GCPolygonArray : public SPropertyContainer
+class GRAPHICSCORE_EXPORT GCPolygonArray : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(GCPolygonArray, SPropertyContainer, 0)
 
@@ -28,7 +28,7 @@ private:
   UnsignedIntProperty _polygonCount;
   };
 
-class GCGeometry : public SPropertyContainer
+class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(GCGeometry, SPropertyContainer, 0)
 

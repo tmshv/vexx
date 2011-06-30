@@ -33,8 +33,7 @@ public:
     const SPropertyContainer *before() const {return _before;}
     SPropertyContainer *after() {return _after;}
     const SPropertyContainer *after() const {return _after;}
-    SProperty *property() {return _property;}
-    const SProperty *property() const {return _property;}
+    SProperty *property() const {return _property;}
     xsize index() const { return _index; }
   private:
     SPropertyContainer *_before;

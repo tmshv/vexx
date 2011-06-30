@@ -1,9 +1,10 @@
 #ifndef GCRENDERTARGET_H
 #define GCRENDERTARGET_H
 
+#include "GCGlobal.h"
 #include "sentity.h"
 
-class GCRenderTarget : public SEntity
+class GRAPHICSCORE_EXPORT GCRenderTarget : public SEntity
   {
   S_ENTITY(GCRenderTarget, SEntity, 0)
 

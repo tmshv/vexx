@@ -7,18 +7,22 @@
 #include "XCamera.h"
 #include "XScene.h"
 #include "XEnvironmentViewer.h"
+#include "splugin.h"
 
 class XEnvironmentRenderer;
 class XGLRenderer;
 class Application;
 
+class GCRenderToScreen;
+
 class EnvironmentEntity;
 
-class Viewport : public QGLWidget, public UISurface, XEnvironmentViewer
+class Viewport : public QGLWidget, public UISurface, XEnvironmentViewer, STreeObserver
   {
   Q_OBJECT
 public:
-  Viewport(Application *env);
+  Viewport(Application *env, SPlugin &);
+  ~Viewport();
 
   void initializeGL();
   void resizeGL( int w, int h );
@@ -38,6 +42,8 @@ private slots:
 private:
   QGLContext *initRenderer();
 
+  virtual void onTreeChange(const SChange *);
+
   virtual XVector3D screenToWorld(const QPoint &pt) const;
   virtual XVector3D position() const;
   virtual xReal farClipPlane() const;
@@ -55,6 +61,9 @@ private:
   //EnvironmentEntity *_entity;
   QWidget *_properties;
   Application *_app;
+
+  SAppDatabase *_db;
+  QList<GCRenderToScreen*> _screenRenderers;
   };
 
 #endif // VIEWPORT_H

@@ -1,11 +1,13 @@
 #include "acore.h"
 #include "aplugin.h"
 #include "scplugin.h"
+#include "splugin.h"
 #include "UIPlugin.h"
 #include "Viewport.h"
 #include "assettree.h"
 #include "application.h"
 #include "webview.h"
+#include "GraphicsCore.h"
 
 int main( int argc, char **argv )
   {
@@ -28,7 +30,12 @@ int main( int argc, char **argv )
   APlugin<UIPlugin> ui(app, "ui");
   if(ui.isValid())
     {
-    ui->addSurface(new Viewport(&envApp));
+    APlugin<SPlugin> db(app, "db");
+    if(db.isValid())
+      {
+      initiateGraphicsCore(&db->db());
+      ui->addSurface(new Viewport(&envApp, *db));
+      }
     ui->addSurface(webData);
 
     ui->show();
