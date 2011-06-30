@@ -20,11 +20,11 @@ HEADERS += GCGlobal.h \
     3D/GCTransform.h \
     3D/GCRenderToTexture.h \
     3D/GCRenderToScreen.h \
-    3D/GCRenderer.h \
+    3D/GCRenderTarget.h \
     3D/GCGeometry.h \
     3D/GCCamera.h
 
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
+INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
 LIBS += -lshift -lEksCore -lEks3D
 
@@ -36,10 +36,9 @@ SOURCES += \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
     GCQImage.cpp \
-    GCGeometry.cpp \
     3D/GCTransform.cpp \
     3D/GCRenderToTexture.cpp \
     3D/GCRenderToScreen.cpp \
-    3D/GCRenderer.cpp \
+    3D/GCRenderTarget.cpp \
     3D/GCGeometry.cpp \
     3D/GCCamera.cpp

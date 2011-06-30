@@ -125,20 +125,6 @@ public:
     return mData.cols();
     }
 
-  void resize(xsize size)
-    {
-    EigenArray result = mData;
-    result.resize(1, width);
-
-    doChange(result);
-    }
-
-  xsize size() const
-    {
-    preGet();
-    return mData.cols();
-    }
-
   xsize width() const
     {
     preGet();
@@ -162,23 +148,11 @@ public:
     EigenArray result = mData;
     result.resize(height, width);
 
-      memcpy(result.data(), &val.front(), sizeof(T)*width*height);
-
-    doChange(result);
-
-  void setData(const EigenArray &result)
-    {
-    doChange(result);
-    }
+    memcpy(result.data(), &val.front(), sizeof(T)*width*height);
 
     doChange(result);
     }
 
-  void setData(const EigenArray &result)
-    {
-    doChange(result);
-    }
-    
   void setData(const EigenArray &result)
     {
     doChange(result);
@@ -190,12 +164,6 @@ public:
     result(y, x) = val;
 
     doChange(result);
-    }
-
-  const T &atIndex(xsize x, xsize y) const
-    {
-    preGet();
-    return mData(y, x);
     }
 
   // called by parent

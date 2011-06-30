@@ -5,10 +5,10 @@
 
 class GCCamera : public GCTransform
   {
-  S_ENTITY(GCCamera, GCTransform)
+  S_ENTITY(GCCamera, GCTransform, 0)
 
 public:
-  GCCamera3D();
+  GCCamera();
   };
 
 #endif // GCCAMERA_H

@@ -1,5 +1,14 @@
-#include "GCCamera3D.h"
+#include "GCCamera.h"
+#include "styperegistry.h"
 
-GCCamera3D::GCCamera3D()
-{
-}
+S_IMPLEMENT_PROPERTY(GCCamera)
+
+const SPropertyInformation *GCCamera::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCCamera>("GCCamera");
+  return info;
+  }
+
+GCCamera::GCCamera()
+  {
+  }

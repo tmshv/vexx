@@ -5,7 +5,7 @@
 
 class GCTransform : public SEntity
   {
-  S_ENTITY(GCTransform, SEntity)
+  S_ENTITY(GCTransform, SEntity, 0)
 
 public:
   GCTransform();
