@@ -13,8 +13,8 @@ HEADERS += mainwindow.h \
     taskglobal.h
 INCLUDEPATH += ../EksCore/ \
     ../Shift/
-LIBS += -L../bin \
-    -lShift \
+LIBS += -lShift \
     -lEksCore
-DESTDIR = ../bin
 FORMS += 
+
+include("../EksCore/GeneralOptions.pri")

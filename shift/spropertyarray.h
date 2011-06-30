@@ -13,12 +13,12 @@ public:
 
   template <typename T> T *add()
     {
-    return addProperty(T::Type, X_SIZE_SENTINEL)->castTo<T>();
+    return addProperty(T::staticTypeInformation(), X_SIZE_SENTINEL)->castTo<T>();
     }
 
-  SProperty *add(SPropertyType id)
+  SProperty *add(const SPropertyInformation *info)
     {
-    return addProperty(id, X_SIZE_SENTINEL);
+    return addProperty(info, X_SIZE_SENTINEL);
     }
 
   SProperty *operator[](xsize i) { return at(i); }
@@ -35,7 +35,7 @@ template <typename T> class STypedPropertyArray : public SPropertyContainer
 public:
   T *add()
     {
-    return addProperty(T::Type)->castTo<T>();
+    return addProperty(T::staticTypeInformation())->castTo<T>();
     }
 
   void remove(SProperty *prop)

@@ -140,26 +140,24 @@ SPropertyContainer::~SPropertyContainer()
   {
   xAssert(database());
 
-  xsize propIndex = 0;
   SProperty *prop = _child;
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
-    if(propIndex >= _containedProperties)
+    if(prop->index() >= _containedProperties)
       {
       database()->deleteDynamicProperty(prop);
       }
-    propIndex++;
     prop = next;
     }
   _child = 0;
   }
 
-SProperty *SPropertyContainer::addProperty(xuint32 type, xsize index)
+SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsize index)
   {
   xAssert(index >= _containedProperties);
 
-  SProperty *newProp = database()->createDynamicProperty(type);
+  SProperty *newProp = database()->createDynamicProperty(info);
 
   void *changeMemory = getChange< TreeChange >();
   TreeChange *change = new(changeMemory) TreeChange(0, this, newProp, index);
@@ -203,7 +201,7 @@ void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
     xsize index = 0;
     while(fChild)
       {
-      if(!tChild || tChild->type() != fChild->type())
+      if(!tChild || tChild->staticTypeInformation() != fChild->staticTypeInformation())
         {
         xAssert(tChild->isDynamic());
         if(tChild)
@@ -211,7 +209,7 @@ void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
           to->removeProperty(tChild);
           }
 
-        tChild = to->addProperty(fChild->type(), index);
+        tChild = to->addProperty(fChild->staticTypeInformation(), index);
         }
 
       tChild->assign(fChild);
@@ -286,7 +284,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
           }
         else
           {
-          ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = propIndex;
+          ((SProperty::InstanceInformation*)newProp->_instanceInfo)->_index = propIndex + 1;
           }
         // insert this prop into the list
         newProp->_nextSibling = prop->_nextSibling;

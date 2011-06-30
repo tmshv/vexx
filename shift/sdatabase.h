@@ -47,7 +47,7 @@ protected:
   void initiateInheritedDatabaseType(const SPropertyInformation *info);
 
 private:
-  SProperty *createDynamicProperty(xuint32);
+  SProperty *createDynamicProperty(const SPropertyInformation *info);
   void deleteDynamicProperty(SProperty *);
 
   void destoryChangeMemory(SChange *);

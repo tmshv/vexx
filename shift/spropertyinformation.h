@@ -13,6 +13,10 @@ class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
 
+namespace std
+{
+  template <typename T> class initializer_list;
+}
 
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
@@ -30,7 +34,7 @@ XProperties:
   XProperty(SProperty SPropertyContainer::*, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
-  XProperty(SProperty SPropertyContainer::* *, affects, setAffects);
+  XROProperty(SProperty SPropertyContainer::* *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
   XProperty(bool, entityChild, setEntityChild);
@@ -43,7 +47,8 @@ public:
   // initiate or destroy them, and that the Database should handle this.
   SPropertyInstanceInformation();
 
-  void setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects);
+  void setAffects(SPropertyInstanceInformation *info);
+  void setAffects(SProperty SPropertyContainer::* *affects);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
@@ -87,7 +92,6 @@ XProperties:
   XROProperty(xuint32, version);
 
   XRORefProperty(QString, typeName);
-  XROProperty(xuint32, typeId);
 
   XROProperty(const SPropertyInformation *, parentTypeInformation);
 
@@ -110,7 +114,6 @@ public:
                                 PropType::assignProperty,
                                 PropType::Version,
                                 typeName,
-                                PropType::Type,
                                 PropType::ParentType::staticTypeInformation(),
                                 sizeof(PropType),
                                 sizeof(typename PropType::InstanceInformation));
@@ -125,23 +128,10 @@ public:
                                 PropType::assignProperty,
                                 PropType::Version,
                                 typeName,
-                                PropType::Type,
                                 0,
                                 sizeof(PropType),
                                 sizeof(typename PropType::InstanceInformation));
     }
-
-  SPropertyInformation(CreateFunction createFn,
-                       CreateInstanceInformationFunction createInstanceInfoFn,
-                       SaveFunction saveFn,
-                       LoadFunction loadFn,
-                       AssignFunction assignFn,
-                       xuint32 version,
-                       const QString &typeName,
-                       xuint32 typeId,
-                       const SPropertyInformation *parent,
-                       xsize size,
-                       xsize instanceInformationSize);
 
   SPropertyInformation(CreateFunction createFn,
                        CreateInstanceInformationFunction createInstanceInfoFn,
@@ -163,7 +153,7 @@ public:
     return inheritsFromType(T::Type);
     }
 
-  bool inheritsFromType(SPropertyType type) const;
+  bool inheritsFromType(const SPropertyInformation *type) const;
 
   // this classes and all its inherited children count
   xsize completeChildCount() const;

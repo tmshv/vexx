@@ -15,14 +15,6 @@ class SConnectionObserver;
 
 #define S_ENTITY(name, parent, version) S_PROPERTY_CONTAINER(name, parent, version)
 
-#define S_ENTITY_DEFINITION S_PROPERTY_CONTAINER_DEFINITION
-#define S_ENTITY_END_DEFINITION S_PROPERTY_CONTAINER_END_DEFINITION
-
-#define S_ENTITY_EMPTY_DEFINITION(name) S_PROPERTY_CONTAINER_EMPTY_DEFINITION(name)
-
-#define S_ENTITY_COMPUTATION(function, ...)
-
-
 class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
   {
   S_ENTITY(SEntity, SPropertyContainer, 0);
@@ -42,9 +34,9 @@ public:
     return ent;
     }
 
-  SProperty *addChild(SPropertyType id, const QString& name)
+  SProperty *addChild(const SPropertyInformation *info, const QString& name)
     {
-    SProperty *ent = children.add(id);
+    SProperty *ent = children.add(info);
     xAssert(ent);
     ent->setName(name);
     return ent;
@@ -52,14 +44,14 @@ public:
 
   template <typename T>T *addProperty(const QString& name)
     {
-    SProperty *p = addProperty(T::Type, name);
+    SProperty *p = addProperty(T::staticTypeInformation(), name);
     xAssert(p);
     return p->uncheckedCastTo<T>();
     }
 
-  SProperty *addProperty(SPropertyType t, const QString& name)
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name)
     {
-    SProperty *p = SPropertyContainer::addProperty(t);
+    SProperty *p = SPropertyContainer::addProperty(info);
     xAssert(p);
     p->setName(name);
     return p;

@@ -1,18 +1,24 @@
 #include "taskdatabase.h"
 #include "item.h"
 #include "sdatabasemodel.h"
+#include "styperegistry.h"
 #include "QDir"
 #include "QDesktopServices"
 #include "sxmlio.h"
 
-S_ENTITY_EMPTY_DEFINITION(TaskDatabase, SDatabase)
+S_IMPLEMENT_PROPERTY(TaskDatabase)
+
+const SPropertyInformation *TaskDatabase::createTypeInformation()
+  {
+  return SPropertyInformation::create<TaskDatabase>("TaskDatabase");
+  }
 
 TaskDatabase::TaskDatabase() : SDatabase(), _rootItem(0)
   {
   initiateInheritedDatabaseType(staticTypeInformation());
 
-  addType<Item>();
-  addType<TaskDatabase>();
+  STypeRegistry::addType(Item::staticTypeInformation());
+  STypeRegistry::addType(TaskDatabase::staticTypeInformation());
   _rootItem = addItem(0, "Root Item");
   }
 
@@ -67,7 +73,22 @@ void TaskDatabase::load()
   QFile file(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "Tasks.db");
   if(file.open(QIODevice::ReadOnly))
     {
+    _rootItem = 0;
     SXMLLoader r;
+
+    children.clear();
     r.readFromDevice(&file, this);
+
+    SProperty *ent = children.findChild("Root Item");
+    xAssert(ent);
+    if(ent)
+      {
+      _rootItem = ent->castTo<Item>();
+      }
+    else
+      {
+      _rootItem = addItem(0, "Root Item");
+      }
+    xAssert(_rootItem);
     }
   }

@@ -81,7 +81,7 @@ protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.
   // you cannot add another contained property once dynamic properties have been added, this bool
   // should really be left alone and not exposed in sub classes
-  SProperty *addProperty(xuint32, xsize index=X_SIZE_SENTINEL);
+  SProperty *addProperty(const SPropertyInformation *info, xsize index=X_SIZE_SENTINEL);
   // move a property from this to newParent
   void moveProperty(SPropertyContainer *newParent, SProperty *property);
   void removeProperty(SProperty *);

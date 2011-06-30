@@ -52,6 +52,7 @@ public slots:
   void hideDebugger();
 
 private:
+  void initDebugger();
   bool executeFile(const QString &);
 
   QScriptEngine *_engine;

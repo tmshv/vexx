@@ -1,5 +1,6 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
+#include <initializer_list>
 
 SPropertyInstanceInformation::SPropertyInstanceInformation()
   : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
@@ -7,28 +8,7 @@ SPropertyInstanceInformation::SPropertyInstanceInformation()
   {
   }
 
-SPropertyInformation::SPropertyInformation(CreateFunction createFn,
-                     CreateInstanceInformationFunction cIIF,
-                     SaveFunction saveFn,
-                     LoadFunction loadFn,
-                     AssignFunction assignFn,
-                     xuint32 version,
-                     const QString &typeName,
-                     xuint32 typeId,
-                     const SPropertyInformation *parent,
-                     xsize size,
-                     xsize instanceInfoSize)
-    : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
-    _version(version), _typeName(typeName), _typeId(typeId), _parentTypeInformation(parent),
-    _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize), _instances(0), _dynamic(false)
-  {
-  if(_parentTypeInformation)
-    {
-    _propertyOffset = _parentTypeInformation->completeChildCount();
-    }
-  }
-
-SPropertyType g_maxDynamicCount = 0x7FFFFFFF;
+xuint32 g_maxDynamicCount = 0x7FFFFFFF;
 SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      CreateInstanceInformationFunction cIIF,
                      SaveFunction saveFn,
@@ -40,7 +20,7 @@ SPropertyInformation::SPropertyInformation(CreateFunction createFn,
                      xsize size,
                      xsize instanceInfoSize)
     : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
-    _version(version), _typeName(typeName), _typeId(g_maxDynamicCount++), _parentTypeInformation(parent),
+    _version(version), _typeName(typeName), _parentTypeInformation(parent),
     _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize),
     _instances(0), _dynamic(false)
   {
@@ -89,9 +69,19 @@ SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   return g_maxChildKey++;
   }
 
-void SPropertyInstanceInformation::setComputable(ComputeFunction computeFn, SProperty SPropertyContainer::* *affects)
+void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info)
   {
-  _compute = computeFn;
+  xAssert(!_affects);
+  xAssert(info);
+
+  _affects = new SProperty SPropertyContainer::*[2];
+  _affects[0] = info->location();
+  _affects[1] = 0;
+  }
+
+void SPropertyInstanceInformation::setAffects(SProperty SPropertyContainer::* *affects)
+  {
+  xAssert(!_affects);
   _affects = affects;
   }
 
@@ -135,12 +125,12 @@ void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformati
     }
   }
 
-bool SPropertyInformation::inheritsFromType(SPropertyType match) const
+bool SPropertyInformation::inheritsFromType(const SPropertyInformation *match) const
   {
   const SPropertyInformation *type = this;
   while(type)
     {
-    if(type->typeId() == match)
+    if(type == match)
       {
       return true;
       }

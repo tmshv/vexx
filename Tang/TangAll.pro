@@ -7,10 +7,10 @@ SUBDIRS = ../EksCore/QtProject/EksCore.pro \
           ../Eks3D/QtProject/Eks3D.pro \
           ../alter2/alter2.pro \
           ../shift/shift.pro \
+          ../shift/GraphicsCore/GraphicsCore.pro \
           ../alter2/plugins/ShiftAlter/ShiftAlter.pro \
           ../alter2/plugins/UI/UI.pro \
           ../alter2/plugins/Script/Script.pro \
-          ../shift/GraphicsCore/GraphicsCore.pro \
           ../Tang/Tang.pro
 
 TARGET = Synapse

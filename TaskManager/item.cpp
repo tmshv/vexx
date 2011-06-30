@@ -1,6 +1,7 @@
 #include "item.h"
 #include "sproperty.h"
 #include "sdatabase.h"
+#include "styperegistry.h"
 
 void severityCompute(const SPropertyInstanceInformation *, SPropertyContainer *container)
   {
@@ -9,16 +10,28 @@ void severityCompute(const SPropertyInstanceInformation *, SPropertyContainer *c
   item->severity = item->priority() * item->links.size();
   }
 
-S_PROPERTY_CONTAINER_DEFINITION(Item, SEntity)
-  S_COMPUTE_GROUP(severitySet)
-    S_AFFECTS(severity)
-  S_COMPUTE_GROUP_END()
+S_IMPLEMENT_PROPERTY(Item)
 
-  S_PROPERTY_DEFINITION(LongStringProperty, description, "")
-  S_COMPUTABLE_PROPERTY_DEFINITION(FloatProperty, priority, 0, severitySet, 1.0f)
-  S_COMPUTABLE_PROPERTY_DEFINITION(FloatProperty, severity, severityCompute, 0, 1.0f)
-  S_COMPUTABLE_PROPERTY_DEFINITION(PointerArray, links, 0, severitySet)
-S_ENTITY_END_DEFINITION(Item, SEntity)
+const SPropertyInformation *Item::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<Item>("Item");
+
+  info->add(&Item::description, "description");
+
+  FloatProperty::InstanceInformation* sevInfo = info->add(&Item::severity, "severity");
+  sevInfo->initiateFromDefinition(1.0f);
+  sevInfo->setCompute(severityCompute);
+
+  FloatProperty::InstanceInformation* priInfo = info->add(&Item::priority, "priority");
+  priInfo->initiateFromDefinition(1.0f);
+  priInfo->setAffects(sevInfo);
+
+  PointerArray::InstanceInformation* linksInfo = info->add(&Item::links, "links");
+  linksInfo->setAffects(sevInfo);
+
+  return info;
+  }
+
 
 Item::Item() : priority(0)
   {
