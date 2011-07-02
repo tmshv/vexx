@@ -58,7 +58,7 @@ template <> class SPODInterface <type> { public: typedef name Type; \
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
   S_IMPLEMENT_PROPERTY(name) \
-  const SPropertyInformation *name::createTypeInformation() { \
+  SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); } \
 name::Change::Change(const type &b, const type &a, name *prop) \
   : SProperty::DataChange(prop), _before(b), _after(a) \

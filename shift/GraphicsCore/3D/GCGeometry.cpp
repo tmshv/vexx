@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(GCGeometry)
 
-const SPropertyInformation *GCGeometry::createTypeInformation()
+SPropertyInformation *GCGeometry::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
   info->add(&GCGeometry::polygons, "polygons");
@@ -13,7 +13,7 @@ const SPropertyInformation *GCGeometry::createTypeInformation()
 
 S_IMPLEMENT_PROPERTY(GCPolygonArray)
 
-const SPropertyInformation *GCPolygonArray::createTypeInformation()
+SPropertyInformation *GCPolygonArray::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCPolygonArray>("GCPolygonArray");
   info->add(&GCPolygonArray::_data, "_data");

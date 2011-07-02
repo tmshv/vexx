@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(GCRenderTarget)
 
-const SPropertyInformation *GCRenderTarget::createTypeInformation()
+SPropertyInformation *GCRenderTarget::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCRenderTarget>("GCRenderTarget");
   return info;

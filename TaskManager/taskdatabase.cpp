@@ -8,7 +8,7 @@
 
 S_IMPLEMENT_PROPERTY(TaskDatabase)
 
-const SPropertyInformation *TaskDatabase::createTypeInformation()
+SPropertyInformation *TaskDatabase::createTypeInformation()
   {
   return SPropertyInformation::create<TaskDatabase>("TaskDatabase");
   }

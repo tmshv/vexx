@@ -4,7 +4,7 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyContainer)
 
-const SPropertyInformation *SPropertyContainer::createTypeInformation()
+SPropertyInformation *SPropertyContainer::createTypeInformation()
   {
   return SPropertyInformation::create<SPropertyContainer>("SPropertyContainer");
   }

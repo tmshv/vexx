@@ -3,14 +3,14 @@
 
 S_IMPLEMENT_PROPERTY(SFloatArrayProperty)
 
-const SPropertyInformation *SFloatArrayProperty::createTypeInformation()
+SPropertyInformation *SFloatArrayProperty::createTypeInformation()
   {
   return SPropertyInformation::create<SFloatArrayProperty>("SFloatArrayProperty");
   }
 
 S_IMPLEMENT_PROPERTY(SUIntArrayProperty)
 
-const SPropertyInformation *SUIntArrayProperty::createTypeInformation()
+SPropertyInformation *SUIntArrayProperty::createTypeInformation()
   {
   return SPropertyInformation::create<SUIntArrayProperty>("SUIntArrayProperty");
   }

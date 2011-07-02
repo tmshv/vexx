@@ -669,14 +669,14 @@ bool PointerArray::hasPointer(SProperty *prop) const
 
 S_IMPLEMENT_PROPERTY(PointerArray)
 
-const SPropertyInformation *PointerArray::createTypeInformation()
+SPropertyInformation *PointerArray::createTypeInformation()
   {
   return SPropertyInformation::create<PointerArray>("PointerArray");
   }
 
 S_IMPLEMENT_PROPERTY(Pointer)
 
-const SPropertyInformation *Pointer::createTypeInformation()
+SPropertyInformation *Pointer::createTypeInformation()
   {
   return SPropertyInformation::create<Pointer>("Pointer");
   }

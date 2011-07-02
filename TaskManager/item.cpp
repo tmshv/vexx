@@ -12,7 +12,7 @@ void severityCompute(const SPropertyInstanceInformation *, SPropertyContainer *c
 
 S_IMPLEMENT_PROPERTY(Item)
 
-const SPropertyInformation *Item::createTypeInformation()
+SPropertyInformation *Item::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<Item>("Item");
 

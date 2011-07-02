@@ -2,6 +2,7 @@
 #define SPROPERTYARRAY_H
 
 #include "spropertycontainer.h"
+#include "styperegistry.h"
 
 class SHIFT_EXPORT SPropertyArray : public SPropertyContainer
   {
@@ -79,10 +80,11 @@ public:
     }
   };
 
-template <typename T>const SPropertyInformation *STypedPropertyArray<T>::staticTypeInformation()
+template <typename T> S_IMPLEMENT_PROPERTY(STypedPropertyArray<T>)
+
+template <typename T>SPropertyInformation *STypedPropertyArray<T>::createTypeInformation()
   {
-  static SPropertyInformation *info(SPropertyInformation::create<STypedPropertyArray<T> >("STypedPropertyArray<T>"));
-  return info;
+  return SPropertyInformation::create<STypedPropertyArray<T> >("STypedPropertyArray<T>");
   }
 
 #endif // SPROPERTYARRAY_H

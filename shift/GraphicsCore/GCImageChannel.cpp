@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(GCImageChannelData)
 
-const SPropertyInformation *GCImageChannelData::createTypeInformation()
+SPropertyInformation *GCImageChannelData::createTypeInformation()
   {
   return SPropertyInformation::create<GCImageChannelData>("GCImageChannelData");
   }
@@ -11,7 +11,7 @@ const SPropertyInformation *GCImageChannelData::createTypeInformation()
 
 S_IMPLEMENT_PROPERTY(GCImageChannel)
 
-const SPropertyInformation *GCImageChannel::createTypeInformation()
+SPropertyInformation *GCImageChannel::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCImageChannel>("GCImageChannel");
   info->add(&GCImageChannel::width, "width");

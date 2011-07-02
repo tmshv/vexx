@@ -14,8 +14,8 @@ class SPropertyMetaData;
 class SDatabase;
 
 #define S_REGISTER_TYPE_FUNCTION() \
-  private: static const SPropertyInformation *createTypeInformation(); \
-  public: static const SPropertyInformation *staticTypeInformation();
+  public: static SPropertyInformation *createTypeInformation(); \
+  static const SPropertyInformation *staticTypeInformation();
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
@@ -102,7 +102,6 @@ public:
   SDatabase *database() { return _database; }
   const SDatabase *database() const { return _database; }
 
-  bool inheritsFromType(const QString &type) const;
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
 

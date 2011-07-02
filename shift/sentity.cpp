@@ -5,7 +5,7 @@
 
 S_IMPLEMENT_PROPERTY(SEntity)
 
-const SPropertyInformation *SEntity::createTypeInformation()
+SPropertyInformation *SEntity::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
   info->add(&SEntity::children, "children");

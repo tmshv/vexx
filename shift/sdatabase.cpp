@@ -8,7 +8,7 @@
 
 S_IMPLEMENT_PROPERTY(SDatabase)
 
-const SPropertyInformation *SDatabase::createTypeInformation()
+SPropertyInformation *SDatabase::createTypeInformation()
   {
   SPropertyInformation* info = SPropertyInformation::create<SDatabase>("SDatabase");
   info->add(&SDatabase::majorVersion, "majorVersion")->initiateFromDefinition(0);
@@ -22,8 +22,6 @@ SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0)
   _database = this;
   _info = staticTypeInformation();
   _instanceInfo = &_instanceInfoData;
-
-  initiatePropertyFromMetaData(this, staticTypeInformation());
   }
 
 SDatabase::~SDatabase()
@@ -90,11 +88,6 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
   {
   xAssert(mD);
 
-  if(includeParents && mD->parentTypeInformation())
-    {
-    initiatePropertyFromMetaData(container, mD->parentTypeInformation());
-    }
-
   for(xsize i=0, s=mD->childCount(); i<s; ++i)
     {
     // no contained properties with duplicated names...
@@ -124,11 +117,6 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
 void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD)
   {
   xAssert(mD);
-
-  if(mD->parentTypeInformation())
-    {
-    uninitiatePropertyFromMetaData(container, mD->parentTypeInformation());
-    }
 
   for(xsize i=0; i<mD->childCount(); ++i)
     {

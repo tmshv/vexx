@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(GCTransform)
 
-const SPropertyInformation *GCTransform::createTypeInformation()
+SPropertyInformation *GCTransform::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCTransform>("GCTransform");
   return info;

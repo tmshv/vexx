@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(GCRenderToScreen)
 
-const SPropertyInformation *GCRenderToScreen::createTypeInformation()
+SPropertyInformation *GCRenderToScreen::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCRenderToScreen>("GCRenderToScreen");
   return info;

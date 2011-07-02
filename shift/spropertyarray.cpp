@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyArray)
 
-const SPropertyInformation *SPropertyArray::createTypeInformation()
+SPropertyInformation *SPropertyArray::createTypeInformation()
   {
   return SPropertyInformation::create<SPropertyArray>("SPropertyArray");
   }

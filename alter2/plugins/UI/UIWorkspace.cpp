@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(UIWorkspace)
 
-const SPropertyInformation *UIWorkspace::createTypeInformation()
+SPropertyInformation *UIWorkspace::createTypeInformation()
   {
   return SPropertyInformation::create<UIWorkspace>("UIWorkspace");
   }
