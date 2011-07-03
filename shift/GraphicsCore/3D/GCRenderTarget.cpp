@@ -10,5 +10,9 @@ SPropertyInformation *GCRenderTarget::createTypeInformation()
   }
 
 GCRenderTarget::GCRenderTarget()
-{
-}
+  {
+  }
+
+void GCRenderTarget::render()
+  {
+  }

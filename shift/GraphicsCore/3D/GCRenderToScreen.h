@@ -10,8 +10,6 @@ class GRAPHICSCORE_EXPORT GCRenderToScreen : public GCRenderTarget
 
 public:
   GCRenderToScreen();
-
-  void render();
   };
 
 #endif // GCRENDERTOSCREEN_H

@@ -9,7 +9,9 @@ class GRAPHICSCORE_EXPORT GCRenderTarget : public SEntity
   S_ENTITY(GCRenderTarget, SEntity, 0)
 
 public:
-    GCRenderTarget();
+  GCRenderTarget();
+
+  void render();
   };
 
 #endif // GCRENDERTARGET_H
