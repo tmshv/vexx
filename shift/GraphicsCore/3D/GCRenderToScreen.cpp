@@ -12,7 +12,3 @@ SPropertyInformation *GCRenderToScreen::createTypeInformation()
 GCRenderToScreen::GCRenderToScreen()
   {
   }
-
-void GCRenderToScreen::render()
-  {
-  }

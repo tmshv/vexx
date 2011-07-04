@@ -135,11 +135,20 @@ class SHIFT_EXPORT Pointer : public SProperty
   S_PROPERTY(Pointer, SProperty, 0);
 
 public:
-  SProperty *pointed() const { preGet(); return input(); }
-  SProperty *operator()() const { preGet(); return input(); }
+  const SProperty *pointed() const { preGet(); return input(); }
+  const SProperty *operator()() const { preGet(); return pointed(); }
 
-  void setPointed(SProperty *prop);
-  Pointer &operator=(SProperty *prop) { setPointed(prop); return *this; }
+  void setPointed(const SProperty *prop);
+  Pointer &operator=(const SProperty *prop) { setPointed(prop); return *this; }
+  };
+
+template <typename T> class TypedPointer : public Pointer
+  {
+  const T *pointed() const { preGet(); return input() ? input()->castTo<T>() : 0; }
+  const T *operator()() const { preGet(); return pointed(); }
+
+  void setPointed(const T *prop) { Pointer::setPointed(prop); }
+  Pointer &operator=(const T *prop) { setPointed(prop); return *this; }
   };
 
 class SHIFT_EXPORT PointerArray : public STypedPropertyArray<Pointer>
@@ -150,5 +159,14 @@ public:
   void removePointer(SProperty *);
   bool hasPointer(SProperty *) const;
   };
+
+#define S_TYPED_POINTER_TYPE(name, type) \
+  class name : public TypedPointer<type> { \
+    S_PROPERTY(name, Pointer, 0); }; \
+    S_IMPLEMENT_PROPERTY(name) \
+  SPropertyInformation *name::createTypeInformation() { \
+    return SPropertyInformation::create<name>(#name); }
+
+
 
 #endif // SBASEPROPERTIES_H

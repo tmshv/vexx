@@ -1,13 +1,20 @@
 #include "GraphicsCore.h"
+#include "styperegistry.h"
+
 #include "GCImage.h"
 #include "GCQImage.h"
+
 #include "3D/GCGeometry.h"
 #include "3D/GCRenderToScreen.h"
 #include "3D/GCRenderToTexture.h"
 #include "3D/GCRenderTarget.h"
+
 #include "3D/GCCamera.h"
 #include "3D/GCTransform.h"
-#include "styperegistry.h"
+#include "3D/GCRenderable.h"
+
+#include "3D/Renderable/GCGrid.h"
+
 
 void initiateGraphicsCore(SDatabase *db)
   {
@@ -23,4 +30,8 @@ void initiateGraphicsCore(SDatabase *db)
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCRenderToScreen::staticTypeInformation());
   STypeRegistry::addType(GCRenderToTexture::staticTypeInformation());
+
+  STypeRegistry::addType(GCRenderable::staticTypeInformation());
+
+  STypeRegistry::addType(GCGrid::staticTypeInformation());
   }

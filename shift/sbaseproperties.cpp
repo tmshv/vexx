@@ -681,7 +681,7 @@ SPropertyInformation *Pointer::createTypeInformation()
   return SPropertyInformation::create<Pointer>("Pointer");
   }
 
-void Pointer::setPointed(SProperty *prop)
+void Pointer::setPointed(const SProperty *prop)
   {
   if(hasInput())
     {
