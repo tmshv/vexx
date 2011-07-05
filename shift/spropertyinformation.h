@@ -55,6 +55,8 @@ public:
 
   void setData(DataKey, const QVariant &);
 
+  X_ALIGNED_OPERATOR_NEW
+
 private:
   void initiate(const SPropertyInformation *info,
                 const QString &name,
@@ -174,7 +176,7 @@ public:
   const SPropertyInstanceInformation *child(xsize index) const;
 
   // size of the property type, and its instance information
-  xsize dynamicSize() const { return size() + instanceInformationSize(); }
+  xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT-1; }
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0)
     {
@@ -189,6 +191,8 @@ public:
     return def;
     }
 
+  X_ALIGNED_OPERATOR_NEW
+
 private:
   template <typename T>
     static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
@@ -201,7 +205,6 @@ private:
     return def;
     }
 
-private:
   void reference() const;
   void dereference() const;
   friend class SDatabase;

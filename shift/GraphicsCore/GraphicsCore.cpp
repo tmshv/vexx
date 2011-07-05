@@ -12,6 +12,7 @@
 #include "3D/GCCamera.h"
 #include "3D/GCTransform.h"
 #include "3D/GCRenderable.h"
+#include "3D/GCScene.h"
 
 #include "3D/Renderable/GCGrid.h"
 
@@ -34,4 +35,5 @@ void initiateGraphicsCore(SDatabase *db)
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
 
   STypeRegistry::addType(GCGrid::staticTypeInformation());
+  STypeRegistry::addType(GCScene::staticTypeInformation());
   }

@@ -16,6 +16,8 @@ public:
 
   virtual void begin(XRenderer *) const;
   virtual void end(XRenderer *) const;
+
+  X_ALIGNED_OPERATOR_NEW
   };
 
 S_TYPED_POINTER_TYPE(GCCameraPointer, GCCamera)

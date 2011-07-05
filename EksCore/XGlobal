@@ -30,6 +30,8 @@
 #include "Eigen/Core"
 
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+#define X_ALIGN_BYTE_COUNT 0xf
+#define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&X_ALIGN_BYTE_COUNT) == 0);
 
 #ifndef QT_NO_DEBUG
 # define X_DEBUG

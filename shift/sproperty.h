@@ -24,7 +24,10 @@ class SDatabase;
   static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
     name *prop = new(ptr) name(); \
     if(instanceInfo) { \
-    *instanceInfo = (SPropertyInstanceInformation *)(prop + 1); \
+    xuint8 *alignedPtr = (xuint8*)(prop+1); \
+    alignedPtr += X_ALIGN_BYTE_COUNT - ((xsize)alignedPtr%X_ALIGN_BYTE_COUNT); \
+    xAssertIsAligned(alignedPtr); \
+    *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
     new(*instanceInfo) InstanceInformation(); \
     (*instanceInfo)->setDynamic(true); \
     } } \
@@ -233,6 +236,8 @@ public:
   static void assignProperty(const SProperty *, SProperty *);
   static void saveProperty(const SProperty *, SSaver & );
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+
+  X_ALIGNED_OPERATOR_NEW
 
 protected:
   template <typename T> T *getChange() const
