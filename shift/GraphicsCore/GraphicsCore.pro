@@ -24,7 +24,8 @@ HEADERS += GCGlobal.h \
     3D/GCGeometry.h \
     3D/GCCamera.h \
     3D/GCRenderable.h \
-    3D/Renderable/GCGrid.h
+    3D/Renderable/GCGrid.h \
+    3D/GCScene.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -45,4 +46,5 @@ SOURCES += \
     3D/GCGeometry.cpp \
     3D/GCCamera.cpp \
     3D/GCRenderable.cpp \
-    3D/Renderable/GCGrid.cpp
+    3D/Renderable/GCGrid.cpp \
+    3D/GCScene.cpp

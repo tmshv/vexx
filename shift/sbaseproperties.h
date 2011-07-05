@@ -125,6 +125,80 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
+template <typename Derived> QTextStream & operator <<(QTextStream &str, const Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width = data.cols();
+  xsize height = data.rows();
+  str << width << " " << height << " ";
+  for (xsize i = 0; i < height; ++i)
+    {
+    for(xsize j = 0; j < width; ++j)
+      {
+      str << data(i, j);
+      if((i < height-1) && (j < width-1)) // while not last element
+        {
+        str << " "; // separate each element with space
+        }
+      }
+    }
+  return str;
+  }
+
+
+template <typename Derived> QDataStream & operator <<(QDataStream &str, const Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width = data.cols();
+  xsize height = data.rows();
+  str << (quint64) width << (quint64) height;
+  for (xsize i = 0; i < height; ++i)
+    {
+    for(xsize j = 0; j < width; ++j)
+      {
+      str << data(i, j);
+      }
+    }
+  return str;
+  }
+
+template <typename Derived> QTextStream & operator >>(QTextStream &str, Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width;
+  xsize height;
+
+  str >> width >> height; // first element in str is size of str
+  data.resize(width, height);
+
+  for(xsize i = 0; i < height; ++i )
+    {
+    for(xsize j = 0; j < width; j++)
+      {
+      typename Derived::Scalar tVal;
+      str >> tVal;
+      data(i, j) = tVal;
+      }
+    }
+  return str;
+  }
+
+template <typename Derived> QDataStream & operator >>(QDataStream &str, Eigen::PlainObjectBase <Derived> &data)
+  {
+  quint64 width;
+  quint64 height;
+
+  str >> width >> height; // first element in str is size of str
+  data.resize(width, height);
+  for(xsize i = 0; i < height; ++i )
+    {
+    for(xsize j = 0; j < width; j++)
+      {
+      typename Derived::Scalar tVal;
+      str >> tVal;
+      data(i, j) = tVal;
+      }
+    }
+  return str;
+  }
+
 // specific pod interface for bool because it is actually a uint8.
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
   static void assign(BoolProperty* s, const bool &val) { s->assign(val); } \
@@ -144,8 +218,9 @@ public:
 
 template <typename T> class TypedPointer : public Pointer
   {
-  const T *pointed() const { preGet(); return input() ? input()->castTo<T>() : 0; }
-  const T *operator()() const { preGet(); return pointed(); }
+public:
+  const T *pointed() const { return input() ? input()->castTo<T>() : 0; }
+  const T *operator()() const { return pointed(); }
 
   void setPointed(const T *prop) { Pointer::setPointed(prop); }
   Pointer &operator=(const T *prop) { setPointed(prop); return *this; }
@@ -163,8 +238,8 @@ public:
 #define S_TYPED_POINTER_TYPE(name, type) \
   class name : public TypedPointer<type> { \
     S_PROPERTY(name, Pointer, 0); }; \
-    S_IMPLEMENT_PROPERTY(name) \
-  SPropertyInformation *name::createTypeInformation() { \
+    S_IMPLEMENT_INLINE_PROPERTY(name) \
+  inline SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); }
 
 

@@ -9,7 +9,7 @@ class GRAPHICSCORE_EXPORT GCRenderToTexture : public GCRenderTarget
   S_ENTITY(GCRenderToTexture, GCRenderTarget, 0)
 
 public:
-    GCRenderToTexture();
+  GCRenderToTexture();
   };
 
 #endif // GCRENDERTOTEXTURE_H

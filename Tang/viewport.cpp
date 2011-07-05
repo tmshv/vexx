@@ -108,14 +108,19 @@ void Viewport::initializeGL()
 
 void Viewport::resizeGL( int w, int h )
   {
-  _scene.setViewportSize( QSize( w, h ) );
+  _renderer->setViewportSize(QSize(w,h));
+  // set viewport info
   }
 
 void Viewport::paintGL()
   {
   foreach(GCRenderToScreen *sc, _screenRenderers)
     {
-    sc->render();
+    const GCRenderable* renderable = sc->source();
+    if(renderable)
+      {
+      renderable->render(_renderer);
+      }
     }
   }
 

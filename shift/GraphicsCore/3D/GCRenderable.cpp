@@ -10,3 +10,8 @@ SPropertyInformation *GCRenderable::createTypeInformation()
 GCRenderable::GCRenderable()
   {
   }
+
+
+void GCRenderable::render(XRenderer *) const
+  {
+  }

@@ -3,6 +3,7 @@
 
 #include "GCGlobal.h"
 #include "sentity.h"
+#include "GCRenderable.h"
 
 class GRAPHICSCORE_EXPORT GCRenderTarget : public SEntity
   {
@@ -11,7 +12,9 @@ class GRAPHICSCORE_EXPORT GCRenderTarget : public SEntity
 public:
   GCRenderTarget();
 
-  void render();
+  GCRenderablePointer source;
+
+  void render(XRenderer *);
   };
 
 #endif // GCRENDERTARGET_H

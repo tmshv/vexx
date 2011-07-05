@@ -30,6 +30,11 @@ class SDatabase;
     } } \
   public: enum { Version = version };
 
+#define S_ADD_ABSTRACT_STATIC_INFO(name, version) \
+  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
+  xAssertFailMessage("Creating abstract type"); } \
+  public: enum { Version = version };
+
 #define S_PROPERTY_ROOT(myName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version); \
@@ -44,9 +49,23 @@ class SDatabase;
   if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
   return info;}
 
+#define S_IMPLEMENT_INLINE_PROPERTY(myName) \
+  inline const SPropertyInformation *myName::staticTypeInformation() { \
+  static const SPropertyInformation *info = 0; \
+  if(!info) { info = STypeRegistry::findType(#myName); \
+  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
+  return info;}
+
 #define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  typedef superName ParentType; \
+  S_REGISTER_TYPE_FUNCTION()
+
+#define S_ABSTRACT_PROPERTY(myName, superName, version) \
+  public: \
+  S_ADD_ABSTRACT_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()

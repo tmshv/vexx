@@ -3,6 +3,10 @@
 
 #include "GCGlobal.h"
 #include "sentity.h"
+#include "XTransform.h"
+#include "sbaseproperties.h"
+
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, TransformProperty, XTransform, XTransform());
 
 class GRAPHICSCORE_EXPORT GCTransform : public SEntity
   {
@@ -10,6 +14,8 @@ class GRAPHICSCORE_EXPORT GCTransform : public SEntity
 
 public:
   GCTransform();
+
+  TransformProperty transform;
   };
 
 #endif // GCTRANSFORM3D_H
