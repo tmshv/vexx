@@ -176,7 +176,7 @@ public:
   const SPropertyInstanceInformation *child(xsize index) const;
 
   // size of the property type, and its instance information
-  xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT-1; }
+  xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0)
     {

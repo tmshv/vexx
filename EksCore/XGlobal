@@ -30,13 +30,18 @@
 #include "Eigen/Core"
 
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-#define X_ALIGN_BYTE_COUNT 0xf
-#define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&X_ALIGN_BYTE_COUNT) == 0);
+#define X_ALIGN_BYTE_COUNT 16
+#define X_ROUND_TO_ALIGNMENT(exp) ((__typeof__(exp))(exp + (ptrdiff_t)X_ALIGN_BYTE_COUNT - (((ptrdiff_t)exp)&((ptrdiff_t)X_ALIGN_BYTE_COUNT-1))))
+#define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&(X_ALIGN_BYTE_COUNT-1)) == 0);
 
 #ifndef QT_NO_DEBUG
 # define X_DEBUG
 # define X_PROFILING_ENABLED
+# define xVerify(x) x
+#else
+# define xVerify(x) xAssert(x);
 #endif
+
 
 #define xAssertFail() xAssert(0);
 #define xAssertFailMessage(msg) xAssert(0 && msg);

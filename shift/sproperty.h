@@ -25,7 +25,7 @@ class SDatabase;
     name *prop = new(ptr) name(); \
     if(instanceInfo) { \
     xuint8 *alignedPtr = (xuint8*)(prop+1); \
-    alignedPtr += X_ALIGN_BYTE_COUNT - ((xsize)alignedPtr%X_ALIGN_BYTE_COUNT); \
+    alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
     xAssertIsAligned(alignedPtr); \
     *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
     new(*instanceInfo) InstanceInformation(); \
