@@ -38,7 +38,8 @@ private:
     {
     None,
     MovingEntity,
-    ConnectingProperty
+    ConnectingProperty,
+    ConnectingEntity
     };
   ControlMode _controlMode;
 

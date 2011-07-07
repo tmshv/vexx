@@ -14,8 +14,7 @@ class GRAPHICSCORE_EXPORT GCCamera : public GCTransform
 public:
   GCCamera();
 
-  virtual void begin(XRenderer *) const;
-  virtual void end(XRenderer *) const;
+  ComplexTransformProperty projection;
 
   X_ALIGNED_OPERATOR_NEW
   };

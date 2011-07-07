@@ -9,7 +9,8 @@ SPropertyInformation *GCScene::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCScene>("GCScene");
 
-  info->add(&GCScene::camera, "camera");
+  info->add(&GCScene::cameraTransform , "cameraTransform");
+  info->add(&GCScene::cameraProjection , "cameraProjection");
 
   return info;
   }
@@ -20,21 +21,19 @@ GCScene::GCScene()
 
 void GCScene::render(XRenderer *r) const
   {
-  if(camera())
-    {
-    camera()->begin(r);
+  r->setProjectionTransform(cameraProjection());
+  r->pushTransform(cameraTransform());
 
-    XGeometry x;
-    XModeller m(&x, 128);
+  XGeometry x;
+  XModeller m(&x, 128);
 
-    m.drawCube();
+  m.drawCube();
 
-    XShader s;
+  XShader s;
 
-    r->setShader(&s);
-    r->drawGeometry(x);
-    r->setShader(0);
+  r->setShader(&s);
+  r->drawGeometry(x);
+  r->setShader(0);
 
-    camera()->end(r);
-    }
+  r->popTransform();
   }

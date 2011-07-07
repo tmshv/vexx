@@ -12,6 +12,8 @@
 #define SHADOW_OFFSET 3
 #define CONNECTION_EXTENSION 50
 
+#define NUM_PROPERTIES_T0_SKIP 0
+
 GCSimpleNodeDelegate::GCSimpleNodeDelegate() : _titleFntMetrics(_titleFnt), _propFntMetrics(_propFnt)
   {
   _titleFnt.setBold(true);
@@ -53,22 +55,32 @@ void GCSimpleNodeDelegate::updateRenderData(const SEntity *ent) const
   propFnt.setPixelSize(9);
   QFontMetrics propFntMetrics(titleFnt);
 
-  xsize numProperties = ent->size();
+  xsize numProperties = ent->size() - NUM_PROPERTIES_T0_SKIP;
 
   int fillWidth = titleFntMetrics.width(ent->name());
 
-  for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling())
+  size_t i = 0;
+  for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling(), ++i)
     {
+    if(i<NUM_PROPERTIES_T0_SKIP)
+      {
+      continue;
+      }
     fillWidth = qMax(fillWidth, titleFntMetrics.width(prop->name()));
     }
   fillWidth = qMin(fillWidth, MAX_WIDTH);
 
-  rd.size.setWidth(fillWidth + (TITLE_PADDING + OUTER_PADDING) * 2);
+  float innerWidth = fillWidth + (2*TITLE_PADDING) + OUTER_PADDING;
+
+  rd.size.setWidth(fillWidth + (2*TITLE_PADDING) + (3*OUTER_PADDING) + titleFntMetrics.height());
   rd.size.setHeight(titleFntMetrics.height() + ((TITLE_PADDING + OUTER_PADDING) * 2) + (numProperties * (PROP_PADDING + propFntMetrics.height())));
 
   rd.titleBounds.setTopLeft(QPoint(OUTER_PADDING, OUTER_PADDING));
-  rd.titleBounds.setBottomRight(QPoint(rd.size.width() - OUTER_PADDING - 1,
+  rd.titleBounds.setBottomRight(QPoint(rd.size.width() - (2*OUTER_PADDING) - 1 - titleFntMetrics.height(),
               _titleFntMetrics.height() + TITLE_PADDING + OUTER_PADDING));
+
+  rd.entOutputRadius = rd.titleBounds.height() / 2;
+  rd.entOutputPos = QPoint(rd.titleBounds.right() + OUTER_PADDING, OUTER_PADDING);
 
   rd.title.setText(titleFntMetrics.elidedText(ent->name(), Qt::ElideRight, fillWidth));
   rd.title.prepare(QTransform(), titleFnt);
@@ -76,11 +88,15 @@ void GCSimpleNodeDelegate::updateRenderData(const SEntity *ent) const
   int propYOffset = PROP_PADDING + _propFntMetrics.height();
   int propYStart = _titleFntMetrics.height() + OUTER_PADDING + (2 * TITLE_PADDING) + PROP_PADDING;
 
-  xsize i = 0;
+  i = 0;
   rd.properties.resize(numProperties);
   for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling(), ++i)
     {
-    QString text = propFntMetrics.elidedText(prop->name(), Qt::ElideRight, fillWidth);
+    if(i<NUM_PROPERTIES_T0_SKIP)
+      {
+      continue;
+      }
+    QString text = propFntMetrics.elidedText(prop->name(), Qt::ElideRight, innerWidth);
     rd.properties[i].text.setText(text);
     rd.properties[i].text.prepare(QTransform(), propFnt);
 
@@ -130,6 +146,11 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
     xsize index = 0;
     for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling(), ++index)
       {
+      if(index<NUM_PROPERTIES_T0_SKIP)
+        {
+        continue;
+        }
+
       if(prop->hasInput())
         {
         SProperty *input = prop->input();
@@ -137,7 +158,7 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
         const RenderData &inputRD(_renderData.value(input->entity()));
 
         QPoint inputPosition = rd.position + rd.properties[index].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
-        QPoint outputPosition = inputRD.position + inputRD.properties[input->index()].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
+        QPoint outputPosition = inputRD.position + inputRD.properties[input->index()-NUM_PROPERTIES_T0_SKIP].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
 
         inputPosition.setX(rd.position.x());
         outputPosition.setX(inputRD.position.x() + inputRD.size.width());
@@ -185,6 +206,10 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
       ptr->setPen(Qt::transparent);
       ptr->drawRoundedRect(QRect(rd.position + rd.titleBounds.topLeft(), rd.titleBounds.size()), 2, 2);
 
+      ptr->setPen(QColor(96, 96, 96));
+      ptr->setBrush(QColor(128, 128, 128));
+      ptr->drawEllipse(renderPoint + rd.entOutputPos, rd.entOutputRadius, rd.entOutputRadius);
+
       ptr->setPen(Qt::black);
       ptr->setFont(_titleFnt);
       ptr->drawStaticText(renderPoint, rd.title);
@@ -213,9 +238,13 @@ GCAbstractNodeDelegate::HitArea GCSimpleNodeDelegate::hitTest(const QPoint &poin
       {
       area = NodeTranslatable;
       }
+    else if(QRect(rd.entOutputPos + rd.position, QSize(rd.entOutputRadius*2, rd.entOutputRadius*2)).contains(point))
+      {
+      area = NodeOutput;
+      }
     else
       {
-      xsize i = 0;
+      xsize i = NUM_PROPERTIES_T0_SKIP;
       foreach(const RenderData::PropertyData &prop, rd.properties)
         {
         QRect left(rd.position + prop.position, QSize(rd.size.width() / 2, _propFntMetrics.height()));
@@ -255,7 +284,15 @@ void GCSimpleNodeDelegate::drawConnection(XAbstractCanvas *c, const void *ent, x
 
   const RenderData &rd(_renderData[ent]);
 
-  QPoint connectingPosition = rd.position + rd.properties[prop].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
+  QPoint connectingPosition;
+  if(prop == X_SIZE_SENTINEL)
+    {
+    connectingPosition = rd.position + rd.entOutputPos + QPoint(rd.entOutputRadius, rd.entOutputRadius);
+    }
+  else
+    {
+    connectingPosition = rd.position + rd.properties[prop-NUM_PROPERTIES_T0_SKIP].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
+    }
 
   QPainterPath path;
   if(fromOutput)

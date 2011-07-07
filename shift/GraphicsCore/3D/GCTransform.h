@@ -7,6 +7,7 @@
 #include "sbaseproperties.h"
 
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, TransformProperty, XTransform, XTransform());
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, ComplexTransformProperty, XComplexTransform, XComplexTransform());
 
 class GRAPHICSCORE_EXPORT GCTransform : public SEntity
   {

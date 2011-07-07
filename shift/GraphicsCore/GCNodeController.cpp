@@ -49,7 +49,7 @@ int GCNodeController::mouseEvent(MouseEventType type,
 
     result |= Used|NeedsUpdate;
     }
-  if(type == Move && _controlMode == ConnectingProperty && _interactionEntity)
+  if(type == Move && (_controlMode == ConnectingProperty || _controlMode == ConnectingEntity) && _interactionEntity)
     {
     result = Used|NeedsUpdate;
     }
@@ -79,6 +79,11 @@ int GCNodeController::mouseEvent(MouseEventType type,
             _interactionEntity = it->entity();
             _controlMode = MovingEntity;
             }
+          else if(hitResult == GCAbstractNodeDelegate::NodeOutput)
+            {
+            _interactionEntity = it->entity();
+            _controlMode = ConnectingEntity;
+            }
           else if(hitResult == GCAbstractNodeDelegate::Input)
             {
             _controlMode = ConnectingProperty;
@@ -100,6 +105,30 @@ int GCNodeController::mouseEvent(MouseEventType type,
       }
     else if(type == Release && _controlMode != None)
       {
+      if(_controlMode == ConnectingEntity)
+        {
+        canvas()->model()->resetIterator(_iterator);
+        while(_iterator->next())
+          {
+          const GCAbstractNodeDelegate *delegate = static_cast<const GCAbstractNodeDelegate*>(canvas()->model()->delegateFor(_iterator, canvas()));
+
+          const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator*>(_iterator);
+          xsize index = X_SIZE_SENTINEL;
+          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+
+          if(hitResult == GCAbstractNodeDelegate::Input)
+            {
+            SProperty *b = it->entity()->at(index);
+            _interactionEntity->connect(b);
+            }
+          }
+
+        _controlMode = None;
+        _interactionEntity = 0;
+        _interactionDelegate = 0;
+
+        result |= Used|NeedsUpdate;
+        }
       if(_controlMode == ConnectingProperty)
         {
         canvas()->model()->resetIterator(_iterator);
@@ -123,8 +152,8 @@ int GCNodeController::mouseEvent(MouseEventType type,
             b->connect(a);
             }
           }
-
         }
+
       _controlMode = None;
       _interactionEntity = 0;
       _interactionDelegate = 0;
@@ -154,5 +183,12 @@ void GCNodeController::paint(xuint32 pass) const
     xAssert(_interactionEntity);
 
     _interactionDelegate->drawConnection(canvas(), _interactionEntity, _interactionProperty, _connectingOutput, lastKnownMousePosition());
+    }
+
+  if(pass == _connectionPass && _controlMode == ConnectingEntity)
+    {
+    xAssert(_interactionEntity);
+
+    _interactionDelegate->drawConnection(canvas(), _interactionEntity, X_SIZE_SENTINEL, true, lastKnownMousePosition());
     }
   }

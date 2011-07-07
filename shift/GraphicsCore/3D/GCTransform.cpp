@@ -2,7 +2,7 @@
 #include "styperegistry.h"
 #include "sdatabase.h"
 
-inline void writeValue(SSaver &s, const XTransform &t)
+template <typename Scalar, int Size, int Type> inline void writeValue(SSaver &s, const Eigen::Transform<Scalar, Size, Type> &t)
   {
   if(s.streamMode() == SSaver::Text)
     {
@@ -14,7 +14,7 @@ inline void writeValue(SSaver &s, const XTransform &t)
     }
   }
 
-inline void readValue(SLoader &l, XTransform &t)
+template <typename Scalar, int Size, int Type> inline void readValue(SLoader &l, Eigen::Transform<Scalar, Size, Type> &t)
   {
   if(l.streamMode() == SLoader::Text)
     {
@@ -27,8 +27,13 @@ inline void readValue(SLoader &l, XTransform &t)
   }
 
 IMPLEMENT_POD_PROPERTY(TransformProperty, XTransform);
+IMPLEMENT_POD_PROPERTY(ComplexTransformProperty, XComplexTransform);
 
 void TransformProperty::assignProperty(const SProperty *f, SProperty *t)
+  {
+  }
+
+void ComplexTransformProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   }
 

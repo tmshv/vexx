@@ -21,6 +21,7 @@ public:
     NodeDull,
     NodeTranslatable,
     Input,
+    NodeOutput,
     Output,
     MaxNodeParts
     };
@@ -57,6 +58,9 @@ public:
     QSize size;
     QRect titleBounds;
     QStaticText title;
+
+    QPoint entOutputPos;
+    xuint32 entOutputRadius;
 
     struct PropertyData
       {

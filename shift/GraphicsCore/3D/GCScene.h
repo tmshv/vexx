@@ -11,7 +11,8 @@ class GCScene : public GCRenderable
 public:
   GCScene();
 
-  GCCameraPointer camera;
+  ComplexTransformProperty cameraProjection;
+  TransformProperty cameraTransform;
 
   void render(XRenderer *) const;
   };
