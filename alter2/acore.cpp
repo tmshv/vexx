@@ -74,7 +74,7 @@ ACore::~ACore()
       plugin->unload();
       plugin->setCore( 0 );
       }
-    delete child;
+    child->deleteLater();
   }
   delete _priv;
   }

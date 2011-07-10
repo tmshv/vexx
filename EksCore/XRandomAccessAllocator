@@ -191,9 +191,9 @@ public:
     }
   bool contains(void *ptr) const
     {
-    foreach(XRandomAccessFixedSizeBlock *ptr, _internal)
+    foreach(XRandomAccessFixedSizeBlock *a, _internal)
       {
-      if(!ptr->contains(ptr))
+      if(a->contains(ptr))
         {
         return true;
         }

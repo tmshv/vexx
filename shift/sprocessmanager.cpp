@@ -102,7 +102,7 @@ void SProcessManager::preCompute(const SPropertyInstanceInformation *info, SProp
       QMutexLocker l(&g_manager->criticalLock);
 
       bool success = true;
-      while(success && g_manager->workers.size())
+      while(success && g_manager->spareWorkers.size())
         {
         WorkerThread *worker = g_manager->spareWorkers.back();
         g_manager->spareWorkers.pop_back();
@@ -167,8 +167,8 @@ void SProcessManager::preCompute(const SPropertyInstanceInformation *info, SProp
     neededToWait = false;
     for(xsize i=0; i<numJobs; ++i)
       {
-      xAssert(!jobs[i]->_flags.hasFlag(SProperty::Dirty));
-      if(jobs[i]->_flags.hasFlag(SProperty::PreGetting))
+      if(jobs[i]->_flags.hasFlag(SProperty::Dirty) ||
+         jobs[i]->_flags.hasFlag(SProperty::PreGetting))
         {
         l.unlock();
         QThread::yieldCurrentThread();

@@ -11,6 +11,7 @@ class UIDatabaseDebugSurface : public QObject, public UISurface
   Q_OBJECT
 public:
   UIDatabaseDebugSurface(SDatabase *db=0);
+  ~UIDatabaseDebugSurface();
 
   void setDatabase(SDatabase *db);
 

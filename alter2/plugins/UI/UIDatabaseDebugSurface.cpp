@@ -24,6 +24,10 @@ UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
   connect(_treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
   }
 
+UIDatabaseDebugSurface::~UIDatabaseDebugSurface()
+  {
+  }
+
 void UIDatabaseDebugSurface::setDatabase(SDatabase *db)
   {
   _db = db;

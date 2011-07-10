@@ -14,15 +14,18 @@
 #include "sentityui.h"
 #include "application.h"
 #include "3D/GCRenderToScreen.h"
+#include "3D/GCViewport.h"
 
-QGLContext *Viewport::initRenderer()
-  {
-  _renderer = new XGLRenderer( true );
-  return _renderer->context();
-  }
+QGLFormat fmt( bool multi )
+    {
+    QGLFormat ret;
+    ret.setSampleBuffers( multi );
+    return ret;
+    }
 
-Viewport::Viewport(Application *app, SPlugin &db) : QGLWidget( initRenderer() ),
+Viewport::Viewport(Application *app, SPlugin &db) : QGLWidget(fmt(false)),
     UISurface("Tang", this, UISurface::Dock),
+    _renderer( new XGLRenderer() ),
     _camera( 55, XVector3D( 0, 5, 10 ) ),
     _scene( _renderer, &_camera ), _initMouse( true ),
     _app(app),
@@ -39,21 +42,13 @@ Viewport::Viewport(Application *app, SPlugin &db) : QGLWidget( initRenderer() ),
   _db = &db.db();
   _db->addTreeObserver(this);
 
-  /*_properties = new QWidget(0);
-  _properties->show();
-  _properties->setGeometry(QRect(_properties->pos(), QSize(250, 600)));
-  connect(this, SIGNAL(destroyed()), _properties, SLOT(deleteLater()));
-  // add a layout for later use
-  new QVBoxLayout(_properties);
-
-  QAction *newItemAction = new QAction(this);
-  connect(newItemAction, SIGNAL(triggered()), this, SLOT(newItem()));
-  newItemAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-  addAction(newItemAction);*/
+  _viewport = _db->addChild<GCViewport>("Viewport");
+  _db->addChild<GCRenderToScreen>("Output");
   }
 
 Viewport::~Viewport()
   {
+  _screenRenderers.clear();
   _db->removeTreeObserver(this);
   }
 
@@ -86,34 +81,25 @@ void Viewport::onTreeChange(const SChange *c)
 
 void Viewport::initializeGL()
   {
+  _renderer->setContext(const_cast<QGLContext*>(context()));
   _renderer->intialise();
-
-  class EnvironmentDoodad : public XDoodad
-    {
-  public:
-    EnvironmentDoodad(XEnvironmentRenderer* rend)// : _envRenderer(rend)
-      {
-      }
-    virtual void render( )
-      {
-      //_envRenderer->render();
-      }
-
-  private:
-    //XEnvironmentRenderer *_envRenderer;
-    };
-
-  //_scene.addDoodad(new EnvironmentDoodad(_envRenderer));
   }
 
 void Viewport::resizeGL( int w, int h )
   {
   _renderer->setViewportSize(QSize(w,h));
-  // set viewport info
+
+  if(_viewport.isValid())
+    {
+    GCViewport *vp = _viewport->uncheckedCastTo<GCViewport>();
+    vp->width = w;
+    vp->height = h;
+    }
   }
 
 void Viewport::paintGL()
   {
+  _renderer->clear();
   foreach(GCRenderToScreen *sc, _screenRenderers)
     {
     const GCRenderable* renderable = sc->source();

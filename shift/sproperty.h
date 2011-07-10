@@ -102,7 +102,7 @@ public:
 
   bool isComputed() const { return baseInstanceInformation()->compute() != 0; }
   bool hasInput() const { return _input; }
-  bool hasOutputs() const { preGet(); return _output; }
+  bool hasOutputs() const { return _output; }
 
   template <typename T> T *nextSibling()
     {

@@ -7,6 +7,7 @@
 #include "XCamera.h"
 #include "XScene.h"
 #include "XEnvironmentViewer.h"
+#include "sentityweakpointer.h"
 #include "splugin.h"
 
 class XEnvironmentRenderer;
@@ -64,6 +65,7 @@ private:
 
   SAppDatabase *_db;
   QList<GCRenderToScreen*> _screenRenderers;
+  SEntityWeakPointer _viewport;
   };
 
 #endif // VIEWPORT_H

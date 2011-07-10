@@ -43,6 +43,7 @@ public:
   typedef XFlags<OptionsFlags> Options;
 
   SDatabaseModel(SDatabase *db, SEntity *ent, Options options);
+  ~SDatabaseModel();
 
   virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QModelIndex index( int row, int column, const QModelIndex &parent = QModelIndex() ) const;

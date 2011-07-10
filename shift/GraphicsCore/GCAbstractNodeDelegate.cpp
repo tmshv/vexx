@@ -158,7 +158,16 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
         const RenderData &inputRD(_renderData.value(input->entity()));
 
         QPoint inputPosition = rd.position + rd.properties[index].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
-        QPoint outputPosition = inputRD.position + inputRD.properties[input->index()-NUM_PROPERTIES_T0_SKIP].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
+        QPoint outputPosition;
+
+        if(input == input->entity())
+          {
+          outputPosition = inputRD.position + QPoint(inputRD.size.width(), inputRD.entOutputPos.y() + inputRD.entOutputRadius);
+          }
+        else
+          {
+          outputPosition = inputRD.position + inputRD.properties[input->index()-NUM_PROPERTIES_T0_SKIP].position + QPoint(-OUTER_PADDING, _propFntMetrics.height() / 2);
+          }
 
         inputPosition.setX(rd.position.x());
         outputPosition.setX(inputRD.position.x() + inputRD.size.width());

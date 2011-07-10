@@ -24,7 +24,7 @@ public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
     InstanceInformation() : _defaultValue(defaultDefault) { } \
     XProperties: XRORefProperty(type, defaultValue); \
-    void initiateFromDefinition(const type &def) { _defaultValue = def; } \
+    void setDefault(const type &def) { _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
       { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
   S_PROPERTY(name, SProperty, 0); \
@@ -143,7 +143,6 @@ template <typename Derived> QTextStream & operator <<(QTextStream &str, const Ei
     }
   return str;
   }
-
 
 template <typename Derived> QDataStream & operator <<(QDataStream &str, const Eigen::PlainObjectBase <Derived> &data)
   {

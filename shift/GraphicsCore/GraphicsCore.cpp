@@ -16,6 +16,8 @@
 
 #include "3D/Renderable/GCGrid.h"
 
+#include "3D/GCViewport.h"
+
 
 void initiateGraphicsCore(SDatabase *db)
   {
@@ -26,7 +28,11 @@ void initiateGraphicsCore(SDatabase *db)
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
 
   STypeRegistry::addType(GCTransform::staticTypeInformation());
+
+  STypeRegistry::addType(GCViewport::staticTypeInformation());
+
   STypeRegistry::addType(GCCamera::staticTypeInformation());
+  STypeRegistry::addType(GCPerspectiveCamera::staticTypeInformation());
 
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCRenderToScreen::staticTypeInformation());

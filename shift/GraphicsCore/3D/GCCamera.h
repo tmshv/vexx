@@ -19,6 +19,21 @@ public:
   X_ALIGNED_OPERATOR_NEW
   };
 
+class GRAPHICSCORE_EXPORT GCPerspectiveCamera : public GCCamera
+  {
+  S_ENTITY(GCPerspectiveCamera, GCCamera, 0)
+
+public:
+  GCPerspectiveCamera();
+
+  FloatProperty fieldOfView;
+
+  FloatProperty aspectRatio;
+
+  FloatProperty nearClip;
+  FloatProperty farClip;
+  };
+
 S_TYPED_POINTER_TYPE(GCCameraPointer, GCCamera)
 
 #endif // GCCAMERA_H

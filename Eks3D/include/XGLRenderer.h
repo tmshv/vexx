@@ -11,7 +11,9 @@ class XGLFramebuffer;
 class EKS3D_EXPORT XGLRenderer : public XRenderer
     {
 public:
-    XGLRenderer( bool multiSample=false );
+    XGLRenderer();
+
+    void setContext(QGLContext *ctx);
 
     QGLContext *context();
     const QGLContext *context() const;
@@ -35,7 +37,6 @@ public:
 
     virtual void enableRenderFlag( RenderFlags );
     virtual void disableRenderFlag( RenderFlags );
-    virtual int enabledFeatures( ) const;
 
     virtual void setViewportSize( QSize );
     virtual void setProjectionTransform( const XComplexTransform & );
@@ -53,7 +54,6 @@ private:
     XGLShader *_currentShader;
     QSize _size;
     XGLFramebuffer *_currentFramebuffer;
-    int _features;
     };
 
 #endif // XGLRENDERER_H

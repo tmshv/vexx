@@ -4,10 +4,36 @@
 #include "XGlobal"
 #include "Eigen/Core"
 #include "XVector2D"
+#include "QDebug"
 
 typedef Eigen::Matrix<xReal, 4, 4> XMatrix4x4;
 typedef Eigen::Matrix<xReal, 3, 3> XMatrix3x3;
 
 #define XMatrix Eigen::Matrix
+
+template <typename Derived> QDebug operator <<(QDebug str, const Eigen::DenseBase <Derived> &data)
+  {
+  xsize width = data.cols();
+  xsize height = data.rows();
+
+  for (xsize i = 0; i < height; ++i)
+    {
+    str << "[ ";
+    for(xsize j = 0; j < width; ++j)
+      {
+      str << data(i, j);
+      if((i < height-1) && (j < width-1)) // while not last element
+        {
+        str << ", "; // separate each element with space
+        }
+      }
+    str << " ]";
+    if(i < (height-1))
+      {
+      str << "\n";
+      }
+    }
+  return str;
+  }
 
 #endif

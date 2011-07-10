@@ -225,16 +225,15 @@ private:
 // RENDERER
 //----------------------------------------------------------------------------------------------------------------------
 
-QGLFormat fmt( bool multi )
+
+XGLRenderer::XGLRenderer() : _currentShader( 0 ), _currentFramebuffer(0)
     {
-    QGLFormat ret;
-    ret.setSampleBuffers( multi );
-    return ret;
     }
 
-XGLRenderer::XGLRenderer( bool multi ) : _context( new QGLContext( fmt( multi ) ) ), _currentShader( 0 )
-    {
-    }
+void XGLRenderer::setContext(QGLContext *ctx)
+  {
+  _context = ctx;
+  }
 
 QGLContext *XGLRenderer::context()
     {
@@ -303,11 +302,6 @@ void XGLRenderer::disableRenderFlag( RenderFlags f )
         }
     }
 
-int XGLRenderer::enabledFeatures() const
-    {
-    return _features;
-    }
-
 void XGLRenderer::setViewportSize( QSize size )
     {
     _size = size;
@@ -319,6 +313,7 @@ void XGLRenderer::setProjectionTransform( const XComplexTransform &trans )
     glMatrixMode( GL_PROJECTION ) GLE;
     glLoadIdentity() GLE;
     glMultMatrixf( trans.data() ) GLE;
+    glMatrixMode( GL_MODELVIEW ) GLE;
     }
 
 QDebug operator<<( QDebug dbg, XVector2D v )

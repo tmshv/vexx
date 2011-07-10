@@ -324,7 +324,6 @@ bool SProperty::ConnectionChange::apply(int mode)
       clearParentHasInputConnection(_driven);
       clearParentHasOutputConnection(_driver);
       }
-    _driven->postSet();
     }
   else if(mode&Backward)
     {
@@ -341,7 +340,6 @@ bool SProperty::ConnectionChange::apply(int mode)
       setParentHasOutputConnection(_driver);
       setDependantsDirty(_driver, true);
       }
-    _driven->postSet();
     }
 
   if(mode&Inform)

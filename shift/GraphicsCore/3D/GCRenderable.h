@@ -14,7 +14,7 @@ class GRAPHICSCORE_EXPORT GCRenderable : public SEntity
 public:
   GCRenderable();
 
-  void render(XRenderer *) const;
+  virtual void render(XRenderer *) const;
   };
 
 S_TYPED_POINTER_TYPE(GCRenderablePointer, GCRenderable)
