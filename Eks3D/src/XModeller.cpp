@@ -4,7 +4,7 @@
 #include "XSize"
 #include "XCuboid.h"
 
-XModeller::XModeller( XGeometry *g, xsize initialSize ) : _geo( g )
+XModeller::XModeller( XGeometry *g, xsize initialSize ) : _geo( g ), _transform(XTransform::Identity())
     {
     _vertex.reserve(initialSize);
     _texture.reserve(initialSize);
@@ -384,7 +384,7 @@ void XModeller::restore()
         }
     }
 
-XVector3D XModeller::transformPoint( XVector3D in )
+XVector3D XModeller::transformPoint( const XVector3D &in )
     {
     return _transform * in;
     }

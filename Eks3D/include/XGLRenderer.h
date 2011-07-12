@@ -54,6 +54,7 @@ private:
     XGLShader *_currentShader;
     QSize _size;
     XGLFramebuffer *_currentFramebuffer;
+    XVector <int> m_ids;
     };
 
 #endif // XGLRENDERER_H
