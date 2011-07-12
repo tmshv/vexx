@@ -14,7 +14,9 @@
 #include "sentityui.h"
 #include "application.h"
 #include "3D/GCRenderToScreen.h"
+#include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
+#include "3D/GCScene.h"
 
 QGLFormat fmt( bool multi )
     {
@@ -42,8 +44,17 @@ Viewport::Viewport(Application *app, SPlugin &db) : QGLWidget(fmt(false)),
   _db = &db.db();
   _db->addTreeObserver(this);
 
-  _viewport = _db->addChild<GCViewport>("Viewport");
-  _db->addChild<GCRenderToScreen>("Output");
+  GCViewport* vp = _db->addChild<GCViewport>("Viewport");
+  _viewport = vp;
+  GCRenderToScreen* op = _db->addChild<GCRenderToScreen>("Output");
+
+  GCPerspectiveCamera* cam = _db->addChild<GCPerspectiveCamera>("Camera");
+  vp->aspectRatio.connect(&cam->aspectRatio);
+
+  GCScene* scene = _db->addChild<GCScene>("Scene");
+  cam->projection.connect(&scene->cameraProjection);
+
+  op->source.setPointed(scene);
   }
 
 Viewport::~Viewport()

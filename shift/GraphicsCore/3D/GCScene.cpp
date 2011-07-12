@@ -19,6 +19,20 @@ SPropertyInformation *GCScene::createTypeInformation()
 
 GCScene::GCScene()
   {
+    {
+    XModeller m(&x, 128);
+
+    m.begin(XModeller::Triangles);
+      m.vertex(0,0,0);
+      m.vertex(0,1,0);
+      m.vertex(0,1,1);
+      m.vertex(0,0,0);
+      m.vertex(0,1,1);
+      m.vertex(0,1,0);
+    m.end();
+
+    m.drawCube();
+    }
   }
 
 void GCScene::render(XRenderer *r) const
@@ -51,6 +65,18 @@ void GCScene::render(XRenderer *r) const
   glLoadIdentity();						// Reset The View
   r->pushTransform(t);
 
+  r->setShader(&s);
+
+
+  glBegin(GL_LINES);
+    glVertex3f( 0.0f, 1.0f, 0.0f);
+    glVertex3f( 0.0f,-1.0f, 0.0f);
+    glVertex3f( 1.0f, 0.0f, 0.0f);
+    glVertex3f(-1.0f, 0.0f, 0.0f);
+    glVertex3f( 0.0f, 0.0f, 1.0f);
+    glVertex3f( 0.0f, 0.0f,-1.0f);
+  glEnd();
+
   glBegin(GL_TRIANGLES);						// Drawing Using Triangles
     glVertex3f( 0.0f, 1.0f, 0.0f);				// Top
     glVertex3f(-1.0f,-1.0f, 0.0f);				// Bottom Left
@@ -66,14 +92,6 @@ void GCScene::render(XRenderer *r) const
     glVertex3f(-1.0f,-1.0f, 0.0f);				// Bottom Left
   glEnd();
 
-  XGeometry x;
-  XModeller m(&x, 128);
-
-  m.drawCube();
-
-  XShader s;
-
-  r->setShader(&s);
   r->drawGeometry(x);
   r->setShader(0);
 

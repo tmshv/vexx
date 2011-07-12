@@ -88,3 +88,8 @@ LIBS += -lEksCore
 RESOURCES += \
     ../GLResources.qrc
 
+OTHER_FILES += \
+    ../GLResources/shaders/default.vert \
+    ../GLResources/shaders/default.frag \
+    ../GLResources/shaders/blinn.vert \
+    ../GLResources/shaders/blinn.frag

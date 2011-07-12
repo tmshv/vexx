@@ -4,7 +4,10 @@
 #include "GCRenderable.h"
 #include "GCCamera.h"
 
-class GCScene : public GCRenderable
+#include "XGeometry.h"
+#include "XShader.h"
+
+class GRAPHICSCORE_EXPORT GCScene : public GCRenderable
   {
   S_PROPERTY(GCScene, GCRenderable, 0);
 
@@ -15,6 +18,10 @@ public:
   TransformProperty cameraTransform;
 
   void render(XRenderer *) const;
+
+private:
+  XGeometry x;
+  XShader s;
   };
 
 #endif // GCSCENE_H
