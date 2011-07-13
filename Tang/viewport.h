@@ -6,7 +6,7 @@
 #include "QGLWidget"
 #include "XCamera.h"
 #include "XScene.h"
-#include "XEnvironmentViewer.h"
+#include "XAbstractCanvasController.h"
 #include "sentityweakpointer.h"
 #include "splugin.h"
 
@@ -18,7 +18,7 @@ class GCRenderToScreen;
 
 class EnvironmentEntity;
 
-class Viewport : public QGLWidget, public UISurface, XEnvironmentViewer, STreeObserver
+class Viewport : public X3DCanvas, public UISurface, XAbstractCanvasController, STreeObserver
   {
   Q_OBJECT
 public:
@@ -31,8 +31,9 @@ public:
 
   void keyPressEvent( QKeyEvent *event );
   void keyReleaseEvent( QKeyEvent *event );
-  void mouseMoveEvent( QMouseEvent *event );
-  void mousePressEvent( QMouseEvent *event );
+
+  X_CANVAS_GENERAL_MOUSEHANDLERS()
+
   void showEvent(QShowEvent *);
 
   X_ALIGNED_OPERATOR_NEW

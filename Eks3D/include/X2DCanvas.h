@@ -5,6 +5,8 @@
 #include "QWidget"
 #include "XAbstractCanvas.h"
 #include "XAbstractCanvasController.h"
+#include "QMouseEvent"
+
 
 class QPainter;
 
@@ -21,10 +23,7 @@ XProperties:
 public:
   X2DCanvas(QWidget *parent=0);
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *event);
-  virtual void mouseMoveEvent(QMouseEvent *event);
-  virtual void mousePressEvent(QMouseEvent *event);
-  virtual void mouseReleaseEvent(QMouseEvent *event);
+  X_CANVAS_GENERAL_MOUSEHANDLERS()
 
   virtual void update(XAbstractRenderModel::UpdateMode);
 
