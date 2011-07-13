@@ -21,16 +21,17 @@ GCNodeController::~GCNodeController()
     }
   }
 
-int GCNodeController::mouseEvent(MouseEventType type,
+GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
                                      QPoint point,
                                      Qt::MouseButton triggerButton,
                                      Qt::MouseButtons buttonsDown,
-                                     Qt::KeyboardModifiers modifiers)
+                                     Qt::KeyboardModifiers modifiers,
+                                     int orientation)
   {
 
   QPoint mouseDelta(point - lastKnownMousePosition());
 
-  int result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers, orientation);
   if(result != NotUsed)
     {
     return result;

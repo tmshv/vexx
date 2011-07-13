@@ -3,70 +3,52 @@
 
 #include "UISurface.h"
 #include "XObject"
-#include "QGLWidget"
+#include "X3DCanvas.h"
 #include "XCamera.h"
 #include "XScene.h"
-#include "XAbstractCanvasController.h"
+#include "XCameraCanvasController.h"
+#include "XAbstractRenderModel.h"
+#include "XAbstractDelegate.h"
 #include "sentityweakpointer.h"
 #include "splugin.h"
+#include "XGLRenderer.h"
 
 class XEnvironmentRenderer;
-class XGLRenderer;
 class Application;
 
 class GCRenderToScreen;
 
 class EnvironmentEntity;
 
-class Viewport : public X3DCanvas, public UISurface, XAbstractCanvasController, STreeObserver
+class Viewport : public X3DCanvas, public UISurface, STreeObserver, XCameraCanvasController::CameraInterface
   {
   Q_OBJECT
+
 public:
   Viewport(Application *env, SPlugin &);
   ~Viewport();
 
+protected:
   void initializeGL();
   void resizeGL( int w, int h );
   void paintGL();
 
-  void keyPressEvent( QKeyEvent *event );
-  void keyReleaseEvent( QKeyEvent *event );
-
-  X_CANVAS_GENERAL_MOUSEHANDLERS()
-
-  void showEvent(QShowEvent *);
-
-  X_ALIGNED_OPERATOR_NEW
-
-private slots:
-  void newItem();
-
-private:
-  QGLContext *initRenderer();
-
   virtual void onTreeChange(const SChange *);
 
-  virtual XVector3D screenToWorld(const QPoint &pt) const;
-  virtual XVector3D position() const;
-  virtual xReal farClipPlane() const;
-  virtual xReal nearClipPlane() const;
-  virtual XFrustum frustum() const;
+  virtual void zoom(float factor, float x, float y);
+  virtual void track(float x, float y);
+  virtual void dolly(float x, float y);
+  virtual void pan(float x, float y);
 
-  XGLRenderer *_renderer;
-  XPerspectiveCamera _camera;
-  XScene _scene;
+  XGLRenderer _renderer;
   QTimer *_timer;
-  QPoint _oldPos;
-  bool _initMouse;
-  XList <int> _move;
-  XEnvironmentRenderer *_envRenderer;
-  //EnvironmentEntity *_entity;
-  QWidget *_properties;
   Application *_app;
 
   SAppDatabase *_db;
   QList<GCRenderToScreen*> _screenRenderers;
   SEntityWeakPointer _viewport;
+
+  XCameraCanvasController _controller;
   };
 
 #endif // VIEWPORT_H

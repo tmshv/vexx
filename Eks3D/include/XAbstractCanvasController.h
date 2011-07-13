@@ -5,26 +5,42 @@
 #include "XProperty"
 #include "QEvent"
 #include "QPoint"
+#include "XFlags"
 class XAbstractCanvas;
 
-#define X_IMPLEMENT_MOUSEHANDLER(function, type) \
+#define X_IMPLEMENT_MOUSEHANDLER(function, type, update) \
 virtual void function(QMouseEvent *event) { \
   if(controller()) { \
-    int result = controller()->triggerMouseEvent(XAbstractCanvasController::type, \
+    XAbstractCanvasController::UsedFlags result = controller()->triggerMouseEvent( \
+                                                  XAbstractCanvasController::type, \
                                                   event->pos(), \
                                                   event->button(), \
                                                   event->buttons(), \
-                                                  event->modifiers()); \
-    if((result&XAbstractCanvasController::Used) != false) { event->accept(); } \
-    if((result&XAbstractCanvasController::NeedsUpdate) != false) { QWidget::update(); } \
+                                                  event->modifiers(), \
+                                                  0); \
+    if((result.hasFlag(XAbstractCanvasController::Used))) { event->accept(); } \
+    if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update; } \
     return; } \
   event->ignore(); }
 
 #define X_CANVAS_GENERAL_MOUSEHANDLERS(update) \
-  X_IMPLEMENT_MOUSEHANDLER(mouseDoubleClickEvent, DoubleClick) \
-  X_IMPLEMENT_MOUSEHANDLER(mouseMoveEvent, Move) \
-  X_IMPLEMENT_MOUSEHANDLER(mousePressEvent, Press) \
-  X_IMPLEMENT_MOUSEHANDLER(mouseReleaseEvent, Release)
+  X_IMPLEMENT_MOUSEHANDLER(mouseDoubleClickEvent, DoubleClick, update) \
+  X_IMPLEMENT_MOUSEHANDLER(mouseMoveEvent, Move, update) \
+  X_IMPLEMENT_MOUSEHANDLER(mousePressEvent, Press, update) \
+  X_IMPLEMENT_MOUSEHANDLER(mouseReleaseEvent, Release, update) \
+  virtual void wheelEvent(QWheelEvent *event) { \
+    if(controller()) { \
+      XAbstractCanvasController::UsedFlags result = controller()->triggerMouseEvent( \
+                                                    XAbstractCanvasController::Wheel, \
+                                                    event->pos(), \
+                                                    Qt::NoButton, \
+                                                    event->buttons(), \
+                                                    event->modifiers(), \
+                                                    event->orientation()); \
+      if((result.hasFlag(XAbstractCanvasController::Used))) { event->accept(); } \
+      if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update; } \
+      return; } \
+    event->ignore(); }
 
 class EKS3D_EXPORT XAbstractCanvasController
   {
@@ -38,7 +54,8 @@ public:
     DoubleClick,
     Move,
     Press,
-    Release
+    Release,
+    Wheel
     };
 
   XAbstractCanvasController(XAbstractCanvas *canvas);
@@ -49,22 +66,25 @@ public:
     Used = 1,
     NeedsUpdate = 2
     };
+  typedef XFlags<Result> UsedFlags;
 
   virtual xuint32 maxNumberOfPasses(xuint32 modelMaxPasses) const { return 0; }
   virtual void paint(xuint32 pass) const { }
 
-  int triggerMouseEvent(MouseEventType type,
+  UsedFlags triggerMouseEvent(MouseEventType type,
                          QPoint point,
                          Qt::MouseButton triggerButton,
                          Qt::MouseButtons buttonsDown,
-                         Qt::KeyboardModifiers modifiers);
+                         Qt::KeyboardModifiers modifiers,
+                         int orientation);
 
 protected:
-  virtual int mouseEvent(MouseEventType type,
+  virtual UsedFlags mouseEvent(MouseEventType type,
                           QPoint point,
                           Qt::MouseButton triggerButton,
                           Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers) { return false; }
+                          Qt::KeyboardModifiers modifiers,
+                          int orientation) { return NotUsed; }
 
   X_DISABLE_COPY(XAbstractCanvasController);
   };
