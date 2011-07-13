@@ -8,7 +8,7 @@ XAbstractGeometry::~XAbstractGeometry()
   }
 
 XGeometry::XGeometry( BufferType type ) : _internal( 0 ), _changedP( false ), _changedL( false ),
-    _changedT( false ), _attributeSizeChanged( false ), _attributeSize( 0 ), _renderer( 0 ), _type( type )
+    _changedT( false ), _attributeSizeChanged( false ), _changedAttrs(false), _attributeSize( 0 ), _renderer( 0 ), _type( type )
   {
   }
 
@@ -115,6 +115,7 @@ void XGeometry::setAttribute( const QString &n, const XVector<xReal> &v )
     _attr1.remove(n);
     }
   _changedA1 << n;
+  _changedAttrs = true;
   }
 
 void XGeometry::setAttribute( const QString &n, const XVector<XVector2D> &v )
@@ -133,6 +134,7 @@ void XGeometry::setAttribute( const QString &n, const XVector<XVector2D> &v )
     _attr1.remove(n);
     }
   _changedA2 << n;
+  _changedAttrs = true;
   }
 
 void XGeometry::setAttribute( const QString &n, const XVector<XVector3D> &v )
@@ -151,6 +153,7 @@ void XGeometry::setAttribute( const QString &n, const XVector<XVector3D> &v )
     _attr1.remove(n);
     }
   _changedA3 << n;
+  _changedAttrs = true;
   }
 
 void XGeometry::setAttribute( const QString &n, const XVector<XVector4D> &v )
@@ -169,6 +172,7 @@ void XGeometry::setAttribute( const QString &n, const XVector<XVector4D> &v )
     _attr1.remove(n);
     }
   _changedA4 << n;
+  _changedAttrs = true;
   }
 
 void XGeometry::removeAttribute( const QString &in )
@@ -178,24 +182,28 @@ void XGeometry::removeAttribute( const QString &in )
     _attr1.remove( in );
     _changedA1 << in;
     _attributeSizeChanged = true;
+    _changedAttrs = true;
     }
   if( _attr2.contains(in) )
     {
     _attr2.remove( in );
     _changedA2 << in;
     _attributeSizeChanged = true;
+    _changedAttrs = true;
     }
   if( _attr3.contains(in) )
     {
     _attr3.remove( in );
     _changedA3 << in;
     _attributeSizeChanged = true;
+    _changedAttrs = true;
     }
   if( _attr4.contains(in) )
     {
     _attr4.remove( in );
     _changedA4 << in;
     _attributeSizeChanged = true;
+    _changedAttrs = true;
     }
   }
 
@@ -266,6 +274,7 @@ void XGeometry::setTriangles( const XList<unsigned int> &in )
 
 void XGeometry::prepareInternal( XRenderer *r ) const
   {
+  xAssert(_renderer == 0 || r == _renderer);
   _renderer = r;
   if( !_internal )
     {
@@ -297,67 +306,75 @@ void XGeometry::prepareInternal( XRenderer *r ) const
   if( _changedP )
     {
     _internal->setPoints( _points );
+    _changedP = false;
     }
   if( _changedL )
     {
     _internal->setLines( _lines );
+    _changedL = false;
     }
   if( _changedT )
     {
     _internal->setTriangles( _triangles );
+    _changedT = false;
     }
 
-  if( _attributeSizeChanged )
+  if(_changedAttrs)
     {
-    _internal->setAttributesSize( _attributeSize, _attr1.size(), _attr2.size(), _attr3.size(), _attr4.size() );
+    if( _attributeSizeChanged )
+      {
+      _internal->setAttributesSize( _attributeSize, _attr1.size(), _attr2.size(), _attr3.size(), _attr4.size() );
 
-    foreach( QString na, _attr1.keys() )
-      {
-      _internal->setAttribute( na, _attr1[na] );
-      }
-    foreach( QString na, _attr2.keys() )
-      {
-      _internal->setAttribute( na, _attr2[na] );
-      }
-    foreach( QString na, _attr3.keys() )
-      {
-      _internal->setAttribute( na, _attr3[na] );
-      }
-    foreach( QString na, _attr4.keys() )
-      {
-      _internal->setAttribute( na, _attr4[na] );
-      }
-    }
-  else
-    {
-    foreach( QString na, _changedA1 )
-      {
-      if( _attr1.contains( na ) )
+      foreach( QString na, _attr1.keys() )
         {
         _internal->setAttribute( na, _attr1[na] );
         }
-      }
-    foreach( QString na, _changedA2 )
-      {
-      if( _attr2.contains( na ) )
+      foreach( QString na, _attr2.keys() )
         {
         _internal->setAttribute( na, _attr2[na] );
         }
-      }
-    foreach( QString na, _changedA3 )
-      {
-      if( _attr3.contains( na ) )
+      foreach( QString na, _attr3.keys() )
         {
         _internal->setAttribute( na, _attr3[na] );
         }
-      }
-    foreach( QString na, _changedA4 )
-      {
-      if( _attr4.contains( na ) )
+      foreach( QString na, _attr4.keys() )
         {
         _internal->setAttribute( na, _attr4[na] );
         }
+      _attributeSizeChanged = false;
       }
+    else
+      {
+      foreach( QString na, _changedA1 )
+        {
+        if( _attr1.contains( na ) )
+          {
+          _internal->setAttribute( na, _attr1[na] );
+          }
+        }
+      foreach( QString na, _changedA2 )
+        {
+        if( _attr2.contains( na ) )
+          {
+          _internal->setAttribute( na, _attr2[na] );
+          }
+        }
+      foreach( QString na, _changedA3 )
+        {
+        if( _attr3.contains( na ) )
+          {
+          _internal->setAttribute( na, _attr3[na] );
+          }
+        }
+      foreach( QString na, _changedA4 )
+        {
+        if( _attr4.contains( na ) )
+          {
+          _internal->setAttribute( na, _attr4[na] );
+          }
+        }
+      }
+    _changedAttrs = 0;
     }
   }
 
