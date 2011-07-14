@@ -25,17 +25,21 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
                                      QPoint point,
                                      Qt::MouseButton triggerButton,
                                      Qt::MouseButtons buttonsDown,
-                                     Qt::KeyboardModifiers modifiers,
-                                     int orientation)
+                                     Qt::KeyboardModifiers modifiers)
   {
+  QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
 
-  QPoint mouseDelta(point - lastKnownMousePosition());
 
-  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers, orientation);
+  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
   if(result != NotUsed)
     {
     return result;
     }
+
+  point = transform.map(point);
+  QPoint lKP = transform.map(lastKnownMousePosition());
+
+  QPoint mouseDelta(point - lKP);
 
   if(!_iterator)
     {
@@ -166,8 +170,6 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
     {
     emit onContextMenu(point);
     }
-
-  lastKnownMousePosition() = point;
   return result;
   }
 
@@ -183,13 +185,21 @@ void GCNodeController::paint(xuint32 pass) const
     {
     xAssert(_interactionEntity);
 
-    _interactionDelegate->drawConnection(canvas(), _interactionEntity, _interactionProperty, _connectingOutput, lastKnownMousePosition());
+    QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
+
+    QPoint point = transform.map(lastKnownMousePosition());
+
+    _interactionDelegate->drawConnection(canvas(), _interactionEntity, _interactionProperty, _connectingOutput, point);
     }
 
   if(pass == _connectionPass && _controlMode == ConnectingEntity)
     {
     xAssert(_interactionEntity);
 
-    _interactionDelegate->drawConnection(canvas(), _interactionEntity, X_SIZE_SENTINEL, true, lastKnownMousePosition());
+    QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
+
+    QPoint point = transform.map(lastKnownMousePosition());
+
+    _interactionDelegate->drawConnection(canvas(), _interactionEntity, X_SIZE_SENTINEL, true, point);
     }
   }

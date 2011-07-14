@@ -12,6 +12,7 @@ public:
   public:
     enum MovementType
       {
+      None = 0,
       Zoom = 1,
       Track = 2,
       Dolly = 4,
@@ -38,8 +39,16 @@ public:
                           QPoint point,
                           Qt::MouseButton triggerButton,
                           Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers,
-                          int orientation);
+                          Qt::KeyboardModifiers modifiers);
+
+  virtual UsedFlags wheelEvent(int delta,
+                               Qt::Orientation orientation,
+                               QPoint point,
+                               Qt::MouseButtons buttonsDown,
+                               Qt::KeyboardModifiers modifiers);
+
+private:
+  CameraInterface::MovementType _current;
   };
 
 #endif // XCAMERACANVASCONTROLLER_H

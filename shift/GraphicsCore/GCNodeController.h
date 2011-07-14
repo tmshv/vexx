@@ -19,8 +19,7 @@ public:
                           QPoint point,
                           Qt::MouseButton triggerButton,
                           Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers,
-                          int orientation);
+                          Qt::KeyboardModifiers modifiers);
   virtual xuint32 maxNumberOfPasses(xuint32 modelMaxPasses) const;
   virtual void paint(xuint32 pass) const;
 

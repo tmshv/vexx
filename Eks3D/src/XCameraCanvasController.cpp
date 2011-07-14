@@ -10,8 +10,7 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
                         QPoint point,
                         Qt::MouseButton triggerButton,
                         Qt::MouseButtons buttonsDown,
-                        Qt::KeyboardModifiers modifiers,
-                        int orientation)
+                        Qt::KeyboardModifiers modifiers)
   {
   if(!_camera)
     {
@@ -20,10 +19,53 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
 
   CameraInterface::MovementFlags supported = _camera->supportedMovements();
 
-  if(supported.hasFlag(CameraInterface::Zoom) && type == Wheel)
+  if(type == Press)
     {
-    QPoint delta = lastKnownMousePosition() - point;
-    float length = 1.0f + 0.0001f * sqrt(delta.x()*delta.x() + delta.y()*delta.y());
+    if(supported.hasFlag(CameraInterface::Track) && triggerButton == Qt::MiddleButton)
+      {
+      _current = CameraInterface::Track;
+      return Used;
+      }
+    }
+  else if(type == Move)
+    {
+    QPoint delta = point - lastKnownMousePosition();
+    if(_current == CameraInterface::Track)
+      {
+      _camera->track(delta.x(), delta.y());
+      return Used|NeedsUpdate;
+      }
+    }
+  else if(type == Release)
+    {
+    if(_current != CameraInterface::None)
+      {
+      _current = CameraInterface::None;
+
+      return Used;
+      }
+    }
+
+  return NotUsed;
+  }
+
+
+XCameraCanvasController::UsedFlags XCameraCanvasController::wheelEvent(int delta,
+                                                                       Qt::Orientation orientation,
+                                                                       QPoint point,
+                                                                       Qt::MouseButtons buttonsDown,
+                                                                       Qt::KeyboardModifiers modifiers)
+  {
+  if(!_camera)
+    {
+    return NotUsed;
+    }
+
+  CameraInterface::MovementFlags supported = _camera->supportedMovements();
+
+  if(supported.hasFlag(CameraInterface::Zoom))
+    {
+    float length = 1.0f + (delta * 0.002f);
 
     _camera->zoom(length, point.x(), point.y());
     return Used|NeedsUpdate;

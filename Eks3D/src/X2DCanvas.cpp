@@ -35,16 +35,6 @@ XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCamer
   {
   }
 
-XSimple2DCanvasController::UsedFlags XSimple2DCanvasController::mouseEvent(MouseEventType type,
-                        QPoint point,
-                        Qt::MouseButton triggerButton,
-                        Qt::MouseButtons buttonsDown,
-                        Qt::KeyboardModifiers modifiers,
-                        int orientation)
-  {
-  return XCameraCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers, orientation);
-  }
-
 XSimple2DCanvasController::MovementFlags XSimple2DCanvasController::supportedMovements() const
   {
   return Track | Zoom;
@@ -54,16 +44,27 @@ void XSimple2DCanvasController::zoom(float factor, float x, float y)
   {
   QTransform& transform = static_cast<X2DCanvas*>(canvas())->transform();
 
-  //transform.translate(-x, -y);
+  if((factor > 1.0f && transform.m11() < 5.0f) || (factor < 1.0f && transform.m11() > 0.1f))
+    {
+    QPoint pos(x, y);
+    pos = transform.inverted().map(pos);
 
-  transform.scale(factor, factor);
+    transform.translate(pos.x(), pos.y());
 
-  //transform.translate(x, y);
+    transform.scale(factor, factor);
+
+    transform.translate(-pos.x(), -pos.y());
+    }
   }
 
 void XSimple2DCanvasController::track(float x, float y)
   {
-  qDebug() << "track" << x << y;
+  QTransform& transform = static_cast<X2DCanvas*>(canvas())->transform();
+
+  x /= transform.m11();
+  y /= transform.m11();
+
+  transform.translate(x, y);
   }
 
 void XSimple2DCanvasController::dolly(float x, float y)

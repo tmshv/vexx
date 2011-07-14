@@ -36,12 +36,6 @@ class EKS3D_EXPORT XSimple2DCanvasController : public XCameraCanvasController, X
   {
 public:
   XSimple2DCanvasController(X2DCanvas *canvas);
-  virtual UsedFlags mouseEvent(MouseEventType type,
-                          QPoint point,
-                          Qt::MouseButton triggerButton,
-                          Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers,
-                          int orientation);
 
 
   virtual MovementFlags supportedMovements() const;

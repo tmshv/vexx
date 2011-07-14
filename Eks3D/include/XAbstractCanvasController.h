@@ -16,29 +16,27 @@ virtual void function(QMouseEvent *event) { \
                                                   event->pos(), \
                                                   event->button(), \
                                                   event->buttons(), \
-                                                  event->modifiers(), \
-                                                  0); \
+                                                  event->modifiers()); \
     if((result.hasFlag(XAbstractCanvasController::Used))) { event->accept(); } \
-    if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update; } \
+    if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update(XAbstractRenderModel::RenderChange); } \
     return; } \
   event->ignore(); }
 
-#define X_CANVAS_GENERAL_MOUSEHANDLERS(update) \
+#define X_CANVAS_GENERAL_MOUSEHANDLERS() \
   X_IMPLEMENT_MOUSEHANDLER(mouseDoubleClickEvent, DoubleClick, update) \
   X_IMPLEMENT_MOUSEHANDLER(mouseMoveEvent, Move, update) \
   X_IMPLEMENT_MOUSEHANDLER(mousePressEvent, Press, update) \
   X_IMPLEMENT_MOUSEHANDLER(mouseReleaseEvent, Release, update) \
   virtual void wheelEvent(QWheelEvent *event) { \
     if(controller()) { \
-      XAbstractCanvasController::UsedFlags result = controller()->triggerMouseEvent( \
-                                                    XAbstractCanvasController::Wheel, \
+      XAbstractCanvasController::UsedFlags result = controller()->triggerWheelEvent( \
+                                                    event->delta(), \
+                                                    event->orientation(), \
                                                     event->pos(), \
-                                                    Qt::NoButton, \
                                                     event->buttons(), \
-                                                    event->modifiers(), \
-                                                    event->orientation()); \
+                                                    event->modifiers()); \
       if((result.hasFlag(XAbstractCanvasController::Used))) { event->accept(); } \
-      if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update; } \
+      if((result.hasFlag(XAbstractCanvasController::NeedsUpdate))) { update(XAbstractRenderModel::RenderChange); } \
       return; } \
     event->ignore(); }
 
@@ -54,8 +52,7 @@ public:
     DoubleClick,
     Move,
     Press,
-    Release,
-    Wheel
+    Release
     };
 
   XAbstractCanvasController(XAbstractCanvas *canvas);
@@ -72,19 +69,29 @@ public:
   virtual void paint(xuint32 pass) const { }
 
   UsedFlags triggerMouseEvent(MouseEventType type,
-                         QPoint point,
-                         Qt::MouseButton triggerButton,
-                         Qt::MouseButtons buttonsDown,
-                         Qt::KeyboardModifiers modifiers,
-                         int orientation);
+                              QPoint point,
+                              Qt::MouseButton triggerButton,
+                              Qt::MouseButtons buttonsDown,
+                              Qt::KeyboardModifiers modifiers);
+
+  UsedFlags triggerWheelEvent(int delta,
+                              Qt::Orientation orientation,
+                              QPoint point,
+                              Qt::MouseButtons buttonsDown,
+                              Qt::KeyboardModifiers modifiers);
 
 protected:
   virtual UsedFlags mouseEvent(MouseEventType type,
                           QPoint point,
                           Qt::MouseButton triggerButton,
                           Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers,
-                          int orientation) { return NotUsed; }
+                          Qt::KeyboardModifiers modifiers) { return NotUsed; }
+
+  virtual UsedFlags wheelEvent(int delta,
+                               Qt::Orientation orientation,
+                               QPoint point,
+                               Qt::MouseButtons buttonsDown,
+                               Qt::KeyboardModifiers modifiers) { return NotUsed; }
 
   X_DISABLE_COPY(XAbstractCanvasController);
   };
