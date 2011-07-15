@@ -20,7 +20,7 @@ class GCRenderToScreen;
 
 class EnvironmentEntity;
 
-class Viewport : public X3DCanvas, public UISurface, STreeObserver, XCameraCanvasController::CameraInterface
+class Viewport : public X3DCanvas, public UISurface, STreeObserver
   {
   Q_OBJECT
 
@@ -34,11 +34,6 @@ protected:
   void paintGL();
 
   virtual void onTreeChange(const SChange *);
-
-  virtual void zoom(float factor, float x, float y);
-  virtual void track(float x, float y);
-  virtual void dolly(float x, float y);
-  virtual void pan(float x, float y);
 
   XGLRenderer _renderer;
   QTimer *_timer;

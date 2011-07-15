@@ -4,10 +4,11 @@
 #include "GCGlobal.h"
 #include "GCTransform.h"
 #include "sbaseproperties.h"
+#include "XCameraCanvasController.h"
 
 class XRenderer;
 
-class GRAPHICSCORE_EXPORT GCCamera : public GCTransform
+class GRAPHICSCORE_EXPORT GCCamera : public GCTransform, public XCameraCanvasController::CameraInterface
   {
   S_ENTITY(GCCamera, GCTransform, 0)
 
@@ -15,6 +16,11 @@ public:
   GCCamera();
 
   ComplexTransformProperty projection;
+
+  void zoom(float factor, float x, float y);
+  void track(float x, float y);
+  void dolly(float x, float y);
+  void pan(float x, float y);
 
   X_ALIGNED_OPERATOR_NEW
   };

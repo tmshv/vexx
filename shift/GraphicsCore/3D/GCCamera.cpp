@@ -21,6 +21,26 @@ GCCamera::GCCamera()
   {
   }
 
+void GCCamera::zoom(float factor, float x, float y)
+  {
+  qDebug() << "zoom" << factor;
+  }
+
+void GCCamera::track(float x, float y)
+  {
+  qDebug() << "track" << x << y;
+  }
+
+void GCCamera::dolly(float x, float y)
+  {
+  qDebug() << "dolly" << x << y;
+  }
+
+void GCCamera::pan(float x, float y)
+  {
+  qDebug() << "pan" << x << y;
+  }
+
 S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 
 void computePerspective(const SPropertyInstanceInformation *child, SPropertyContainer *prop)

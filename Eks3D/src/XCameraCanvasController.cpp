@@ -32,7 +32,6 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
        ((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == (Qt::ShiftModifier|Qt::AltModifier)))
       {
 
-      qDebug() << "Pan";
       _current = CameraInterface::Pan;
       return Used;
       }
@@ -40,7 +39,6 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
        ((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == Qt::AltModifier))
       {
 
-      qDebug() << "Dolly";
       _current = CameraInterface::Dolly;
       return Used;
       }
