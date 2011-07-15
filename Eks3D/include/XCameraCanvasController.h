@@ -49,6 +49,7 @@ public:
 
 private:
   CameraInterface::MovementType _current;
+  QPoint _zoomCentre;
   };
 
 #endif // XCAMERACANVASCONTROLLER_H

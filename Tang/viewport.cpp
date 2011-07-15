@@ -23,6 +23,8 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
     _db(0),
     _controller(this, this)
   {
+  setController(&_controller);
+
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
   _timer->start( 40 );
