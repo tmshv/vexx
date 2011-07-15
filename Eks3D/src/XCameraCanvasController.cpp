@@ -1,7 +1,7 @@
 #include "XCameraCanvasController.h"
 
 XCameraCanvasController::XCameraCanvasController(CameraInterface *cam, XAbstractCanvas *canvas)
-    : XAbstractCanvasController(canvas), _camera(cam)
+    : XAbstractCanvasController(canvas), _camera(cam), _current(CameraInterface::None)
   {
   }
 

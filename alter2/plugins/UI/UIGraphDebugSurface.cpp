@@ -32,6 +32,8 @@ const XAbstractDelegate *UIGraphDebugSurface::delegateFor(XAbstractRenderModel::
 
 void UIGraphDebugSurface::onContextMenu(QPoint point)
   {
+  QPoint graphSpacePoint = _canvas->transform().inverted().map(point);
+
   QMenu menu;
 
   SEntity *ent = 0;
@@ -47,7 +49,7 @@ void UIGraphDebugSurface::onContextMenu(QPoint point)
     {
     Iterator *i = static_cast<Iterator*>(_iterator);
     xsize idx = X_SIZE_SENTINEL;
-    GCAbstractNodeDelegate::HitArea hA = _delegate.hitTest(point, i->entity(), idx);
+    GCAbstractNodeDelegate::HitArea hA = _delegate.hitTest(graphSpacePoint, i->entity(), idx);
     if(hA != GCAbstractNodeDelegate::None)
       {
       area = hA;

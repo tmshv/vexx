@@ -22,7 +22,7 @@ GCNodeController::~GCNodeController()
   }
 
 GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
-                                     QPoint point,
+                                     QPoint widgetSpacePoint,
                                      Qt::MouseButton triggerButton,
                                      Qt::MouseButtons buttonsDown,
                                      Qt::KeyboardModifiers modifiers)
@@ -30,16 +30,16 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
   QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
 
 
-  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, widgetSpacePoint, triggerButton, buttonsDown, modifiers);
   if(result != NotUsed)
     {
     return result;
     }
 
-  point = transform.map(point);
+  QPoint graphSpacePoint = transform.map(widgetSpacePoint);
   QPoint lKP = transform.map(lastKnownMousePosition());
 
-  QPoint mouseDelta(point - lKP);
+  QPoint mouseDelta(graphSpacePoint - lKP);
 
   if(!_iterator)
     {
@@ -71,7 +71,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
 
         const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(_iterator);
         xsize index = X_SIZE_SENTINEL;
-        GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+        GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
 
         if(hitResult != GCAbstractNodeDelegate::None)
           {
@@ -119,7 +119,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
 
           const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator*>(_iterator);
           xsize index = X_SIZE_SENTINEL;
-          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
 
           if(hitResult == GCAbstractNodeDelegate::Input)
             {
@@ -143,7 +143,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
 
           const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator*>(_iterator);
           xsize index = X_SIZE_SENTINEL;
-          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
 
           SProperty *a = _interactionEntity->at(_interactionProperty);
           if(_connectingOutput && hitResult == GCAbstractNodeDelegate::Input)
@@ -168,7 +168,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
     }
   else if(type == Press && triggerButton == Qt::RightButton)
     {
-    emit onContextMenu(point);
+    emit onContextMenu(widgetSpacePoint);
     }
   return result;
   }

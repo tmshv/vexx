@@ -15,8 +15,8 @@ void X2DCanvas::paintEvent(QPaintEvent *event)
   painter.setRenderHint(QPainter::Antialiasing, antiAliasingEnabled());
   _currentPainter = &painter;
 
-  _region = event->rect();
-  painter.fillRect(_region, _backgroundColour);
+  _region = _transform.inverted().mapRect(event->rect());
+  painter.fillRect(event->rect(), _backgroundColour);
 
   painter.setTransform(_transform);
 
