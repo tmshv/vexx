@@ -1,7 +1,7 @@
 void main(void)
   {
   float dist = gl_FragCoord.x + gl_FragCoord.y;
-  bool aOrB = fmod(dist, 20.0) < 10.0;
+  bool aOrB = mod(dist, 20.0) < 10.0;
   if(aOrB)
     {
     gl_FragColor = vec4( 0.2, 0.2, 0.2, 1.0 );

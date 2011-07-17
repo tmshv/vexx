@@ -3,44 +3,69 @@
 #include "XRenderer.h"
 #include "XCamera.h"
 
+S_IMPLEMENT_PROPERTY(GCViewableTransform)
+
+SPropertyInformation *GCViewableTransform::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCViewableTransform>("GCViewableTransform");
+
+  info->add(&GCCamera::distance, "distance");
+  info->add(&GCCamera::projection, "projection");
+
+  return info;
+  }
+
+GCViewableTransform::GCViewableTransform()
+  {
+  }
+
+void GCViewableTransform::setPosition(const XVector3D &point)
+  {
+  XTransform t = transform();
+  t.translation() = point;
+  transform = t;
+  }
+
+void GCViewableTransform::setFocalPoint(const XVector3D &point)
+  {
+  }
+
+void GCViewableTransform::zoom(float factor, float x, float y)
+  {
+  qDebug() << "zoom" << factor;
+  }
+
+void GCViewableTransform::track(float x, float y)
+  {
+  qDebug() << "track" << x << y;
+  }
+
+void GCViewableTransform::dolly(float x, float y)
+  {
+  rotateAboutPoint(XVector3D(0, 0, 0), x, y);
+  }
+
+void GCViewableTransform::pan(float x, float y)
+  {
+  rotateAboutPoint(transform().translation(), x, y);
+  }
+
+void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, float y)
+  {
+  qDebug() << "rap" << x << y;
+  }
+
 S_IMPLEMENT_PROPERTY(GCCamera)
 
 SPropertyInformation *GCCamera::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCCamera>("GCCamera");
-
-  info->add(&GCCamera::projection, "projection");
-
-  TransformProperty::InstanceInformation *trInfo = info->child(&GCCamera::transform);
-  trInfo->setDefault(XTransformUtilities::lookAt(XVector3D(10,5,10), XVector3D(0,0,0), XVector3D(0,1,0)));
-
   return info;
   }
 
 GCCamera::GCCamera()
   {
   }
-
-void GCCamera::zoom(float factor, float x, float y)
-  {
-  qDebug() << "zoom" << factor;
-  }
-
-void GCCamera::track(float x, float y)
-  {
-  qDebug() << "track" << x << y;
-  }
-
-void GCCamera::dolly(float x, float y)
-  {
-  qDebug() << "dolly" << x << y;
-  }
-
-void GCCamera::pan(float x, float y)
-  {
-  qDebug() << "pan" << x << y;
-  }
-
 S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 
 void computePerspective(const SPropertyInstanceInformation *child, SPropertyContainer *prop)

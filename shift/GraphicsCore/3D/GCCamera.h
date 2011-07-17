@@ -8,21 +8,32 @@
 
 class XRenderer;
 
-class GRAPHICSCORE_EXPORT GCCamera : public GCTransform, public XCameraCanvasController::CameraInterface
+class GRAPHICSCORE_EXPORT GCViewableTransform : public GCTransform, public XCameraCanvasController::CameraInterface
   {
-  S_ENTITY(GCCamera, GCTransform, 0)
+  S_ENTITY(GCViewableTransform, GCTransform, 0)
 
 public:
-  GCCamera();
+  GCViewableTransform();
 
+  FloatProperty distance;
   ComplexTransformProperty projection;
+
+  void setPosition(const XVector3D &point);
+  void setFocalPoint(const XVector3D &point);
 
   void zoom(float factor, float x, float y);
   void track(float x, float y);
   void dolly(float x, float y);
   void pan(float x, float y);
+  void rotateAboutPoint(const XVector3D &point, float x, float y);
+  };
 
-  X_ALIGNED_OPERATOR_NEW
+class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
+  {
+  S_ENTITY(GCCamera, GCViewableTransform, 0)
+
+public:
+  GCCamera();
   };
 
 class GRAPHICSCORE_EXPORT GCPerspectiveCamera : public GCCamera
