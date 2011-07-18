@@ -74,7 +74,8 @@ SPropertyInformation *GCTransform::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCTransform>("GCTransform");
 
-  info->add(&GCTransform::transform, "transform");
+  TransformProperty::InstanceInformation* trInfo = info->add(&GCTransform::transform, "transform");
+  trInfo->setDefault(XTransform::Identity());
 
   return info;
   }

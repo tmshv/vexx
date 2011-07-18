@@ -10,8 +10,8 @@ SPropertyInformation *GCScene::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCScene>("GCScene");
 
-  info->add(&GCScene::cameraTransform , "cameraTransform");
-  info->add(&GCScene::cameraProjection , "cameraProjection");
+  info->add(&GCScene::cameraTransform, "cameraTransform");
+  info->add(&GCScene::cameraProjection, "cameraProjection");
 
   return info;
   }

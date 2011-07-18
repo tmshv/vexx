@@ -43,12 +43,12 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   vp->aspectRatio.connect(&cam->aspectRatio);
   _controller.setCamera(cam);
 
-  cam->setPosition(XVector3D(10.0f, 5.0f, 10.0f));
+  cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
   cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
 
   GCScene* scene = _db->addChild<GCScene>("Scene");
   cam->projection.connect(&scene->cameraProjection);
-  cam->transform.connect(&scene->cameraTransform);
+  cam->viewTransform.connect(&scene->cameraTransform);
 
   op->source.setPointed(scene);
   }

@@ -15,11 +15,16 @@ class GRAPHICSCORE_EXPORT GCViewableTransform : public GCTransform, public XCame
 public:
   GCViewableTransform();
 
-  FloatProperty distance;
+  Vector3DProperty upVector;
+  FloatProperty focalDistance;
   ComplexTransformProperty projection;
 
+  TransformProperty viewTransform;
+
   void setPosition(const XVector3D &point);
+
   void setFocalPoint(const XVector3D &point);
+  XVector3D focalPoint() const;
 
   void zoom(float factor, float x, float y);
   void track(float x, float y);
