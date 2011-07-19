@@ -16,6 +16,9 @@ SPropertyInformation *GCViewport::createTypeInformation()
   aR->setCompute(computeAspectRatio);
   aR->setDefault(1.0f);
 
+  info->add(&GCViewport::x, "x");
+  info->add(&GCViewport::y, "y");
+
   UnsignedIntProperty::InstanceInformation *width = info->add(&GCViewport::width, "width");
   width->setAffects(aR);
   UnsignedIntProperty::InstanceInformation *height = info->add(&GCViewport::height, "height");

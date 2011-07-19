@@ -10,7 +10,7 @@ class XRenderer;
 
 class GRAPHICSCORE_EXPORT GCViewableTransform : public GCTransform, public XCameraCanvasController::CameraInterface
   {
-  S_ENTITY(GCViewableTransform, GCTransform, 0)
+  S_ABSTRACT_ENTITY(GCViewableTransform, GCTransform, 0)
 
 public:
   GCViewableTransform();
@@ -19,12 +19,21 @@ public:
   FloatProperty focalDistance;
   ComplexTransformProperty projection;
 
+  UnsignedIntProperty viewportX;
+  UnsignedIntProperty viewportY;
+  UnsignedIntProperty viewportWidth;
+  UnsignedIntProperty viewportHeight;
+
   TransformProperty viewTransform;
 
   void setPosition(const XVector3D &point);
 
   void setFocalPoint(const XVector3D &point);
   XVector3D focalPoint() const;
+
+  bool unitViewportCoordinates(xuint32 x, xuint32 y, float &xUnit, float &yUnit);
+  XVector3D worldSpaceFromScreenSpace(xuint32 x, xuint32 y);
+  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth) = 0;
 
   void zoom(float factor, float x, float y);
   void track(float x, float y);
@@ -35,7 +44,7 @@ public:
 
 class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
   {
-  S_ENTITY(GCCamera, GCViewableTransform, 0)
+  S_ABSTRACT_ENTITY(GCCamera, GCViewableTransform, 0)
 
 public:
   GCCamera();
@@ -48,9 +57,9 @@ class GRAPHICSCORE_EXPORT GCPerspectiveCamera : public GCCamera
 public:
   GCPerspectiveCamera();
 
-  FloatProperty fieldOfView;
+  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth);
 
-  FloatProperty aspectRatio;
+  FloatProperty fieldOfView;
 
   FloatProperty nearClip;
   FloatProperty farClip;

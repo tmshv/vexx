@@ -14,6 +14,13 @@ class SPropertyContainer;
   S_ADD_INSTANCE_INFORMATION(myName) \
   S_REGISTER_TYPE_FUNCTION()
 
+#define S_ABSTRACT_PROPERTY_CONTAINER(myName, superName, version) \
+  public: \
+  S_ADD_ABSTRACT_STATIC_INFO(myName, version); \
+  typedef superName ParentType; \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  S_REGISTER_TYPE_FUNCTION()
+
 #define S_COMPUTE_GROUP(name) static SProperty SPropertyContainer::* name[] = {
 #define S_AFFECTS(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
 #define S_COMPUTE_GROUP_END() 0 };

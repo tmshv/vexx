@@ -11,8 +11,11 @@ class GRAPHICSCORE_EXPORT GCViewport : public SEntity
 public:
   GCViewport();
 
+  UnsignedIntProperty x;
+  UnsignedIntProperty y;
   UnsignedIntProperty width;
   UnsignedIntProperty height;
+
   FloatProperty aspectRatio;
   };
 

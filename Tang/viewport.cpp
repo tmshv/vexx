@@ -40,7 +40,10 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   GCRenderToScreen* op = _db->addChild<GCRenderToScreen>("Output");
 
   GCPerspectiveCamera* cam = _db->addChild<GCPerspectiveCamera>("Camera");
-  vp->aspectRatio.connect(&cam->aspectRatio);
+  vp->x.connect(&cam->viewportX);
+  vp->y.connect(&cam->viewportY);
+  vp->width.connect(&cam->viewportWidth);
+  vp->height.connect(&cam->viewportHeight);
   _controller.setCamera(cam);
 
   cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
@@ -101,6 +104,8 @@ void Viewport::resizeGL( int w, int h )
   if(_viewport.isValid())
     {
     GCViewport *vp = _viewport->uncheckedCastTo<GCViewport>();
+    vp->x = 0;
+    vp->y = 0;
     vp->width = w;
     vp->height = h;
     }

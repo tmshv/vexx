@@ -28,6 +28,11 @@ SPropertyInformation *GCViewableTransform::createTypeInformation()
 
   info->add(&GCViewableTransform::projection, "projection");
 
+  info->add(&GCViewableTransform::viewportX, "viewportX");
+  info->add(&GCViewableTransform::viewportY, "viewportY");
+  info->add(&GCViewableTransform::viewportWidth, "viewportWidth");
+  info->add(&GCViewableTransform::viewportHeight, "viewportHeight");
+
   TransformProperty::InstanceInformation* viewInfo = info->add(&GCViewableTransform::viewTransform, "viewTransform");
   viewInfo->setCompute(computeView);
 
@@ -69,6 +74,38 @@ XVector3D GCViewableTransform::focalPoint() const
   return transform().translation() + (transform().matrix().row(2).head<3>().transpose() * focalDistance());
   }
 
+bool GCViewableTransform::unitViewportCoordinates(xuint32 x, xuint32 y, float &xUnit, float &yUnit)
+  {
+  x -= viewportX();
+  y -= viewportY();
+  if(x < 0 || y < 0 || x >= viewportWidth() || y >= viewportHeight())
+    {
+    xUnit = 0.0f;
+    yUnit = 0.0f;
+    return false;
+    }
+
+  xUnit = (float)x/viewportWidth();
+  yUnit = (float)y/viewportHeight();
+
+  xUnit *= 2.0f;
+  yUnit *= 2.0f;
+
+  xUnit -= 1.0f;
+  yUnit -= 1.0f;
+
+  return true;
+  }
+
+XVector3D GCViewableTransform::worldSpaceFromScreenSpace(xuint32 x, xuint32 y)
+  {
+  XVector3D vpSpace(0.0f, 0.0f, 1.0f);
+  unitViewportCoordinates(x, y, vpSpace(0), vpSpace(1));
+
+  XVector3D world = transform() * vpSpace;
+  return world;
+  }
+
 void GCViewableTransform::zoom(float factor, float x, float y)
   {
   XTransform t = transform();
@@ -91,11 +128,17 @@ void GCViewableTransform::track(float x, float y)
   XTransform t = transform();
   XTransform v = viewTransform();
 
-  float fDScale = focalDistance() * 0.005f;
+  xuint32 midWidth = viewportWidth()/2;
+  xuint32 midHeight = viewportWidth()/2;
+
+  XVector3D posA = worldSpaceAtDepthFromScreenSpace(midWidth, midHeight, focalDistance());
+  XVector3D posB = worldSpaceAtDepthFromScreenSpace(midWidth+x, midHeight+y, focalDistance());
+
+  float fDScale = (posA - posB).norm();
 
   // flip axes because input x and y are in a top left coordinate system
-  XVector3D across = v.matrix().col(0).head<3>() * -fDScale * x;
-  XVector3D up = v.matrix().col(1).head<3>() * fDScale * y;
+  XVector3D across = v.matrix().col(0).head<3>() * fDScale;
+  XVector3D up = v.matrix().col(1).head<3>() * fDScale;
 
   t.translate(across + up);
 
@@ -134,7 +177,7 @@ S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 void computePerspective(const SPropertyInstanceInformation *child, SPropertyContainer *prop)
   {
   GCPerspectiveCamera *c = prop->uncheckedCastTo<GCPerspectiveCamera>();
-  c->projection = XTransformUtilities::perspective(c->fieldOfView(), c->aspectRatio(), c->nearClip(), c->farClip());
+  c->projection = XTransformUtilities::perspective(c->fieldOfView(), c->viewportWidth() / c->viewportHeight(), c->nearClip(), c->farClip());
   }
 
 SPropertyInformation *GCPerspectiveCamera::createTypeInformation()
@@ -147,10 +190,6 @@ SPropertyInformation *GCPerspectiveCamera::createTypeInformation()
   FloatProperty::InstanceInformation *fov = info->add(&GCPerspectiveCamera::fieldOfView, "fieldOfView");
   fov->setDefault(45.0f);
   fov->setAffects(proj);
-
-  FloatProperty::InstanceInformation *aR = info->add(&GCPerspectiveCamera::aspectRatio, "aspectRatio");
-  aR->setDefault(1.0f);
-  aR->setAffects(proj);
 
   FloatProperty::InstanceInformation *nC = info->add(&GCPerspectiveCamera::nearClip, "nearClip");
   nC->setDefault(0.1f);
@@ -165,4 +204,14 @@ SPropertyInformation *GCPerspectiveCamera::createTypeInformation()
 
 GCPerspectiveCamera::GCPerspectiveCamera()
   {
+  }
+
+XVector3D GCPerspectiveCamera::worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth)
+  {
+  XVector3D wsFSS(worldSpaceFromScreenSpace(x,y));
+  const XVector3D &camPos = transform().translation();
+
+  XVector3D camToPoint = wsFSS - camPos;
+
+  return camPos + (camToPoint.normalized() * depth);
   }
