@@ -2,6 +2,7 @@
 #include "styperegistry.h"
 #include "XRenderer.h"
 #include "XCamera.h"
+#include "Eigen/Geometry"
 
 S_IMPLEMENT_PROPERTY(GCViewableTransform)
 
@@ -111,7 +112,7 @@ void GCViewableTransform::zoom(float factor, float x, float y)
   XTransform t = transform();
   XTransform v = viewTransform();
 
-  float moveDist = focalDistance() * 0.1f * (factor - 1.0f);
+  float moveDist = focalDistance() * -0.5f * (factor - 1.0f);
   focalDistance = focalDistance() - moveDist;
 
   // flip axes because input x and y are in a top left coordinate system
@@ -126,19 +127,30 @@ void GCViewableTransform::zoom(float factor, float x, float y)
 void GCViewableTransform::track(float x, float y)
   {
   XTransform t = transform();
-  XTransform v = viewTransform();
 
   xuint32 midWidth = viewportWidth()/2;
   xuint32 midHeight = viewportWidth()/2;
 
   XVector3D posA = worldSpaceAtDepthFromScreenSpace(midWidth, midHeight, focalDistance());
-  XVector3D posB = worldSpaceAtDepthFromScreenSpace(midWidth+x, midHeight+y, focalDistance());
+  XVector3D posB = worldSpaceAtDepthFromScreenSpace(midWidth+x, midHeight, focalDistance());
+  XVector3D posC = worldSpaceAtDepthFromScreenSpace(midWidth, midHeight-y, focalDistance());
 
-  float fDScale = (posA - posB).norm();
+  float xScale = (posA - posB).norm();
+  float yScale = (posA - posC).norm();
 
   // flip axes because input x and y are in a top left coordinate system
-  XVector3D across = v.matrix().col(0).head<3>() * fDScale;
-  XVector3D up = v.matrix().col(1).head<3>() * fDScale;
+  XVector3D across = t.matrix().col(0).head<3>() * xScale;
+  XVector3D up = t.matrix().col(1).head<3>() * yScale;
+
+  if(x > 0)
+    {
+    across *= -1.0f;
+    }
+
+  if(y < 0)
+    {
+    up *= -1.0f;
+    }
 
   t.translate(across + up);
 
@@ -157,7 +169,21 @@ void GCViewableTransform::pan(float x, float y)
 
 void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, float y)
   {
-  qDebug() << "rap" << x << y;
+  XTransform t = transform();
+
+  Eigen::AngleAxisf xRot(x * 0.1f, t.matrix().col(0).head<3>());
+  Eigen::AngleAxisf yRot(y * 0.1f, t.matrix().col(1).head<3>());
+
+  t.rotate(yRot);
+  t.rotate(xRot);
+
+  XVector3D vec = t.translation() - point;
+  float length = vec.norm();
+  vec = vec.normalized();
+
+  t.translation() = point + (vec * length);
+
+  transform = t;
   }
 
 S_IMPLEMENT_PROPERTY(GCCamera)
@@ -177,7 +203,7 @@ S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 void computePerspective(const SPropertyInstanceInformation *child, SPropertyContainer *prop)
   {
   GCPerspectiveCamera *c = prop->uncheckedCastTo<GCPerspectiveCamera>();
-  c->projection = XTransformUtilities::perspective(c->fieldOfView(), c->viewportWidth() / c->viewportHeight(), c->nearClip(), c->farClip());
+  c->projection = XTransformUtilities::perspective(c->fieldOfView(), (float)c->viewportWidth() / (float)c->viewportHeight(), c->nearClip(), c->farClip());
   }
 
 SPropertyInformation *GCPerspectiveCamera::createTypeInformation()
@@ -186,6 +212,11 @@ SPropertyInformation *GCPerspectiveCamera::createTypeInformation()
 
   ComplexTransformProperty::InstanceInformation *proj = info->child(&GCCamera::projection);
   proj->setCompute(computePerspective);
+
+  UnsignedIntProperty::InstanceInformation *width = info->child(&GCCamera::viewportWidth);
+  width->setAffects(proj);
+  UnsignedIntProperty::InstanceInformation *height = info->child(&GCCamera::viewportHeight);
+  height->setAffects(proj);
 
   FloatProperty::InstanceInformation *fov = info->add(&GCPerspectiveCamera::fieldOfView, "fieldOfView");
   fov->setDefault(45.0f);
