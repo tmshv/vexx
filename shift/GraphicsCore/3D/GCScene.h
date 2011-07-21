@@ -1,6 +1,7 @@
 #ifndef GCSCENE_H
 #define GCSCENE_H
 
+#include "GCShadingGroup.h"
 #include "GCRenderable.h"
 #include "GCCamera.h"
 
@@ -18,6 +19,8 @@ public:
   TransformProperty cameraTransform;
 
   void render(XRenderer *) const;
+
+  GCShadingGroupPointerArray shadingGroups;
 
 private:
   XGeometry x;

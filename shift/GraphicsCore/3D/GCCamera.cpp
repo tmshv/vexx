@@ -171,11 +171,11 @@ void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, floa
   {
   XTransform t = transform();
 
-  Eigen::AngleAxisf xRot(x * 0.1f, t.matrix().col(0).head<3>());
-  Eigen::AngleAxisf yRot(y * 0.1f, t.matrix().col(1).head<3>());
-
-  t.rotate(yRot);
+  Eigen::AngleAxisf xRot(x * 0.001f, upVector());
   t.rotate(xRot);
+
+  Eigen::AngleAxisf yRot(y * 0.001f, t.matrix().col(0).head<3>());
+  t.rotate(yRot);
 
   XVector3D vec = t.translation() - point;
   float length = vec.norm();

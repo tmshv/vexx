@@ -208,6 +208,8 @@ class SHIFT_EXPORT Pointer : public SProperty
   S_PROPERTY(Pointer, SProperty, 0);
 
 public:
+  typedef SProperty Type;
+
   const SProperty *pointed() const { preGet(); return input(); }
   const SProperty *operator()() const { preGet(); return pointed(); }
 
@@ -218,6 +220,8 @@ public:
 template <typename T> class TypedPointer : public Pointer
   {
 public:
+  typedef T Type;
+
   const T *pointed() const { return input() ? input()->castTo<T>() : 0; }
   const T *operator()() const { return pointed(); }
 
@@ -225,13 +229,29 @@ public:
   Pointer &operator=(const T *prop) { setPointed(prop); return *this; }
   };
 
-class SHIFT_EXPORT PointerArray : public STypedPropertyArray<Pointer>
+SHIFT_EXPORT Pointer *internalAddPointer(SPropertyContainer *arr, SProperty *ptr, const SPropertyInformation *info);
+SHIFT_EXPORT void internalRemovePointer(SPropertyContainer *arr, SProperty *ptr);
+SHIFT_EXPORT bool internalHasPointer(SPropertyContainer *arr, SProperty *ptr);
+
+template <typename PTR> class TypedPointerArray : public STypedPropertyArray<PTR>
   {
-  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<Pointer>, 0);
 public:
-  void addPointer(SProperty *);
-  void removePointer(SProperty *);
-  bool hasPointer(SProperty *) const;
+  PTR* addPointer(typename PTR::Type *prop)
+    {
+    Pointer *res = internalAddPointer(this, prop, PTR::staticTypeInformation());
+    xAssert(res);
+    return res->uncheckedCastTo<PTR>();
+    }
+
+  void removePointer(typename PTR::Type *p)
+    {
+    internalRemovePointer(this, p);
+    }
+
+  bool hasPointer(typename PTR::Type *prop) const
+    {
+    return internalHasPointer(this, prop);
+    }
   };
 
 #define S_TYPED_POINTER_TYPE(name, type) \
@@ -241,6 +261,13 @@ public:
   inline SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); }
 
+#define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
+  class name : public TypedPointerArray<type> { \
+  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<type>, 0);}; \
+    S_IMPLEMENT_INLINE_PROPERTY(name) \
+  inline SPropertyInformation *name::createTypeInformation() { \
+    return SPropertyInformation::create<name>(#name); }
 
 
+S_TYPED_POINTER_ARRAY_TYPE(PointerArray, Pointer)
 #endif // SBASEPROPERTIES_H

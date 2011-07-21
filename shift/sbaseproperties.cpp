@@ -625,27 +625,29 @@ void ByteArrayProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   }
 
-void PointerArray::addPointer(SProperty *prop)
+Pointer *internalAddPointer(SPropertyContainer *arr, SProperty *prop, const SPropertyInformation *info)
   {
-  SDatabase* db = database();
+  SDatabase* db = arr->database();
   xAssert(db);
 
   SBlock b(db);
-  Pointer *p = add();
+  Pointer *p = arr->add(info)->castTo<Pointer>();
+  xAssert(p);
   p->setPointed(prop);
+  return p;
   }
 
-void PointerArray::removePointer(SProperty *p)
+void internalRemovePointer(SPropertyArray *arr, SProperty *ptr)
   {
-  SProperty *c = firstChild();
+  SProperty *c = arr->firstChild();
   while(c)
     {
     Pointer *cT = c->castTo<Pointer>();
     if(cT)
       {
-      if(cT->pointed() == p)
+      if(cT->pointed() == ptr)
         {
-        remove(c);
+        arr->remove(c);
         return;
         }
       }
@@ -653,25 +655,18 @@ void PointerArray::removePointer(SProperty *p)
     }
   }
 
-bool PointerArray::hasPointer(SProperty *prop) const
+bool internalHasPointer(SPropertyArray *arr, SProperty *ptr)
   {
-  SProperty *child = firstChild();
+  SProperty *child = arr->firstChild();
   while(child)
     {
-    if(prop == child->input())
+    if(ptr == child->input())
       {
       return true;
       }
     child = child->nextSibling();
     }
   return false;
-  }
-
-S_IMPLEMENT_PROPERTY(PointerArray)
-
-SPropertyInformation *PointerArray::createTypeInformation()
-  {
-  return SPropertyInformation::create<PointerArray>("PointerArray");
   }
 
 S_IMPLEMENT_PROPERTY(Pointer)

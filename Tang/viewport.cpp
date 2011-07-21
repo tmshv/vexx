@@ -17,6 +17,8 @@
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
+#include "3D/GCShader.h"
+#include "3D/GCShadingGroup.h"
 
 Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
     _app(app),
@@ -52,6 +54,12 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   GCScene* scene = _db->addChild<GCScene>("Scene");
   cam->projection.connect(&scene->cameraProjection);
   cam->viewTransform.connect(&scene->cameraTransform);
+
+  GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
+  scene->shadingGroups.addPointer(group);
+
+  GCShader *shader = _db->addChild<GCShader>("Shader");
+  group->shader = shader;
 
   op->source.setPointed(scene);
   }

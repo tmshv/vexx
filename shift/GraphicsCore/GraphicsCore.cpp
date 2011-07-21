@@ -18,6 +18,9 @@
 
 #include "3D/GCViewport.h"
 
+#include "3D/GCShader.h"
+#include "3D/GCShadingGroup.h"
+
 
 void initiateGraphicsCore(SDatabase *db)
   {
@@ -42,4 +45,8 @@ void initiateGraphicsCore(SDatabase *db)
 
   STypeRegistry::addType(GCGrid::staticTypeInformation());
   STypeRegistry::addType(GCScene::staticTypeInformation());
+
+
+  STypeRegistry::addType(GCShadingGroup::staticTypeInformation());
+  STypeRegistry::addType(GCShader::staticTypeInformation());
   }

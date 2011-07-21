@@ -13,6 +13,8 @@ SPropertyInformation *GCScene::createTypeInformation()
   info->add(&GCScene::cameraTransform, "cameraTransform");
   info->add(&GCScene::cameraProjection, "cameraProjection");
 
+  info->add(&GCScene::shadingGroups, "shadingGroups");
+
   return info;
   }
 
