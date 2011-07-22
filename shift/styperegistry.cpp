@@ -2,6 +2,7 @@
 #include "sentity.h"
 #include "sarrayproperty.h"
 #include "sreferenceentity.h"
+#include "sbasepointerproperties.h"
 #include "sdatabase.h"
 
 static XSet <const SPropertyInformation *> _types;

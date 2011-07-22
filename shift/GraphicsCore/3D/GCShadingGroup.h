@@ -1,10 +1,12 @@
 #ifndef GCSHADINGGROUP_H
 #define GCSHADINGGROUP_H
 
+#include "GCGlobal.h"
 #include "sentity.h"
+#include "sbasepointerproperties.h"
 #include "GCShader.h"
 
-class GCShadingGroup : public SEntity
+class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity
   {
   S_ENTITY(GCShadingGroup, SEntity, 0)
 public:

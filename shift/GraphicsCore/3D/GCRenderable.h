@@ -3,7 +3,7 @@
 
 #include "GCGlobal.h"
 #include "sentity.h"
-#include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 
 class XRenderer;
 

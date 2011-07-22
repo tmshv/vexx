@@ -59,7 +59,7 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   scene->shadingGroups.addPointer(group);
 
   GCShader *shader = _db->addChild<GCShader>("Shader");
-  group->shader = shader;
+  group->shader.setPointed(shader);
 
   op->source.setPointed(scene);
   }

@@ -1,10 +1,11 @@
 #ifndef GCSHADER_H
 #define GCSHADER_H
 
+#include "GCGlobal.h"
 #include "sentity.h"
-#include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 
-class GCShader : public SEntity
+class GRAPHICSCORE_EXPORT GCShader : public SEntity
   {
   S_ENTITY(GCShader, SEntity, 0)
 public:

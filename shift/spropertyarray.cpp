@@ -20,7 +20,7 @@ void SPropertyArray::remove(SProperty *prop)
   {
   SPropertyContainer::removeProperty(prop);
   }
-  
+
 void SPropertyArray::clear()
   {
   while(firstChild())
