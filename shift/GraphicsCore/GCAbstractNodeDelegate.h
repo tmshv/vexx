@@ -66,6 +66,8 @@ public:
       {
       QStaticText text;
       QPoint position;
+      QSize renderSize;
+      bool onRight;
       };
 
     QVector<PropertyData> properties;
@@ -73,6 +75,9 @@ public:
   mutable QHash<const void *, RenderData> _renderData;
   void updateRenderData(const SEntity *ent) const;
   void ensureRenderData(const SEntity *ent) const;
+
+private:
+  void setupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop) const;
 
   QFont _titleFnt;
   QFontMetrics _titleFntMetrics;
