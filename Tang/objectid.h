@@ -7,9 +7,11 @@
 class ObjectId
   {
 public:
-  ObjectId(const xuint8 *data);
+  ObjectId();
+  ObjectId(const QByteArray &data);
 
   QByteArray toHex() const;
+  bool isValid() const;
 
 private:
   QByteArray _data;

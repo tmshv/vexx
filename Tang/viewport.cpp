@@ -116,6 +116,10 @@ void Viewport::onTreeChange(const SChange *c)
     }
   }
 
+void Viewport::setObject(const ObjectId &id)
+  {
+  }
+
 void Viewport::initializeGL()
   {
   X3DCanvas::initializeGL();

@@ -38,6 +38,8 @@ int main( int argc, char **argv )
       }
     ui->addSurface(webData);
 
+    connect(webData, SIGNAL(objectChanged(ObjectId)), vp, SLOT(setObject))
+
     ui->show();
     }
 
