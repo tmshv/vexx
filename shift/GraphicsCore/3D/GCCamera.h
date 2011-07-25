@@ -3,7 +3,7 @@
 
 #include "GCGlobal.h"
 #include "GCTransform.h"
-#include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 #include "XCameraCanvasController.h"
 
 class XRenderer;

@@ -32,18 +32,73 @@ void GCSimpleNodeDelegate::ensureRenderData(const SEntity *ent) const
     }
   }
 
-void GCSimpleNodeDelegate::setupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop) const
+void GCSimpleNodeDelegate::preSetupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop, int yOffset) const
   {
   QFontMetrics propFntMetrics(font);
 
-  QString elided = propFntMetrics.elidedText(prop->name(), Qt::ElideRight, MAX_WIDTH - 2*OUTER_PADDING);
+  QString name = prop->name();
+  if(name.isEmpty())
+    {
+    name = "[" + QString::number(prop->index()) + "]";
+    }
+
+  QString elided = propFntMetrics.elidedText(name, Qt::ElideRight, MAX_WIDTH - 2*OUTER_PADDING);
   data.text.setText(elided);
   data.text.prepare(QTransform(), font);
 
   data.onRight = (prop->hasOutputs() && !prop->hasInput()) || prop->isComputed();
 
-  data.renderSize.setHeight(propFntMetrics.height());
-  data.renderSize.setWidth(propFntMetrics.width(elided));
+  int fillHeight = propFntMetrics.height();
+  int fillWidth = propFntMetrics.width(elided);
+
+  const SPropertyContainer* cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+    data.childProperties.resize(cont->size());
+
+    int i = 0;
+    for(SProperty *child=cont->firstChild(); child; child=cont->nextSibling(), ++i)
+      {
+      RenderData::PropertyData& childData = data.childProperties[i];
+
+      childData.position.setY(yOffset);
+
+      preSetupProperty(font, childData, child, yOffset);
+
+      fillWidth = qMax(fillWidth, childData.renderSize.width());
+
+      yOffset += childData.renderSize.height();
+      fillHeight += childData.renderSize.height();
+      }
+    }
+
+  data.renderSize.setHeight(fillHeight);
+  data.renderSize.setWidth(fillWidth);
+  }
+
+void GCSimpleNodeDelegate::postSetupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop, int minX, int maxWidth) const
+  {
+  const SPropertyContainer* cont = prop->castTo<SPropertyContainer>();
+  if(cont)
+    {
+
+    int i = 0;
+    for(SProperty *child=cont->firstChild(); child; child=cont->nextSibling(), ++i)
+      {
+      RenderData::PropertyData& childData = data.childProperties[i];
+
+      if(childData.onRight)
+        {
+        childData.position.setX(maxWidth - childData.renderSize.width());
+        }
+      else
+        {
+        childData.position.setX(minX);
+        }
+
+      postSetupProperty(font, childData, child, minX + OUTER_PADDING, maxWidth - 2 * OUTER_PADDING);
+      }
+    }
   }
 
 void GCSimpleNodeDelegate::updateRenderData(const SEntity *ent) const
@@ -79,21 +134,13 @@ void GCSimpleNodeDelegate::updateRenderData(const SEntity *ent) const
   for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling(), ++i)
     {
     RenderData::PropertyData& data = rd.properties[i];
-    setupProperty(propFnt, data, prop);
-
-    fillWidth = qMax(fillWidth, data.renderSize.width());
 
     data.position.setY(propYStart);
     propYStart += data.renderSize.height();
 
-    if(data.onRight)
-      {
-      rd.properties[i].position.setX(rd.size.width() - data.renderSize.width() - OUTER_PADDING);
-      }
-    else
-      {
-      rd.properties[i].position.setX(OUTER_PADDING);
-      }
+    preSetupProperty(propFnt, data, prop, propYStart);
+
+    fillWidth = qMax(fillWidth, data.renderSize.width());
     }
 
 
@@ -105,6 +152,24 @@ void GCSimpleNodeDelegate::updateRenderData(const SEntity *ent) const
   rd.titleBounds.setTopLeft(QPoint(OUTER_PADDING, OUTER_PADDING));
   rd.titleBounds.setBottomRight(QPoint(rd.size.width() - (2*OUTER_PADDING) - 1 - titleFntMetrics.height(),
               _titleFntMetrics.height() + TITLE_PADDING + OUTER_PADDING));
+
+  i = 0;
+  for(SProperty *prop=ent->firstChild(); prop; prop=prop->nextSibling(), ++i)
+    {
+    RenderData::PropertyData& data = rd.properties[i];
+
+    postSetupProperty(propFnt, data, prop, OUTER_PADDING, rd.size.width() - (2*OUTER_PADDING));
+
+    if(data.onRight)
+      {
+      data.position.setX(rd.size.width() - data.renderSize.width() - OUTER_PADDING);
+      }
+    else
+      {
+      data.position.setX(OUTER_PADDING);
+      }
+    }
+
 
   rd.entOutputRadius = rd.titleBounds.height() / 2;
   rd.entOutputPos = QPoint(rd.titleBounds.right() + OUTER_PADDING, OUTER_PADDING);
@@ -122,6 +187,16 @@ void GCSimpleNodeDelegate::update(const XAbstractCanvas *,
   xAssert(ent);
 
   updateRenderData(ent);
+  }
+
+void GCSimpleNodeDelegate::paintProperties(QPainter *ptr, QPoint nodePos, const QVector<RenderData::PropertyData> &props) const
+  {
+  foreach(const RenderData::PropertyData &prop, props)
+    {
+    ptr->drawStaticText(nodePos + prop.position, prop.text);
+
+    paintProperties(ptr, nodePos, prop.childProperties);
+    }
   }
 
 void GCSimpleNodeDelegate::paint(xuint32 pass,
@@ -223,10 +298,8 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
 
       ptr->setPen(QColor(196, 196, 196));
       ptr->setFont(_propFnt);
-      foreach(const RenderData::PropertyData &prop, rd.properties)
-        {
-        ptr->drawStaticText(rd.position + prop.position, prop.text);
-        }
+
+      paintProperties(ptr, rd.position, rd.properties);
       }
     }
   }
