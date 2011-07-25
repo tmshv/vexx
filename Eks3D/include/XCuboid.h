@@ -5,9 +5,6 @@
 #include "XVector3D"
 #include "XSize"
 #include "XProperty"
-#include "XTransform.h"
-
-class XLine;
 
 class EKS3D_EXPORT XCuboid
     {
@@ -21,11 +18,6 @@ public:
     XCuboid( XVector3D minimum, XVector3D maximum );
     XCuboid( XVector3D minimum, XSize );
 
-    XVector3D centre() const;
-
-    void unite( const XVector3D & );
-    void unite( const XCuboid & );
-
     XCuboid united( const XVector3D & ) const;
     XCuboid united( const XCuboid & ) const;
 
@@ -37,25 +29,8 @@ public:
 
     XSize size() const;
 
-    xReal maximumDistanceSquared() const;
-
     bool isInside( const XVector3D & ) const;
-    bool intersects( const XCuboid & ) const;
-    bool intersects( const XLine & ) const;
-
-    friend EKS3D_EXPORT QDataStream &operator<<(QDataStream &stream, const XCuboid &itemRequest);
-    friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, XCuboid &itemRequest);
+    bool isInside( const XCuboid & ) const;
     };
-
-inline XCuboid operator *( const XTransform &mat, const XCuboid &cub )
-  {
-  XVector3D min = mat * cub.minimum();
-  XVector3D max = mat * cub.maximum();
-
-  XCuboid ret;
-  ret.unite(min);
-  ret.unite(max);
-  return ret;
-  }
 
 #endif // XCUBOID_H

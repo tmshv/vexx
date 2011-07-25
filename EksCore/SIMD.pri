@@ -1,1 +1,0 @@
-QMAKE_CXXFLAGS += -msse2

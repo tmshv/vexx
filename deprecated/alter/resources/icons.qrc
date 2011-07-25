@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/app">
-        <file>popIn.png</file>
-        <file>popOut.png</file>
-        <file>close.png</file>
-        <file>open.svg</file>
-        <file>close.svg</file>
-    </qresource>
-</RCC>

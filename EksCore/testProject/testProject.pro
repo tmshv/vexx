@@ -12,5 +12,3 @@ SOURCES += main.cpp \
     testSignalsMain.cpp
 HEADERS += timeNow.h \
     TestClasses.h
-
-include("../GeneralOptions.pri")

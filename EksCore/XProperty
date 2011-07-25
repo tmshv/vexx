@@ -22,12 +22,6 @@
     accessLevel: \
     XReadProperty( type, readName, readName );
 
-#define XWOSpecificProperty( type, writeName, accessLevel ) \
-    private: \
-    XPropertyMember( type, writeName ); \
-    accessLevel: \
-    XWriteProperty( type, writeName, writeName );
-
 #define XRefSpecificProperty( type, name, accessLevel ) \
     private: \
     XPropertyMember( type, name ) \
@@ -41,16 +35,12 @@
     accessLevel: \
     XConstReadProperty( type &, name, name )
 
-#define XInitProperty(name, value) _##name( value )
 #define XGetPropertyMember( name ) _##name
 
 #define XProperty( type, readName, writeName ) XSpecificProperty( type, readName, writeName, public )
 #define XROProperty( type, readName ) XROSpecificProperty( type, readName, public )
-#define XWOProperty( type, writeName ) XWOSpecificProperty( type, writeName, public )
 
 #define XRefProperty( type, name ) XRefSpecificProperty( type, name, public )
 #define XRORefProperty( type, name ) XRORefSpecificProperty( type, name, public )
 
-#define XProperties private
-    
 #endif // XPROPERTY_H

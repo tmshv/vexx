@@ -2,12 +2,12 @@
 #define XMATRIX4X4_H
 
 #include "XGlobal"
-#include "Eigen/Core"
-#include "XVector2D"
+#include "QMatrix4x4"
 
-typedef Eigen::Matrix<xReal, 4, 4> XMatrix4x4;
-typedef Eigen::Matrix<xReal, 3, 3> XMatrix3x3;
+typedef QMatrix4x4 XMatrix4x4;
 
-#define XMatrix Eigen::Matrix
+class QTextStream;
+EKSCORE_EXPORT QTextStream &operator>>( QTextStream &str, XMatrix4x4 &mat );
+EKSCORE_EXPORT QTextStream &operator<<( QTextStream &str, const XMatrix4x4 &mat );
 
 #endif

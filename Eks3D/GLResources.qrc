@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>GLResources/shaders/blinn.frag</file>
-        <file>GLResources/shaders/blinn.vert</file>
-        <file>GLResources/shaders/default.frag</file>
-        <file>GLResources/shaders/default.vert</file>
-    </qresource>
-</RCC>

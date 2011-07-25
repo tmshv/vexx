@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>pleaseWaitClock.svg</file>
-        <file>shadow.png</file>
-    </qresource>
-</RCC>

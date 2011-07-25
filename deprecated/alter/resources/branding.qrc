@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>icon.png</file>
-        <file>splash.png</file>
-        <file>calcSplash.png</file>
-    </qresource>
-</RCC>

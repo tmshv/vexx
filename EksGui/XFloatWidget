@@ -24,15 +24,12 @@ public:
     double value() const;
     void forceValue( double );
 
-    bool isReadOnly() const;
-
 signals:
     void valueChanged( double );
     void valueChanged( XFloatWidget * );
 
 public slots:
     void setValue( double );
-    void setReadOnly(bool);
 
 private slots:
     void setValueFromSlider( int );

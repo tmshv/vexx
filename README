@@ -1,0 +1,17 @@
+DEPENDANCIES
+
+Synapse depends on the Qt SDK (4.6.2 at this time), and on Linux Synapse expects the openEXR library to be present.
+
+BUILD
+
+To build Synapse you must open the "synapse.pro" file, and build it. It is recommended that QtCreator is used to do this, however it should also be possible via command line with qmake and make.
+
+INSTALL
+
+The folder bin folder can now be copied and placed in an appropriate directory for execution
+
+RUNNING
+
+The build process will place all executables into the bin folder. "alter" can then be executed under windows, or "runSynapse.sh" under linux (the script will configure some environment variables, then run alter).
+
+For more information visit vexx.googlecode.com

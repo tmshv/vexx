@@ -1,90 +1,38 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-04-21T15:51:26
 # -------------------------------------------------
-
+QT += opengl
 TARGET = Eks3D
 TEMPLATE = lib
-
-include("../../EksCore/GeneralOptions.pri")
-
-QT += opengl \
-    xml
+DEFINES += EKS3D_BUILD
 SOURCES += ../src/XDoodad.cpp \
     ../src/XScene.cpp \
     ../src/XCuboid.cpp \
     ../src/XTransform.cpp \
-    ../src/XRenderer.cpp \
+    ../src/XAbstractRenderer.cpp \
     ../src/XFrameEvent.cpp \
     ../src/XTransformEvent.cpp \
     ../src/XCamera.cpp \
-    ../src/XGeometry.cpp \
-    ../src/XShader.cpp \
-    ../src/XTexture.cpp \
-    ../src/XGLRenderer.cpp \
-    ../3rdParty/GL/glew.c \
-    ../src/XModeller.cpp \
-    ../src/XColladaFile.cpp \
-    ../src/XShape.cpp \
-    ../src/XAbstractEnvironmentInterface.cpp \
-    ../src/XEnvironment.cpp \
-    ../src/XEnvironmentArea.cpp \
-    ../src/XFrustum.cpp \
-    ../src/XPlane.cpp \
-    ../src/XLine.cpp \
-    ../src/XTriangle.cpp \
-    ../src/XEnvironmentRequest.cpp \
-    ../src/XFramebuffer.cpp \
-    ../src/XEnvironmentRenderer.cpp \
-    ../src/XEnvironmentViewer.cpp \
-    ../src/XLightManager.cpp \
-    ../src/XLightRig.cpp \
-    ../src/XAbstractCanvas.cpp \
-    ../src/X2DCanvas.cpp \
-    ../src/XAbstractRenderModel.cpp \
-    ../src/XAbstractDelegate.cpp \
-    ../src/XAbstractCanvasController.cpp
+    ../src/XAbstractGeometryCache.cpp \
+    ../src/XPrimitives.cpp \
+    ../src/XAbstractShader.cpp \
+    ../src/glew.c \
+    ../src/XAbstractTexture.cpp
 HEADERS += ../include/XDoodad.h \
     ../include/X3DGlobal.h \
     ../include/XScene.h \
     ../include/XCuboid.h \
     ../include/XTransform.h \
-    ../include/XRenderer.h \
+    ../include/XAbstractRenderer.h \
     ../include/XFrameEvent.h \
     ../include/XTransformEvent.h \
     ../include/XCamera.h \
-    ../include/XGeometry.h \
-    ../include/XShader.h \
-    ../include/XTexture.h \
-    ../include/XGLRenderer.h \
-    ../include/XModeller.h \
-    ../include/XColladaFile.h \
-    ../include/XShape.h \
-    ../include/XAbstractEnvironmentInterface.h \
-    ../include/XEnvironment.h \
-    ../include/XEnvironmentArea.h \
-    ../include/XFrustum.h \
-    ../include/XPlane.h \
-    ../include/XLine.h \
-    ../include/XTriangle.h \
-    ../include/XEnvironmentRequest.h \
-    ../include/XFramebuffer.h \
-    ../include/XEnvironmentRenderer.h \
-    ../include/XEnvironmentViewer.h \
-    ../include/XLightManager.h \
-    ../include/XLightRig.h \
-    ../include/XAbstractCanvas.h \
-    ../include/X2DCanvas.h \
-    ../include/XAbstractRenderModel.h \
-    ../include/XAbstractDelegate.h \
-    ../include/XAbstractCanvasController.h
-DEFINES += GLEW_STATIC
-
+    ../include/XAbstractGeometryCache.h \
+    ../include/XPrimitives.h \
+    ../include/XAbstractShader.h \
+    ../include/XAbstractTexture.h
 INCLUDEPATH += ../include/ \
-    $$ROOT/EksCore/ \
-    ../3rdParty
-
-LIBS += -lEksCore
-
-RESOURCES += \
-    ../GLResources.qrc
-
+    ../../EksCore/
+LIBS += -L../../bin/ \
+    -lEksCore
+DESTDIR = ../../bin

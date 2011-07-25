@@ -17,22 +17,4 @@
 #   define EKS3D_EXPORT
 #endif
 
-#if xReal == float
-#define EKS_XREAL_GL_TYPE GL_FLOAT
-#else
-#define EKS_XREAL_GL_TYPE GL_DOUBLE
-#endif
-
-typedef xuint64 XEnvironmentID;
-
-enum TextureFormat
-  {
-  RGB = 1,
-  RGBA = 2,
-  Byte = 4,
-  Short = 8,
-  Half = 16,
-  Float = 32,
-  };
-
 #endif // X3DGLOBAL_H

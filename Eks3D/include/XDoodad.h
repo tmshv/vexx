@@ -12,9 +12,9 @@ class XScene;
 class XFrameEvent;
 class XTransformEvent;
 class XDoodad;
-class XRenderer;
+class XAbstractRenderer;
 class XCamera;
-class XRenderer;
+class XAbstractRenderer;
 
 typedef XList<XDoodad *> XDoodadList;
 
@@ -30,8 +30,6 @@ public:
 public:
     XDoodad( );
 
-    X_ALIGNED_OPERATOR_NEW
-
     virtual void render( );
 
     XCuboid bounds() const;
@@ -44,7 +42,7 @@ public:
     XScene *scene();
     const XScene *scene() const;
 
-    XRenderer *renderer();
+    XAbstractRenderer *renderer();
     XCamera *camera();
 
     enum DoodadAttribute { HasTransform, DoesntRenderChildren };

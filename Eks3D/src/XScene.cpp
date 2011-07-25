@@ -1,11 +1,11 @@
 #include "XScene.h"
 #include "XFrameEvent.h"
-#include "XRenderer.h"
+#include "XAbstractRenderer.h"
 #include "XCamera.h"
 
 #include "XDebug"
 
-XScene::XScene( XRenderer *renderer, XCamera *cam ) : _renderer( renderer ), _camera( cam ), _root( new XDoodad( ) )
+XScene::XScene( XAbstractRenderer *renderer, XCamera *cam ) : _renderer( renderer ), _camera( cam ), _root( new XDoodad( ) )
     {
     _root->setScene( this );
 
@@ -57,8 +57,6 @@ void XScene::renderScene( )
 void XScene::setViewportSize( QSize size )
     {
     _viewportSize = size;
-
-    renderer()->setViewportSize( size );
 
     if( _camera )
         {

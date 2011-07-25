@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/Sc">
-        <file>CoreUtils.js</file>
-        <file>run.svg</file>
-        <file>debug.svg</file>
-        <file>runDebugged.svg</file>
-        <file>debugWindow.svg</file>
-    </qresource>
-</RCC>

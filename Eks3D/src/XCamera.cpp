@@ -4,7 +4,7 @@
 
 XCamera::XCamera( XVector3D position, XVector3D aimPosition, XVector3D up )
         : _position( position ), _aimPosition( aimPosition ), _upDirection( up ),
-        _currentScene( 0 ), _invertedTransformIsValid(false)
+        _currentScene( 0 )
     {
     setTransform();
     }
@@ -35,17 +35,17 @@ void XCamera::setAimPosition( XVector3D aim )
 
 XVector3D XCamera::aimDirection() const
     {
-    return _viewTransform.matrix().row( 2 ).head<3>();
+    return _viewTransform.row( 2 ).toVector3D();
     }
 
 XVector3D XCamera::vertical() const
     {
-    return _viewTransform.matrix().row( 1 ).head<3>();
+    return _viewTransform.row( 1 ).toVector3D();
     }
 
 XVector3D XCamera::horizontal() const
     {
-    return _viewTransform.matrix().row( 0 ).head<3>();
+    return _viewTransform.row( 0 ).toVector3D();
     }
 
 void XCamera::pan( xReal x, xReal y )
@@ -61,7 +61,7 @@ void XCamera::track( xReal x, xReal y, xReal z )
     setAimPosition( aimPosition() + adj );
     }
 
-void XCamera::setViewportSize( const QSize &in )
+void XCamera::setViewportSize( QSize in )
     {
     _aspectRatio = (float)in.width() / (float)in.height();
     _viewportSize = in;
@@ -69,25 +69,9 @@ void XCamera::setViewportSize( const QSize &in )
     aspectRatioChanged();
     }
 
-XVector3D XCamera::screenToWorld( const QPoint &pos ) const
-    {
-    QPointF posRatio((2.0f*((float)pos.x()/(float)_viewportSize.width()))-1.0f,
-                -1.0f*((2.0f*((float)pos.y()/(float)_viewportSize.height()))-1.0f));
-
-    if(!_invertedTransformIsValid)
-      {
-      _inverted = viewTransform().inverse() * projectionTransform().inverse();
-      }
-
-    xAssertFail();
-    return (_inverted * XVector4D(posRatio.x(), posRatio.y(), 0, 1)).head<3>();
-    }
-
-void XCamera::setProjectionTransform( const XComplexTransform &proj )
+void XCamera::setProjectionTransform( XTransform proj )
     {
     _projectionTransform = proj;
-
-    _invertedTransformIsValid = false;
     trigger(projectionChanged());
     if( currentScene() )
         {
@@ -99,16 +83,11 @@ void XCamera::aspectRatioChanged()
     {
     }
 
-void XCamera::viewTransformChanged()
-    {
-    }
-
 void XCamera::setTransform()
     {
-    _viewTransform = XTransformUtilities::lookAt(position(), aimPosition(), upDirection());
+    _viewTransform = XTransform();
 
-    _invertedTransformIsValid = false;
-    viewTransformChanged();
+    _viewTransform.lookAt( position(), aimPosition(), upDirection() );
     trigger(viewChanged());
     if( currentScene() )
         {
@@ -145,12 +124,9 @@ void XPerspectiveCamera::aspectRatioChanged()
     updateProjectionTransform();
     }
 
-void XPerspectiveCamera::viewTransformChanged()
-    {
-    _frustum = XFrustum(position()*-1.0, aimDirection(), horizontal(), vertical(), viewAngle(), aspectRatio(), nearClipPlane(), farClipPlane());
-    }
-
 void XPerspectiveCamera::updateProjectionTransform()
     {
-    setProjectionTransform(XTransformUtilities::perspective( viewAngle(), aspectRatio(), nearClipPlane(), farClipPlane() ));
+    XTransform mat;
+    mat.perspective( viewAngle(), aspectRatio(), nearClipPlane(), farClipPlane() );
+    setProjectionTransform( mat );
     }

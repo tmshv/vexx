@@ -2,11 +2,10 @@
 #define XSCENE_H
 
 #include "X3DGlobal.h"
-#include "QSize"
 #include "XObject"
 #include "XDoodad.h"
 
-class XRenderer;
+class XAbstractRenderer;
 class XCamera;
 
 class EKS3D_EXPORT XScene : public XObject
@@ -14,12 +13,12 @@ class EKS3D_EXPORT XScene : public XObject
     X_OBJECT( XScene, XObject, 3 )
 
 public:
-    XROProperty( XRenderer *, renderer );
+    XROProperty( XAbstractRenderer *, renderer );
     XROProperty( XCamera *, camera );
     XROProperty( QSize, viewportSize );
 
 public:
-    XScene( XRenderer *, XCamera *cam=0 );
+    XScene( XAbstractRenderer *, XCamera *cam=0 );
     ~XScene( );
 
     void addDoodad( XDoodad * );

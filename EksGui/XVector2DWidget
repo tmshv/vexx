@@ -22,14 +22,11 @@ public:
     XVector2D range() const;
     XVector2D value() const;
 
-    bool isReadOnly() const;
-
 signals:
     void valueChanged( XVector2D );
 
 public slots:
     void setValue( XVector2D );
-    void setReadOnly(bool);
 
 protected:
     void keyPressEvent( QKeyEvent * );

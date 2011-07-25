@@ -1,1 +1,8 @@
-#include "XMatrix3x3"
+#ifndef XMATRIX3X3_H
+#define XMATRIX3X3_H
+
+#include "QMatrix3x3"
+
+typedef QMatrix3x3 XMatrix3x3;
+
+#endif

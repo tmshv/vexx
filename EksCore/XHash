@@ -3,6 +3,6 @@
 
 #include "QHash"
 
-#define XHash QHash
+typedef QHash XHash;
 
 #endif

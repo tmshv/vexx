@@ -67,18 +67,6 @@ XVector3DWidget::XVector3DWidget( XVector3D val, XVector3D min, XVector3D max, Q
     connect( _z, SIGNAL(valueChanged(double)), this, SLOT(setValues()) );
     }
 
-bool XVector3DWidget::isReadOnly() const
-    {
-    return _x->isReadOnly();
-    }
-
-void XVector3DWidget::setReadOnly(bool t)
-    {
-    _x->setReadOnly(t);
-    _y->setReadOnly(t);
-    _z->setReadOnly(t);
-    }
-
 void XVector3DWidget::setMaximum( XVector3D in )
     {
     _x->setMaximum( in.x() );

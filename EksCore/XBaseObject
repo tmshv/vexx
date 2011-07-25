@@ -6,38 +6,33 @@
 #include "XSet"
 
 // Casting macros
-#define X_CASTABLE( myName, superName, myID, rootName ) \
+#define X_CASTABLE( myName, superName, myID ) \
     public: \
-    virtual const rootName *castToType( xuint32 id ) const { if( id == myID ){return this;}else{return superName::castToType( id );} } \
+    enum {Type=myID}; \
+    virtual int type() const {return myID;} \
+    virtual XObject *castToType( int id ) { if( id == myID ){return this;}else{return superName::castToType( id );} } \
+    virtual const XObject *castToType( int id ) const { if( id == myID ){return this;}else{return superName::castToType( id );} } \
     private:
 
 // Casting macro for XObject to use (neater to have it here)
-#define X_CASTABLE_ROOT( myName, myID, getTID ) \
+#define X_CASTABLE_ROOT( myName, myID ) \
     public: \
-    myName *castToType( xuint32 id ) { return (myName*)((const myName*)this)->castToType(id); } \
-    virtual const myName *castToType( xuint32 id ) const { if( id == myID ){return this;}else{return 0;} } \
-    template <typename T>inline T *uncheckedCastTo() \
-      { \
-      xAssert( castTo<T>() ); \
-      return static_cast<T*>( this ); \
-      } \
-    template <typename T>inline const T *uncheckedCastTo() const \
-      { \
-      xAssert( castTo<T>() ); \
-      return static_cast<const T*>( this ); \
-      } \
-    template <typename T>inline T *castTo() \
-      { \
-      return static_cast<T*>( castToType( getTID ) ); \
-      } \
-    template <typename T>inline const T *castTo() const \
-      { \
-      return static_cast<const T *>( castToType( getTID ) ); \
-      } \
+    enum {Type=myID}; \
+    virtual int type() const {return myID;} \
+    virtual XObject *castToType( int id ) { if( id == myID ){return this;}else{return 0;} } \
+    template <typename T>inline T castTo() \
+        { \
+        return static_cast<T>( castToType( static_cast<T>(0)->Type ) ); \
+        } \
+    virtual const XObject *castToType( int id ) const { if( id == myID ){return this;}else{return 0;} } \
+    template <typename T>inline T castTo() const \
+        { \
+        return static_cast<T>( castToType( static_cast<T>(0)->Type ) ); \
+        } \
     private:
 
 // XObject may eventually do more
-#define X_OBJECT(myName,superName,myID) public: enum {Type = myID}; X_CASTABLE(myName,superName,myID,XObject)
+#define X_OBJECT(myName,superName,myID) X_CASTABLE(myName,superName,myID)
 
 // predefs
 class XObject;

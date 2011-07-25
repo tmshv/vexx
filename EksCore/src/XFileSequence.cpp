@@ -1,6 +1,5 @@
 #include "XFileSequence"
 #include "XVariant"
-#include "QRegExp"
 
 #include "XDebug"
 
@@ -14,7 +13,6 @@ XFileSequence::XFileSequence( const char *in, stringMode mode )
     setSequence( XString( in ), mode );
     }
 
-#if 0
 XFileSequence::XFileSequence( XVariant in )
     {
     XVariantList list( in.toList() );
@@ -37,7 +35,6 @@ XFileSequence::operator XVariant()
     XVariantList list;
     return list << _pre << _padding << _post << _hasNumber;
     }
-#endif
 
 void XFileSequence::setSequence( XString in, stringMode mode )
     {

@@ -76,19 +76,6 @@ XVector4DWidget::XVector4DWidget( XVector4D val, XVector4D min, XVector4D max, Q
     connect( _w, SIGNAL(valueChanged(double)), this, SLOT(setValues()) );
     }
 
-bool XVector4DWidget::isReadOnly() const
-    {
-    return _x->isReadOnly();
-    }
-
-void XVector4DWidget::setReadOnly(bool t)
-    {
-    _x->setReadOnly(t);
-    _y->setReadOnly(t);
-    _z->setReadOnly(t);
-    _w->setReadOnly(t);
-    }
-
 void XVector4DWidget::setMaximum( XVector4D in )
     {
     _x->setMaximum( in.x() );

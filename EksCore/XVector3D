@@ -1,1 +1,12 @@
-#include "XVector2D"
+#ifndef XVECTOR3D_H
+#define XVECTOR3D_H
+
+#include "XGlobal"
+#include "QVector3D"
+typedef QVector3D XVector3D;
+
+class QTextStream;
+EKSCORE_EXPORT QTextStream &operator>>( QTextStream &str, XVector3D &vec );
+EKSCORE_EXPORT QTextStream &operator<<( QTextStream &str, const XVector3D &vec );
+
+#endif // XVECTOR3D_H

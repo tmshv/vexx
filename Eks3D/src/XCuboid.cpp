@@ -1,76 +1,58 @@
 #include "XCuboid.h"
-#include "XLine.h"
-#include "XPlane.h"
 
 XCuboid::XCuboid() : _isValid( false )
-  {
-  }
+    {
+    }
 
 XCuboid::XCuboid( XVector3D minimum, XVector3D maximum ) : _minimum( minimum ), _maximum( maximum ), _isValid( true )
-  {
-  }
+    {
+    }
 
 XCuboid::XCuboid( XVector3D minimum, XSize size ) : _minimum( minimum ), _maximum( _minimum + size ), _isValid( true )
-  {
-  }
-
-XVector3D XCuboid::centre() const
-  {
-  return (minimum() + maximum()) * 0.5;
-  }
-
-void XCuboid::unite( const XVector3D &in )
-  {
-  if( !isValid() )
-      {
-      _minimum = in;
-      _maximum = in;
-      _isValid = true;
-      }
-  else
-      {
-      if( in.x() < _minimum.x() )
-          {
-          _minimum(0) = in.x();
-          }
-      if( in.x() > _maximum.x() )
-          {
-          _maximum(0) = in.x();
-          }
-      if( in.y() < _minimum.y() )
-          {
-          _minimum(1) = in.y();
-          }
-      if( in.y() > _maximum.y() )
-          {
-          _maximum(1) = in.y();
-          }
-      if( in.z() < _minimum.z() )
-          {
-          _minimum(2) = in.z();
-          }
-      if( in.z() > _maximum.z() )
-          {
-          _maximum(2) = in.z();
-          }
-      }
-  }
-
-void XCuboid::unite( const XCuboid &in )
-  {
-  unite( in.minimum() );
-  unite( in.maximum() );
-  }
+    {
+    }
 
 XCuboid XCuboid::united( const XCuboid &in ) const
     {
-    return united( in.minimum() ).united( in.maximum() );
+    return this->united( in.minimum() ).united( in.maximum() );
     }
 
 XCuboid XCuboid::united( const XVector3D &in ) const
     {
     XCuboid ret( *this );
-    ret.unite(in);
+    if( !ret.isValid() )
+        {
+        ret._minimum = in;
+        ret._maximum = in;
+        ret._isValid = true;
+        }
+    else
+        {
+        if( in.x() < ret._minimum.x() )
+            {
+            ret._minimum.setX( in.x() );
+            }
+        if( in.x() > ret._maximum.x() )
+            {
+            ret._maximum.setX( in.x() );
+            }
+        if( in.y() < ret._minimum.y() )
+            {
+            ret._minimum.setY( in.y() );
+            }
+        if( in.y() > ret._maximum.y() )
+            {
+            ret._maximum.setY( in.y() );
+            }
+        if( in.z() < ret._minimum.z() )
+            {
+            ret._minimum.setZ( in.y() );
+            }
+        if( in.z() > ret._maximum.z() )
+            {
+            ret._maximum.setZ( in.y() );
+            }
+        }
     return ret;
     }
 
@@ -102,14 +84,7 @@ XSize XCuboid::size() const
     return XSize( _maximum - _minimum );
     }
 
-xReal XCuboid::maximumDistanceSquared() const
-    {
-    return XVector3D( xMax(_maximum.x(), -_minimum.x()),
-                      xMax(_maximum.y(), -_minimum.y()),
-                      xMax(_maximum.z(), -_minimum.z())).squaredNorm();
-    }
-
-bool XCuboid::intersects( const XCuboid &in ) const
+bool XCuboid::isInside( const XCuboid &in ) const
     {
     if( this == &in )
         {
@@ -120,71 +95,9 @@ bool XCuboid::intersects( const XCuboid &in ) const
             in.maximum().z() < _minimum.z() && in.minimum().z() > _maximum.z();
     }
 
-bool XCuboid::intersects( const XLine &in ) const
-    {
-    XVector3D t = in.sample(XPlane(maximum(), XVector3D(0, 1, 0)).intersection(in));
-    if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
-        t.z() <= maximum().z() && t.z() >= minimum().z() )
-      {
-      return true;
-      }
-
-    t = in.sample(XPlane(minimum(), XVector3D(0, -1, 0)).intersection(in));
-    if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
-        t.z() <= maximum().z() && t.z() >= minimum().z() )
-      {
-      return true;
-      }
-
-    t = in.sample(XPlane(maximum(), XVector3D(1, 0, 0)).intersection(in));
-    if( t.y() <= maximum().y() && t.y() >= minimum().y() &&
-        t.z() <= maximum().z() && t.z() >= minimum().z() )
-      {
-      return true;
-      }
-
-    t = in.sample(XPlane(minimum(), XVector3D(-1, 0, 0)).intersection(in));
-    if( t.y() <= maximum().y() && t.y() >= minimum().y() &&
-        t.z() <= maximum().z() && t.z() >= minimum().z() )
-      {
-      return true;
-      }
-
-    t = in.sample(XPlane(maximum(), XVector3D(0, 0, 1)).intersection(in));
-    if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
-        t.y() <= maximum().y() && t.y() >= minimum().y() )
-      {
-      return true;
-      }
-
-    t = in.sample(XPlane(minimum(), XVector3D(0, 0, -1)).intersection(in));
-    if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
-        t.y() <= maximum().y() && t.y() >= minimum().y() )
-      {
-      return true;
-      }
-
-    return false;
-    }
-
 bool XCuboid::isInside( const XVector3D &in ) const
     {
     return in.x() < _minimum.x() && in.x() > _maximum.x() &&
             in.y() < _minimum.y() && in.y() > _maximum.y() &&
             in.z() < _minimum.z() && in.z() > _maximum.z();
     }
-
-
-QDataStream &operator<<(QDataStream &stream, const XCuboid &cuboid)
-  {
-  return stream << cuboid._isValid
-                << cuboid._maximum
-                << cuboid._minimum;
-  }
-
-QDataStream &operator>>(QDataStream &stream, XCuboid &cuboid)
-  {
-  return stream >> cuboid._isValid
-                >> cuboid._maximum
-                >> cuboid._minimum;
-  }

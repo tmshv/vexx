@@ -1,7 +1,7 @@
 #include "XDoodad.h"
 #include "XChildEvent"
 #include "XCuboid.h"
-#include "XRenderer.h"
+#include "XAbstractRenderer.h"
 #include "XScene.h"
 #include "XDebug"
 #include "XTransformEvent.h"
@@ -82,7 +82,7 @@ const XScene *XDoodad::scene() const
     return _scene;
     }
 
-XRenderer *XDoodad::renderer()
+XAbstractRenderer *XDoodad::renderer()
     {
     return scene()->renderer();
     }
@@ -124,7 +124,7 @@ void XDoodad::childEvent( XChildEvent *event )
         _childrenDoodads.removeAll( child );
         child->setScene( 0 );
         }
-    else if( event->object()->castTo<XDoodad>() )
+    else if( event->object()->castTo<XDoodad*>() )
         {
         XDoodad *child( static_cast<XDoodad*>(event->object()) );
         _childrenDoodads << child;

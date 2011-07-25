@@ -26,5 +26,4 @@ public:
 
 XVector3D EKSCORE_EXPORT operator+( const XVector3D &, const XSize & );
 
-XSize &EKSCORE_EXPORT operator*=( XSize &, float );
 #endif // XSIZE_H

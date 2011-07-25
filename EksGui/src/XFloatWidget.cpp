@@ -182,16 +182,6 @@ void XFloatWidget::updateUsed()
     setSliderFromValue( value() );
     }
 
-bool XFloatWidget::isReadOnly() const
-    {
-    return _spinner->isReadOnly();
-    }
-
-void XFloatWidget::setReadOnly(bool t)
-    {
-    _spinner->setReadOnly(t);
-    }
-
 void XFloatWidget::setMaximum( double in )
     {
     _spinner->setMaximum( in );

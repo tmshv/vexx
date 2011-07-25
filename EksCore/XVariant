@@ -1,180 +1,165 @@
-#if 0
-#ifndef XVARIANT_H
-#define XVARIANT_H
+#ifndef XXVariant_H
+#define XXVariant_H
 
-#include "QDebug"
 #include "XGlobal"
-#include "XMetaType"
-#include "XShared"
+#include "XProperty"
 #include "XList"
-#include "XVector"
-#include "XMap"
 #include "XString"
 #include "XVector2D"
 #include "XVector3D"
 #include "XVector4D"
 #include "XColour"
 #include "XQuaternion"
+#include "QVariant"
+#include "QTextStream"
+#include "XMatrix3x3"
+#include "XMatrix4x4"
+
+#define X_XVARIANT_INLINE_REFERENCE_FROM_METHOD( name, type ) \
+    void from##name( const type &in )                       \
+        {                                                   \
+        clear();                                            \
+        _other = new type( in );                            \
+        _type = name;                                       \
+        }
+
+#define X_XVARIANT_CONSTRUCTOR( name, type )                \
+inline XVariant( type in ) : _type( Null )                  \
+    {                                                       \
+    from##name( in );                                       \
+    }                                                       \
+type to##name( ) const;                                     \
+void from##name( type );
+
+#define X_XVARIANT_REFERENCE_CONSTRUCTOR( name, type )      \
+inline XVariant( const type &in ) : _type( Null )           \
+    {                                                       \
+    from##name( in );                                       \
+    }                                                       \
+type to##name( ) const;                                     \
+X_XVARIANT_INLINE_REFERENCE_FROM_METHOD( name, type )
 
 class XVariant;
-
-typedef XList<XVariant> XVariantList;
-typedef XVector<XVariant> XVariantVector;
-typedef XMap<XString, XVariant> XVariantMap;
-
-X_DECLARE_METATYPE(XVariantList);
-X_DECLARE_METATYPE(XVariantVector);
-X_DECLARE_METATYPE(XVariantMap);
-
-EKSCORE_EXPORT void xInitiateMetaTypes();
+typedef XList <XVariant> XVariantList;
 
 class EKSCORE_EXPORT XVariant
-  {
+    {
 public:
-  XVariant();
-  XVariant(const XVariant &);
-  ~XVariant();
+    enum VariantType { Null,
+                       String,
+                       Bool,
+                       Int,
+                       UnsignedInt,
+                       Char,
+                       Double,
+                       Vector2D,
+                       Vector3D,
+                       Vector4D,
+                       List,
+                       Matrix3x3,
+                       Matrix4x4,
+                       ByteArray,
+                       QtVariant };
+    XROProperty( VariantType, type )
+public:
+    XVariant();
+    XVariant( const XVariant & );
+    ~XVariant();
+    bool isNull() const;
+    void clear();
+    XVariant &operator =( const XVariant & );
+    void fromVariant( const XVariant & );
 
-  bool isNull();
-  XMetaType::Type type() const;
+    X_XVARIANT_CONSTRUCTOR( Bool, bool )
+    X_XVARIANT_CONSTRUCTOR( Int, int )
+    X_XVARIANT_CONSTRUCTOR( UnsignedInt, unsigned int )
+    X_XVARIANT_CONSTRUCTOR( Char, char )
+    X_XVARIANT_CONSTRUCTOR( Double, double )
 
-  template <typename T> XVariant( const T &ref );
-  template <typename T> XVariant &operator=(const T &cpy);
+    XVariant( const char * );
+    void fromCharString( const char * );
 
-  template <typename T> bool is() const { return is(XMetaType::typeOf<T>()); }
-  bool is( XMetaType::Type t ) const;
+    XColour toColour() const;
+    void fromColour( const XColour & );
 
-  template <typename T> void setValue( const T & );
-  template <typename T> T valueAs() const;
-  template <typename T> const T &value() const;
-  template <typename T> T &value();
+    XVariant( XQuaternion );
+    XQuaternion toQuaternion( ) const;
+    void fromQuaternion( const XQuaternion & );
 
-#define X_VALUE(type, name) type to##name() const { return valueAs<type>(); } void set##name(type t) { setValue<type>(t); }
-#define X_REFERENCE_VALUE(type, name) const type &to##name() const { return value<type>(); } void set##name(const type &t) { setValue<type>(t); }
-  X_VALUE(bool, Bool);
-  X_VALUE(xint32, Int);
-  X_VALUE(xuint32, UnsignedInt);
-  X_VALUE(float, Float);
-  X_VALUE(xint64, LongInt);
-  X_VALUE(xuint64, UnsignedLongInt);
-  X_VALUE(double, Double);
-  X_REFERENCE_VALUE(XString, String);
-  X_REFERENCE_VALUE(XVector2D, Vector2D);
-  X_REFERENCE_VALUE(XVector3D, Vector3D);
-  X_REFERENCE_VALUE(XVector4D, Vector4D);
-  X_REFERENCE_VALUE(XColour, Colour);
-  X_REFERENCE_VALUE(XQuaternion, Quaternion);
-  X_REFERENCE_VALUE(XVariantList, List);
-#undef X_VALUE
-#undef X_REFERENCE_VALUE
+    XVariant( const QVariant & );
+    QVariant toQVariant() const;
+    void fromQVariant( const QVariant &in );
 
-  friend EKSCORE_EXPORT QDataStream &operator>>(QDataStream &, XVariant &);
-  friend EKSCORE_EXPORT QDataStream &operator<<(QDataStream &, const XVariant &);
+    enum PortableType { Binary, Ascii };
+    QByteArray toPortable( PortableType=Ascii ) const;
+    void fromPortable( QByteArray, PortableType=Ascii );
 
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( String, XString )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( ByteArray, QByteArray )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( Vector2D, XVector2D )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( Vector3D, XVector3D )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( Vector4D, XVector4D )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( List, XVariantList )
+
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( Matrix3x3, XMatrix3x3 )
+    X_XVARIANT_REFERENCE_CONSTRUCTOR( Matrix4x4, XMatrix4x4 )
+
+    template <typename T> inline void fromBasicTypeList( const XList <T> & );
+    template <typename T> inline XList <T> toBasicTypeList( );
 private:
-  void initiate( XMetaType::Type type, const void * );
-  void clear();
-
-  class XVariantData;
-  XSharedPointer<XVariantData> _d;
-  };
-
-class XVariant::XVariantData : public XSharedData
-  {
-public:
-  enum
-    {
-    BufferSize = sizeof(xuint64) * 2
+    union
+        {
+        bool _bool;
+        int _int;
+        int _uint;
+        char _char;
+        double _double;
+        void *_other;
+        };
     };
 
-  XVariantData() : type(XMetaType::Null)
+EKSCORE_EXPORT QDataStream &operator<<( QDataStream &stream, const XVariant &var );
+EKSCORE_EXPORT QDataStream &operator>>( QDataStream &stream, XVariant &var );
+
+EKSCORE_EXPORT QDebug operator<<( QDebug, const XVariant & );
+
+template <typename T> void XVariant::fromBasicTypeList( const QList <T> &list )
     {
+    XString str;
+        {
+        QTextStream stream( &str );
+
+        for( int x=0; x<list.size(); x++ )
+            {
+            stream << list[x];
+
+            if( x < ( list.size()-1) )
+                {
+                stream << " ";
+                }
+            }
+        }
+    fromString( str );
     }
 
-  XMetaType::Type type;
-  union
+template <typename T> XList <T> XVariant::toBasicTypeList( )
     {
-    void *data;
-    xuint64 buffer[2];
-    };
-  };
+    XList <T> ret;
+    XString str( toString() );
+        {
+        QTextStream stream( &str );
 
-template <typename T> XVariant::XVariant( const T &ref )
-    : _d( new XVariantData )
-  {
-  initiate( XMetaType::typeOf(ref), &ref );
-  }
-
-template <typename T> XVariant &XVariant::operator=(const T &cpy)
-  {
-  initiate( XMetaType::typeOf(cpy), &cpy );
-  return *this;
-  }
-
-template <typename T> void XVariant::setValue( const T &ref )
-  {
-  initiate( XMetaType::typeOf<T>(), &ref );
-  }
-
-template <typename T>const T &XVariant::value() const
-  {
-  const XVariantData *d = _d.constPtr();
-  if(d->type == XMetaType::typeOf<T>())
-    {
-    if(XMetaType::sizeOf(d->type) < XVariantData::BufferSize)
-      {
-      return *(T*)d->buffer;
-      }
-    else
-      {
-      return *(T*)d->data;
-      }
+        qint64 oldPos( -1 );
+        while( !stream.atEnd() && stream.pos() != oldPos )
+            {
+            oldPos = stream.pos();
+            T type;
+            stream >> type;
+            stream.skipWhiteSpace();
+            ret << type;
+            }
+        }
+    return ret;
     }
-  return *(T*)0;
-  }
 
-template <typename T>T &XVariant::value()
-  {
-  XVariantData *d = _d.ptr();
-  if(d->type == XMetaType::typeOf<T>())
-    {
-    if(XMetaType::sizeOf(d->type) < XVariantData::BufferSize)
-      {
-      return *(T*)d->buffer;
-      }
-    else
-      {
-      return *(T*)d->data;
-      }
-    }
-  return *(T*)0;
-  }
-
-template <typename T>T XVariant::valueAs() const
-  {
-  const XVariantData *d = _d.constPtr();
-  if(d->type == XMetaType::typeOf<T>())
-    {
-    if(XMetaType::sizeOf(d->type) < XVariantData::BufferSize)
-      {
-      return *(T*)d->buffer;
-      }
-    else
-      {
-      return *(T*)d->data;
-      }
-    }
-  T ret;
-  if(XMetaType::sizeOf(d->type) < XVariantData::BufferSize)
-    {
-    XMetaType::convert(d->type, d->buffer, XMetaType::typeOf<T>(), &ret);
-    }
-  else
-    {
-    XMetaType::convert(d->type, d->data, XMetaType::typeOf<T>(), &ret);
-    }
-  return ret;
-  }
-
-#endif
 #endif
