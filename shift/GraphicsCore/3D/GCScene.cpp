@@ -1,8 +1,8 @@
 #include "GCScene.h"
-#include "XModeller.h"
 #include "XShader.h"
 #include "XRenderer.h"
 #include "XMatrix4x4"
+#include "siterator.h"
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
@@ -20,15 +20,6 @@ SPropertyInformation *GCScene::createTypeInformation()
 
 GCScene::GCScene()
   {
-    {
-    XModeller m(&x, 128);
-
-    m.begin(XModeller::Triangles);
-      m.vertex( 0.0f, 1.0f, 0.0f);
-      m.vertex(-1.0f,-1.0f, 0.0f);
-      m.vertex( 1.0f,-1.0f, 0.0f);
-    m.end();
-    }
   }
 
 void GCScene::render(XRenderer *r) const
@@ -37,10 +28,14 @@ void GCScene::render(XRenderer *r) const
 
   r->pushTransform(cameraTransform());
 
-  r->setShader(&s);
-
-  r->drawGeometry(x);
-  r->setShader(0);
+  for(const GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCShadingGroupPointer>())
+    {
+    const GCShadingGroup* group = groupPtr->pointed();
+    if(group)
+      {
+      group->render(r);
+      }
+    }
 
   r->popTransform();
   }

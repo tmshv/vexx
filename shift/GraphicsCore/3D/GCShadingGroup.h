@@ -5,6 +5,7 @@
 #include "sentity.h"
 #include "sbasepointerproperties.h"
 #include "GCShader.h"
+#include "XGeometry.h"
 
 class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity
   {
@@ -12,7 +13,12 @@ class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity
 public:
   GCShadingGroup();
 
+  void render(XRenderer *r) const;
+
   GCShaderPointer shader;
+  GCGeometryPointerArray geometry;
+
+  XGeometry x;
   };
 
 

@@ -104,7 +104,7 @@ public:
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }
 
-  template <typename T> T *nextSibling()
+  template <typename T> T *nextSibling() const
     {
     SProperty *prop = nextSibling();
     while(prop)

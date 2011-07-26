@@ -227,13 +227,14 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
 
         SProperty *inputProp = input;
         SEntity *connectedEnt = 0;
-        while(inputProp && !ent)
+        while(inputProp && !connectedEnt)
           {
-          inputProp = inputProp->parent();
-          if(inputProp == ent->parent())
+          if(inputProp->parent() == ent->parent())
             {
             connectedEnt = inputProp->castTo<SEntity>();
+            break;
             }
+          inputProp = inputProp->parent();
           }
 
         if(!ent)

@@ -54,7 +54,7 @@ public:
   SPropertyContainer();
   virtual ~SPropertyContainer();
 
-  template <typename T> T *firstChild()
+  template <typename T> T *firstChild() const
     {
     SProperty *prop = firstChild();
     while(prop)

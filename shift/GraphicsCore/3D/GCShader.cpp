@@ -1,4 +1,5 @@
 #include "GCShader.h"
+#include "XRenderer.h"
 
 S_IMPLEMENT_PROPERTY(GCShader)
 
@@ -11,4 +12,9 @@ SPropertyInformation *GCShader::createTypeInformation()
 
 GCShader::GCShader()
   {
+  }
+
+void GCShader::bind(XRenderer *r) const
+  {
+  r->setShader(&shader);
   }
