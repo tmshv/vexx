@@ -1,6 +1,30 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
 
+void writeValue(SSaver &s, const XGeometry &t)
+  {
+  xAssertFail();
+  }
+
+void readValue(SLoader &l, XGeometry &t)
+  {
+  xAssertFail();
+  }
+
+IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry, XGeometry)
+
+void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
+  {
+  GCRuntimeGeometry *to = t->uncheckedCastTo<GCRuntimeGeometry>();
+
+  const GCRuntimeGeometry *sProp = f->castTo<GCRuntimeGeometry>();
+  if(sProp)
+    {
+    to->assign(sProp->value());
+    return;
+    }
+  }
+
 S_IMPLEMENT_PROPERTY(GCGeometry)
 
 SPropertyInformation *GCGeometry::createTypeInformation()

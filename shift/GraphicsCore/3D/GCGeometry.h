@@ -6,6 +6,8 @@
 #include "spropertyarray.h"
 #include "sarrayproperty.h"
 #include "sdatabase.h"
+#include "XGeometry.h"
+#include "sbasepointerproperties.h"
 
 class GRAPHICSCORE_EXPORT GCPolygonArray : public SPropertyContainer
   {
@@ -59,5 +61,11 @@ public:
 private:
   SPropertyArray attributes;
   };
+
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())
+
+S_TYPED_POINTER_TYPE(GCGeometryPointer, GCGeometry)
+
+S_TYPED_POINTER_ARRAY_TYPE(GCGeometryPointerArray, GCGeometryPointer)
 
 #endif // GCGEOMETRY_H
