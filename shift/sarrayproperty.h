@@ -192,6 +192,12 @@ class SHIFT_EXPORT SUIntArrayProperty : public SArrayProperty<xuint32, SUIntArra
 public:
   };
 
+class SHIFT_EXPORT SVector3ArrayProperty : public SArrayProperty<XVector3D, SVector3ArrayProperty>
+  {
+  S_PROPERTY(SVector3ArrayProperty, SProperty, 0)
+public:
+  };
+
 
 
 #endif // SARRAYPROPERTY_H

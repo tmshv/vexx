@@ -144,10 +144,46 @@ void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
 
 void GCPolygonArray::addPolygons(const xuint32 *sizes, xuint32 count)
   {
+  /*
+  xuint32 vertexSize = _vertexSize();
+
+  xsize expandBy = 0;
+  for(xsize i=0; i<count; ++i)
+    {
+    expandBy += 1; // size storage
+    expandBy += sizes[i] * vertexSize;
+    }
+
+  SUIntArrayProperty::EigenArray newData = _data.data();
+
+  newData.resize(1, newData.cols() + expandBy);
+
+  for(xsize i=0; i<count; ++i)
+    {
+    xsize attr = offsetOfAttribute()
+    expandBy += 1; // size storage
+    expandBy += sizes[i] * vertexSize;
+    }
+    */
+###
   }
 
+void GCPolygonArray::setPolygon(xuint32 index, xuint32 attribute, const xuint32 *indices)
+  {
+  }
 
 GCGeometry::GCGeometry()
   {
   }
 
+
+void GCGeometry::appendTo(XGeometry *geo) const
+  {
+  }
+
+void GCGeometry::clearAttributes()
+  {
+  SBlock b(database());
+  polygons.removeVertexAttribute(0, polygons.vertexSize());
+  attributes.clear();
+  }

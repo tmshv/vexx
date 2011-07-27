@@ -10,14 +10,13 @@ void computeRuntime(const SPropertyInstanceInformation *info, SPropertyContainer
   GCShadingGroup* rtGeo = cont->uncheckedCastTo<GCShadingGroup>();
 
   XGeometry x;
+  for(const GCGeometryPointer* geoPtr = rtGeo->geometry.firstChild<GCGeometryPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryPointer>())
     {
-    XModeller m(&x, 128);
-
-    m.begin(XModeller::Triangles);
-      m.vertex( 0.0f, 1.0f, 0.0f);
-      m.vertex(-1.0f,-1.0f, 0.0f);
-      m.vertex( 1.0f,-1.0f, 0.0f);
-    m.end();
+    const GCGeometry* geo = geoPtr->pointed();
+    if(geo)
+      {
+      geo->appendTo(&x);
+      }
     }
   rtGeo->runtimeGeometry = x;
   }

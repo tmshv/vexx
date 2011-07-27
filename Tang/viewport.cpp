@@ -19,6 +19,7 @@
 #include "3D/GCScene.h"
 #include "3D/GCShader.h"
 #include "3D/GCShadingGroup.h"
+#include "3D/Renderable/GCCuboid.h"
 
 Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
     _app(app),
@@ -60,6 +61,9 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
 
   GCShader *shader = _db->addChild<GCShader>("Shader");
   group->shader.setPointed(shader);
+
+  GCCuboid *cube = _db->addChild<GCCuboid>("Cube");
+  group->geometry.addPointer(cube);
 
   op->source.setPointed(scene);
   }

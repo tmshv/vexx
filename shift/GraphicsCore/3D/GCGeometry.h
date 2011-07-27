@@ -24,6 +24,9 @@ public:
   void addPolygons(const XVector<xuint32> &sizes) { addPolygons(&sizes.front(), sizes.size()); }
   void addPolygons(const xuint32 *sizes, xuint32 count);
 
+  void setPolygon(xuint32 attribute, xuint32 index, const XVector<xuint32> &indices) { setPolygon(index, attribute, &indices.front()); }
+  void setPolygon(xuint32 attribute, xuint32 index, const xuint32 *indices);
+
 private:
   SUIntArrayProperty _data;
   UnsignedIntProperty _vertexSize;
@@ -43,6 +46,7 @@ public:
     SBlock b(database());
     T* result = attributes.add<T>();
     polygons.addVertexAttribute();
+    return result;
     }
 
   void removeAttribute(const QString &name)
@@ -56,7 +60,25 @@ public:
       }
     }
 
+  template <typename T>
+  T *attribute(const QString &name)
+    {
+    SProperty *prop = attributes.findChild(name);
+    if(prop)
+      {
+      return prop->castTo<T>();
+      }
+    return 0;
+    }
+
+  void setPolygon(SProperty *attribute, xuint32 index, const XVector<xuint32> &indices) { setPolygon(attribute, index, &indices.front()); }
+  void setPolygon(SProperty *attribute, xuint32 index, const xuint32 *indices) { polygons.setPolygon(attributes.index(), index, indices);
+
+  void clearAttributes();
+
   GCGeometry();
+
+  void appendTo(XGeometry *geo) const;
 
 private:
   SPropertyArray attributes;
