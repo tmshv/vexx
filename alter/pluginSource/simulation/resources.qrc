@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>simulate.png</file>
+        <file>reset.png</file>
+        <file>stopSimulation.png</file>
+        <file>dragSimulation.png</file>
+    </qresource>
+</RCC>

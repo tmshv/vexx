@@ -1,0 +1,127 @@
+#include "propertiesDock.h"
+#include "QLineEdit"
+#include "QLabel"
+#include "ui_propertiesDock.h"
+#include "propertyEntitySearch.h"
+
+propertiesDock::propertiesDock() : _entity( 0 ), _adding( FALSE ), _setting( 0 )
+    {
+    widget = new Ui::propertiesDock( );
+    widget->setupUi( base );
+
+    connect( widget->propertiesTable, SIGNAL(cellChanged(int, int)), this, SLOT(set(int, int)) );
+    }
+
+void propertiesDock::added()
+    {
+    app().addSelectionObserver( this );
+    }
+
+void propertiesDock::setEntity( propertyEntity &d )
+    {
+    if( _entity )
+        {
+        _entity->propertyEntityInformer::removeObserver( this );
+        }
+    _entity = &d;
+    if( _entity )
+        {
+        _entity->propertyEntityInformer::addObserver( this );
+        }
+    refreshProperties();
+    }
+
+void propertiesDock::onPropertyEntityChange( propertyEntity *, propertyData * )
+    {
+    refreshProperties();
+    }
+
+void propertiesDock::refreshProperties()
+    {
+    clearProperties();
+
+    if( _entity )
+        {
+        FOREACH( (*_entity), d )
+            {
+            if( !d->second.hidden( ) )
+                {
+                addProperty( d->second.displayName( ), d->second );
+                }
+            }
+        }
+    }
+
+void propertiesDock::onSelectionChange( )
+    {
+    if( app().selection().size() > 0 )
+        {
+        propertyEntitySearch search = app().search().findEntity( app().selection().back() );
+
+        if( search.size() > 1 )
+            {
+            appLog<<"Multiple items with same name, not supported"<<endl;
+            }
+
+        if( app().selection().size() > 0 && search.size() != 0 )
+            {
+            setEntity( search[0] );
+            }
+        else
+            {
+            clearProperties();
+            }
+        }
+    else
+        {
+        clearProperties();
+        }
+    }
+
+void propertiesDock::set( int x, int y )
+    {
+    if( !_setting && !_adding && _entity )
+        {
+        _setting = TRUE;
+        jAssert( y == 1 );
+        QTableWidgetItem *label = widget->propertiesTable->item( x, 0 );
+        QTableWidgetItem *value = widget->propertiesTable->item( x, 1 );
+        if( label && value )
+            {
+            QString lText = label->text();
+            QString vText = value->text();
+
+            _entity->property( _entity->nameFromDisplayName( lText ) ) = vText;
+
+            refreshProperties();
+            }
+        _setting = FALSE;
+        }
+    }
+
+void propertiesDock::addProperty( QString n, propertyVariant v )
+    {
+    _adding = TRUE;
+    int row = widget->propertiesTable->rowCount();
+    widget->propertiesTable->setRowCount( row + 1 );
+
+    QTableWidgetItem *header = new QTableWidgetItem( );
+    //header->setText( "New Row" );
+    widget->propertiesTable->setVerticalHeaderItem( row, header );
+
+    QTableWidgetItem *name = new QTableWidgetItem( );
+    name->setText( n );
+    name->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+    widget->propertiesTable->setItem( row, 0, name );
+
+    QTableWidgetItem *value = new QTableWidgetItem( );
+    value->setText( v.toQtString() );
+    value->setFlags( Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled );
+    widget->propertiesTable->setItem( row, 1, value );
+    _adding = FALSE;
+    }
+
+void propertiesDock::clearProperties( )
+    {
+    widget->propertiesTable->setRowCount( 0 );
+    }
