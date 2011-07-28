@@ -63,7 +63,7 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   group->shader.setPointed(shader);
 
   GCCuboid *cube = _db->addChild<GCCuboid>("Cube");
-  group->geometry.addPointer(cube);
+  group->geometry.addPointer(&cube->geometry);
 
   op->source.setPointed(scene);
   }

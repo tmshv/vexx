@@ -4,7 +4,7 @@
 #include "sentity.h"
 #include "3D/GCGeometry.h"
 
-class GCCuboid : public SEntity
+class GRAPHICSCORE_EXPORT GCCuboid : public SEntity
   {
   S_PROPERTY(GCCuboid, SEntity, 0)
 

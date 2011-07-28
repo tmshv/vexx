@@ -27,7 +27,7 @@ void initiateGraphicsCore(SDatabase *db)
   STypeRegistry::addType(GCImage::staticTypeInformation());
   STypeRegistry::addType(GCQImage::staticTypeInformation());
 
-  STypeRegistry::addType(GCPolygonArray::staticTypeInformation());
+  STypeRegistry::addType(GCGeometryAttribute::staticTypeInformation());
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
 
   STypeRegistry::addType(GCTransform::staticTypeInformation());

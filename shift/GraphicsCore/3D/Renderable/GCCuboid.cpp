@@ -15,7 +15,8 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
   geo.clearAttributes();
 
   geo.addAttribute<SVector3ArrayProperty>("vertex");
-  SVector3ArrayProperty *vertex = geo.attribute<SVector3ArrayProperty>("vertex");
+  GCGeometryAttribute *vertex = geo.attribute("vertex");
+  SVector3ArrayProperty *vertexData = vertex->attributeData<SVector3ArrayProperty>();
 
   SVector3ArrayProperty::EigenArray arr;
   arr << XVector3D(x,y,z),
@@ -27,16 +28,16 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
         XVector3D(-x,-y,-z),
         XVector3D(x,-y,-z);
 
-  vertex->setData(arr);
+  vertexData->setData(arr);
 
   xuint32 polys[] = { 4, 4, 4, 4, 4, 4 };
-  geo.polygons.addPolygons(polys, 6);
+  geo.addPolygons(polys, 6);
 
   xuint32 posZ[] = { 0, 1, 2, 3 };
-  geo.polygons.setPolygon(0, posZ);
+  vertex->setPolygon(0, posZ);
 
   xuint32 negZ[] = { 4, 5, 6, 7 };
-  geo.polygons.setPolygon(1, negZ);
+  vertex->setPolygon(1, negZ);
   }
 
 SPropertyInformation *GCCuboid::createTypeInformation()

@@ -30,145 +30,58 @@ S_IMPLEMENT_PROPERTY(GCGeometry)
 SPropertyInformation *GCGeometry::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
-  info->add(&GCGeometry::polygons, "polygons");
-  info->add(&GCGeometry::attributes, "attributes");
   return info;
   }
 
-S_IMPLEMENT_PROPERTY(GCPolygonArray)
+S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
-SPropertyInformation *GCPolygonArray::createTypeInformation()
+SPropertyInformation *GCGeometryAttribute::createTypeInformation()
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCPolygonArray>("GCPolygonArray");
-  info->add(&GCPolygonArray::_data, "_data");
-  info->add(&GCPolygonArray::_vertexSize, "_vertexSize");
-  info->add(&GCPolygonArray::_polygonCount, "_polygonCount");
+  SPropertyInformation *info = SPropertyInformation::create<GCGeometryAttribute>("GCGeometryAttribute");
+  info->add(&GCGeometryAttribute::polygons, "polygons");
   return info;
   }
 
-GCPolygonArray::GCPolygonArray()
+GCGeometryAttribute::GCGeometryAttribute()
   {
   }
 
-void GCPolygonArray::addVertexAttribute(xuint32 count)
+void GCGeometryAttribute::setType(const SPropertyInformation *type)
   {
-  const SUIntArrayProperty::EigenArray oldData = _data.data();
-  const xuint32* oldPolygonPtr = oldData.data();
-
-  xuint32 oldVertexSize = _vertexSize();
-  _vertexSize = oldVertexSize + count;
-
-  xuint32 numVertices = ((oldData.size() - _polygonCount()) / (_polygonCount() * oldVertexSize));
-  xAssert(((oldData.size() - _polygonCount()) % (_polygonCount() * oldVertexSize)) == 0);
-
-  SUIntArrayProperty::EigenArray newData;
-
-  // old data size plus an extra count indices per polygon
-  newData.resize(1, (numVertices * _vertexSize()) + _polygonCount());
-
-  xuint32* newPolygonPtr = newData.data();
-
-  // so the memory format of the indexes is
-  // Data = | PolygonSize | PolygonData |
-  //
-  // PolygonData = | AttributeAIndices | AttributeBIndices | AttributeCIndices | etc |
-  //
-
-
-  for(xuint32 poly=0, polys=_polygonCount(); poly<polys; ++poly)
+  SBlock b(database());
+  if(firstChild())
     {
-    const xuint32 polygonSize = *oldPolygonPtr;
-    *newPolygonPtr = polygonSize;
-
-    oldPolygonPtr++;
-    newPolygonPtr++;
-
-    for(xuint32 vert=0; vert<polygonSize; ++vert)
-      {
-      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*oldVertexSize*polygonSize);
-      newPolygonPtr += oldVertexSize * polygonSize;
-      oldPolygonPtr += oldVertexSize * polygonSize;
-
-      memset(newPolygonPtr, 0, sizeof(SUIntArrayProperty::ElementType)*count*polygonSize);
-      newPolygonPtr += count * polygonSize;
-      }
+    removeProperty(firstChild());
     }
 
-  _data.setData(newData);
+  addProperty(type);
   }
 
-void GCPolygonArray::removeVertexAttribute(xuint32 index, xuint32 count)
+void GCGeometryAttribute::addPolygons(const xuint32 *sizes, xuint32 count)
   {
-  const SUIntArrayProperty::EigenArray oldData = _data.data();
-  const xuint32* oldPolygonPtr = oldData.data();
-
-  xuint32 oldVertexSize = _vertexSize();
-  _vertexSize = oldVertexSize + count;
-
-  xuint32 numVertices = ((oldData.size() - _polygonCount()) / (_polygonCount() * oldVertexSize));
-  xAssert(((oldData.size() - _polygonCount()) % (_polygonCount() * oldVertexSize)) == 0);
-
-  SUIntArrayProperty::EigenArray newData;
-
-  // old data size plus an extra count indices per polygon
-  newData.resize(1, (numVertices * _vertexSize()) + _polygonCount());
-
-  xuint32* newPolygonPtr = newData.data();
-
-  for(xuint32 poly=0, polys=_polygonCount(); poly<polys; ++poly)
+  xuint32 expandBy = 0;
+  for(xuint32 i=0; i<s; ++i)
     {
-    const xuint32 polygonSize = *oldPolygonPtr;
-    *newPolygonPtr = polygonSize;
-
-    oldPolygonPtr++;
-    newPolygonPtr++;
-
-    for(xuint32 vert=0; vert<polygonSize; ++vert)
-      {
-      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*index);
-      newPolygonPtr += index * polygonSize;
-      oldPolygonPtr += index * polygonSize;
-
-      oldPolygonPtr += count * polygonSize;
-
-      xuint32 leftToCopy = oldVertexSize - count - index;
-
-      memcpy(newPolygonPtr, oldPolygonPtr, sizeof(SUIntArrayProperty::ElementType)*leftToCopy*polygonSize);
-      newPolygonPtr += leftToCopy * polygonSize;
-      oldPolygonPtr += leftToCopy * polygonSize;
-      }
+    expandBy += 1 + sizes[i];
     }
 
-  _data.setData(newData);
+  SUIntArrayProperty::EigenArray data = polygons.data();
+  xuint32 offset = data.rows();
+
+  for(xuint32 i=0; i<s; ++i)
+    {
+    data()
+    ###
+    }
+
+  polygons.setData(data);
   }
 
-void GCPolygonArray::addPolygons(const xuint32 *sizes, xuint32 count)
+void GCGeometryAttribute::removePolygons(xuint32 index, xuint32 count)
   {
-  /*
-  xuint32 vertexSize = _vertexSize();
-
-  xsize expandBy = 0;
-  for(xsize i=0; i<count; ++i)
-    {
-    expandBy += 1; // size storage
-    expandBy += sizes[i] * vertexSize;
-    }
-
-  SUIntArrayProperty::EigenArray newData = _data.data();
-
-  newData.resize(1, newData.cols() + expandBy);
-
-  for(xsize i=0; i<count; ++i)
-    {
-    xsize attr = offsetOfAttribute()
-    expandBy += 1; // size storage
-    expandBy += sizes[i] * vertexSize;
-    }
-    */
-###
   }
 
-void GCPolygonArray::setPolygon(xuint32 index, xuint32 attribute, const xuint32 *indices)
+void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
   {
   }
 
@@ -176,6 +89,21 @@ GCGeometry::GCGeometry()
   {
   }
 
+void GCGeometry::addPolygons(const xuint32 *sizes, xuint32 count)
+  {
+  for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+    {
+    child->addPolygons(sizes, count);
+    }
+  }
+
+void GCGeometry::removePolygons(xuint32 index, xuint32 count)
+  {
+  for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+    {
+    child->removePolygons(index, count);
+    }
+  }
 
 void GCGeometry::appendTo(XGeometry *geo) const
   {
@@ -184,6 +112,8 @@ void GCGeometry::appendTo(XGeometry *geo) const
 void GCGeometry::clearAttributes()
   {
   SBlock b(database());
-  polygons.removeVertexAttribute(0, polygons.vertexSize());
-  attributes.clear();
+  while(firstChild())
+    {
+    removeProperty(firstChild());
+    }
   }

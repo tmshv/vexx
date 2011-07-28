@@ -9,28 +9,42 @@
 #include "XGeometry.h"
 #include "sbasepointerproperties.h"
 
-class GRAPHICSCORE_EXPORT GCPolygonArray : public SPropertyContainer
+class GRAPHICSCORE_EXPORT GCGeometryAttribute : public SPropertyContainer
   {
-  S_PROPERTY_CONTAINER(GCPolygonArray, SPropertyContainer, 0)
+  S_PROPERTY_CONTAINER(GCGeometryAttribute, SPropertyContainer, 0)
 
 public:
-  GCPolygonArray();
+  GCGeometryAttribute();
 
-  xuint32 vertexSize() const { return _vertexSize(); }
-  void addVertexAttribute(xuint32 count=1);
-  void removeVertexAttribute(xuint32 index, xuint32 count=1);
+  void setType(const SPropertyInformation *type);
+
+  template <typename T>T *attributeData()
+    {
+    SProperty *prop = firstChild();
+    if(!prop)
+      {
+      xAssertFail();
+      return 0;
+      }
+
+    T *t = prop->castTo<T>();
+    xAssert(t);
+
+    return t;
+    }
 
   void addPolygon(xuint32 size) { addPolygons(&size, 1); }
   void addPolygons(const XVector<xuint32> &sizes) { addPolygons(&sizes.front(), sizes.size()); }
   void addPolygons(const xuint32 *sizes, xuint32 count);
 
-  void setPolygon(xuint32 attribute, xuint32 index, const XVector<xuint32> &indices) { setPolygon(index, attribute, &indices.front()); }
-  void setPolygon(xuint32 attribute, xuint32 index, const xuint32 *indices);
+  void removePolygons(xuint32 index, xuint32 count);
 
-private:
-  SUIntArrayProperty _data;
-  UnsignedIntProperty _vertexSize;
-  UnsignedIntProperty _polygonCount;
+  void clear();
+
+  void setPolygon(xuint32 index, const XVector<xuint32> &indices) { setPolygon(index, &indices.front()); }
+  void setPolygon(xuint32 index, const xuint32 *indices);
+
+  SUIntArrayProperty polygons;
   };
 
 class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
@@ -38,50 +52,49 @@ class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
   S_PROPERTY_CONTAINER(GCGeometry, SPropertyContainer, 0)
 
 public:
-  GCPolygonArray polygons;
-
-  template <typename T>
-  T *addAttribute(const QString &name)
-    {
-    SBlock b(database());
-    T* result = attributes.add<T>();
-    polygons.addVertexAttribute();
-    return result;
-    }
-
-  void removeAttribute(const QString &name)
-    {
-    SProperty *prop = attributes.findChild(name);
-    if(prop)
-      {
-      SBlock b(database());
-      polygons.removeVertexAttribute(prop->index());
-      attributes.remove(prop);
-      }
-    }
-
-  template <typename T>
-  T *attribute(const QString &name)
-    {
-    SProperty *prop = attributes.findChild(name);
-    if(prop)
-      {
-      return prop->castTo<T>();
-      }
-    return 0;
-    }
-
-  void setPolygon(SProperty *attribute, xuint32 index, const XVector<xuint32> &indices) { setPolygon(attribute, index, &indices.front()); }
-  void setPolygon(SProperty *attribute, xuint32 index, const xuint32 *indices) { polygons.setPolygon(attributes.index(), index, indices);
-
-  void clearAttributes();
-
   GCGeometry();
 
   void appendTo(XGeometry *geo) const;
 
-private:
-  SPropertyArray attributes;
+  template <typename T>
+  GCGeometryAttribute *addAttribute(const QString &name)
+    {
+    SBlock b(database());
+    SProperty *attr = addProperty(GCGeometryAttribute::staticTypeInformation());
+    xAssert(attr);
+
+    attr->setName(name);
+    GCGeometryAttribute* t = attr->castTo<GCGeometryAttribute>();
+    t->setType(T::staticTypeInformation());
+    return t;
+    }
+
+  void removeAttribute(const QString &name)
+    {
+    SProperty *prop = findChild(name);
+    if(prop)
+      {
+      removeProperty(prop);
+      }
+    }
+
+  GCGeometryAttribute *attribute(const QString &name)
+    {
+    SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<GCGeometryAttribute>();
+      }
+    return 0;
+    }
+
+  void addPolygon(xuint32 size) { addPolygons(&size, 1); }
+  void addPolygons(const XVector<xuint32> &sizes) { addPolygons(&sizes.front(), sizes.size()); }
+  void addPolygons(const xuint32 *sizes, xuint32 count);
+
+  void removePolygons(xuint32 index, xuint32 count);
+
+  void clearAttributes();
   };
 
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())
