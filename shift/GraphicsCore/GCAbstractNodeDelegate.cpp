@@ -59,7 +59,7 @@ void GCSimpleNodeDelegate::preSetupProperty(const QFont& font, RenderData::Prope
     data.childProperties.resize(cont->size());
 
     int i = 0;
-    for(SProperty *child=cont->firstChild(); child; child=cont->nextSibling(), ++i)
+    for(SProperty *child=cont->firstChild(); child; child=child->nextSibling(), ++i)
       {
       RenderData::PropertyData& childData = data.childProperties[i];
 
@@ -85,7 +85,7 @@ void GCSimpleNodeDelegate::postSetupProperty(const QFont& font, RenderData::Prop
     int newMaxWidth = maxWidth - 2 * OUTER_PADDING;
 
     int i = 0;
-    for(SProperty *child=cont->firstChild(); child; child=cont->nextSibling(), ++i)
+    for(SProperty *child=cont->firstChild(); child; child=child->nextSibling(), ++i)
       {
       RenderData::PropertyData& childData = data.childProperties[i];
 

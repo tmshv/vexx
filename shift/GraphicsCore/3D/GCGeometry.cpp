@@ -49,7 +49,7 @@ GCGeometryAttribute::GCGeometryAttribute()
 void GCGeometryAttribute::setType(const SPropertyInformation *type)
   {
   SBlock b(database());
-  if(firstChild())
+  if(size() > 1)
     {
     removeProperty(firstChild());
     }
@@ -60,18 +60,28 @@ void GCGeometryAttribute::setType(const SPropertyInformation *type)
 void GCGeometryAttribute::addPolygons(const xuint32 *sizes, xuint32 count)
   {
   xuint32 expandBy = 0;
-  for(xuint32 i=0; i<s; ++i)
+  for(xuint32 i=0; i<count; ++i)
     {
     expandBy += 1 + sizes[i];
     }
 
   SUIntArrayProperty::EigenArray data = polygons.data();
-  xuint32 offset = data.rows();
+  xuint32 offset = data.size();
 
-  for(xuint32 i=0; i<s; ++i)
+  data.resize(offset + expandBy, 1);
+
+  for(xuint32 i=0; i<count; ++i)
     {
-    data()
-    ###
+    data(offset) = sizes[i];
+    offset += 1;
+
+    // initialise indices to 0.
+    for(xuint32 j=0; j<sizes[i]; ++i)
+      {
+      data(offset + j) = 0;
+      }
+
+    offset += sizes[i];
     }
 
   polygons.setData(data);
@@ -79,10 +89,72 @@ void GCGeometryAttribute::addPolygons(const xuint32 *sizes, xuint32 count)
 
 void GCGeometryAttribute::removePolygons(xuint32 index, xuint32 count)
   {
+  SUIntArrayProperty::EigenArray data = polygons.data();
+
+  xuint32 currentIndex = 0;
+
+  xuint32 startOffset = X_UINT32_SENTINEL;
+
+  xuint32 initialSize = data.size();
+  xuint32 offset = 0;
+  while(offset < initialSize)
+    {
+    if(index == currentIndex && startOffset == X_UINT32_SENTINEL)
+      {
+      startOffset = offset;
+      }
+    else if(index == currentIndex+count)
+      {
+      xAssert(startOffset != X_UINT32_SENTINEL);
+
+      // offset of the last index we are removing
+      xuint32 finalOffset = offset + data(offset);
+
+      // assign the important data over the old data.
+      data.block(startOffset, 0, initialSize - finalOffset, 1) = data.block(finalOffset, 0, initialSize - finalOffset, 1);
+
+      // remove the end of the array we dont want.
+      data.resize(initialSize - (finalOffset - startOffset), 1);
+
+      polygons.setData(data);
+      return;
+      }
+
+    // increment by the poly size and the indices.
+    offset += 1 + data(offset);
+    currentIndex += 1;
+    }
+
+  xAssertFail();
   }
 
 void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
   {
+  SUIntArrayProperty::EigenArray data = polygons.data();
+
+  xuint32 currentIndex = 0;
+
+  xuint32 initialSize = data.size();
+  xuint32 offset = 0;
+  while(offset < initialSize)
+    {
+    if(index == currentIndex)
+      {
+      xuint32* rawData = data.data();
+      data += offset + 1;
+
+      memcpy(rawData, indices, sizeof(xuint32) * data(offset));
+
+      polygons.setData(data);
+      return;
+      }
+
+    // increment by the poly size and the indices.
+    offset += 1 + data(offset);
+    currentIndex += 1;
+    }
+
+  xAssertFail();
   }
 
 GCGeometry::GCGeometry()

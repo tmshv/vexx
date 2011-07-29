@@ -20,7 +20,7 @@ public:
 
   template <typename T>T *attributeData()
     {
-    SProperty *prop = firstChild();
+    SProperty *prop = at(1);
     if(!prop)
       {
       xAssertFail();

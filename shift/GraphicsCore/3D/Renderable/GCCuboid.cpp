@@ -19,6 +19,7 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
   SVector3ArrayProperty *vertexData = vertex->attributeData<SVector3ArrayProperty>();
 
   SVector3ArrayProperty::EigenArray arr;
+  arr.resize(8,1);
   arr << XVector3D(x,y,z),
         XVector3D(-x,y,z),
         XVector3D(-x,-y,z),
