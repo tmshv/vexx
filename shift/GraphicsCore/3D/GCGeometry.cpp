@@ -76,7 +76,7 @@ void GCGeometryAttribute::addPolygons(const xuint32 *sizes, xuint32 count)
     offset += 1;
 
     // initialise indices to 0.
-    for(xuint32 j=0; j<sizes[i]; ++i)
+    for(xuint32 j=0; j<sizes[i]; ++j)
       {
       data(offset + j) = 0;
       }
@@ -141,7 +141,7 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
     if(index == currentIndex)
       {
       xuint32* rawData = data.data();
-      data += offset + 1;
+      rawData += offset + 1;
 
       memcpy(rawData, indices, sizeof(xuint32) * data(offset));
 
@@ -177,8 +177,127 @@ void GCGeometry::removePolygons(xuint32 index, xuint32 count)
     }
   }
 
+namespace Triangulator
+  {
+  void triangulate(const xuint32 *indexData,
+                          const XVector3D *positionData,
+                          xuint32 polySize,
+                          XVector<xuint32>* triangleData,
+                          xuint32 vertexStart)
+    {
+    xuint32 zeroVertex = vertexStart++;
+    while(polySize > 2)
+      {
+      *triangleData << zeroVertex;
+
+      --polySize;
+
+      *triangleData << vertexStart;
+      *triangleData << ++vertexStart;
+      }
+    }
+  };
+
+template <typename T> void appendToAttribute(XGeometry *geo, const QHash<QString, QVector<typename T::ElementType>> &attrDatas, T *attr, const QString &name, xuint32 size, const xuint32 *indices)
+  {
+  QVector<typename T::ElementType> attrData = attrDatas[name];
+  attrData.reserve(attrData.size() + size);
+
+  const typename T::EigenArray &arr = attr->data();
+  const typename T::ElementType* data = arr.data();
+  xAssert(data);
+
+  for(xuint32 i=0; i<size; ++i)
+    {
+    xuint32 index = indices[i];
+    xAssert(index < (xuint32)arr.rows());
+    attrData << data[index];
+    }
+
+  geo->setAttribute(name, attrData);
+  }
+
 void GCGeometry::appendTo(XGeometry *geo) const
   {
+  XVector <xuint32> triangles = geo->triangles();
+  xuint32 vertexIndexStart = geo->attributes3D()["vertex"].size();
+
+  const GCGeometryAttribute *positionAttr = attribute("vertex");
+  if(!positionAttr)
+    {
+    return;
+    }
+
+  const SVector3ArrayProperty *vector3Data = positionAttr->attributeData<SVector3ArrayProperty>();
+  if(!vector3Data)
+    {
+    return;
+    }
+
+  const SVector3ArrayProperty::EigenArray &positionArray = vector3Data->data();
+  if(positionArray.rows() == 0)
+    {
+    return;
+    }
+
+  const XVector3D* positionData = positionArray.data();
+
+  const SUIntArrayProperty::EigenArray &indices = positionAttr->polygons.data();
+  xuint32 offset = 0;
+  while(offset < (xuint32)indices.rows())
+    {
+    xuint32 indexCount = indices(offset);
+    const xuint32 *polyIndex = indices.data() + offset + 1;
+
+    // stream to vertex attributes at polyIndex from polygon, to index vertexIndexStart to (vertexIndexStart + indexCount)
+    for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+      {
+      const SUIntArrayProperty::EigenArray &attrIndicesArray = child->polygons.data();
+      xAssert(indexCount == attrIndicesArray(offset));
+      const xuint32 *attrIndices = attrIndicesArray.data() + offset + 1;
+
+      const SFloatArrayProperty* floatArray = child->attributeData<SFloatArrayProperty>();
+      if(floatArray)
+        {
+        appendToAttribute(geo, geo->attributes1D(), floatArray, child->name(), indexCount, attrIndices);
+        }
+      else
+        {
+        const SVector2ArrayProperty* vec2 = child->attributeData<SVector2ArrayProperty>();
+        if(vec2)
+          {
+          appendToAttribute(geo, geo->attributes2D(), vec2, child->name(), indexCount, attrIndices);
+          }
+        else
+          {
+          const SVector3ArrayProperty* vec3 = child->attributeData<SVector3ArrayProperty>();
+          if(vec3)
+            {
+            appendToAttribute(geo, geo->attributes3D(), vec3, child->name(), indexCount, attrIndices);
+            }
+          else
+            {
+            const SVector4ArrayProperty* vec4 = child->attributeData<SVector4ArrayProperty>();
+            if(vec4)
+              {
+              appendToAttribute(geo, geo->attributes4D(), vec4, child->name(), indexCount, attrIndices);
+              }
+            else
+              {
+              xAssertFailMessage("Non-supported attribute type encountered");
+              }
+            }
+          }
+        }
+      }
+
+    triangles.reserve(triangles.size() + (3 * (indexCount - 2)));
+    Triangulator::triangulate(polyIndex, positionData, indexCount, &triangles, vertexIndexStart);
+
+    offset += indexCount + 1;
+    }
+
+  geo->setTriangles(triangles);
   }
 
 void GCGeometry::clearAttributes()

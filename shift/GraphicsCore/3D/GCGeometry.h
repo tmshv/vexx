@@ -28,8 +28,19 @@ public:
       }
 
     T *t = prop->castTo<T>();
-    xAssert(t);
+    return t;
+    }
 
+  template <typename T>const T *attributeData() const
+    {
+    const SProperty *prop = at(1);
+    if(!prop)
+      {
+      xAssertFail();
+      return 0;
+      }
+
+    const T *t = prop->castTo<T>();
     return t;
     }
 
@@ -81,6 +92,16 @@ public:
   GCGeometryAttribute *attribute(const QString &name)
     {
     SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<GCGeometryAttribute>();
+      }
+    return 0;
+    }
+
+  const GCGeometryAttribute *attribute(const QString &name) const
+    {
+    const SProperty *prop = findChild(name);
     if(prop)
       {
       return prop->castTo<GCGeometryAttribute>();

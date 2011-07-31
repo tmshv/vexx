@@ -36,7 +36,8 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
       return Used;
       }
     else if(supported.hasFlag(CameraInterface::Dolly) &&
-       ((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == Qt::AltModifier))
+       (((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == Qt::AltModifier) ||
+            ((triggerButton == Qt::LeftButton) && modifiers == (Qt::AltModifier|Qt::ControlModifier))))
       {
 
       _current = CameraInterface::Dolly;
