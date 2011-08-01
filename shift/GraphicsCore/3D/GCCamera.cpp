@@ -11,9 +11,11 @@ void computeView(const SPropertyInstanceInformation *info, SPropertyContainer *e
   GCViewableTransform* tr = ent->uncheckedCastTo<GCViewableTransform>();
 
   XTransform inv;
+
   bool invertible = false;
   tr->transform().matrix().computeInverseWithCheck(inv.matrix(),invertible);
   xAssert(invertible);
+
   tr->viewTransform = inv;
   }
 
@@ -72,7 +74,7 @@ void GCViewableTransform::setFocalPoint(const XVector3D &aim)
 
 XVector3D GCViewableTransform::focalPoint() const
   {
-  return transform().translation() + (transform().matrix().row(2).head<3>().transpose() * focalDistance());
+  return transform().translation() - (transform().matrix().col(2).head<3>() * focalDistance());
   }
 
 bool GCViewableTransform::unitViewportCoordinates(xuint32 x, xuint32 y, float &xUnit, float &yUnit)
@@ -110,16 +112,14 @@ XVector3D GCViewableTransform::worldSpaceFromScreenSpace(xuint32 x, xuint32 y)
 void GCViewableTransform::zoom(float factor, float x, float y)
   {
   XTransform t = transform();
-  XTransform v = viewTransform();
 
   float moveDist = focalDistance() * -0.5f * (factor - 1.0f);
   focalDistance = focalDistance() - moveDist;
 
   // flip axes because input x and y are in a top left coordinate system
-  XVector3D look = v.matrix().col(2).head<3>() * moveDist;;
+  XVector3D look = upVector().cross(XVector3D(1.0f, 0.0f, 0.0f)) * moveDist;
 
   t.translate(look);
-
 
   transform = t;
   }
@@ -139,8 +139,8 @@ void GCViewableTransform::track(float x, float y)
   float yScale = (posA - posC).norm();
 
   // flip axes because input x and y are in a top left coordinate system
-  XVector3D across = t.matrix().col(0).head<3>() * xScale;
-  XVector3D up = t.matrix().col(1).head<3>() * yScale;
+  XVector3D across = XVector3D(1.0f, 0.0f, 0.0f) * xScale;
+  XVector3D up = upVector() * yScale;
 
   if(x > 0)
     {
@@ -170,19 +170,20 @@ void GCViewableTransform::pan(float x, float y)
 void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, float y)
   {
   XTransform t = transform();
+  XTransform v = viewTransform();
 
   // old translation vector
-  XVector3D vec = t.translation() - point;
-  float length = vec.norm();
-  vec = vec.normalized();
+  float length = (t.translation() - point).norm();
 
-  Eigen::AngleAxisf xRot(x * 0.001f, upVector());
-  t.rotate(xRot);
+  Eigen::AngleAxisf xRot(x * 0.005f, upVector());
+  t.prerotate(xRot);
 
-  Eigen::AngleAxisf yRot(y * 0.001f, t.matrix().col(0).head<3>());
+  Eigen::AngleAxisf yRot(y * 0.005f, XVector3D(1.0f, 0.0f, 0.0f));
   t.rotate(yRot);
 
-  t.translation() = point + (vec * length);
+
+  XVector3D newLook = t.matrix().col(2).head<3>();
+  t.translation() = point + (newLook * length);
 
   transform = t;
   }

@@ -41,16 +41,16 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
   vertex->setPolygon(1, negX);
 
   xuint32 posY[] = { 0, 1, 4, 5 };
-  vertex->setPolygon(0, posY);
+  vertex->setPolygon(2, posY);
 
   xuint32 negY[] = { 2, 3, 6, 7 };
-  vertex->setPolygon(1, negY);
+  vertex->setPolygon(3, negY);
 
   xuint32 posZ[] = { 0, 1, 2, 3 };
-  vertex->setPolygon(0, posZ);
+  vertex->setPolygon(4, posZ);
 
   xuint32 negZ[] = { 4, 5, 6, 7 };
-  vertex->setPolygon(1, negZ);
+  vertex->setPolygon(5, negZ);
   }
 
 SPropertyInformation *GCCuboid::createTypeInformation()

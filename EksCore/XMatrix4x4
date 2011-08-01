@@ -13,22 +13,22 @@ typedef Eigen::Matrix<xReal, 3, 3> XMatrix3x3;
 
 template <typename Derived> QDebug operator <<(QDebug str, const Eigen::DenseBase <Derived> &data)
   {
-  xsize width = data.cols();
-  xsize height = data.rows();
+  xsize cols = data.cols();
+  xsize rows = data.rows();
 
-  for (xsize i = 0; i < height; ++i)
+  for (xsize r = 0; r < rows; ++r)
     {
     str << "[ ";
-    for(xsize j = 0; j < width; ++j)
+    for(xsize c = 0; c < cols; ++c)
       {
-      str << data(i, j);
-      if((i < height-1) && (j < width-1)) // while not last element
+      str << data(c, r);
+      if((c < cols-1)) // while not last element
         {
         str << ", "; // separate each element with space
         }
       }
     str << " ]";
-    if(i < (height-1))
+    if(r < (rows-1))
       {
       str << "\n";
       }
