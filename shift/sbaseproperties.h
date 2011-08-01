@@ -90,16 +90,12 @@ name::name(const type &def) : _value(def) \
   } \
 name &name::operator=(const type &in) \
   { \
-  void *changeMemory = getChange< Change >(); \
-  Change *change = new(changeMemory) Change(_value, in, this); \
-  database()->submitChange(change); \
+  database()->doChange<Change>(_value, in, this); \
   return *this; \
   } \
 void name::assign(const type &in) \
   { \
-  void *changeMemory = getChange< Change >(); \
-  Change *change = new(changeMemory) Change(_value, in, this); \
-  database()->submitChange(change); \
+  database()->doChange<Change>(_value, in, this); \
   } \
 void name::saveProperty(const SProperty *p, SSaver &l ) { \
   SProperty::saveProperty(p, l); \

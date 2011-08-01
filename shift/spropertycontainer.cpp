@@ -159,9 +159,7 @@ SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsi
 
   SProperty *newProp = database()->createDynamicProperty(info);
 
-  void *changeMemory = getChange< TreeChange >();
-  TreeChange *change = new(changeMemory) TreeChange(0, this, newProp, index);
-  database()->submitChange(change);
+  database()->doChange<TreeChange>((SPropertyContainer*)0, this, newProp, index);
   return newProp;
   }
 
@@ -169,9 +167,7 @@ void SPropertyContainer::moveProperty(SPropertyContainer *c, SProperty *p)
   {
   xAssert(p->parent() == this);
 
-  void *changeMemory = getChange< TreeChange >();
-  TreeChange *change = new(changeMemory) TreeChange(this, c, p, p->index());
-  database()->submitChange(change);
+  database()->doChange<TreeChange>(this, c, p, p->index());
   }
 
 void SPropertyContainer::removeProperty(SProperty *oldProp)
@@ -184,9 +180,7 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
   SBlock b(db);
 
   oldProp->disconnect();
-  void *changeMemory = getChange< TreeChange >();
-  TreeChange *change = new(changeMemory) TreeChange(this, 0, oldProp, oldProp->index());
-  database()->submitChange(change);
+  database()->doChange<TreeChange>(this, (SPropertyContainer*)0, oldProp, oldProp->index());
   }
 
 void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)

@@ -17,7 +17,7 @@ const SPropertyInformation *SDatabase::createTypeInformation()
   return info;
   }
 
-SDatabase::SDatabase() : _blockLevel(0), _inSubmitChange(0)
+SDatabase::SDatabase() : _blockLevel(0)
   {
   _database = this;
   _info = staticTypeInformation();
@@ -223,52 +223,6 @@ void SDatabase::destoryChangeMemory(SChange *ptr)
   SProfileFunction
   ptr->~SChange();
   _memory.free(ptr);
-  }
-
-void SDatabase::submitChange(SChange *ch)
-  {
-  SProfileFunction
-  bool oldStateStorageEnabled = _stateStorageEnabled;
-  setStateStorageEnabled(false);
-  _inSubmitChange = true;
-  try
-    {
-    int mode = SChange::Forward;
-    if(_informingEnabled)
-      {
-      mode |= SChange::Inform;
-      }
-
-    bool result = ch->apply(mode);
-
-    if(_stateStorageEnabled)
-      {
-      if(result)
-        {
-        _done << ch;
-
-        if(_blockLevel == 0)
-          {
-          inform();
-          }
-        }
-      else
-        {
-        qDebug() << "Failure in change";
-        destoryChangeMemory(ch);
-        }
-      }
-    else
-      {
-      destoryChangeMemory(ch);
-      }
-    }
-  catch(...)
-    {
-    xAssert(0 && "Unhandled exception");
-    }
-  _inSubmitChange = false;
-  setStateStorageEnabled(oldStateStorageEnabled);
   }
 
 void SDatabase::inform()

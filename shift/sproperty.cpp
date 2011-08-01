@@ -123,9 +123,7 @@ void SProperty::setName(const QString &in)
     realName = fixedName + QString::number(num++);
     }
 
-  void *changeMemory = getChange< NameChange >();
-  NameChange *change = new(changeMemory) NameChange(name(), realName, this);
-  database()->submitChange(change);
+  database()->doChange<NameChange>(name(), realName, this);
   }
 
 SProperty *SProperty::nextSibling() const
@@ -298,10 +296,7 @@ void SProperty::connect(SProperty *prop) const
   SProfileFunction
   if(prop && prop != this)
     {
-    SProfileFunction
-    void *changeMemory = getChange< ConnectionChange >();
-    ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Connect, (SProperty*)this, prop);
-    ((SDatabase*)database())->submitChange(change);
+    ((SDatabase*)database())->doChange<ConnectionChange>(ConnectionChange::Connect, (SProperty*)this, prop);
     }
   else
     {
@@ -312,9 +307,7 @@ void SProperty::connect(SProperty *prop) const
 void SProperty::disconnect(SProperty *prop) const
   {
   SProfileFunction
-  void *changeMemory = getChange< ConnectionChange >();
-  ConnectionChange *change = new(changeMemory) ConnectionChange(ConnectionChange::Disconnect, (SProperty*)this, prop);
-  ((SDatabase*)database())->submitChange(change);
+  ((SDatabase*)database())->doChange<ConnectionChange>(ConnectionChange::Disconnect, (SProperty*)this, prop);
   }
 
 void SProperty::disconnect() const
@@ -654,8 +647,8 @@ void SProperty::preGet() const
   SProfileFunction
   if(_flags.hasFlag(Dirty))
     {
-    bool informingEnabled = database()->informingEnabled();
-    const_cast<SDatabase*>(database())->setInformingEnabled(false);
+    bool stateStorageEnabled = database()->stateStorageEnabled();
+    const_cast<SDatabase*>(database())->setStateStorageEnabled(false);
 
     // this is a const function, but because we delay computation we may need to assign here
     SProperty *prop = const_cast<SProperty*>(this);
@@ -678,7 +671,7 @@ void SProperty::preGet() const
     prop->_flags.clearFlag(Dirty);
     prop->_flags.clearFlag(PreGetting);
 
-    const_cast<SDatabase*>(database())->setInformingEnabled(informingEnabled);
+    const_cast<SDatabase*>(database())->setStateStorageEnabled(stateStorageEnabled);
 
     xAssert(!_flags.hasFlag(Dirty));
     return;
