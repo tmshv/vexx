@@ -27,6 +27,8 @@
 # define xAssert( arg ) Q_ASSERT( arg )
 #endif
 
+#define X_ASSERTS_ENABLED 1
+
 #include "Eigen/Core"
 
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW

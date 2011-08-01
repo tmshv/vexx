@@ -33,12 +33,49 @@ public:
 
   void *allocateChangeMemory(xsize);
 
-  void submitChange(SChange *change);
+
+  template <typename CLS, typename ...CLSARGS> void doChange(CLSARGS&&... params)
+    {
+    bool oldStateStorageEnabled = _stateStorageEnabled;
+    setStateStorageEnabled(false);
+
+    int mode = SChange::Forward|SChange::Inform;
+    if(!oldStateStorageEnabled)
+      {
+      CLS change(std::forward<CLSARGS>(params)...);
+      ((SChange&)change).apply(mode);
+      }
+    else
+      {
+#if X_ASSERTS_ENABLED
+      if(_doChange.tryLock())
+        {
+        _doChange.unlock();
+        }
+      else
+        {
+        xAssertFail();
+        }
+#endif
+      QMutexLocker l(&_doChange);
+      void *mem = allocateChangeMemory(sizeof(CLS));
+      SChange* change = new(mem) CLS(std::forward<CLSARGS>(params)...);
+
+      bool result = change->apply(mode);
+
+      if(result)
+        {
+        _done << change;
+        }
+      else
+        {
+        xAssertFailMessage("Change failed");
+        }
+      }
+    setStateStorageEnabled(oldStateStorageEnabled);
+    }
 
   SObservers &currentBlockObserverList() { return _blockObservers; }
-
-  bool informingEnabled() const { return _informingEnabled; }
-  void setInformingEnabled(bool enable) { _informingEnabled = enable; }
 
   bool stateStorageEnabled() const { return _stateStorageEnabled; }
   void setStateStorageEnabled(bool enable) { _stateStorageEnabled = enable; }
@@ -60,8 +97,7 @@ private:
 
   void inform();
   SObservers _blockObservers;
-  bool _inSubmitChange;
-  bool _informingEnabled;
+  QMutex _doChange;
   bool _stateStorageEnabled;
 
   XList <SChange*> _done;
