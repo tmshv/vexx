@@ -9,7 +9,7 @@
 
 S_IMPLEMENT_PROPERTY(SProperty)
 
-const SPropertyInformation *SProperty::createTypeInformation()
+SPropertyInformation *SProperty::createTypeInformation()
   {
   return SPropertyInformation::createNoParent<SProperty>("SProperty");
   }
@@ -95,7 +95,7 @@ xsize SProperty::index() const
     parent()->preGet();
     }
 
-  return _info->propertyOffset() + _instanceInfo->index();
+  return _instanceInfo->index();
   }
 
 void SProperty::setName(const QString &in)
@@ -225,32 +225,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
 bool SProperty::inheritsFromType(const SPropertyInformation *type) const
   {
   SProfileFunction
-  const SPropertyInformation *current = typeInformation();
-  xAssert(current);
-  while(current)
-    {
-    if(current == type)
-      {
-      return true;
-      }
-    current = current->parentTypeInformation();
-    }
-  return false;
-  }
-
-bool SProperty::inheritsFromType(const QString &type) const
-  {
-  SProfileFunction
-  const SPropertyInformation *current = typeInformation();
-  while(current)
-    {
-    if(current->typeName() == type)
-      {
-      return true;
-      }
-    current = current->parentTypeInformation();
-    }
-  return false;
+  return typeInformation()->inheritsFromType(type);
   }
 
 const QString &SProperty::name() const
@@ -342,7 +317,6 @@ bool SProperty::ConnectionChange::apply(int mode)
       clearParentHasInputConnection(_driven);
       clearParentHasOutputConnection(_driver);
       }
-    _driven->postSet();
     }
   else if(mode&Backward)
     {
@@ -359,7 +333,6 @@ bool SProperty::ConnectionChange::apply(int mode)
       setParentHasOutputConnection(_driver);
       setDependantsDirty(_driver, true);
       }
-    _driven->postSet();
     }
 
   if(mode&Inform)

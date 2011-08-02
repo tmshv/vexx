@@ -34,7 +34,8 @@ SOURCES += \
     siterator.cpp \
     sxmlio.cpp \
     sbinaryio.cpp \
-    styperegistry.cpp
+    styperegistry.cpp \
+    sbasepointerproperties.cpp
 
 HEADERS += \
     sglobal.h \
@@ -59,4 +60,5 @@ HEADERS += \
     siterator.h \
     sxmlio.h \
     sbinaryio.h \
-    styperegistry.h
+    styperegistry.h \
+    sbasepointerproperties.h

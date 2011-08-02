@@ -15,7 +15,7 @@ public:
   GCNodeController(X2DCanvas *c);
   ~GCNodeController();
 
-  virtual int mouseEvent(MouseEventType type,
+  virtual UsedFlags mouseEvent(MouseEventType type,
                           QPoint point,
                           Qt::MouseButton triggerButton,
                           Qt::MouseButtons buttonsDown,
@@ -38,7 +38,8 @@ private:
     {
     None,
     MovingEntity,
-    ConnectingProperty
+    ConnectingProperty,
+    ConnectingEntity
     };
   ControlMode _controlMode;
 

@@ -57,6 +57,7 @@ QScriptValue ScShiftFloatArrayProperty::at(QScriptContext *ctx, QScriptEngine *)
   ScProfileFunction
   SProperty **thisProperty = getThis(ctx);
 
+
   if(thisProperty && ctx->argumentCount() == 2)
     {
     SFloatArrayProperty* thisArray = (*thisProperty)->castTo<SFloatArrayProperty>();
@@ -65,7 +66,8 @@ QScriptValue ScShiftFloatArrayProperty::at(QScriptContext *ctx, QScriptEngine *)
       {
       quint32 x = ctx->argument(0).toUInt32();
       quint32 y = ctx->argument(1).toUInt32();
-      return thisArray->atIndex(x, y);
+      xAssertFail();
+      return "";//thisArray->atIndex(x, y);
       }
     }
   return QScriptValue();

@@ -14,6 +14,7 @@ class SDirtyObserver;
 class SConnectionObserver;
 
 #define S_ENTITY(name, parent, version) S_PROPERTY_CONTAINER(name, parent, version)
+#define S_ABSTRACT_ENTITY(name, parent, version) S_ABSTRACT_PROPERTY_CONTAINER(name, parent, version)
 
 class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
   {
@@ -79,7 +80,7 @@ public:
   void removeDirtyObserver(SDirtyObserver *);
   void removeTreeObserver(STreeObserver *);
   void removeConnectionObserver(SConnectionObserver *);
-  
+
   void informDirtyObservers(SProperty *prop);
   void informTreeObservers(const SChange *event);
   void informConnectionObservers(const SChange *event);

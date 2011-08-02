@@ -3,6 +3,7 @@
 #include "QPaintEvent"
 #include "QApplication"
 #include "XAbstractCanvasController.h"
+#include "QDebug"
 
 X2DCanvas::X2DCanvas(QWidget *parent) : QWidget(parent), _backgroundColour(QApplication::palette().color(QPalette::Window)), _currentPainter(0)
   {
@@ -13,109 +14,15 @@ void X2DCanvas::paintEvent(QPaintEvent *event)
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing, antiAliasingEnabled());
   _currentPainter = &painter;
-  _region = event->rect();
 
-  painter.fillRect(_region, _backgroundColour);
+  _region = _transform.inverted().mapRect(event->rect());
+  painter.fillRect(event->rect(), _backgroundColour);
+
+  painter.setTransform(_transform);
 
   paint();
 
   _currentPainter = 0;
-  }
-
-void X2DCanvas::mouseDoubleClickEvent(QMouseEvent *event)
-  {
-  if(controller())
-    {
-    int result = controller()->triggerMouseEvent(XAbstractCanvasController::DoubleClick,
-                                                  event->pos(),
-                                                  event->button(),
-                                                  event->buttons(),
-                                                  event->modifiers());
-
-    if((result&XAbstractCanvasController::Used) != false)
-      {
-      event->accept();
-      }
-    if((result&XAbstractCanvasController::NeedsUpdate) != false)
-      {
-      QWidget::update();
-      }
-    return;
-    }
-
-  event->ignore();
-  }
-
-void X2DCanvas::mouseMoveEvent(QMouseEvent *event)
-  {
-  if(controller())
-    {
-    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Move,
-                                                  event->pos(),
-                                                  event->button(),
-                                                  event->buttons(),
-                                                  event->modifiers());
-
-    if((result&XAbstractCanvasController::Used) != false)
-      {
-      event->accept();
-      }
-    if((result&XAbstractCanvasController::NeedsUpdate) != false)
-      {
-      QWidget::update();
-      }
-    return;
-    }
-
-  event->ignore();
-  }
-
-void X2DCanvas::mousePressEvent(QMouseEvent *event)
-  {
-  if(controller())
-    {
-    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Press,
-                                                  event->pos(),
-                                                  event->button(),
-                                                  event->buttons(),
-                                                  event->modifiers());
-
-    if((result&XAbstractCanvasController::Used) != false)
-      {
-      event->accept();
-      }
-    if((result&XAbstractCanvasController::NeedsUpdate) != false)
-      {
-      QWidget::update();
-      }
-    return;
-    }
-
-  event->ignore();
-  }
-
-void X2DCanvas::mouseReleaseEvent(QMouseEvent *event)
-  {
-  if(controller())
-    {
-    int result = controller()->triggerMouseEvent(XAbstractCanvasController::Release,
-                                                  event->pos(),
-                                                  event->button(),
-                                                  event->buttons(),
-                                                  event->modifiers());
-
-    if((result&XAbstractCanvasController::Used) != false)
-      {
-      event->accept();
-      }
-    if((result&XAbstractCanvasController::NeedsUpdate) != false)
-      {
-      QWidget::update();
-      }
-    return;
-    }
-
-  event->ignore();
   }
 
 void X2DCanvas::update(XAbstractRenderModel::UpdateMode c)
@@ -124,15 +31,48 @@ void X2DCanvas::update(XAbstractRenderModel::UpdateMode c)
   QWidget::update();
   }
 
-XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XAbstractCanvasController(canvas)
+XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCameraCanvasController(this, canvas)
   {
   }
 
-int XSimple2DCanvasController::mouseEvent(MouseEventType type,
-                        QPoint point,
-                        Qt::MouseButton triggerButton,
-                        Qt::MouseButtons buttonsDown,
-                        Qt::KeyboardModifiers modifiers)
+XSimple2DCanvasController::MovementFlags XSimple2DCanvasController::supportedMovements() const
   {
-  return NotUsed;
+  return Track | Zoom;
+  }
+
+void XSimple2DCanvasController::zoom(float factor, float x, float y)
+  {
+  QTransform& transform = static_cast<X2DCanvas*>(canvas())->transform();
+
+  if((factor > 1.0f && transform.m11() < 5.0f) || (factor < 1.0f && transform.m11() > 0.1f))
+    {
+    QPoint pos(x, y);
+    pos = transform.inverted().map(pos);
+
+    transform.translate(pos.x(), pos.y());
+
+    transform.scale(factor, factor);
+
+    transform.translate(-pos.x(), -pos.y());
+    }
+  }
+
+void XSimple2DCanvasController::track(float x, float y)
+  {
+  QTransform& transform = static_cast<X2DCanvas*>(canvas())->transform();
+
+  x /= transform.m11();
+  y /= transform.m11();
+
+  transform.translate(x, y);
+  }
+
+void XSimple2DCanvasController::dolly(float x, float y)
+  {
+  qDebug() << "dolly" << x << y;
+  }
+
+void XSimple2DCanvasController::pan(float x, float y)
+  {
+  qDebug() << "pan" << x << y;
   }

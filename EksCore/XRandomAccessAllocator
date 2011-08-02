@@ -16,8 +16,10 @@ class XRandomAccessFixedSizeBlock
 public:
   XRandomAccessFixedSizeBlock(xsize objectSize, xsize count) : _count(count), _size(objectSize)
     {
+    xAssertIsAligned(objectSize);
     xAssert((count % 32) == 0);
-    _memory = new xuint8[_count*_size + (_count / 8)];
+    _alloc = new xuint8[_count*_size + (_count / 8) + X_ALIGN_BYTE_COUNT];
+    _memory = X_ROUND_TO_ALIGNMENT(_alloc);
     _masks = (xuint32*)((xuint8*)_memory + (_count*_size));
 
     for(xsize i=0, s=(_count/32); i<s; ++i)
@@ -27,7 +29,7 @@ public:
     }
   ~XRandomAccessFixedSizeBlock()
     {
-    delete [] _memory;
+    delete [] _alloc;
     }
   void *alloc()
     {
@@ -68,7 +70,7 @@ public:
     }
   bool free(void *ptr)
     {
-    if(ptr >= _memory && ptr < (_memory + (_count*_size)))
+    if(contains(ptr))
       {
       // always positive
       xsize index = ( (char*)ptr - (char*)_memory ) / _size;
@@ -96,6 +98,18 @@ public:
       }
     return true;
     }
+  bool contains(void *ptr) const
+    {
+    if(ptr < _memory)
+      {
+      return false;
+      }
+    if(ptr >= (_memory + (_count*_size)))
+      {
+      return false;
+      }
+    return true;
+    }
 
 private:
   xuint8 findFirstSpareBit(xuint8 mask)
@@ -115,6 +129,7 @@ private:
   xsize _size;
   xuint32 *_masks;
   xuint8 *_memory;
+  xuint8 *_alloc;
   };
 
 class XRandomAccessFixedSizeAllocator
@@ -174,6 +189,17 @@ public:
       }
     return true;
     }
+  bool contains(void *ptr) const
+    {
+    foreach(XRandomAccessFixedSizeBlock *a, _internal)
+      {
+      if(a->contains(ptr))
+        {
+        return true;
+        }
+      }
+    return false;
+    }
 
 private:
   X_DISABLE_COPY(XRandomAccessFixedSizeAllocator);
@@ -200,22 +226,25 @@ public:
     }
   void *alloc(xsize size)
     {
-    xsize index = size + sizeof(xsize);
-    if(!_internal.contains(index))
+    size = X_ROUND_TO_ALIGNMENT(size);
+
+    if(!_internal.contains(size))
       {
-      _internal.insert(index, new XRandomAccessFixedSizeAllocator(index, _defaultSize, _expandSize));
+      _internal.insert(size, new XRandomAccessFixedSizeAllocator(size, _defaultSize, _expandSize));
       }
-    xsize *allocted = (xsize *)_internal[index]->alloc();
-
-    allocted[0] = index;
-
-    return allocted + 1;
+    return _internal[size]->alloc();
     }
   void free(void *ptr)
     {
-    xsize *del = ((xsize *)ptr) - 1;
-    xAssert(_internal[*del]);
-    xAssert(_internal[*del]->free(del));
+    foreach(XRandomAccessFixedSizeAllocator *a, _internal.values())
+      {
+      if(a->contains(ptr))
+        {
+        xVerify(a->free(ptr));
+        return;
+        }
+      }
+    xAssertFail();
     }
   bool empty() const
     {

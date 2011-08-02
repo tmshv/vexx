@@ -8,26 +8,26 @@ SPropertyInstanceInformation::SPropertyInstanceInformation()
   {
   }
 
-xuint32 g_maxDynamicCount = 0x7FFFFFFF;
-SPropertyInformation::SPropertyInformation(CreateFunction createFn,
-                     CreateInstanceInformationFunction cIIF,
-                     SaveFunction saveFn,
-                     LoadFunction loadFn,
-                     AssignFunction assignFn,
-                     xuint32 version,
-                     const QString &typeName,
-                     const SPropertyInformation *parent,
-                     xsize size,
-                     xsize instanceInfoSize)
-    : _create(createFn), _createInstanceInformation(cIIF), _save(saveFn), _load(loadFn), _assign(assignFn),
-    _version(version), _typeName(typeName), _parentTypeInformation(parent),
-    _propertyOffset(0), _size(size), _instanceInformationSize(instanceInfoSize),
-    _instances(0), _dynamic(false)
+SPropertyInformation::SPropertyInformation()
+    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0),
+    _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
+    _dynamic(false), _instances(0)
   {
-  if(_parentTypeInformation)
-    {
-    _propertyOffset = _parentTypeInformation->completeChildCount();
-    }
+  }
+
+SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
+  : _create(info.create()),
+    _createInstanceInformation(info.createInstanceInformation()),
+    _save(info.save()),
+    _load(info.load()),
+    _assign(info.assign()),
+    _version(info.version()),
+    _parentTypeInformation(info.parentTypeInformation()),
+    _size(info.size()),
+    _instanceInformationSize(info.instanceInformationSize()),
+    _dynamic(info.dynamic()),
+    _instances(0)
+  {
   }
 
 SPropertyInformation::~SPropertyInformation()
@@ -39,22 +39,40 @@ SPropertyInformation::~SPropertyInformation()
     }
   }
 
-const SPropertyInstanceInformation *SPropertyInformation::completeChild(xsize index) const
+SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* location)
   {
-  const SPropertyInformation *metaData = this;
-  xAssert(index < metaData->completeChildCount());
-  while(metaData && index < metaData->propertyOffset())
+  foreach(SPropertyInstanceInformation *i, _children)
     {
-    metaData = metaData->parentTypeInformation();
+    if(i->location() == location)
+      {
+      return i;
+      }
     }
-
-  if(metaData)
-    {
-    xAssert(index >= metaData->propertyOffset() && index < metaData->completeChildCount());
-    return metaData->child(index - metaData->propertyOffset());
-    }
-
   return 0;
+  }
+
+const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* location) const
+  {
+  foreach(const SPropertyInstanceInformation *i, _children)
+    {
+    if(i->location() == location)
+      {
+      return i;
+      }
+    }
+  return 0;
+  }
+
+const SPropertyInstanceInformation *SPropertyInformation::child(xsize index) const
+  {
+  xAssert(index < childCount());
+  return _children[index];
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::child(xsize index)
+  {
+  xAssert(index < childCount());
+  return _children[index];
   }
 
 SPropertyInformation::DataKey g_maxKey = 0;
@@ -139,10 +157,6 @@ bool SPropertyInformation::inheritsFromType(const SPropertyInformation *match) c
   return false;
   }
 
-xsize SPropertyInformation::completeChildCount() const
-  {
-  return propertyOffset() + children().size();
-  }
 
 void SPropertyInformation::reference() const
   {

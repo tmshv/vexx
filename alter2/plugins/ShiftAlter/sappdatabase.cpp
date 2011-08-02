@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(SAppDatabase)
 
-const SPropertyInformation *SAppDatabase::createTypeInformation()
+SPropertyInformation *SAppDatabase::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SAppDatabase>("SAppDatabase");
   info->add(&SAppDatabase::document, "document");

@@ -11,7 +11,7 @@ if(data() == 0 || (data()->parent() == 0 && !data()->inheritsFromType<SDatabase>
 class SEntityWeakPointer : private XWeakSharedPointer<SEntity>
   {
 public:
-  explicit SEntityWeakPointer(SEntity *ptr) : XWeakSharedPointer<SEntity>(ptr)
+  explicit SEntityWeakPointer(SEntity *ptr=0) : XWeakSharedPointer<SEntity>(ptr)
     {
     }
 

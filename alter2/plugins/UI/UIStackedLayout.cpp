@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(UIStackedLayout)
 
-const SPropertyInformation *UIStackedLayout::createTypeInformation()
+SPropertyInformation *UIStackedLayout::createTypeInformation()
   {
   return SPropertyInformation::create<UIStackedLayout>("UIStackedLayout");
   }

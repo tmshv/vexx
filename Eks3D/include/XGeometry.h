@@ -69,10 +69,11 @@ private:
     XSet <QString> _changedA2;
     XSet <QString> _changedA3;
     XSet <QString> _changedA4;
-    bool _changedP;
-    bool _changedL;
-    bool _changedT;
-    bool _attributeSizeChanged;
+    mutable bool _changedP;
+    mutable bool _changedL;
+    mutable bool _changedT;
+    mutable bool _attributeSizeChanged;
+    mutable bool _changedAttrs;
     int _attributeSize;
     XHash <QString, XVector<xReal> > _attr1;
     XHash <QString, XVector<XVector2D> > _attr2;

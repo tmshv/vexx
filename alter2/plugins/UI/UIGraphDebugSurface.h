@@ -20,7 +20,7 @@ class UIGraphDebugSurface : public QObject, public UISurface, public GCShiftRend
   {
   Q_OBJECT
 public:
-  UIGraphDebugSurface();
+  UIGraphDebugSurface(SEntity *ent);
   ~UIGraphDebugSurface();
 
   virtual const XAbstractDelegate *delegateFor(XAbstractRenderModel::Iterator *, const XAbstractCanvas *canvas) const;

@@ -55,7 +55,7 @@ public:
     void restore();
 
 private:
-    inline XVector3D transformPoint( XVector3D );
+    inline XVector3D transformPoint( const XVector3D & );
     inline XVector <XVector3D> transformPoints( const XVector <XVector3D> & );
 
     inline XVector3D transformNormal( XVector3D );
@@ -72,7 +72,13 @@ private:
 
     struct State
         {
-        State() : type( None ), normalsAutomatic( false ) { }
+        State() : normal(XVector3D::Zero()),
+            texture(XVector2D::Zero()),
+            colour(1.0f, 1.0f, 1.0f, 1.0f),
+            type( None ),
+            normalsAutomatic( false )
+          {
+          }
         XVector3D normal;
         XVector2D texture;
         XVector4D colour;

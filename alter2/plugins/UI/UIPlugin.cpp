@@ -66,9 +66,6 @@ public:
   XList <UISurface*> _surfaces;
   QDialog *_preferences;
   QTabWidget *_preferenceTabs;
-  UIDatabaseDebugSurface _dbDebug;
-  UIGraphDebugSurface _graphDebug;
-  UIProfilerSurface _profiler;
   UIPlugin *_plugin;
   };
 
@@ -107,14 +104,12 @@ void UIPlugin::load()
 
     if(core()->isDebugUIEnabled())
       {
-      _priv->_dbDebug.setDatabase(&db);
-      addSurface(&_priv->_dbDebug);
-      _priv->_graphDebug.setEntity(&db);
-      addSurface(&_priv->_graphDebug);
+      addSurface(new UIDatabaseDebugSurface(&db));
+      addSurface(new UIGraphDebugSurface(&db));
       }
 
 #ifdef X_PROFILING_ENABLED
-    addSurface(&_priv->_profiler);
+    addSurface(new UIProfilerSurface);
 #endif
     }
   }
@@ -130,6 +125,7 @@ void UIPlugin::unload()
   foreach(UISurface *s, _priv->_surfaces)
     {
     s->privateData()->setPlugin(0);
+    delete s;
     }
 
   delete _priv;

@@ -115,7 +115,7 @@ private:
   friend class SPropertyContainer::TreeChange;
   };
 
-class SBlock
+class SHIFT_EXPORT SBlock
   {
 public:
   SBlock(SDatabase *db);

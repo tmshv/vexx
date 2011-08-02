@@ -5,13 +5,26 @@ XAbstractCanvasController::XAbstractCanvasController(XAbstractCanvas *canvas) : 
   }
 
 
-int XAbstractCanvasController::triggerMouseEvent(MouseEventType type,
+XAbstractCanvasController::UsedFlags XAbstractCanvasController::triggerMouseEvent(MouseEventType type,
                        QPoint point,
                        Qt::MouseButton triggerButton,
                        Qt::MouseButtons buttonsDown,
                        Qt::KeyboardModifiers modifiers)
   {
-  int ret = mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  UsedFlags ret = mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  _lastKnownMousePosition = point;
+  return ret;
+  }
+
+
+
+XAbstractCanvasController::UsedFlags XAbstractCanvasController::triggerWheelEvent(int delta,
+                       Qt::Orientation orientation,
+                       QPoint point,
+                       Qt::MouseButtons buttonsDown,
+                       Qt::KeyboardModifiers modifiers)
+  {
+  UsedFlags ret = wheelEvent(delta, orientation, point, buttonsDown, modifiers);
   _lastKnownMousePosition = point;
   return ret;
   }

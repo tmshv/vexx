@@ -27,16 +27,20 @@ LIBS += -lEksCore \
     -lshift \
     -lalter \
     -lscript \
+    -lShiftAlter \
+    -lShiftGraphicsCore \
     -lUI
 
 INCLUDEPATH += ../include \
     $$ROOT/EksCore \
     $$ROOT/Eks3D/include \
     $$ROOT/Shift \
+    $$ROOT/Shift/GraphicsCore \
     $$ROOT/Alter2 \
     $$ROOT/EksCore \
     $$ROOT/Alter2/Plugins/UI \
-    $$ROOT/Alter2/Plugins/Script
+    $$ROOT/Alter2/Plugins/Script \
+    $$ROOT/Alter2/Plugins/ShiftAlter
 
 HEADERS += Interface.h \
     viewport.h \

@@ -207,7 +207,7 @@ private:
 
     int _type;
 
-    int getCacheOffset( QString name, int components, int attrSize );
+    int getCacheOffset( const QString &name, int components, int attrSize );
     struct DrawCache
         {
         QString name;
@@ -225,16 +225,16 @@ private:
 // RENDERER
 //----------------------------------------------------------------------------------------------------------------------
 
-QGLFormat fmt( bool multi )
-    {
-    QGLFormat ret;
-    ret.setSampleBuffers( multi );
-    return ret;
-    }
 
-XGLRenderer::XGLRenderer( bool multi ) : _context( new QGLContext( fmt( multi ) ) ), _currentShader( 0 )
-    {
-    }
+XGLRenderer::XGLRenderer() : _currentShader( 0 ), _currentFramebuffer(0)
+  {
+  m_ids.reserve(8);
+  }
+
+void XGLRenderer::setContext(QGLContext *ctx)
+  {
+  _context = ctx;
+  }
 
 QGLContext *XGLRenderer::context()
     {
@@ -303,11 +303,6 @@ void XGLRenderer::disableRenderFlag( RenderFlags f )
         }
     }
 
-int XGLRenderer::enabledFeatures() const
-    {
-    return _features;
-    }
-
 void XGLRenderer::setViewportSize( QSize size )
     {
     _size = size;
@@ -319,6 +314,7 @@ void XGLRenderer::setProjectionTransform( const XComplexTransform &trans )
     glMatrixMode( GL_PROJECTION ) GLE;
     glLoadIdentity() GLE;
     glMultMatrixf( trans.data() ) GLE;
+    glMatrixMode( GL_MODELVIEW ) GLE;
     }
 
 QDebug operator<<( QDebug dbg, XVector2D v )
@@ -332,54 +328,55 @@ QDebug operator<<( QDebug dbg, XVector3D v )
     }
 
 void XGLRenderer::drawGeometry( const XGeometry &cache )
+  {
+  if( _currentShader )
     {
-    if( _currentShader )
+    cache.prepareInternal( this );
+    XGLGeometryCache *gC = static_cast<XGLGeometryCache*>((&cache)->internal());
+
+    glBindBuffer( GL_ARRAY_BUFFER, gC->_vertexArray ) GLE;
+
+    m_ids.clear();
+    foreach( const XGLGeometryCache::DrawCache &ref, gC->_cache )
+      {
+      int location( _currentShader->shader.attributeLocation(ref.name) );
+      if( location >= 0 )
         {
-        cache.prepareInternal( this );
-        XList<int> ids;
-        XGLGeometryCache *gC = static_cast<XGLGeometryCache*>((&cache)->internal());
-
-        glBindBuffer( GL_ARRAY_BUFFER, gC->_vertexArray ) GLE;
-
-        foreach( const XGLGeometryCache::DrawCache &ref, gC->_cache )
-            {
-            int location( _currentShader->shader.attributeLocation(ref.name) );
-            if( location >= 0 )
-                {
-                ids << location;
-                glEnableVertexAttribArray( location ) GLE;
-                glVertexAttribPointer( location, ref.components, GL_FLOAT, GL_FALSE, 0, (GLvoid*)ref.offset ) GLE;
-                }
-            }
-
-        if( gC->_pointArray )
-            {
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_pointArray ) GLE;
-            glDrawElements( GL_POINTS, gC->_pointSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
-            }
-
-        if( gC->_lineArray )
-            {
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_lineArray ) GLE;
-            glDrawElements( GL_LINES, gC->_lineSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
-            }
-
-        if( gC->_triangleArray )
-            {
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_triangleArray ) GLE;
-            glDrawElements( GL_TRIANGLES, gC->_triangleSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
-            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
-            }
-
-        foreach( int id, ids )
-            {
-            glDisableVertexAttribArray( id ) GLE;
-            }
-        glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
+        m_ids << location;
+        glEnableVertexAttribArray( location ) GLE;
+        glVertexAttribPointer( location, ref.components, GL_FLOAT, GL_FALSE, 0, (GLvoid*)ref.offset ) GLE;
         }
+      }
+
+    if( gC->_pointArray )
+      {
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_pointArray ) GLE;
+      glDrawElements( GL_POINTS, gC->_pointSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
+      }
+
+    if( gC->_lineArray )
+      {
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_lineArray ) GLE;
+      glDrawElements( GL_LINES, gC->_lineSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
+      }
+
+    if( gC->_triangleArray )
+      {
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gC->_triangleArray ) GLE;
+      glDrawElements( GL_TRIANGLES, gC->_triangleSize, GL_UNSIGNED_INT, (GLvoid*)((char*)NULL)) GLE;
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) GLE;
+      }
+
+    foreach( int id, m_ids )
+      {
+      glDisableVertexAttribArray( id ) GLE;
+      }
+
+    glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
     }
+  }
 
 XAbstractGeometry *XGLRenderer::getGeometry( XGeometry::BufferType t )
     {
@@ -1132,7 +1129,7 @@ void XGLGeometryCache::setAttribute( QString name, const XVector<XVector4D> &att
     glBindBuffer( GL_ARRAY_BUFFER, 0 ) GLE;
     }
 
-int XGLGeometryCache::getCacheOffset( QString name, int components, int attrSize )
+int XGLGeometryCache::getCacheOffset( const QString &name, int components, int attrSize )
     {
     foreach( const DrawCache &ref, _cache )
         {

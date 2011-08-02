@@ -14,6 +14,13 @@ class SPropertyContainer;
   S_ADD_INSTANCE_INFORMATION(myName) \
   S_REGISTER_TYPE_FUNCTION()
 
+#define S_ABSTRACT_PROPERTY_CONTAINER(myName, superName, version) \
+  public: \
+  S_ADD_ABSTRACT_STATIC_INFO(myName, version); \
+  typedef superName ParentType; \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  S_REGISTER_TYPE_FUNCTION()
+
 #define S_COMPUTE_GROUP(name) static SProperty SPropertyContainer::* name[] = {
 #define S_AFFECTS(property) reinterpret_cast<SProperty SPropertyContainer::*>(&className :: property),
 #define S_COMPUTE_GROUP_END() 0 };
@@ -33,8 +40,7 @@ public:
     const SPropertyContainer *before() const {return _before;}
     SPropertyContainer *after() {return _after;}
     const SPropertyContainer *after() const {return _after;}
-    SProperty *property() {return _property;}
-    const SProperty *property() const {return _property;}
+    SProperty *property() const {return _property;}
     xsize index() const { return _index; }
   private:
     SPropertyContainer *_before;
@@ -48,7 +54,7 @@ public:
   SPropertyContainer();
   virtual ~SPropertyContainer();
 
-  template <typename T> T *firstChild()
+  template <typename T> T *firstChild() const
     {
     SProperty *prop = firstChild();
     while(prop)

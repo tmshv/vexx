@@ -42,7 +42,9 @@ SOURCES += ../src/XDoodad.cpp \
     ../src/X2DCanvas.cpp \
     ../src/XAbstractRenderModel.cpp \
     ../src/XAbstractDelegate.cpp \
-    ../src/XAbstractCanvasController.cpp
+    ../src/XAbstractCanvasController.cpp \
+    ../src/X3DCanvas.cpp \
+    ../src/XCameraCanvasController.cpp
 HEADERS += ../include/XDoodad.h \
     ../include/X3DGlobal.h \
     ../include/XScene.h \
@@ -76,7 +78,9 @@ HEADERS += ../include/XDoodad.h \
     ../include/X2DCanvas.h \
     ../include/XAbstractRenderModel.h \
     ../include/XAbstractDelegate.h \
-    ../include/XAbstractCanvasController.h
+    ../include/XAbstractCanvasController.h \
+    ../include/X3DCanvas.h \
+    ../include/XCameraCanvasController.h
 DEFINES += GLEW_STATIC
 
 INCLUDEPATH += ../include/ \
@@ -88,3 +92,8 @@ LIBS += -lEksCore
 RESOURCES += \
     ../GLResources.qrc
 
+OTHER_FILES += \
+    ../GLResources/shaders/default.vert \
+    ../GLResources/shaders/default.frag \
+    ../GLResources/shaders/blinn.vert \
+    ../GLResources/shaders/blinn.frag

@@ -23,7 +23,7 @@ private:
 template <typename T>inline T &APlugin<T>::operator *()
   {
   xAssert( _plugin );
-  return _plugin;
+  return *_plugin;
   }
 
 template <typename T>inline T *APlugin<T>::operator->()

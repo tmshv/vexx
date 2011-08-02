@@ -176,12 +176,14 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     }
 
 #warning check what happens if you embed a script type in a script type... etc, i think it will crash and burn?
-  SPropertyInformation *newType = new SPropertyInformation(parent->create(), parent->createInstanceInformation(),
-                                                           parent->save(), parent->load(), parent->assign(),
-                                                           version, name, parent, endOfUsedMemory,
-                                                           parent->instanceInformationSize());
+  SPropertyInformation *newType = new SPropertyInformation(*parent);
 
-  newType->children() = properties;
+  newType->setVersion(version);
+  newType->typeName() = name;
+  newType->setParentTypeInformation(parent);
+  newType->setSize(endOfUsedMemory);
+
+  newType->children() << parent->children() << properties;
 
   STypeRegistry::addType(newType);
 

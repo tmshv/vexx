@@ -84,7 +84,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     template<typename StrideType> struct StridedConstMapType { typedef Eigen::Map<const Derived, Unaligned, StrideType> type; };
     template<typename StrideType> struct StridedAlignedMapType { typedef Eigen::Map<Derived, Aligned, StrideType> type; };
     template<typename StrideType> struct StridedConstAlignedMapType { typedef Eigen::Map<const Derived, Aligned, StrideType> type; };
-    
+
 
   protected:
     DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options> m_storage;
@@ -296,7 +296,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       * of rows and/or of columns, you can use conservativeResize(NoChange_t, Index) or
       * conservativeResize(Index, NoChange_t).
       *
-      * Matrices are resized relative to the top-left element. In case values need to be 
+      * Matrices are resized relative to the top-left element. In case values need to be
       * appended to the matrix they will be uninitialized.
       */
     EIGEN_STRONG_INLINE void conservativeResize(Index rows, Index cols)
@@ -349,7 +349,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       * of rows and/or of columns, you can use conservativeResize(NoChange_t, Index) or
       * conservativeResize(Index, NoChange_t).
       *
-      * Matrices are resized relative to the top-left element. In case values need to be 
+      * Matrices are resized relative to the top-left element. In case values need to be
       * appended to the matrix they will copied from \c other.
       */
     template<typename OtherDerived>
@@ -602,7 +602,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
       // it wouldn't allow to copy a row-vector into a column-vector.
-      return internal::assign_selector<Derived,OtherDerived>::run(this->derived(), other.derived());
+      return internal::assign_selector<Derived,OtherDerived,false>::run(this->derived(), other.derived());
     }
 
     template<typename T0, typename T1>

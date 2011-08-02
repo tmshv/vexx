@@ -44,8 +44,8 @@ XComplexTransform perspective(xReal angle, xReal aspect, xReal nearPlane, xReal 
   m(0,0) = cotan / aspect;
   m(1,1) = cotan;
   m(2,2) = -(nearPlane + farPlane) / clip;
-  m(3,2) = -(2.0f * nearPlane * farPlane) / clip;
-  m(2,3) = -1.0f;
+  m(2,3) = -(2.0f * nearPlane * farPlane) / clip;
+  m(3,2) = -1.0f;
 
   return m;
   }

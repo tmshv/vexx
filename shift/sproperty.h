@@ -14,8 +14,8 @@ class SPropertyMetaData;
 class SDatabase;
 
 #define S_REGISTER_TYPE_FUNCTION() \
-  private: static const SPropertyInformation *createTypeInformation(); \
-  public: static const SPropertyInformation *staticTypeInformation();
+  public: static SPropertyInformation *createTypeInformation(); \
+  static const SPropertyInformation *staticTypeInformation();
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
@@ -24,10 +24,18 @@ class SDatabase;
   static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
     name *prop = new(ptr) name(); \
     if(instanceInfo) { \
-    *instanceInfo = (SPropertyInstanceInformation *)(prop + 1); \
+    xuint8 *alignedPtr = (xuint8*)(prop+1); \
+    alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+    xAssertIsAligned(alignedPtr); \
+    *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
     new(*instanceInfo) InstanceInformation(); \
     (*instanceInfo)->setDynamic(true); \
     } } \
+  public: enum { Version = version };
+
+#define S_ADD_ABSTRACT_STATIC_INFO(name, version) \
+  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
+  xAssertFailMessage("Creating abstract type"); } \
   public: enum { Version = version };
 
 #define S_PROPERTY_ROOT(myName, version) \
@@ -44,9 +52,23 @@ class SDatabase;
   if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
   return info;}
 
+#define S_IMPLEMENT_INLINE_PROPERTY(myName) \
+  inline const SPropertyInformation *myName::staticTypeInformation() { \
+  static const SPropertyInformation *info = 0; \
+  if(!info) { info = STypeRegistry::findType(#myName); \
+  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
+  return info;}
+
 #define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
+  S_ADD_INSTANCE_INFORMATION(myName) \
+  typedef superName ParentType; \
+  S_REGISTER_TYPE_FUNCTION()
+
+#define S_ABSTRACT_PROPERTY(myName, superName, version) \
+  public: \
+  S_ADD_ABSTRACT_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()
@@ -80,9 +102,9 @@ public:
 
   bool isComputed() const { return baseInstanceInformation()->compute() != 0; }
   bool hasInput() const { return _input; }
-  bool hasOutputs() const { preGet(); return _output; }
+  bool hasOutputs() const { return _output; }
 
-  template <typename T> T *nextSibling()
+  template <typename T> T *nextSibling() const
     {
     SProperty *prop = nextSibling();
     while(prop)
@@ -102,7 +124,6 @@ public:
   SDatabase *database() { return _database; }
   const SDatabase *database() const { return _database; }
 
-  bool inheritsFromType(const QString &type) const;
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
 
@@ -215,6 +236,8 @@ public:
   static void assignProperty(const SProperty *, SProperty *);
   static void saveProperty(const SProperty *, SSaver & );
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+
+  X_ALIGNED_OPERATOR_NEW
 
 protected:
   template <typename T> T *getChange() const

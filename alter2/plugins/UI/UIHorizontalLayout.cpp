@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(UIHorizontalLayout)
 
-const SPropertyInformation *UIHorizontalLayout::createTypeInformation()
+SPropertyInformation *UIHorizontalLayout::createTypeInformation()
   {
   return SPropertyInformation::create<UIHorizontalLayout>("UIHorizontalLayout");
   }

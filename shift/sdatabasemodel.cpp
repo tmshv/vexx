@@ -65,9 +65,17 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
     _root = db;
     }
 
-  if(_root)
+  if(_root.isValid())
     {
     _root->addTreeObserver(this);
+    }
+  }
+
+SDatabaseModel::~SDatabaseModel()
+  {
+  if(_root.isValid())
+    {
+    _root->removeTreeObserver(this);
     }
   }
 

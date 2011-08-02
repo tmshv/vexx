@@ -15,7 +15,7 @@ XAbstractCanvas::~XAbstractCanvas()
 
 void XAbstractCanvas::update(XAbstractRenderModel::UpdateMode)
   {
-  xAssert(_model && _iterator);
+  xAssert(!_model || (_model && _iterator));
   if(_model && _iterator)
     {
     _model->resetIterator(_iterator);

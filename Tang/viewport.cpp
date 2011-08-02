@@ -13,175 +13,125 @@
 #include "XEnvironmentRenderer.h"
 #include "sentityui.h"
 #include "application.h"
+#include "3D/GCRenderToScreen.h"
+#include "3D/GCCamera.h"
+#include "3D/GCViewport.h"
+#include "3D/GCScene.h"
+#include "3D/GCShader.h"
+#include "3D/GCShadingGroup.h"
+#include "3D/Renderable/GCCuboid.h"
 
-QGLContext *Viewport::initRenderer()
+Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
+    _app(app),
+    _db(0),
+    _controller(0, this)
   {
-  _renderer = new XGLRenderer( true );
-  return _renderer->context();
-  }
+  setController(&_controller);
 
-Viewport::Viewport(Application *app) : QGLWidget( initRenderer() ),
-    UISurface("Tang", this, UISurface::Dock),
-    _camera( 55, XVector3D( 0, 5, 10 ) ),
-    _scene( _renderer, &_camera ), _initMouse( true ),
-    _app(app)
-  {
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
   _timer->start( 40 );
 
   setMouseTracking( true );
 
-  _move << 0 << 0 << 0;
 
-  /*_properties = new QWidget(0);
-  _properties->show();
-  _properties->setGeometry(QRect(_properties->pos(), QSize(250, 600)));
-  connect(this, SIGNAL(destroyed()), _properties, SLOT(deleteLater()));
-  // add a layout for later use
-  new QVBoxLayout(_properties);
+  _db = &db.db();
+  _db->addTreeObserver(this);
 
-  QAction *newItemAction = new QAction(this);
-  connect(newItemAction, SIGNAL(triggered()), this, SLOT(newItem()));
-  newItemAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-  addAction(newItemAction);*/
+  GCViewport* vp = _db->addChild<GCViewport>("Viewport");
+  _viewport = vp;
+  GCRenderToScreen* op = _db->addChild<GCRenderToScreen>("Output");
+
+  GCPerspectiveCamera* cam = _db->addChild<GCPerspectiveCamera>("Camera");
+  vp->x.connect(&cam->viewportX);
+  vp->y.connect(&cam->viewportY);
+  vp->width.connect(&cam->viewportWidth);
+  vp->height.connect(&cam->viewportHeight);
+  _controller.setCamera(cam);
+
+  cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
+  cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
+
+  GCScene* scene = _db->addChild<GCScene>("Scene");
+  cam->projection.connect(&scene->cameraProjection);
+  cam->viewTransform.connect(&scene->cameraTransform);
+
+  GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
+  scene->shadingGroups.addPointer(group);
+
+  GCShader *shader = _db->addChild<GCShader>("Shader");
+  group->shader.setPointed(shader);
+
+  GCCuboid *cube = _db->addChild<GCCuboid>("Cube");
+  group->geometry.addPointer(&cube->geometry);
+
+  op->source.setPointed(scene);
+  }
+
+Viewport::~Viewport()
+  {
+  _screenRenderers.clear();
+  _db->removeTreeObserver(this);
+  }
+
+void Viewport::onTreeChange(const SChange *c)
+  {
+  const SPropertyContainer::TreeChange* t = c->castTo<SPropertyContainer::TreeChange>();
+  if(!t)
+    {
+    return;
+    }
+
+  GCRenderToScreen *prop = t->property()->castTo<GCRenderToScreen>();
+  if(!prop)
+    {
+    return;
+    }
+
+  if(t->after())
+    {
+    if(!_screenRenderers.contains(prop))
+      {
+      _screenRenderers << prop;
+      }
+    }
+  else
+    {
+    _screenRenderers.removeAll(prop);
+    }
   }
 
 void Viewport::initializeGL()
   {
-  _renderer->intialise();
-
-  class EnvironmentDoodad : public XDoodad
-    {
-  public:
-    EnvironmentDoodad(XEnvironmentRenderer* rend)// : _envRenderer(rend)
-      {
-      }
-    virtual void render( )
-      {
-      //_envRenderer->render();
-      }
-
-  private:
-    //XEnvironmentRenderer *_envRenderer;
-    };
-
-  //_scene.addDoodad(new EnvironmentDoodad(_envRenderer));
+  X3DCanvas::initializeGL();
+  _renderer.setContext(const_cast<QGLContext*>(context()));
+  _renderer.intialise();
   }
 
 void Viewport::resizeGL( int w, int h )
   {
-  _scene.setViewportSize( QSize( w, h ) );
+  X3DCanvas::resizeGL(w, h);
+  _renderer.setViewportSize(QSize(w,h));
+
+  if(_viewport.isValid())
+    {
+    GCViewport *vp = _viewport->uncheckedCastTo<GCViewport>();
+    vp->x = 0;
+    vp->y = 0;
+    vp->width = w;
+    vp->height = h;
+    }
   }
 
 void Viewport::paintGL()
   {
-  _camera.track( 0.5 * _move[0], 0.5 * _move[1], 0.5 * _move[2] );
-  _scene.renderScene( );
-  }
-
-void Viewport::keyPressEvent( QKeyEvent *event )
-  {
-  switch( event->key() )
+  _renderer.clear();
+  foreach(GCRenderToScreen *sc, _screenRenderers)
     {
-    case Qt::Key_Escape: QApplication::quit(); break;
-    case Qt::Key_W: _move[2] = -1; break;
-    case Qt::Key_S: _move[2] = 1; break;
-    case Qt::Key_A: _move[0] = -1; break;
-    case Qt::Key_D: _move[0] = 1; break;
-    case Qt::Key_Q: _move[1] = -1; break;
-    case Qt::Key_E: _move[1] = 1; break;
-    }
-  }
-
-void Viewport::keyReleaseEvent( QKeyEvent *event )
-  {
-  switch( event->key() )
-    {
-    case Qt::Key_W: _move[2] = 0; break;
-    case Qt::Key_S: _move[2] = 0; break;
-    case Qt::Key_A: _move[0] = 0; break;
-    case Qt::Key_D: _move[0] = 0; break;
-    case Qt::Key_Q: _move[1] = 0; break;
-    case Qt::Key_E: _move[1] = 0; break;
-    }
-  }
-
-void Viewport::mouseMoveEvent( QMouseEvent *event )
-  {
-  if((event->modifiers()&Qt::AltModifier) != false)
-    {
-    QPointF pan( QPointF( QCursor::pos() - _oldPos ) * 0.05 );
-
-    _camera.pan( pan.x(), -pan.y() );
-    }
-  _oldPos = QCursor::pos();
-  }
-
-void Viewport::mousePressEvent( QMouseEvent *event )
-  {
-  if(event->button() == Qt::LeftButton)
-    {
-    /*XEnvironmentRenderer::RayCastResults results = _envRenderer->rayCast(event->pos(), true);
-
-    // clear the UI
-    foreach(QObject *child, _properties->children())
+    const GCRenderable* renderable = sc->source();
+    if(renderable)
       {
-      if(child->isWidgetType())
-        {
-        child->deleteLater();
-        }
+      renderable->render(&_renderer);
       }
-
-    // try to fill it again
-    if(results.hasResults())
-      {
-      XEnvironmentRenderer::RayCastResult result = results.closestResult(_camera.position());
-
-      //_entity->setItem(result.ID(), result.parentTree().back(), result.index());
-
-      //SEntityUI ui;
-      //_properties->layout()->addWidget(ui.createControlWidget(_entity, _properties));
-      }*/
     }
-  }
-
-void Viewport::showEvent(QShowEvent *event)
-  {
-  if(!isVisible())
-    {
-    QApplication::quit();
-    }
-  }
-
-void Viewport::newItem()
-  {
-  /*
-  NewItemDialog *dialog = new NewItemDialog(_app->environment(), this);
-  dialog->show();*/
-  }
-
-XVector3D Viewport::screenToWorld(const QPoint &pt) const
-  {
-  return _camera.screenToWorld(pt);
-  }
-
-XVector3D Viewport::position() const
-  {
-  return _camera.position();
-  }
-
-xReal Viewport::farClipPlane() const
-  {
-  return _camera.farClipPlane();
-  }
-
-xReal Viewport::nearClipPlane() const
-  {
-  return _camera.nearClipPlane();
-  }
-
-XFrustum Viewport::frustum() const
-  {
-  return _camera.frustum();
   }

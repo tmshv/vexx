@@ -55,6 +55,8 @@ public:
 
   void setData(DataKey, const QVariant &);
 
+  X_ALIGNED_OPERATOR_NEW
+
 private:
   void initiate(const SPropertyInformation *info,
                 const QString &name,
@@ -83,66 +85,65 @@ public:
   typedef XHash<DataKey, QVariant> DataHash;
 
 XProperties:
-  XROProperty(CreateFunction, create);
-  XROProperty(CreateInstanceInformationFunction, createInstanceInformation);
-  XROProperty(SaveFunction, save);
-  XROProperty(LoadFunction, load);
-  XROProperty(AssignFunction, assign);
+  XProperty(CreateFunction, create, setCreate);
+  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
+  XProperty(SaveFunction, save, setSave);
+  XProperty(LoadFunction, load, setLoad);
+  XProperty(AssignFunction, assign, setAssign);
 
-  XROProperty(xuint32, version);
+  XProperty(xuint32, version, setVersion);
 
-  XRORefProperty(QString, typeName);
+  XRefProperty(QString, typeName);
 
-  XROProperty(const SPropertyInformation *, parentTypeInformation);
+  XProperty(const SPropertyInformation *, parentTypeInformation, setParentTypeInformation);
 
   XRefProperty(XList<SPropertyInstanceInformation*>, children);
-  XROProperty(xsize, propertyOffset);
-  XROProperty(xsize, size);
-  XROProperty(xsize, instanceInformationSize);
-  XROProperty(xsize, instances);
-  XROProperty(bool, dynamic);
+  XProperty(xsize, size, setSize);
+  XProperty(xsize, instanceInformationSize, setInstanceInformationSize);
+  XProperty(bool, dynamic, seyDynamic);
 
   XRORefProperty(DataHash, data);
+
+  XROProperty(xsize, instances);
 
 public:
   template <typename PropType> static SPropertyInformation *create(const QString &typeName)
     {
-    return new SPropertyInformation(PropType::createProperty,
-                                createInstanceInformation<PropType>,
-                                PropType::saveProperty,
-                                PropType::loadProperty,
-                                PropType::assignProperty,
-                                PropType::Version,
-                                typeName,
-                                PropType::ParentType::staticTypeInformation(),
-                                sizeof(PropType),
-                                sizeof(typename PropType::InstanceInformation));
+    SPropertyInformation *info = PropType::ParentType::createTypeInformation();
+
+    info->setCreate(PropType::createProperty);
+    info->setCreateInstanceInformation(createInstanceInformation<PropType>);
+    info->setSave(PropType::saveProperty);
+    info->setLoad(PropType::loadProperty);
+    info->setAssign(PropType::assignProperty);
+    info->setVersion(PropType::Version);
+    info->typeName() = typeName;
+    info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
+    info->setSize(sizeof(PropType));
+    info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+
+    return info;
     }
 
   template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName)
     {
-    return new SPropertyInformation(PropType::createProperty,
-                                createInstanceInformation<PropType>,
-                                PropType::saveProperty,
-                                PropType::loadProperty,
-                                PropType::assignProperty,
-                                PropType::Version,
-                                typeName,
-                                0,
-                                sizeof(PropType),
-                                sizeof(typename PropType::InstanceInformation));
+    SPropertyInformation *info = new SPropertyInformation();
+
+    info->setCreate(PropType::createProperty);
+    info->setCreateInstanceInformation(createInstanceInformation<PropType>);
+    info->setSave(PropType::saveProperty);
+    info->setLoad(PropType::loadProperty);
+    info->setAssign(PropType::assignProperty);
+    info->setVersion(PropType::Version);
+    info->typeName() = typeName;
+    info->setSize(sizeof(PropType));
+    info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+
+    return info;
     }
 
-  SPropertyInformation(CreateFunction createFn,
-                       CreateInstanceInformationFunction createInstanceInfoFn,
-                       SaveFunction saveFn,
-                       LoadFunction loadFn,
-                       AssignFunction assignFn,
-                       xuint32 version,
-                       const QString &typeName,
-                       const SPropertyInformation *parent,
-                       xsize size,
-                       xsize instanceInformationSize);
+  SPropertyInformation();
+  SPropertyInformation(const SPropertyInformation &info);
 
   ~SPropertyInformation();
 
@@ -155,17 +156,27 @@ public:
 
   bool inheritsFromType(const SPropertyInformation *type) const;
 
-  // this classes and all its inherited children count
-  xsize completeChildCount() const;
   // this classes children count
   xsize childCount() const { return children().size(); }
+
+  template <typename T, typename U>
+  typename U::InstanceInformation *child(U T::* location)
+    { return static_cast<typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+
+  template <typename T, typename U>
+  const typename U::InstanceInformation *child(U T::* location) const
+    { return static_cast<const typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+
+  // access the properties from offset of member
+  SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location);
+  const SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location) const;
+
   // access child instance information
-  const SPropertyInstanceInformation *completeChild(xsize index) const;
-  const SPropertyInstanceInformation *child(xsize index) const
-    { return children()[index]; };
+  SPropertyInstanceInformation *child(xsize index);
+  const SPropertyInstanceInformation *child(xsize index) const;
 
   // size of the property type, and its instance information
-  xsize dynamicSize() const { return size() + instanceInformationSize(); }
+  xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0)
     {
@@ -180,6 +191,8 @@ public:
     return def;
     }
 
+  X_ALIGNED_OPERATOR_NEW
+
 private:
   template <typename T>
     static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
@@ -192,7 +205,6 @@ private:
     return def;
     }
 
-private:
   void reference() const;
   void dereference() const;
   friend class SDatabase;

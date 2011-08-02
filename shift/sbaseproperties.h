@@ -24,7 +24,7 @@ public: \
   class InstanceInformation : public SProperty::InstanceInformation { public: \
     InstanceInformation() : _defaultValue(defaultDefault) { } \
     XProperties: XRORefProperty(type, defaultValue); \
-    void initiateFromDefinition(const type &def) { _defaultValue = def; } \
+    void setDefault(const type &def) { _defaultValue = def; } \
     virtual void initiateProperty(SProperty *propertyToInitiate) const \
       { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
   S_PROPERTY(name, SProperty, 0); \
@@ -58,7 +58,7 @@ template <> class SPODInterface <type> { public: typedef name Type; \
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
   S_IMPLEMENT_PROPERTY(name) \
-  const SPropertyInformation *name::createTypeInformation() { \
+  SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); } \
 name::Change::Change(const type &b, const type &a, name *prop) \
   : SProperty::DataChange(prop), _before(b), _after(a) \
@@ -121,30 +121,82 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, XString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
+template <typename Derived> QTextStream & operator <<(QTextStream &str, const Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width = data.cols();
+  xsize height = data.rows();
+  str << width << " " << height << " ";
+  for (xsize i = 0; i < height; ++i)
+    {
+    for(xsize j = 0; j < width; ++j)
+      {
+      str << data(i, j);
+      if((i < height-1) && (j < width-1)) // while not last element
+        {
+        str << " "; // separate each element with space
+        }
+      }
+    }
+  return str;
+  }
+
+template <typename Derived> QDataStream & operator <<(QDataStream &str, const Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width = data.cols();
+  xsize height = data.rows();
+  str << (quint64) width << (quint64) height;
+  for (xsize i = 0; i < height; ++i)
+    {
+    for(xsize j = 0; j < width; ++j)
+      {
+      str << data(i, j);
+      }
+    }
+  return str;
+  }
+
+template <typename Derived> QTextStream & operator >>(QTextStream &str, Eigen::PlainObjectBase <Derived> &data)
+  {
+  xsize width;
+  xsize height;
+
+  str >> width >> height; // first element in str is size of str
+  data.resize(width, height);
+
+  for(xsize i = 0; i < height; ++i )
+    {
+    for(xsize j = 0; j < width; j++)
+      {
+      typename Derived::Scalar tVal;
+      str >> tVal;
+      data(i, j) = tVal;
+      }
+    }
+  return str;
+  }
+
+template <typename Derived> QDataStream & operator >>(QDataStream &str, Eigen::PlainObjectBase <Derived> &data)
+  {
+  quint64 width;
+  quint64 height;
+
+  str >> width >> height; // first element in str is size of str
+  data.resize(width, height);
+  for(xsize i = 0; i < height; ++i )
+    {
+    for(xsize j = 0; j < width; j++)
+      {
+      typename Derived::Scalar tVal;
+      str >> tVal;
+      data(i, j) = tVal;
+      }
+    }
+  return str;
+  }
+
 // specific pod interface for bool because it is actually a uint8.
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
   static void assign(BoolProperty* s, const bool &val) { s->assign(val); } \
   static const xuint8 &value(const BoolProperty* s) { return s->value(); } };
-
-class SHIFT_EXPORT Pointer : public SProperty
-  {
-  S_PROPERTY(Pointer, SProperty, 0);
-
-public:
-  SProperty *pointed() const { preGet(); return input(); }
-  SProperty *operator()() const { preGet(); return input(); }
-
-  void setPointed(SProperty *prop);
-  Pointer &operator=(SProperty *prop) { setPointed(prop); return *this; }
-  };
-
-class SHIFT_EXPORT PointerArray : public STypedPropertyArray<Pointer>
-  {
-  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<Pointer>, 0);
-public:
-  void addPointer(SProperty *);
-  void removePointer(SProperty *);
-  bool hasPointer(SProperty *) const;
-  };
 
 #endif // SBASEPROPERTIES_H

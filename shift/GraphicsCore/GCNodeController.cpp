@@ -21,20 +21,25 @@ GCNodeController::~GCNodeController()
     }
   }
 
-int GCNodeController::mouseEvent(MouseEventType type,
-                                     QPoint point,
+GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
+                                     QPoint widgetSpacePoint,
                                      Qt::MouseButton triggerButton,
                                      Qt::MouseButtons buttonsDown,
                                      Qt::KeyboardModifiers modifiers)
   {
+  QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
 
-  QPoint mouseDelta(point - lastKnownMousePosition());
 
-  int result = XSimple2DCanvasController::mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, widgetSpacePoint, triggerButton, buttonsDown, modifiers);
   if(result != NotUsed)
     {
     return result;
     }
+
+  QPoint graphSpacePoint = transform.map(widgetSpacePoint);
+  QPoint lKP = transform.map(lastKnownMousePosition());
+
+  QPoint mouseDelta(graphSpacePoint - lKP);
 
   if(!_iterator)
     {
@@ -49,7 +54,7 @@ int GCNodeController::mouseEvent(MouseEventType type,
 
     result |= Used|NeedsUpdate;
     }
-  if(type == Move && _controlMode == ConnectingProperty && _interactionEntity)
+  if(type == Move && (_controlMode == ConnectingProperty || _controlMode == ConnectingEntity) && _interactionEntity)
     {
     result = Used|NeedsUpdate;
     }
@@ -66,7 +71,7 @@ int GCNodeController::mouseEvent(MouseEventType type,
 
         const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(_iterator);
         xsize index = X_SIZE_SENTINEL;
-        GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+        GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
 
         if(hitResult != GCAbstractNodeDelegate::None)
           {
@@ -78,6 +83,11 @@ int GCNodeController::mouseEvent(MouseEventType type,
             {
             _interactionEntity = it->entity();
             _controlMode = MovingEntity;
+            }
+          else if(hitResult == GCAbstractNodeDelegate::NodeOutput)
+            {
+            _interactionEntity = it->entity();
+            _controlMode = ConnectingEntity;
             }
           else if(hitResult == GCAbstractNodeDelegate::Input)
             {
@@ -100,6 +110,30 @@ int GCNodeController::mouseEvent(MouseEventType type,
       }
     else if(type == Release && _controlMode != None)
       {
+      if(_controlMode == ConnectingEntity)
+        {
+        canvas()->model()->resetIterator(_iterator);
+        while(_iterator->next())
+          {
+          const GCAbstractNodeDelegate *delegate = static_cast<const GCAbstractNodeDelegate*>(canvas()->model()->delegateFor(_iterator, canvas()));
+
+          const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator*>(_iterator);
+          xsize index = X_SIZE_SENTINEL;
+          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
+
+          if(hitResult == GCAbstractNodeDelegate::Input)
+            {
+            SProperty *b = it->entity()->at(index);
+            _interactionEntity->connect(b);
+            }
+          }
+
+        _controlMode = None;
+        _interactionEntity = 0;
+        _interactionDelegate = 0;
+
+        result |= Used|NeedsUpdate;
+        }
       if(_controlMode == ConnectingProperty)
         {
         canvas()->model()->resetIterator(_iterator);
@@ -109,7 +143,7 @@ int GCNodeController::mouseEvent(MouseEventType type,
 
           const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator*>(_iterator);
           xsize index = X_SIZE_SENTINEL;
-          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(point, it->entity(), index);
+          GCAbstractNodeDelegate::HitArea hitResult = delegate->hitTest(graphSpacePoint, it->entity(), index);
 
           SProperty *a = _interactionEntity->at(_interactionProperty);
           if(_connectingOutput && hitResult == GCAbstractNodeDelegate::Input)
@@ -123,8 +157,8 @@ int GCNodeController::mouseEvent(MouseEventType type,
             b->connect(a);
             }
           }
-
         }
+
       _controlMode = None;
       _interactionEntity = 0;
       _interactionDelegate = 0;
@@ -134,10 +168,8 @@ int GCNodeController::mouseEvent(MouseEventType type,
     }
   else if(type == Press && triggerButton == Qt::RightButton)
     {
-    emit onContextMenu(point);
+    emit onContextMenu(widgetSpacePoint);
     }
-
-  lastKnownMousePosition() = point;
   return result;
   }
 
@@ -153,6 +185,21 @@ void GCNodeController::paint(xuint32 pass) const
     {
     xAssert(_interactionEntity);
 
-    _interactionDelegate->drawConnection(canvas(), _interactionEntity, _interactionProperty, _connectingOutput, lastKnownMousePosition());
+    QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
+
+    QPoint point = transform.map(lastKnownMousePosition());
+
+    _interactionDelegate->drawConnection(canvas(), _interactionEntity, _interactionProperty, _connectingOutput, point);
+    }
+
+  if(pass == _connectionPass && _controlMode == ConnectingEntity)
+    {
+    xAssert(_interactionEntity);
+
+    QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
+
+    QPoint point = transform.map(lastKnownMousePosition());
+
+    _interactionDelegate->drawConnection(canvas(), _interactionEntity, X_SIZE_SENTINEL, true, point);
     }
   }

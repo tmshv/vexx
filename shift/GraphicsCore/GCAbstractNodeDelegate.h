@@ -21,6 +21,7 @@ public:
     NodeDull,
     NodeTranslatable,
     Input,
+    NodeOutput,
     Output,
     MaxNodeParts
     };
@@ -58,10 +59,17 @@ public:
     QRect titleBounds;
     QStaticText title;
 
+    QPoint entOutputPos;
+    xuint32 entOutputRadius;
+
     struct PropertyData
       {
       QStaticText text;
       QPoint position;
+      QSize renderSize;
+      bool onRight;
+
+      QVector<PropertyData> childProperties;
       };
 
     QVector<PropertyData> properties;
@@ -69,6 +77,12 @@ public:
   mutable QHash<const void *, RenderData> _renderData;
   void updateRenderData(const SEntity *ent) const;
   void ensureRenderData(const SEntity *ent) const;
+
+private:
+  void preSetupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop, int yOffset) const;
+  void postSetupProperty(const QFont& font, RenderData::PropertyData& data, const SProperty *prop, int minX, int maxWidth) const;
+
+  void paintProperties(QPainter *ptr, QPoint nodePos, const QVector<RenderData::PropertyData> &) const;
 
   QFont _titleFnt;
   QFontMetrics _titleFntMetrics;
