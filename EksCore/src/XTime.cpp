@@ -47,7 +47,7 @@ XTime::XTime(const XTime &t) : _secs(t._secs), _nanosecs(t._nanosecs)
   {
   }
 
-XTime::XTime &XTime::operator+=(const XTime &t)
+XTime &XTime::operator+=(const XTime &t)
   {
   _secs += t._secs;
   _nanosecs += t._nanosecs;

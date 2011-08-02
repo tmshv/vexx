@@ -3,6 +3,7 @@
 
 #include "spropertycontainer.h"
 #include "sbaseproperties.h"
+#include "sdatabase.h"
 #include "XList"
 #include "sloader.h"
 #include "Eigen/Core"
@@ -20,12 +21,12 @@ public:
   void add(const SArrayProperty <T, U> *in)
     {
     EigenArray result = mData + in->data();
-    doChange(result);
+    applyChange(result);
     }
 
   void add(const SArrayProperty <T, U> *inA, const SArrayProperty <T, U> *inB)
     {
-    doChange(inA->data() + inB->data());
+    applyChange(inA->data() + inB->data());
     }
 
   void resize(xsize width, xsize height)
@@ -33,7 +34,7 @@ public:
     EigenArray result = mData;
     result.resize(height, width);
 
-    doChange(result);
+    applyChange(result);
     }
 
   void resize(xsize size)
@@ -41,7 +42,7 @@ public:
     EigenArray result = mData;
     result.resize(1, width);
 
-    doChange(result);
+    applyChange(result);
     }
 
   xsize size() const
@@ -75,12 +76,12 @@ public:
 
     memcpy(result.data(), &val.front(), sizeof(T)*width*height);
 
-    doChange(result);
+    applyChange(result);
     }
 
   void setData(const EigenArray &result)
     {
-    doChange(result);
+    applyChange(result);
     }
 
   void setIndex(xsize x, xsize y, const T &val)
@@ -88,7 +89,7 @@ public:
     EigenArray result = mData;
     result(y, x) = val;
 
-    doChange(result);
+    applyChange(result);
     }
 
   // called by parent
@@ -107,11 +108,12 @@ public:
     }
 
 private:
-  class Change : public SProperty::DataChange
+  class ArrayChange : public SProperty::DataChange
     {
-    S_CHANGE( Change, SChange, Type);
+    S_CHANGE( ArrayChange, SChange, Type);
   public:
-    Change(const EigenArray &b, const EigenArray &a, SProperty *prop)
+    ArrayChange(){}
+    ArrayChange(const EigenArray &b, const EigenArray &a, SProperty *prop)
       : SProperty::DataChange(prop),
       _before(b),
       _after(a)
@@ -144,11 +146,10 @@ private:
       }
     };
 
-  void doChange(const EigenArray &arr)
+  void applyChange(const EigenArray &arr)
     {
-    void *changeMemory = getChange<Change>();
-    Change *change = new(changeMemory) Change(mData, arr, this);
-    database()->submitChange(change);
+    SDatabase& db = *database();
+    db.doChange<ArrayChange>(mData, arr, this);
     }
 
   Eigen::Array <T, Eigen::Dynamic, Eigen::Dynamic> mData;
