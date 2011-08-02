@@ -34,16 +34,16 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
   xuint32 polys[] = { 4, 4, 4, 4, 4, 4 };
   geo.addPolygons(polys, 6);
 
-  xuint32 posX[] = { 0, 3, 4, 7 };
+  xuint32 posX[] = { 0, 3, 7, 4 };
   vertex->setPolygon(0, posX);
 
-  xuint32 negX[] = { 1, 2, 5, 6 };
+  xuint32 negX[] = { 1, 2, 6, 5 };
   vertex->setPolygon(1, negX);
 
-  xuint32 posY[] = { 0, 1, 4, 5 };
+  xuint32 posY[] = { 0, 1, 5, 4 };
   vertex->setPolygon(2, posY);
 
-  xuint32 negY[] = { 2, 3, 6, 7 };
+  xuint32 negY[] = { 2, 3, 7, 6 };
   vertex->setPolygon(3, negY);
 
   xuint32 posZ[] = { 0, 1, 2, 3 };

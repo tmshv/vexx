@@ -294,6 +294,7 @@ void GCGeometry::appendTo(XGeometry *geo) const
     triangles.reserve(triangles.size() + (3 * (indexCount - 2)));
     Triangulator::triangulate(polyIndex, positionData, indexCount, &triangles, vertexIndexStart);
 
+    vertexIndexStart += indexCount;
     offset += indexCount + 1;
     }
 
