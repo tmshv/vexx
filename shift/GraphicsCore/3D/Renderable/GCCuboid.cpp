@@ -18,6 +18,13 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
   GCGeometryAttribute *vertex = geo.attribute("vertex");
   SVector3ArrayProperty *vertexData = vertex->attributeData<SVector3ArrayProperty>();
 
+  geo.addAttribute<SVector3ArrayProperty>("normals");
+  GCGeometryAttribute *normals = geo.attribute("normals");
+  SVector3ArrayProperty *normalData = normals->attributeData<SVector3ArrayProperty>();
+
+  xuint32 polys[] = { 4, 4, 4, 4, 4, 4 };
+  geo.addPolygons(polys, 6);
+
   SVector3ArrayProperty::EigenArray arr;
   arr.resize(8,1);
   arr << XVector3D(x,y,z),
@@ -28,29 +35,59 @@ void computeCube(const SPropertyInstanceInformation *info, SPropertyContainer *c
         XVector3D(-x,y,-z),
         XVector3D(-x,-y,-z),
         XVector3D(x,-y,-z);
-
   vertexData->setData(arr);
 
-  xuint32 polys[] = { 4, 4, 4, 4, 4, 4 };
-  geo.addPolygons(polys, 6);
+  SVector3ArrayProperty::EigenArray norm;
+  norm.resize(6,1);
+  norm << XVector3D(1.0f, 0.0f, 0.0f),
+        XVector3D(-1.0f, 0.0f, 0.0f),
+        XVector3D(0.0f, 1.0f, 0.0f),
+        XVector3D(0.0f, -1.0f, 0.0f),
+        XVector3D(0.0f, 0.0f, 1.0f),
+        XVector3D(0.0f, 0.0f, -1.0f);
+  normalData->setData(norm);
 
-  xuint32 posX[] = { 0, 3, 7, 4 };
-  vertex->setPolygon(0, posX);
+  // pos
+    {
+    xuint32 posX[] = { 0, 3, 7, 4 };
+    vertex->setPolygon(0, posX);
 
-  xuint32 negX[] = { 1, 2, 6, 5 };
-  vertex->setPolygon(1, negX);
+    xuint32 negX[] = { 1, 2, 6, 5 };
+    vertex->setPolygon(1, negX);
 
-  xuint32 posY[] = { 0, 1, 5, 4 };
-  vertex->setPolygon(2, posY);
+    xuint32 posY[] = { 0, 1, 5, 4 };
+    vertex->setPolygon(2, posY);
 
-  xuint32 negY[] = { 2, 3, 7, 6 };
-  vertex->setPolygon(3, negY);
+    xuint32 negY[] = { 2, 3, 7, 6 };
+    vertex->setPolygon(3, negY);
 
-  xuint32 posZ[] = { 0, 1, 2, 3 };
-  vertex->setPolygon(4, posZ);
+    xuint32 posZ[] = { 0, 1, 2, 3 };
+    vertex->setPolygon(4, posZ);
 
-  xuint32 negZ[] = { 4, 5, 6, 7 };
-  vertex->setPolygon(5, negZ);
+    xuint32 negZ[] = { 4, 5, 6, 7 };
+    vertex->setPolygon(5, negZ);
+    }
+
+  // norm
+    {
+    xuint32 posX[] = { 0, 0, 0, 0 };
+    normals->setPolygon(0, posX);
+
+    xuint32 negX[] = { 1, 1, 1, 1 };
+    normals->setPolygon(1, negX);
+
+    xuint32 posY[] = { 2, 2, 2, 2 };
+    normals->setPolygon(2, posY);
+
+    xuint32 negY[] = { 3, 3, 3, 3 };
+    normals->setPolygon(3, negY);
+
+    xuint32 posZ[] = { 4, 4, 4, 4 };
+    normals->setPolygon(4, posZ);
+
+    xuint32 negZ[] = { 5, 5, 5, 5 };
+    normals->setPolygon(5, negZ);
+    }
   }
 
 SPropertyInformation *GCCuboid::createTypeInformation()
