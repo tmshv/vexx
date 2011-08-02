@@ -65,7 +65,7 @@ class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
 public:
   GCGeometry();
 
-  void appendTo(XGeometry *geo) const;
+  GCRuntimeGeometry runtimeGeometry;
 
   template <typename T>
   GCGeometryAttribute *addAttribute(const QString &name)
@@ -116,6 +116,9 @@ public:
   void removePolygons(xuint32 index, xuint32 count);
 
   void clearAttributes();
+
+private:
+  void appendTo(XGeometry *geo) const;
   };
 
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())

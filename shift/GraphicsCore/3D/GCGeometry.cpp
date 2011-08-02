@@ -25,14 +25,6 @@ void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
     }
   }
 
-S_IMPLEMENT_PROPERTY(GCGeometry)
-
-SPropertyInformation *GCGeometry::createTypeInformation()
-  {
-  SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
-  return info;
-  }
-
 S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
 SPropertyInformation *GCGeometryAttribute::createTypeInformation()
@@ -155,6 +147,17 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
     }
 
   xAssertFail();
+  }
+
+S_IMPLEMENT_PROPERTY(GCGeometry)
+
+SPropertyInformation *GCGeometry::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
+
+  info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
+
+  return info;
   }
 
 GCGeometry::GCGeometry()

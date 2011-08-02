@@ -48,5 +48,12 @@ void GCShadingGroup::render(XRenderer *r) const
     s->bind(r);
     }
 
-  r->drawGeometry(runtimeGeometry());
+  for(const GCGeometryTransformPointer* geoPtr = rtGeo->geometry.firstChild<GCGeometryPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryPointer>())
+    {
+    const GCGeometryTransform* geo = geoPtr->pointed();
+    if(geo)
+      {
+      geo->render(r);
+      }
+    }
   }
