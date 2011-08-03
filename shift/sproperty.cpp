@@ -392,7 +392,10 @@ void SProperty::ConnectionChange::clearParentHasInputConnection(SProperty *prop)
     SProperty *child = cont->firstChild();
     while(child)
       {
-      if(child->_flags.hasFlag(SProperty::ParentHasInput))
+      if(child->_flags.hasFlag(SProperty::ParentHasInput) &&
+         (!prop->parent()->input() &&
+          !prop->parent()->instanceInformation()->isComputed() &&
+          !prop->parent()->_flags.hasFlag(ParentHasInput)))
         {
         child->_flags.clearFlag(SProperty::ParentHasInput);
         clearParentHasInputConnection(child);
@@ -411,7 +414,10 @@ void SProperty::ConnectionChange::clearParentHasOutputConnection(SProperty *prop
     SProperty *child = cont->firstChild();
     while(child)
       {
-      if(child->_flags.hasFlag(SProperty::ParentHasOutput))
+      if(child->_flags.hasFlag(SProperty::ParentHasOutput) &&
+         (!prop->parent()->output() &&
+          !prop->parent()->instanceInformation()->affectsSiblings() &&
+          !prop->parent()->_flags.hasFlag(ParentHasOutput)))
         {
         child->_flags.clearFlag(SProperty::ParentHasOutput);
         clearParentHasOutputConnection(child);

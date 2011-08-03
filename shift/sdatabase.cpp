@@ -106,9 +106,10 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     xAssert(thisProp->_entity == 0);
     xAssert(thisProp->_nextSibling == 0);
 
-    container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     thisProp->_info = child->childInformation();
     thisProp->_instanceInfo = child;
+
+    container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     initiateProperty(thisProp);
     child->initiateProperty(thisProp);
     }

@@ -310,6 +310,16 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
     newProp->_entity = 0;
     newProp->_database = _database;
     }
+
+  if(input() || _flags.hasFlag(ParentHasInput) || instanceInformation()->isComputed())
+    {
+    SProperty::ConnectionChange::setParentHasInputConnection(newProp);
+    }
+
+  if(output() || _flags.hasFlag(ParentHasOutput) || instanceInformation()->affectsSiblings())
+    {
+    SProperty::ConnectionChange::setParentHasOutputConnection(newProp);
+    }
   }
 
 void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
@@ -346,6 +356,9 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
       prop = prop->_nextSibling;
       }
     }
+
+  SProperty::ConnectionChange::clearParentHasInputConnection(oldProp);
+  SProperty::ConnectionChange::clearParentHasOutputConnection(oldProp);
   }
 
 const SProperty *SPropertyContainer::at(xsize i) const

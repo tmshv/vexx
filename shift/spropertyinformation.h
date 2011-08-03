@@ -53,6 +53,9 @@ public:
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
 
+  bool isComputed() const { return _compute != 0; }
+  bool affectsSiblings() const { return _affects != 0; }
+
   void setData(DataKey, const QVariant &);
 
   X_ALIGNED_OPERATOR_NEW

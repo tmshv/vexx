@@ -8,12 +8,13 @@
 
 class GRAPHICSCORE_EXPORT GCGeometryTransform : public GCTransform
   {
+  S_PROPERTY(GCGeometryTransform, GCTransform, 0)
 public:
   GCGeometryTransform();
 
   GCGeometryPointer geometry;
 
-  void render(XRenderer* r);
+  void render(XRenderer* r) const;
   };
 
 S_TYPED_POINTER_TYPE(GCGeometryTransformPointer, GCGeometryTransform)

@@ -58,6 +58,8 @@ public:
   SUIntArrayProperty polygons;
   };
 
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())
+
 class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(GCGeometry, SPropertyContainer, 0)
@@ -65,33 +67,34 @@ class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
 public:
   GCGeometry();
 
+  STypedPropertyArray<GCGeometryAttribute> attributes;
   GCRuntimeGeometry runtimeGeometry;
 
   template <typename T>
   GCGeometryAttribute *addAttribute(const QString &name)
     {
     SBlock b(database());
-    SProperty *attr = addProperty(GCGeometryAttribute::staticTypeInformation());
-    xAssert(attr);
+    GCGeometryAttribute *t = attributes.add();
+    xAssert(t);
 
-    attr->setName(name);
-    GCGeometryAttribute* t = attr->castTo<GCGeometryAttribute>();
+    t->setName(name);
     t->setType(T::staticTypeInformation());
+
     return t;
     }
 
   void removeAttribute(const QString &name)
     {
-    SProperty *prop = findChild(name);
+    SProperty *prop = attributes.findChild(name);
     if(prop)
       {
-      removeProperty(prop);
+      attributes.remove(prop);
       }
     }
 
   GCGeometryAttribute *attribute(const QString &name)
     {
-    SProperty *prop = findChild(name);
+    SProperty *prop = attributes.findChild(name);
     if(prop)
       {
       return prop->castTo<GCGeometryAttribute>();
@@ -117,11 +120,8 @@ public:
 
   void clearAttributes();
 
-private:
   void appendTo(XGeometry *geo) const;
   };
-
-DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())
 
 S_TYPED_POINTER_TYPE(GCGeometryPointer, GCGeometry)
 

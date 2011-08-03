@@ -5,33 +5,13 @@
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 
-void computeRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
-  {
-  GCShadingGroup* rtGeo = cont->uncheckedCastTo<GCShadingGroup>();
-
-  XGeometry x;
-  for(const GCGeometryPointer* geoPtr = rtGeo->geometry.firstChild<GCGeometryPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryPointer>())
-    {
-    const GCGeometry* geo = geoPtr->pointed();
-    if(geo)
-      {
-      geo->appendTo(&x);
-      }
-    }
-  rtGeo->runtimeGeometry = x;
-  }
-
 SPropertyInformation *GCShadingGroup::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCShadingGroup>("GCShadingGroup");
 
   info->add(&GCShadingGroup::shader, "shader");
 
-  GCRuntimeGeometry::InstanceInformation* rtInfo = info->add(&GCShadingGroup::runtimeGeometry, "runtimeGeometry");
-  rtInfo->setCompute(computeRuntime);
-
-  GCGeometry::InstanceInformation* geoInfo = info->add(&GCShadingGroup::geometry, "geometry");
-  geoInfo->setAffects(rtInfo);
+  info->add(&GCShadingGroup::geometry, "geometry");
 
   return info;
   }
@@ -48,7 +28,7 @@ void GCShadingGroup::render(XRenderer *r) const
     s->bind(r);
     }
 
-  for(const GCGeometryTransformPointer* geoPtr = rtGeo->geometry.firstChild<GCGeometryPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryPointer>())
+  for(const GCGeometryTransformPointer* geoPtr = geometry.firstChild<GCGeometryTransformPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryTransformPointer>())
     {
     const GCGeometryTransform* geo = geoPtr->pointed();
     if(geo)

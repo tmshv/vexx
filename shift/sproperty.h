@@ -222,15 +222,17 @@ public:
     const SProperty *driver() const { return _driver; }
     const SProperty *driven() const { return _driven; }
     Mode mode() const { return _mode; }
+
+    static void setParentHasInputConnection(SProperty *);
+    static void setParentHasOutputConnection(SProperty *);
+    static void clearParentHasInputConnection(SProperty *);
+    static void clearParentHasOutputConnection(SProperty *);
+
   private:
     SProperty *_driver;
     SProperty *_driven;
     Mode _mode;
     bool apply(int mode);
-    void setParentHasInputConnection(SProperty *);
-    void setParentHasOutputConnection(SProperty *);
-    void clearParentHasInputConnection(SProperty *);
-    void clearParentHasOutputConnection(SProperty *);
     };
 
   static void assignProperty(const SProperty *, SProperty *);

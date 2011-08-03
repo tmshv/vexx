@@ -151,11 +151,24 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
 
 S_IMPLEMENT_PROPERTY(GCGeometry)
 
+void computeRuntimeGeometry(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
+  {
+  GCGeometry* rtGeo = cont->uncheckedCastTo<GCGeometry>();
+
+  XGeometry x;
+  rtGeo->appendTo(&x);
+  rtGeo->runtimeGeometry = x;
+  }
+
 SPropertyInformation *GCGeometry::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
 
-  info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
+  GCRuntimeGeometry::InstanceInformation *rtGeo = info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
+  rtGeo->setCompute(computeRuntimeGeometry);
+
+  STypedPropertyArray<GCGeometryAttribute>::InstanceInformation *attrs = info->add(&GCGeometry::attributes, "attributes");
+  attrs->setAffects(rtGeo);
 
   return info;
   }
@@ -307,8 +320,8 @@ void GCGeometry::appendTo(XGeometry *geo) const
 void GCGeometry::clearAttributes()
   {
   SBlock b(database());
-  while(firstChild())
+  while(attributes.firstChild())
     {
-    removeProperty(firstChild());
+    attributes.remove(attributes.firstChild());
     }
   }
