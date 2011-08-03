@@ -104,7 +104,7 @@ public:
 
   const GCGeometryAttribute *attribute(const QString &name) const
     {
-    const SProperty *prop = findChild(name);
+    const SProperty *prop = attributes.findChild(name);
     if(prop)
       {
       return prop->castTo<GCGeometryAttribute>();

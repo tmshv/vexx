@@ -62,8 +62,23 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   GCShader *shader = _db->addChild<GCShader>("Shader");
   group->shader.setPointed(shader);
 
+  XTransform tr = XTransform::Identity();
+  tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
+
+  GCGeometryTransform *transform = _db->addChild<GCGeometryTransform>("Transform");
+  group->geometry.addPointer(transform);
+  transform->transform = tr;
+
+
+  tr.translation() = XVector3D(-1.0f, 0.0f, 0.0f);
+
+  GCGeometryTransform *transform2 = _db->addChild<GCGeometryTransform>("Transform");
+  group->geometry.addPointer(transform2);
+  transform2->transform = tr;
+
   GCCuboid *cube = _db->addChild<GCCuboid>("Cube");
-  group->geometry.addPointer(&cube->geometry);
+  transform->geometry.setPointed(&cube->geometry);
+  transform2->geometry.setPointed(&cube->geometry);
 
   op->source.setPointed(scene);
   }

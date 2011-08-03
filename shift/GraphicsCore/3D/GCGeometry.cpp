@@ -179,7 +179,7 @@ GCGeometry::GCGeometry()
 
 void GCGeometry::addPolygons(const xuint32 *sizes, xuint32 count)
   {
-  for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+  for(GCGeometryAttribute *child=attributes.firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
     {
     child->addPolygons(sizes, count);
     }
@@ -187,7 +187,7 @@ void GCGeometry::addPolygons(const xuint32 *sizes, xuint32 count)
 
 void GCGeometry::removePolygons(xuint32 index, xuint32 count)
   {
-  for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+  for(GCGeometryAttribute *child=attributes.firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
     {
     child->removePolygons(index, count);
     }
@@ -266,7 +266,7 @@ void GCGeometry::appendTo(XGeometry *geo) const
     const xuint32 *polyIndex = indices.data() + offset + 1;
 
     // stream to vertex attributes at polyIndex from polygon, to index vertexIndexStart to (vertexIndexStart + indexCount)
-    for(GCGeometryAttribute *child=firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
+    for(GCGeometryAttribute *child=attributes.firstChild<GCGeometryAttribute>(); child; child=child->nextSibling<GCGeometryAttribute>())
       {
       const SUIntArrayProperty::EigenArray &attrIndicesArray = child->polygons.data();
       xAssert(indexCount == attrIndicesArray(offset));
