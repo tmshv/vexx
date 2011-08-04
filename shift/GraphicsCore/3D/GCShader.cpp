@@ -16,11 +16,11 @@ GCShaderComponent::GCShaderComponent()
   {
   }
 
-S_IMPLEMENT_PROPERTY(GCFragmentShaderComponentVShader)
+S_IMPLEMENT_PROPERTY(GCFragmentShaderComponent)
 
-SPropertyInformation *GCFragmentShaderComponentVShader::createTypeInformation()
+SPropertyInformation *GCFragmentShaderComponent::createTypeInformation()
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCFragmentShaderComponentVShader>("GCFragmentShaderComponentVShader");
+  SPropertyInformation *info = SPropertyInformation::create<GCFragmentShaderComponent>("GCFragmentShaderComponent");
   return info;
   }
 

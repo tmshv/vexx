@@ -115,6 +115,16 @@ public:
   void prepareInternal( );
   };
 
+class EKS3D_EXPORT XAbstractShaderComponent
+  {
+XProperties:
+
+public:
+
+private:
+  mutable QAtomicInt _ref;
+  };
+
 class EKS3D_EXPORT XAbstractShader
   {
 XProperties:
@@ -123,29 +133,34 @@ XProperties:
 public:
   XAbstractShader( XRenderer * );
   virtual ~XAbstractShader();
-  virtual void setType( int ) = 0;
+
   virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * ) = 0;
   virtual void destroyVariable( XAbstractShaderVariable * ) = 0;
-
-  virtual QByteArray save() = 0;
-  virtual void load( QByteArray ) = 0;
 
 private:
   mutable QAtomicInt _ref;
   };
 
-class EKS3D_EXPORT XShader : public XObject
+class EKS3D_EXPORT XShaderComponent
   {
 XProperties:
   XROProperty( XRenderer *, renderer );
 
 public:
-  enum PredefinedShaders { Default, AmbientShader, ColourShader };
-  XShader( int = Default );
-  XShader( const XShader & );
-  virtual ~XShader();
+  };
 
-  void setType( int );
+class EKS3D_EXPORT XShader
+  {
+XProperties:
+  XROProperty( XRenderer *, renderer );
+
+public:
+  XShader();
+  XShader( const XShader & );
+  ~XShader();
+
+  void addComponent(XShaderComponent *component);
+  void clear();
 
   XShaderVariable *getVariable( QString );
 
@@ -153,15 +168,6 @@ public:
 
   void prepareInternal( XRenderer * ) const;
   XAbstractShader *internal() const;
-
-  enum SerialisationMode
-    {
-    Shader = 1,
-    Variables = 2,
-    Full = Shader|Variables
-    };
-  void save( QDataStream &, SerialisationMode ) const;
-  void restore( QDataStream &, SerialisationMode );
 
 private:
   QHash <QString, XShaderVariable*> _variables;
