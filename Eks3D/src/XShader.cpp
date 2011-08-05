@@ -340,11 +340,11 @@ XAbstractShader::~XAbstractShader()
   {
   }
 
-XShader::XShader( int shadertype ) : _renderer( 0 ), _internal( 0 ), _type( shadertype )
+XShader::XShader() : _renderer( 0 ), _internal( 0 )
   {
   }
 
-XShader::XShader( const XShader &c ) : _renderer( 0 ), _internal( 0 ), _type( c._type )
+XShader::XShader( const XShader &c ) : _renderer( 0 ), _components(c._components), _internal( 0 )
   {
   foreach( QString n, c._variables.keys() )
     {
@@ -355,20 +355,30 @@ XShader::XShader( const XShader &c ) : _renderer( 0 ), _internal( 0 ), _type( c.
 
 XShader::~XShader()
   {
+  clear();
+  }
+
+
+void XShader::addComponent(XAbstractShader::ComponentType t, const QString &source)
+  {
+  Component c;
+  c.source = source;
+  c.type = t;
+  _components << c;
+
+  delete _internal;
+  _internal = 0;
+  }
+
+void XShader::clear()
+  {
+  _components.clear();
+  delete _internal;
+  _internal = 0;
+
   foreach( XShaderVariable *var, _variables )
     {
     delete var;
-    }
-  delete _internal;
-  }
-
-void XShader::setType( int type )
-  {
-  _type = type;
-  if( _internal )
-    {
-    delete _internal;
-    _internal = 0;
     }
   }
 
@@ -401,7 +411,12 @@ void XShader::prepareInternal( XRenderer *renderer ) const
     {
     _internal = renderer->getShader( );
     xAssert( _internal );
-    _internal->setType( _type );
+    foreach(const Component &c, _components)
+      {
+      _internal->addComponent(c.type, c.source);
+      }
+    _internal->build();
+
     foreach( XShaderVariable *var, _variables )
       {
       var->prepareInternal();
@@ -413,45 +428,4 @@ void XShader::prepareInternal( XRenderer *renderer ) const
 XAbstractShader *XShader::internal( ) const
   {
   return _internal;
-  }
-
-void XShader::save( QDataStream &stream, SerialisationMode mode ) const
-  {
-  if( (mode & Shader) != false )
-    {
-    stream << _type;
-    }
-  if( (mode & Variables ) != false )
-    {
-    stream << _variables.size();
-    foreach( QString str, _variables.keys() )
-      {
-      stream << str << _variables.value(str)->value();
-      }
-    }
-  }
-
-void XShader::restore( QDataStream &stream, SerialisationMode mode )
-  {
-  delete _internal;
-  _internal = 0;
-
-  if( (mode & Shader) != false )
-    {
-    stream >> _type;
-    }
-  if( (mode & Variables ) != false )
-    {
-    int size;
-    stream >> size;
-    for( int i=0; i<size; ++i )
-      {
-      QString str;
-      QVariant value;
-      stream >> str;
-      stream >> value;
-      XShaderVariable *var = getVariable( str );
-      var->setVariantValue( value );
-      }
-    }
   }

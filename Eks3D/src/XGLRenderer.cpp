@@ -107,11 +107,11 @@ public:
 
     void setType( int );
 private:
+    virtual bool addComponent(ComponentType c, const QString &source);
+    virtual bool build();
+
     virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * );
     virtual void destroyVariable( XAbstractShaderVariable * );
-
-    virtual QByteArray save();
-    virtual void load( QByteArray );
 
     QGLShaderProgram shader;
     friend class XGLRenderer;
@@ -692,73 +692,44 @@ const XAbstractTexture *XGLFramebuffer::depth() const
 // SHADER
 //----------------------------------------------------------------------------------------------------------------------
 
-QString getVertex( int type )
-  {
-  QString file("default");
-  switch( type )
-    {
-  case XShader::AmbientShader: file = "blinn"; break;
-  case XShader::ColourShader: file = "plainColour"; break;
-  case XShader::Default: break;
-    }
-
-  QFile shaderResource(":/GLResources/shaders/" + file + ".vert");
-  if(shaderResource.open(QIODevice::ReadOnly))
-    {
-    return shaderResource.readAll();
-    }
-  return "";
-  }
-
-QString getFragment( int type )
-  {
-  QString file("default");
-  switch( type )
-    {
-  case XShader::AmbientShader: file = "blinn"; break;
-  case XShader::ColourShader: file = "plainColour"; break;
-  case XShader::Default: break;
-    }
-
-  QFile shaderResource(":/GLResources/shaders/" + file + ".frag");
-  if(shaderResource.open(QIODevice::ReadOnly))
-    {
-    return shaderResource.readAll();
-    }
-  return "";
-  }
-
-XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() ),
-    _renderer(renderer)
+XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() )
   {
   }
 
 void XGLShader::setType( int type )
+  {
+  }
+
+bool XGLShader::addComponent(ComponentType c, const QString &source)
+  {
+  QGLShader::ShaderTypeBit t = QGLShader::Fragment;
+  if(c == Vertex)
     {
-    shader.addShaderFromSourceCode( QGLShader::Vertex, getVertex( type ) ) GLE;
-    shader.addShaderFromSourceCode( QGLShader::Fragment, getFragment( type ) ) GLE;
-    shader.link() GLE;
-    shader.bind() GLE;
+    t = QGLShader::Vertex;
     }
+  else if(c == Geometry)
+    {
+    t = QGLShader::Geometry;
+    }
+  bool result = shader.addShaderFromSourceCode( t, source ) GLE;
+  return result;
+  }
+
+bool XGLShader::build()
+  {
+  bool result = shader.link() GLE;
+  return result;
+  }
 
 XAbstractShaderVariable *XGLShader::createVariable( QString in, XAbstractShader *s )
-    {
-    return new XGLShaderVariable( s, in );
-    }
+  {
+  return new XGLShaderVariable( s, in );
+  }
 
 void XGLShader::destroyVariable( XAbstractShaderVariable *var )
   {
   delete var;
   }
-
-QByteArray XGLShader::save()
-    {
-    return QByteArray();
-    }
-
-void XGLShader::load( QByteArray )
-    {
-    }
 
 //----------------------------------------------------------------------------------------------------------------------
 // SHADER VARIABLE

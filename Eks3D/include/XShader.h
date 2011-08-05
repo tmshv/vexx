@@ -115,16 +115,6 @@ public:
   void prepareInternal( );
   };
 
-class EKS3D_EXPORT XAbstractShaderComponent
-  {
-XProperties:
-
-public:
-
-private:
-  mutable QAtomicInt _ref;
-  };
-
 class EKS3D_EXPORT XAbstractShader
   {
 XProperties:
@@ -133,6 +123,15 @@ XProperties:
 public:
   XAbstractShader( XRenderer * );
   virtual ~XAbstractShader();
+
+  enum ComponentType
+    {
+    Fragment,
+    Vertex,
+    Geometry
+    };
+  virtual bool addComponent(ComponentType c, const QString& source) = 0;
+  virtual bool build() = 0;
 
   virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * ) = 0;
   virtual void destroyVariable( XAbstractShaderVariable * ) = 0;
@@ -159,7 +158,7 @@ public:
   XShader( const XShader & );
   ~XShader();
 
-  void addComponent(XShaderComponent *component);
+  void addComponent(XAbstractShader::ComponentType, const QString &source);
   void clear();
 
   XShaderVariable *getVariable( QString );
@@ -171,8 +170,15 @@ public:
 
 private:
   QHash <QString, XShaderVariable*> _variables;
+
+  struct Component
+    {
+    XAbstractShader::ComponentType type;
+    QString source;
+    };
+  XList<Component> _components;
+
   mutable XAbstractShader *_internal;
-  int _type;
   };
 
 #endif // XABSTRACTSHADER_H

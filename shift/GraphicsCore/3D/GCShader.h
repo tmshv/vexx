@@ -30,6 +30,8 @@ S_TYPED_POINTER_TYPE(GCShaderComponentPointer, GCShaderComponent);
 
 S_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray, GCShaderComponentPointer);
 
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeShader, XShader, XShader())
+
 class GRAPHICSCORE_EXPORT GCShader : public SEntity
   {
   S_ENTITY(GCShader, SEntity, 0)
@@ -39,9 +41,7 @@ public:
   void bind(XRenderer *r) const;
 
   GCShaderComponentPointerArray components;
-
-private:
-  XShader shader;
+  GCRuntimeShader runtimeShader;
   };
 
 S_TYPED_POINTER_TYPE(GCShaderPointer, GCShader);
