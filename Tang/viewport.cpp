@@ -80,177 +80,189 @@ void computeSamples(const SPropertyInstanceInformation *, SPropertyContainer *co
 
 void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
-  enum EdgeAxis
+
+  enum BoxCases
     {
-    XEdge = 1,
-    YEdge = 2,
-    ZEdge = 3
-    };
-
-  enum OffsetAxis
-    {
-    NegNeg = 0,
-    NegPos = 4,
-    PosNeg = 8,
-    PosPos = 12
-    };
-
-  enum Masks
-    {
-    EdgeMask = 0x3,
-    OffsetMask = 0xC
-    };
-
-  enum EdgeIdentifier
-    {
-    NoIdentifier = 0,
-
-    XNegNeg = 1,
-    XNegPos = 2,
-    XPosNeg = 4,
-    XPosPos = 8,
-
-    YNegNeg = 16,
-    YNegPos = 32,
-    YPosNeg = 64,
-    YPosPos = 128,
-
-    ZNegNeg = 256,
-    ZNegPos = 512,
-    ZPosNeg = 1024,
-    ZPosPos = 2048
+    AllOut = 0x00,
+    OnePointXYZ,
+    OnePointWYZ,
+    OnePointWWZ,
+    OnePointXWZ,
+    OnePointXYW,
+    OnePointWYW,
+    OnePointWWW,
+    OnePointXWW,
+    AllIn = 0xFF
     };
 
   class Utils
     {
   public:
-    static bool addPointIfRequired(FractalGeometry *fr,
-                                   const XVector3D &pointA,
+    static void addPoint(const XVector3D &pointA,
                                    const XVector3D &pointB,
                                    float densityA,
                                    float densityB,
-                                   XVector<XVector3D>& vertex,
-                                   xsize &index)
+                                   XVector<XVector3D>& vertex)
       {
-      if((densityA > 0.0f && densityB < 0.0f) || (densityA < 0.0f && densityB > 0.0f))
-        {
-        float percentAlong = fabs(densityA) / (fabs(densityA) + fabs(densityB));
+      xAssert((densityA > 0.0f && densityB < 0.0f) || (densityA < 0.0f && densityB > 0.0f));
+      float percentAlong = fabs(densityA) / (fabs(densityA) + fabs(densityB));
 
-        XVector3D point = pointA + (percentAlong * pointB);
-
-        index = vertex.size();
-        vertex << point;
-
-        return true;
-        }
-
-      return false;
+      XVector3D point = pointA + (percentAlong * pointB);
+      vertex << point;
       }
 
-    static xsize indexInBox(xsize x, xsize y, xsize z, xsize width, xsize height, xsize)
+    static void addIndexRing(XVector<xuint32> &vertexIndices, xuint32 initial, xuint32 *offsets, xsize numOffsets, bool reverse)
       {
-      return x + (y * (width-1)) + (z * (height-1) * (width-1));
       }
 
-    static xsize toEdgeIdentifier(int id)
+    static void addVerticesAndIndicesForCase(xuint8 boxCase, XVector<XVector3D> &vertices, XVector<xuint32> &vertexIndices)
       {
-      switch(id&EdgeMask)
+
+#define ADD_INDEX_RING(...) \
+      { xuint32 data[] = { __VA_ARGS__ }; \
+      addIndexRing(vertexIndices, base, data, sizeof(data)/sizeof(xuint32), reverse); };
+
+//       8 __________ 7
+//        /|         /|
+//       / |        / |
+//    5 /__|_____6_/  |
+//      |  |       |  | 3
+//   /\ |  |4______|  / /|
+//    Y | /        | / Z
+//      |__________|/
+//     1   X >      2
+
+
+      bool reverse = (((boxCase % 2) == 1) && (boxCase != 0)) || (boxCase == 254);
+      XFlags<xuint8, xuint8> normalisedCase = reverse ? ~boxCase : boxCase;
+
+#define TEST_CASE(c, var) (var = c, normalisedCase.hasFlag(c))
+      xuint8 chosenCase = 0;
+      while(normalisedCase != 0)
         {
-        case XEdge:
+        xuint32 base = vertices.size();
+
+        // X Half missing
+        if(TEST_CAST(XYZ|XWZ|XWW|XYW, chosenCase))
           {
-          switch(id&OffsetMask)
-            {
-            case NegNeg:
-              return XNegNeg;
-            case PosNeg:
-              return XPosNeg;
-            case NegPos:
-              return XNegPos;
-            case PosPos:
-              return XPosPos;
-            }
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
+          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
+          ADD_POINT(pointA, true, false, false);
+          ADD_POINT(pointB, true, false, false);
+          ADD_POINT(pointC, true, false, false);
+          ADD_POINT(pointD, true, false, false);
+          ADD_INDEX_RING(0,1,2,3);
+
+          normalisedCase.clearFlags(chosenCase);
+          continue;
           }
-          break;
-        case YEdge:
+
+        // Y Half missing
+        if(TEST_CAST(XYZ|WYZ|WYW|XYW, chosenCase))
           {
-          switch(id&OffsetMask)
-            {
-            case NegNeg:
-              return YNegNeg;
-            case PosNeg:
-              return YPosNeg;
-            case NegPos:
-              return YNegPos;
-            case PosPos:
-              return YPosPos;
-            }
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
+          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
+          ADD_POINT(pointA, false, true, false);
+          ADD_POINT(pointB, false, true, false);
+          ADD_POINT(pointC, false, true, false);
+          ADD_POINT(pointD, false, true, false);
+          ADD_INDEX_RING(0,1,2,3);
+
+          normalisedCase.clearFlags(chosenCase);
+          continue;
           }
-          break;
-        case ZEdge:
+
+        // Z Half missing
+        if(TEST_CAST(XYZ|WYZ|WWZ|XWZ, chosenCase))
           {
-          switch(id&OffsetMask)
-            {
-            case NegNeg:
-              return ZNegNeg;
-            case PosNeg:
-              return ZPosNeg;
-            case NegPos:
-              return ZNegPos;
-            case PosPos:
-              return ZPosPos;
-            }
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
+          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
+          ADD_POINT(pointA, false, false, true);
+          ADD_POINT(pointB, false, false, true);
+          ADD_POINT(pointC, false, false, true);
+          ADD_POINT(pointD, false, false, true);
+          ADD_INDEX_RING(0,1,2,3);
+
+          normalisedCase.clearFlags(chosenCase);
+          continue;
           }
-          break;
-        }
-      xAssertFail();
-      return NoIdentifier;
-      }
 
-    static void markIndex(EdgeAxis axis, xsize *indices, xsize x, xsize y, xsize z, xsize width, xsize height, xsize depth)
-      {
-      // mark axis
-      xsize index = indexInBox(x, y, z, width, height, depth);
-      indices[index] |= toEdgeIdentifier(axis|NegNeg);
+        // X direction edge missing
+        if(TEST_CAST(XYZ|WYZ, chosenCase) ||
+           TEST_CASE(XYW|WYW, chosenCase) ||
+           TEST_CASE(XWZ|WWZ, chosenCase) ||
+           TEST_CASE(XWW|WWW, chosenCase))
+          {
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          ADD_POINT(pointA, false, false, false);
+          ADD_POINT(pointA, false, true, false);
+          ADD_POINT(pointB, false, true, true);
+          ADD_POINT(pointB, false, false, true);
+          ADD_INDEX_RING(0,1,2,3);
 
-      // consider upper axes
-      if(axis != XEdge && (x+1) < width)
-        {
-        int type = (axis == YEdge) ? NegPos : PosNeg;
-        xsize index = indexInBox(x+1, y, z, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|type);
-        }
-      if(axis != YEdge && (y+1) < height)
-        {
-        int type = (axis == XEdge) ? PosNeg : NegPos;
-        xsize index = indexInBox(x, y+1, z, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|type);
-        }
-      if(axis != ZEdge && (z+1) < depth)
-        {
-        int type = axis == XEdge ? NegPos : PosNeg;
-        xsize index = indexInBox(x, y, z+1, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|type);
-        }
+          normalisedCase.clearFlags(chosenCase);
+          continue;
+          }
 
-      if(axis == XEdge && (y+1) < height && (z+1) < depth)
-        {
-        xsize index = indexInBox(x, y+1, z+1, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|PosPos);
-        }
-      if(axis == YEdge && (x+1) < width && (z+1) < depth)
-        {
-        xsize index = indexInBox(x+1, y, z+1, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|PosPos);
-        }
-      if(axis == ZEdge && (x+1) < width && (y+1) < height)
-        {
-        xsize index = indexInBox(x+1, y+1, z, width, height, depth);
-        indices[index] |= toEdgeIdentifier(axis|PosPos);
-        }
-      }
+        // Y direction edge missing
+        if(TEST_CAST(XYZ|XWZ, chosenCase) ||
+           TEST_CASE(XYW|XWW, chosenCase) ||
+           TEST_CASE(WYW|WWW, chosenCase) ||
+           TEST_CASE(WYZ|WWZ, chosenCase))
+          {
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          ADD_POINT(pointA, false, false, false);
+          ADD_POINT(pointA, true, false, false);
+          ADD_POINT(pointB, true, false, true);
+          ADD_POINT(pointB, false, false, true);
+          ADD_INDEX_RING(0,1,2,3);
 
-    static void addVertexIndices(xsize boxType)
-      {
+          normalisedCase.clearFlags(chosenCase);
+          continue;
+          }
+
+        // Z direction edge missing
+        if(TEST_CAST(XYZ|XYW, chosenCase) ||
+           TEST_CASE(WYZ|WYW, chosenCase) ||
+           TEST_CASE(WWZ|WWW, chosenCase) ||
+           TEST_CASE(XWZ|XWW, chosenCase))
+          {
+          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
+          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
+          ADD_POINT(pointA, false, false, false);
+          ADD_POINT(pointA, true, false, false);
+          ADD_POINT(pointB, true, true, false);
+          ADD_POINT(pointB, false, true, false);
+          ADD_INDEX_RING(0,1,2,3);
+
+          normalisedCase.clearFlags(chosenCase);
+          continue;
+          }
+
+        // one point
+        if(TEST_CAST(XYZ, chosenCase) || TEST_CASE(WYZ, chosenCase) ||
+           TEST_CASE(WWZ, chosenCase) || TEST_CASE(XWZ, chosenCase) ||
+           TEST_CASE(XYW, chosenCase) || TEST_CASE(WYW, chosenCase) ||
+           TEST_CASE(WWW, chosenCase) || TEST_CASE(XWW, chosenCase))
+          {
+          xuint8 point = POINT_FROM_CASE(chosenCase, 0);
+          ADD_POINT(point, true, false, false);
+          ADD_POINT(point, false, true, false);
+          ADD_POINT(point, false, false, true);
+          ADD_INDEX_RING(0,1,2);
+
+          normalisedCase.clearFlags(chosenCase);
+          continue;
+          }
+        }
       }
     };
 
@@ -260,81 +272,10 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
   xsize height = fr->height();
   xsize depth = fr->depth();
 
-  STemporaryMemory <xsize> indicesAlloc(fr, (width-1)*(height-1)*(depth-1));
-  xsize *indices = indicesAlloc.data();
-
-  STemporaryMemory <XVector3D> pointsAlloc(fr, width*height*depth);
-  XVector3D *points = pointsAlloc.data();
-
   const SFloatArrayProperty::EigenArray densities = fr->densitySamples.data();
 
   XVector<XVector3D> vertices;
   vertices.reserve(256);
-
-
-  for(xsize z=0; z<depth; ++z)
-    {
-    for(xsize y=0; y<height; ++y)
-      {
-      for(xsize x=0; x<width; ++x)
-        {
-        xsize index = fr->indexAtPoint(x, y, z);
-        points[index] = fr->pointAtIndex(x, y, z);
-        }
-      }
-    }
-
-  for(xsize z=0; z<depth; ++z)
-    {
-    for(xsize y=0; y<height; ++y)
-      {
-      for(xsize x=0; x<width; ++x)
-        {
-        xsize indexXYZ = fr->indexAtPoint(x, y, z);
-        XVector3D pointXYZ = points[indexXYZ];
-        float densityXYZ = densities(indexXYZ);
-
-        if((x+1) < width)
-          {
-          xsize indexWYZ = fr->indexAtPoint(x+1, y, z);
-          XVector3D pointWYZ = points[indexWYZ];
-          float densityWYZ = densities(indexWYZ);
-
-          xsize index = X_SIZE_SENTINEL;
-          if(Utils::addPointIfRequired(fr, pointXYZ, pointWYZ, densityXYZ, densityWYZ, vertices, index))
-            {
-            Utils::markIndex(XEdge, indices, x, y, z, width, depth, height);
-            }
-          }
-
-        if((y+1) < height)
-          {
-          xsize indexXWZ = fr->indexAtPoint(x, y+1, z);
-          XVector3D pointXWZ = points[indexXWZ];
-          float densityXWZ = densities(indexXWZ);
-
-          xsize index = X_SIZE_SENTINEL;
-          if(Utils::addPointIfRequired(fr, pointXYZ, pointXWZ, densityXYZ, densityXWZ, vertices, index))
-            {
-            Utils::markIndex(YEdge, indices, x, y, z, width, depth, height);
-            }
-          }
-
-        if((z+1) < depth)
-          {
-          xsize indexXYW = fr->indexAtPoint(x, y, z+1);
-          XVector3D pointXYW = points[indexXYW];
-          float densityXYW = densities(indexXYW);
-
-          xsize index = X_SIZE_SENTINEL;
-          if(Utils::addPointIfRequired(fr, pointXYZ, pointXYZ, densityXYZ, densityXYW, vertices, index))
-            {
-            Utils::markIndex(YEdge, indices, x, y, z, width, depth, height);
-            }
-          }
-        }
-      }
-    }
 
   XVector<xuint32> vertexIndices;
   vertexIndices.reserve(256);
@@ -345,8 +286,31 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
       {
       for(xsize x=0; x<(width-1); ++x)
         {
-        xsize index = indexInBox(x, y, z, width, height, depth);
-        Utils::addVertexIndices(indices[index]);
+        xsize indexXYZ = fr->indexAtPoint(x, y, z);
+        xsize indexWYZ = fr->indexAtPoint(x+1, y, z);
+        xsize indexWWZ = fr->indexAtPoint(x+1, y+1, z);
+        xsize indexXWZ = fr->indexAtPoint(x, y+1, z);
+        xsize indexXYW = fr->indexAtPoint(x, y, z+1);
+        xsize indexWYW = fr->indexAtPoint(x+1, y, z+1);
+        xsize indexWWW = fr->indexAtPoint(x+1, y+1, z+1);
+        xsize indexXWW = fr->indexAtPoint(x, y+1, z+1);
+
+        xuint8 boxCase = 0;
+        boxCase |= ((densities(indexXYZ) > 0.0f) ? 1 : 0) << 0;
+        boxCase |= ((densities(indexWYZ) > 0.0f) ? 1 : 0) << 1;
+        boxCase |= ((densities(indexWWZ) > 0.0f) ? 1 : 0) << 2;
+        boxCase |= ((densities(indexXWZ) > 0.0f) ? 1 : 0) << 3;
+        boxCase |= ((densities(indexXYW) > 0.0f) ? 1 : 0) << 4;
+        boxCase |= ((densities(indexWYW) > 0.0f) ? 1 : 0) << 5;
+        boxCase |= ((densities(indexWWW) > 0.0f) ? 1 : 0) << 6;
+        boxCase |= ((densities(indexXWW) > 0.0f) ? 1 : 0) << 7;
+
+        if(boxCase == AllOut || boxCase == AllIn)
+          {
+          continue;
+          }
+
+        Utils::addVerticesAndIndicesForCase(boxCase, vertices, vertexIndices);
         }
       }
     }
