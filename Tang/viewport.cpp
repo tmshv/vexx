@@ -145,7 +145,12 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
       { xuint32 data[] = { __VA_ARGS__ }; \
       addIndexRing(vertexIndices, base, data, sizeof(data)/sizeof(xuint32), reverse); };
 
-#define ADD_POINT(point, axis)
+#define GET_POINT_FLIPPED(point, axis)
+#define GET_POINT(point) fr->pointAtIndex()
+
+#define ADD_POINT(point, axis) XVector3D a = GET_POINT(point), b = GET_POINT_FLIPPED(point, axis) \
+      float dA = GET_DENSITY(point), dB = GET_DENSITY_FLIPPED(point, axis) \
+      addPoint(a, b, dA, dB, vertices);
 
 //       8 __________ 7
 //        /|         /|
@@ -198,7 +203,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointD, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -215,7 +220,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointD, YAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -232,7 +237,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointD, ZAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -250,7 +255,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointB, ZAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -268,7 +273,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointB, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -286,7 +291,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(pointB, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
 
@@ -302,7 +307,7 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           ADD_POINT(point, ZAxis);
           ADD_INDEX_RING(0,1,2);
 
-          normalisedCase.clearFlags(chosenCase);
+          normalisedCase.clearFlag(chosenCase);
           continue;
           }
         }
