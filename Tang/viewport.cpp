@@ -115,12 +115,37 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
       {
       }
 
+    static xuint8 pointFromCase(xuint8 c, xuint8 num)
+      {
+      for(xuint32 i=0; i<8; ++i)
+        {
+        if((c&1) == 1)
+          {
+          if(num == 0)
+            {
+            return 1 << i;
+            }
+          else
+            {
+            --num;
+            }
+          }
+
+        c = c >> 1;
+        }
+
+      xAssertFail();
+      return 1;
+      }
+
     static void addVerticesAndIndicesForCase(xuint8 boxCase, XVector<XVector3D> &vertices, XVector<xuint32> &vertexIndices)
       {
 
 #define ADD_INDEX_RING(...) \
       { xuint32 data[] = { __VA_ARGS__ }; \
       addIndexRing(vertexIndices, base, data, sizeof(data)/sizeof(xuint32), reverse); };
+
+#define ADD_POINT(point, axis)
 
 //       8 __________ 7
 //        /|         /|
@@ -132,6 +157,24 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
 //      |__________|/
 //     1   X >      2
 
+      enum
+        {
+        XYZ = 1,
+        WYZ = 2,
+        WWZ = 4,
+        XWZ = 8,
+        XYW = 16,
+        WYW = 32,
+        WWW = 64,
+        XWW = 128
+        };
+
+      enum
+        {
+        XAxis,
+        YAxis,
+        ZAxis
+        };
 
       bool reverse = (((boxCase % 2) == 1) && (boxCase != 0)) || (boxCase == 254);
       XFlags<xuint8, xuint8> normalisedCase = reverse ? ~boxCase : boxCase;
@@ -143,16 +186,16 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
         xuint32 base = vertices.size();
 
         // X Half missing
-        if(TEST_CAST(XYZ|XWZ|XWW|XYW, chosenCase))
+        if(TEST_CASE(XYZ|XWZ|XWW|XYW, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
-          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
-          ADD_POINT(pointA, true, false, false);
-          ADD_POINT(pointB, true, false, false);
-          ADD_POINT(pointC, true, false, false);
-          ADD_POINT(pointD, true, false, false);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          xuint8 pointC = pointFromCase(chosenCase, 2);
+          xuint8 pointD = pointFromCase(chosenCase, 3);
+          ADD_POINT(pointA, XAxis);
+          ADD_POINT(pointB, XAxis);
+          ADD_POINT(pointC, XAxis);
+          ADD_POINT(pointD, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -160,16 +203,16 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // Y Half missing
-        if(TEST_CAST(XYZ|WYZ|WYW|XYW, chosenCase))
+        if(TEST_CASE(XYZ|WYZ|WYW|XYW, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
-          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
-          ADD_POINT(pointA, false, true, false);
-          ADD_POINT(pointB, false, true, false);
-          ADD_POINT(pointC, false, true, false);
-          ADD_POINT(pointD, false, true, false);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          xuint8 pointC = pointFromCase(chosenCase, 2);
+          xuint8 pointD = pointFromCase(chosenCase, 3);
+          ADD_POINT(pointA, YAxis);
+          ADD_POINT(pointB, YAxis);
+          ADD_POINT(pointC, YAxis);
+          ADD_POINT(pointD, YAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -177,16 +220,16 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // Z Half missing
-        if(TEST_CAST(XYZ|WYZ|WWZ|XWZ, chosenCase))
+        if(TEST_CASE(XYZ|WYZ|WWZ|XWZ, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          xuint8 pointC = POINT_FROM_CASE(chosenCase, 2);
-          xuint8 pointD = POINT_FROM_CASE(chosenCase, 3);
-          ADD_POINT(pointA, false, false, true);
-          ADD_POINT(pointB, false, false, true);
-          ADD_POINT(pointC, false, false, true);
-          ADD_POINT(pointD, false, false, true);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          xuint8 pointC = pointFromCase(chosenCase, 2);
+          xuint8 pointD = pointFromCase(chosenCase, 3);
+          ADD_POINT(pointA, ZAxis);
+          ADD_POINT(pointB, ZAxis);
+          ADD_POINT(pointC, ZAxis);
+          ADD_POINT(pointD, ZAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -194,17 +237,17 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // X direction edge missing
-        if(TEST_CAST(XYZ|WYZ, chosenCase) ||
+        if(TEST_CASE(XYZ|WYZ, chosenCase) ||
            TEST_CASE(XYW|WYW, chosenCase) ||
            TEST_CASE(XWZ|WWZ, chosenCase) ||
            TEST_CASE(XWW|WWW, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          ADD_POINT(pointA, false, false, false);
-          ADD_POINT(pointA, false, true, false);
-          ADD_POINT(pointB, false, true, true);
-          ADD_POINT(pointB, false, false, true);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          ADD_POINT(pointA, ZAxis);
+          ADD_POINT(pointA, YAxis);
+          ADD_POINT(pointB, YAxis);
+          ADD_POINT(pointB, ZAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -212,17 +255,17 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // Y direction edge missing
-        if(TEST_CAST(XYZ|XWZ, chosenCase) ||
+        if(TEST_CASE(XYZ|XWZ, chosenCase) ||
            TEST_CASE(XYW|XWW, chosenCase) ||
            TEST_CASE(WYW|WWW, chosenCase) ||
            TEST_CASE(WYZ|WWZ, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          ADD_POINT(pointA, false, false, false);
-          ADD_POINT(pointA, true, false, false);
-          ADD_POINT(pointB, true, false, true);
-          ADD_POINT(pointB, false, false, true);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          ADD_POINT(pointA, XAxis);
+          ADD_POINT(pointA, ZAxis);
+          ADD_POINT(pointB, ZAxis);
+          ADD_POINT(pointB, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -230,17 +273,17 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // Z direction edge missing
-        if(TEST_CAST(XYZ|XYW, chosenCase) ||
+        if(TEST_CASE(XYZ|XYW, chosenCase) ||
            TEST_CASE(WYZ|WYW, chosenCase) ||
            TEST_CASE(WWZ|WWW, chosenCase) ||
            TEST_CASE(XWZ|XWW, chosenCase))
           {
-          xuint8 pointA = POINT_FROM_CASE(chosenCase, 0);
-          xuint8 pointB = POINT_FROM_CASE(chosenCase, 1);
-          ADD_POINT(pointA, false, false, false);
-          ADD_POINT(pointA, true, false, false);
-          ADD_POINT(pointB, true, true, false);
-          ADD_POINT(pointB, false, true, false);
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          ADD_POINT(pointA, XAxis);
+          ADD_POINT(pointA, YAxis);
+          ADD_POINT(pointB, YAxis);
+          ADD_POINT(pointB, XAxis);
           ADD_INDEX_RING(0,1,2,3);
 
           normalisedCase.clearFlags(chosenCase);
@@ -248,15 +291,15 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           }
 
         // one point
-        if(TEST_CAST(XYZ, chosenCase) || TEST_CASE(WYZ, chosenCase) ||
+        if(TEST_CASE(XYZ, chosenCase) || TEST_CASE(WYZ, chosenCase) ||
            TEST_CASE(WWZ, chosenCase) || TEST_CASE(XWZ, chosenCase) ||
            TEST_CASE(XYW, chosenCase) || TEST_CASE(WYW, chosenCase) ||
            TEST_CASE(WWW, chosenCase) || TEST_CASE(XWW, chosenCase))
           {
-          xuint8 point = POINT_FROM_CASE(chosenCase, 0);
-          ADD_POINT(point, true, false, false);
-          ADD_POINT(point, false, true, false);
-          ADD_POINT(point, false, false, true);
+          xuint8 point = pointFromCase(chosenCase, 0);
+          ADD_POINT(point, XAxis);
+          ADD_POINT(point, YAxis);
+          ADD_POINT(point, ZAxis);
           ADD_INDEX_RING(0,1,2);
 
           normalisedCase.clearFlags(chosenCase);
