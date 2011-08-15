@@ -131,7 +131,7 @@ private:
   InstanceInformation _instanceInfoData;
 
   void initiateProperty(SProperty *);
-  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD, bool includeParents=true);
+  void initiatePropertyFromMetaData(SPropertyContainer *prop, const SPropertyInformation *mD);
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 

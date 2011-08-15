@@ -285,6 +285,7 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
 
 void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newProp, xsize index)
   {
+  // xAssert(newProp->_entity == 0); may be true because of pose init
   xAssert(newProp->_parent == 0);
   xAssert(newProp->_nextSibling == 0);
 

@@ -12,7 +12,7 @@
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
-#include "3D/GCShader.h"
+#include "3D/Shaders/GCStandardSurface.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
@@ -50,28 +50,8 @@ Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
   GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
   scene->shadingGroups.addPointer(group);
 
-  GCShader *shader = _db->addChild<GCShader>("Shader");
+  GCStandardSurface *shader = _db->addChild<GCStandardSurface>("Shader");
   group->shader.setPointed(shader);
-
-    {
-    GCFragmentShaderComponent *frag = _db->addChild<GCFragmentShaderComponent>("Fragment");
-    QFile shaderResource(":/GLResources/shaders/default.frag");
-    if(shaderResource.open(QIODevice::ReadOnly))
-      {
-      frag->source = shaderResource.readAll();
-      }
-    shader->components.addPointer(frag);
-    }
-
-    {
-    GCVertexShaderComponent *vert = _db->addChild<GCVertexShaderComponent>("Vertex");
-    QFile shaderResource(":/GLResources/shaders/default.vert");
-    if(shaderResource.open(QIODevice::ReadOnly))
-      {
-      vert->source = shaderResource.readAll();
-      }
-    shader->components.addPointer(vert);
-    }
 
   XTransform tr = XTransform::Identity();
   tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);

@@ -21,6 +21,8 @@
 #include "3D/GCShader.h"
 #include "3D/GCShadingGroup.h"
 
+#include "3D/Shaders/GCStandardSurface.h"
+
 
 void initiateGraphicsCore(SDatabase *)
   {
@@ -52,4 +54,6 @@ void initiateGraphicsCore(SDatabase *)
 
   STypeRegistry::addType(GCShadingGroup::staticTypeInformation());
   STypeRegistry::addType(GCShader::staticTypeInformation());
+
+  STypeRegistry::addType(GCStandardSurface::staticTypeInformation());
   }

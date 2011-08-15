@@ -68,10 +68,10 @@ void SDatabase::deleteDynamicProperty(SProperty *prop)
 void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)
   {
   _info = info;
-  initiatePropertyFromMetaData(this, info, false);
+  initiatePropertyFromMetaData(this, info);
   }
 
-void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool)
+void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD)
   {
   xAssert(mD);
 
@@ -79,24 +79,25 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     {
     // no contained properties with duplicated names...
     const SPropertyInstanceInformation *child = mD->childFromIndex(i);
+    const SPropertyInformation *childInformation = child->childInformation();
 
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
 
     if(child->extra())
       {
-      child->childInformation()->create()(thisProp, child->childInformation(), 0);
+      childInformation->create()(thisProp, child->childInformation(), 0);
       }
 
     xAssert(thisProp->_parent == 0);
     xAssert(thisProp->_entity == 0);
     xAssert(thisProp->_nextSibling == 0);
 
-    thisProp->_info = child->childInformation();
+    thisProp->_info = childInformation;
     thisProp->_instanceInfo = child;
-
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     initiateProperty(thisProp);
+
     child->initiateProperty(thisProp);
     }
   }

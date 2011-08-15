@@ -260,6 +260,7 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setShouldSave(PropType::shouldSaveProperty);
   info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
   info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
@@ -281,6 +282,7 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
   info->setShouldSave(PropType::shouldSaveProperty);
   info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
   info->setSize(sizeof(PropType));
