@@ -35,7 +35,8 @@ SOURCES += \
     sxmlio.cpp \
     sbinaryio.cpp \
     styperegistry.cpp \
-    sbasepointerproperties.cpp
+    sbasepointerproperties.cpp \
+    sinterface.cpp
 
 HEADERS += \
     sglobal.h \
@@ -61,4 +62,5 @@ HEADERS += \
     sxmlio.h \
     sbinaryio.h \
     styperegistry.h \
-    sbasepointerproperties.h
+    sbasepointerproperties.h \
+    sinterface.h

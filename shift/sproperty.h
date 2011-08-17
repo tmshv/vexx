@@ -13,6 +13,11 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
 
+#define S_USER_DATA_TYPE(typeId) public: \
+  enum { UserDataType = SUserDataTypes::typeId }; \
+  virtual xuint32 userDataTypeId() const { return UserDataType; } \
+  private:
+
 #define S_REGISTER_TYPE_FUNCTION() \
   public: static SPropertyInformation *createTypeInformation(); \
   static const SPropertyInformation *staticTypeInformation();
@@ -175,6 +180,22 @@ public:
     return 0;
     }
 
+  class UserData
+    {
+    S_USER_DATA_TYPE(Invalid);
+  XProperties:
+    XROProperty(UserData *, next);
+  public:
+    // bool indicates whether the caller should delete the UserData on
+    virtual bool onPropertyDelete(SProperty *);
+  private:
+    friend class SProperty;
+    };
+
+  UserData *firstUserData() { return _userData; }
+  void addUserData(UserData *userData);
+  void removeUserData(UserData *userData);
+
   class DataChange : public SChange
     {
     S_CHANGE(DataChange, SChange, 53)
@@ -263,6 +284,7 @@ private:
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
   const InstanceInformation *_instanceInfo;
+  UserData *_userData;
   mutable SEntity *_entity;
 
   enum Flags

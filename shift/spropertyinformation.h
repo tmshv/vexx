@@ -3,6 +3,7 @@
 
 #include "QString"
 #include "sglobal.h"
+#include "sinterface.h"
 #include "XProperty"
 #include "XHash"
 #include "QVariant"
@@ -86,6 +87,7 @@ public:
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
+  typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
 XProperties:
   XProperty(CreateFunction, create, setCreate);
@@ -106,44 +108,13 @@ XProperties:
   XProperty(bool, dynamic, seyDynamic);
 
   XRORefProperty(DataHash, data);
+  XRefProperty(InterfaceHash, interfaceFactories);
 
   XROProperty(xsize, instances);
 
 public:
-  template <typename PropType> static SPropertyInformation *create(const QString &typeName)
-    {
-    SPropertyInformation *info = PropType::ParentType::createTypeInformation();
-
-    info->setCreate(PropType::createProperty);
-    info->setCreateInstanceInformation(createInstanceInformation<PropType>);
-    info->setSave(PropType::saveProperty);
-    info->setLoad(PropType::loadProperty);
-    info->setAssign(PropType::assignProperty);
-    info->setVersion(PropType::Version);
-    info->typeName() = typeName;
-    info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
-    info->setSize(sizeof(PropType));
-    info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
-
-    return info;
-    }
-
-  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName)
-    {
-    SPropertyInformation *info = new SPropertyInformation();
-
-    info->setCreate(PropType::createProperty);
-    info->setCreateInstanceInformation(createInstanceInformation<PropType>);
-    info->setSave(PropType::saveProperty);
-    info->setLoad(PropType::loadProperty);
-    info->setAssign(PropType::assignProperty);
-    info->setVersion(PropType::Version);
-    info->typeName() = typeName;
-    info->setSize(sizeof(PropType));
-    info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
-
-    return info;
-    }
+  template <typename PropType> static SPropertyInformation *create(const QString &typeName);
+  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName);
 
   SPropertyInformation();
   SPropertyInformation(const SPropertyInformation &info);
@@ -181,18 +152,14 @@ public:
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
 
-  template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0)
-    {
-    if(!def)
-      {
-      def = new typename U::InstanceInformation;
-      }
+  template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0);
 
-    def->initiate(U::staticTypeInformation(), name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+  SInterfaceBaseFactory *interfaceFactory(xuint32 type) { return _interfaceFactories.value(type, 0); }
 
-    _children << def;
-    return def;
-    }
+  template <typename T> void addInterfaceFactory(T *factory);
+  template <typename T> void addInheritedInterface();
+  template <typename T> void addAddonInterface();
+
 
   X_ALIGNED_OPERATOR_NEW
 
@@ -213,5 +180,109 @@ private:
   friend class SDatabase;
 };
 
+#include "sproperty.h"
+
+template <typename PropType> SPropertyInformation *SPropertyInformation::create(const QString &typeName)
+  {
+  SPropertyInformation *info = PropType::ParentType::createTypeInformation();
+
+  info->setCreate(PropType::createProperty);
+  info->setCreateInstanceInformation(createInstanceInformation<PropType>);
+  info->setSave(PropType::saveProperty);
+  info->setLoad(PropType::loadProperty);
+  info->setAssign(PropType::assignProperty);
+  info->setVersion(PropType::Version);
+  info->typeName() = typeName;
+  info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
+  info->setSize(sizeof(PropType));
+  info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+
+  return info;
+  }
+
+template <typename PropType> SPropertyInformation *SPropertyInformation::createNoParent(const QString &typeName)
+  {
+  SPropertyInformation *info = new SPropertyInformation();
+
+  info->setCreate(PropType::createProperty);
+  info->setCreateInstanceInformation(createInstanceInformation<PropType>);
+  info->setSave(PropType::saveProperty);
+  info->setLoad(PropType::loadProperty);
+  info->setAssign(PropType::assignProperty);
+  info->setVersion(PropType::Version);
+  info->typeName() = typeName;
+  info->setSize(sizeof(PropType));
+  info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+
+  return info;
+  }
+
+template <typename T, typename U>
+typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
+                                                           const QString &name,
+                                                           typename U::InstanceInformation *def)
+  {
+  if(!def)
+    {
+    def = new typename U::InstanceInformation;
+    }
+
+  def->initiate(U::staticTypeInformation(), name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+
+  _children << def;
+  return def;
+  }
+
+template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory)
+  {
+  xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == 0);
+  _interfaceFactories.insert(T::InterfaceType::InterfaceType, factory);
+  xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == factory);
+  }
+
+template <typename T> void SPropertyInformation::addInheritedInterface()
+  {
+  class InheritedInterface : public SInterfaceBaseFactory
+    {
+    S_INTERFACE_FACTORY_TYPE(T)
+    virtual SInterfaceBase *classInterface(SProperty *prop)
+      {
+      return static_cast<T*>(prop);
+      }
+    };
+
+  addInterfaceFactory(new InheritedInterface);
+  }
+
+template <typename T> void SPropertyInformation::addAddonInterface()
+  {
+  class AddonInterface : public SInterfaceBaseFactory
+    {
+    S_INTERFACE_FACTORY_TYPE(T)
+    virtual SInterfaceBase *classInterface(SProperty *prop)
+      {
+      SProperty::UserData *userData = prop->firstUserData();
+      while(userData)
+        {
+        if(userData->userDataTypeId() == SBaseInterface::InterfaceUserDataType)
+          {
+          SInterfaceBase *interfaceBase = static_cast<SInterfacaBase*>(userData);
+          if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceType)
+            {
+            return interfaceBase;
+            }
+          }
+        userData = userData->nextUserData();
+        }
+
+      // none found, create one and add it.
+      T* newInterface = new T(prop);
+      prop->addUserData(prop);
+      return newInterface;
+      }
+    };
+
+  addInterfaceFactory(new AddonInterface);
+  }
 
 #endif // SPROPERTYINFORMATION_H
