@@ -227,12 +227,12 @@ public:
 
   template <typename T> T *interface()
     {
-    return static_cast<T *>(interface(T::InterfaceType));
+    return static_cast<T *>(interface(T::InterfaceTypeId));
     }
 
   template <typename T> const T *interface() const
     {
-    return static_cast<const T *>(interface(T::InterfaceType));
+    return static_cast<const T *>(interface(T::InterfaceTypeId));
     }
 
   class UserData

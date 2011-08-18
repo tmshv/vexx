@@ -13,7 +13,7 @@ class QScriptContext;
 
 class ScScriptInterface : public SStaticInterfaceBase
   {
-  S_INTERFACE_TYPE(ScriptInterface)
+  S_STATIC_INTERFACE_TYPE(ScScriptInterface, ScriptInterface)
 public:
   ScScriptInterface(bool deleteOnNoReferences) : SStaticInterfaceBase(deleteOnNoReferences) { }
   virtual QScriptClass *scriptClass() = 0;
@@ -32,24 +32,24 @@ public:
     _prototype = engine()->newObject();
     }
 
-  template <typename U> void setConstructor(const QString &name, QScriptEngine::FunctionSignature constuctor, bool defaultValueForType=true)
+//  template <typename U> void setConstructor(const QString &name, QScriptEngine::FunctionSignature constuctor, bool defaultValueForType=true)
+//    {
+//    QScriptValue globalObject = engine()->globalObject().property("db");
+//    _constructor = engine()->newFunction(constuctor, _prototype);
+//    _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
+
+//    // register the constructor
+//    globalObject.setProperty(name, constructor());
+
+//    if(defaultValueForType)
+//      {
+//      engine()->setDefaultPrototype(qMetaTypeId<T*>(), _prototype);
+//      }
+//    }
+
+  template <typename U> void setDBValueConstructor(const QString &name)
     {
-    QScriptValue globalObject = engine()->globalObject();
-    _constructor = engine()->newFunction(constuctor, _prototype);
-    _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
-
-    // register the constructor
-    globalObject.setProperty(name, constructor());
-
-    if(defaultValueForType)
-      {
-      engine()->setDefaultPrototype(qMetaTypeId<T*>(), _prototype);
-      }
-    }
-
-  template <typename U> void setBlankConstructor(const QString &name)
-    {
-    QScriptValue globalObject = engine()->globalObject();
+    QScriptValue globalObject = engine()->globalObject().property("db");
     _constructor = engine()->newFunction(blank, _prototype);
     _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
 

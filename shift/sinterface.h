@@ -25,8 +25,8 @@ private:
   };
 
 #define S_INTERFACE_TYPE(typeId) public: \
-  enum { InterfaceType = SInterfaceTypes::typeId }; \
-  virtual xuint32 interfaceTypeId() const { return InterfaceType; } \
+  enum { InterfaceTypeId = SInterfaceTypes::typeId }; \
+  virtual xuint32 interfaceTypeId() const { return InterfaceTypeId; } \
   private:
 
 class SInterfaceBase : public SProperty::UserData
@@ -34,6 +34,10 @@ class SInterfaceBase : public SProperty::UserData
   S_INTERFACE_TYPE(Invalid)
   };
 
+
+#define S_STATIC_INTERFACE_TYPE(type, interfaceTypeId) public: \
+  S_INTERFACE_TYPE(interfaceTypeId) \
+  S_INTERFACE_FACTORY_TYPE(type)
 
 class SStaticInterfaceBase : public SInterfaceBase, public SInterfaceBaseFactory
   {

@@ -250,11 +250,10 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
 template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory) const
   {
   xAssert(factory);
-  xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == 0);
-  _interfaceFactories.insert(T::InterfaceType::InterfaceType, factory);
+  _interfaceFactories.insert(T::InterfaceType::InterfaceTypeId, factory);
   SInterfaceBaseFactory *facBase = factory;
   ++facBase->_referenceCount;
-  xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == factory);
+  xAssert(interfaceFactory(T::InterfaceType::InterfaceTypeId) == factory);
   }
 
 template <typename T> void SPropertyInformation::addInheritedInterface() const
@@ -286,7 +285,7 @@ template <typename T> void SPropertyInformation::addAddonInterface() const
         if(userData->userDataTypeId() == SUserDataTypes::InterfaceUserDataType)
           {
           SInterfaceBase *interfaceBase = static_cast<SInterfaceBase*>(userData);
-          if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceType)
+          if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceTypeId)
             {
             return interfaceBase;
             }

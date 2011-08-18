@@ -16,7 +16,7 @@ ScShiftFloatArrayProperty::~ScShiftFloatArrayProperty()
 
 void ScShiftFloatArrayProperty::initiate()
   {
-  setBlankConstructor<ScShiftFloatArrayProperty>("ScShiftFloatArrayProperty");
+  setBlankConstructor<ScShiftFloatArrayProperty>("SFloatArrayProperty");
   }
 
 QScriptValue ScShiftFloatArrayProperty::add(QScriptContext *ctx, QScriptEngine *)

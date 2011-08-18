@@ -18,11 +18,17 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
   xAssert(_types == 0);
   _types = this;
 
-  SProperty::staticTypeInformation()->addStaticInterface(&_property);
+  _property.initiate();
   _propertyContainer.initiate();
   _entity.initiate();
   _database.initiate();
   _floatArrayProperty.initiate();
+
+  SProperty::staticTypeInformation()->addStaticInterface(&_property);
+  SPropertyContainer::staticTypeInformation()->addStaticInterface(&_propertyContainer);
+  SEntity::staticTypeInformation()->addStaticInterface(&_property);
+  SDatabase::staticTypeInformation()->addStaticInterface(&_database);
+  SFloatArrayProperty::staticTypeInformation()->addStaticInterface(&_floatArrayProperty);
   }
 
 ScEmbeddedTypes::~ScEmbeddedTypes()

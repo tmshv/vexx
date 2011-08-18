@@ -57,14 +57,25 @@ void ScPlugin::load()
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new QScriptEngine(this);
 
-  _types = new ScEmbeddedTypes(_engine);
-
   registerScriptGlobal(this);
 
   APlugin<SPlugin> db(this, "db");
   if(db.isValid())
     {
     registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
+
+    _types = new ScEmbeddedTypes(_engine);
+
+    QScriptValue dbObject = engine()->globalObject().property("db");
+    foreach(const SPropertyInformation *t, STypeRegistry::types())
+      {
+      QScriptValue type = dbObject.property(t->typeName());
+      if(type.isNull())
+        {
+        type = _engine->newObject();
+        type.setProperty("typeName", t->typeName());
+        }
+      }
     }
 
 
