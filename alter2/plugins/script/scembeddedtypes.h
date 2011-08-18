@@ -1,7 +1,6 @@
 #ifndef SCEMBEDDEDTYPES_H
 #define SCEMBEDDEDTYPES_H
 
-#include "scshiftdynamicpropertyinformation.h"
 #include "scshiftproperty.h"
 #include "scshiftpropertycontainer.h"
 #include "scshiftentity.h"
@@ -20,8 +19,6 @@ public:
   static QScriptValue packValue(SProperty *);
 
 private:
-  ScShiftDynamicPropertyInformation _dynamicPropertyInformation;
-
   ScShiftProperty _property;
   ScShiftPropertyContainer _propertyContainer;
   ScShiftEntity _entity;

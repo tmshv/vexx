@@ -4,7 +4,7 @@
 #include "XCamera.h"
 #include "Eigen/Geometry"
 
-S_IMPLEMENT_PROPERTY(GCViewableTransform)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform)
 
 void computeView(const SPropertyInstanceInformation *info, SPropertyContainer *ent)
   {
@@ -188,7 +188,7 @@ void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, floa
   transform = t;
   }
 
-S_IMPLEMENT_PROPERTY(GCCamera)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCCamera)
 
 SPropertyInformation *GCCamera::createTypeInformation()
   {

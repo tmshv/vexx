@@ -1,4 +1,5 @@
 #include "scembeddedtypes.h"
+#include "spropertyinformation.h"
 #include "sproperty.h"
 #include "sentity.h"
 #include "sdatabase.h"
@@ -8,7 +9,6 @@ ScEmbeddedTypes *ScEmbeddedTypes::_types = 0;
 
 ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
     _engine(eng),
-    _dynamicPropertyInformation(eng),
     _property(eng),
     _propertyContainer(eng),
     _entity(eng),
@@ -18,7 +18,7 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
   xAssert(_types == 0);
   _types = this;
 
-  _property.initiate();
+  SProperty::staticTypeInformation()->addStaticInterface(&_property);
   _propertyContainer.initiate();
   _entity.initiate();
   _database.initiate();
@@ -38,24 +38,16 @@ QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
     return QScriptValue();
     }
 
-  QScriptClass* classType = &_types->_property;
+  ScScriptInterface *interface = prop->interface<ScScriptInterface>();
 
-  if(prop->inheritsFromType<SDatabase>())
+  if(interface)
     {
-    classType = &_types->_database;
-    }
-  else if(prop->inheritsFromType<SEntity>())
-    {
-    classType = &_types->_entity;
-    }
-  else if(prop->inheritsFromType<SPropertyContainer>())
-    {
-    classType = &_types->_propertyContainer;
-    }
-  else if(prop->inheritsFromType<SFloatArrayProperty>())
-    {
-    classType = &_types->_floatArrayProperty;
-    }
+    QScriptClass* classType = interface->scriptClass();
 
-  return _types->engine()->newObject(classType, _types->engine()->newVariant(qVariantFromValue(prop)));
+    return _types->engine()->newObject(classType, _types->engine()->newVariant(qVariantFromValue(prop)));
+    }
+  else
+    {
+    return QScriptValue();
+    }
   }

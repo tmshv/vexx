@@ -29,7 +29,6 @@ SOURCES += \
     spropertyinformation.cpp \
     sarrayproperty.cpp \
     sdatabasemodel.cpp \
-    sdynamicpropertyinformation.cpp \
     sprocessmanager.cpp \
     siterator.cpp \
     sxmlio.cpp \
@@ -55,7 +54,6 @@ HEADERS += \
     sloader.h \
     sarrayproperty.h \
     sdatabasemodel.h \
-    sdynamicpropertyinformation.h \
     sentityweakpointer.h \
     sprocessmanager.h \
     siterator.h \

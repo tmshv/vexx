@@ -6,11 +6,20 @@
 #include "XGlobal"
 #include "XProperty"
 #include "scglobal.h"
+#include "sinterface.h"
 
 class ScPlugin;
 class QScriptContext;
 
-template <typename T> class ScWrappedClass : public QScriptClass
+class ScScriptInterface : public SStaticInterfaceBase
+  {
+  S_INTERFACE_TYPE(ScriptInterface)
+public:
+  ScScriptInterface(bool deleteOnNoReferences) : SStaticInterfaceBase(deleteOnNoReferences) { }
+  virtual QScriptClass *scriptClass() = 0;
+  };
+
+template <typename T> class ScWrappedClass : public QScriptClass, public ScScriptInterface
   {
   XWOProperty(QScriptValue, prototype);
   XWOProperty(QScriptValue, constructor);
@@ -18,7 +27,7 @@ template <typename T> class ScWrappedClass : public QScriptClass
 
 public:
   ScWrappedClass(QScriptEngine *eng, const QString &parentType)
-      : QScriptClass(eng), _engine(eng)
+      : QScriptClass(eng), ScScriptInterface(false), _engine(eng)
     {
     _prototype = engine()->newObject();
     }
@@ -95,6 +104,7 @@ private:
     {
     return QScriptValue();
     }
+  virtual QScriptClass *scriptClass() { return this; }
   };
 
 template <typename T, typename U> class ScWrappedClassNoInheritance : public ScWrappedClass<T>

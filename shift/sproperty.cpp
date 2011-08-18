@@ -1,4 +1,6 @@
 #include "sproperty.h"
+#include "spropertyinformation.h"
+#include "sinterface.h"
 #include "sentity.h"
 #include "sdatabase.h"
 #include "schange.h"
@@ -289,6 +291,11 @@ void SProperty::connect(SProperty *prop) const
     {
     xAssertFail();
     }
+  }
+
+bool SProperty::isComputed() const
+  {
+  return baseInstanceInformation()->compute() != 0;
   }
 
 void SProperty::disconnect(SProperty *prop) const
@@ -711,4 +718,25 @@ void SProperty::removeUserData(UserData *userData)
     ud = ud->next();
     }
   xAssert(!userData->_next);
+  }
+
+SInterfaceBase *SProperty::interface(xuint32 typeId)
+  {
+  const SInterfaceBaseFactory* factory = typeInformation()->interfaceFactory(typeId);
+  if(factory)
+    {
+    return const_cast<SInterfaceBaseFactory*>(factory)->classInterface(this);
+    }
+  return 0;
+  }
+
+const SInterfaceBase *SProperty::interface(xuint32 typeId) const
+  {
+  const SInterfaceBaseFactory* factory = typeInformation()->interfaceFactory(typeId);
+  if(factory)
+    {
+    return const_cast<SInterfaceBaseFactory*>(factory)->classInterface(const_cast<SProperty*>(this));
+    }
+  return 0;
+
   }

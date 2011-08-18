@@ -108,7 +108,6 @@ XProperties:
   XProperty(bool, dynamic, seyDynamic);
 
   XRORefProperty(DataHash, data);
-  XRefProperty(InterfaceHash, interfaceFactories);
 
   XROProperty(xsize, instances);
 
@@ -154,11 +153,23 @@ public:
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0);
 
-  SInterfaceBaseFactory *interfaceFactory(xuint32 type) { return _interfaceFactories.value(type, 0); }
+  const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const
+    {
+    const SInterfaceBaseFactory *fac = 0;
+    const SPropertyInformation *info = this;
+    while(!fac && info)
+      {
+      fac = info->_interfaceFactories.value(type, 0);
+      info = info->parentTypeInformation();
+      }
 
-  template <typename T> void addInterfaceFactory(T *factory);
-  template <typename T> void addInheritedInterface();
-  template <typename T> void addAddonInterface();
+    return fac;
+    }
+
+  template <typename T> void addInterfaceFactory(T *factory) const;
+  template <typename T> void addInheritedInterface() const;
+  template <typename T> void addAddonInterface() const;
+  template <typename T> void addStaticInterface(T *) const;
 
 
   X_ALIGNED_OPERATOR_NEW
@@ -177,6 +188,9 @@ private:
 
   void reference() const;
   void dereference() const;
+
+  mutable InterfaceHash _interfaceFactories;
+
   friend class SDatabase;
 };
 
@@ -233,18 +247,22 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
   return def;
   }
 
-template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory)
+template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory) const
   {
+  xAssert(factory);
   xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == 0);
   _interfaceFactories.insert(T::InterfaceType::InterfaceType, factory);
+  SInterfaceBaseFactory *facBase = factory;
+  ++facBase->_referenceCount;
   xAssert(interfaceFactory(T::InterfaceType::InterfaceType) == factory);
   }
 
-template <typename T> void SPropertyInformation::addInheritedInterface()
+template <typename T> void SPropertyInformation::addInheritedInterface() const
   {
   class InheritedInterface : public SInterfaceBaseFactory
     {
     S_INTERFACE_FACTORY_TYPE(T)
+    InheritedInterface() : SInterfaceBaseFactory(true) { }
     virtual SInterfaceBase *classInterface(SProperty *prop)
       {
       return static_cast<T*>(prop);
@@ -254,35 +272,41 @@ template <typename T> void SPropertyInformation::addInheritedInterface()
   addInterfaceFactory(new InheritedInterface);
   }
 
-template <typename T> void SPropertyInformation::addAddonInterface()
+template <typename T> void SPropertyInformation::addAddonInterface() const
   {
   class AddonInterface : public SInterfaceBaseFactory
     {
     S_INTERFACE_FACTORY_TYPE(T)
+    AddonInterface() : SInterfaceBaseFactory(true) { }
     virtual SInterfaceBase *classInterface(SProperty *prop)
       {
       SProperty::UserData *userData = prop->firstUserData();
       while(userData)
         {
-        if(userData->userDataTypeId() == SBaseInterface::InterfaceUserDataType)
+        if(userData->userDataTypeId() == SUserDataTypes::InterfaceUserDataType)
           {
-          SInterfaceBase *interfaceBase = static_cast<SInterfacaBase*>(userData);
+          SInterfaceBase *interfaceBase = static_cast<SInterfaceBase*>(userData);
           if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceType)
             {
             return interfaceBase;
             }
           }
-        userData = userData->nextUserData();
+        userData = userData->next();
         }
 
       // none found, create one and add it.
       T* newInterface = new T(prop);
-      prop->addUserData(prop);
+      prop->addUserData(newInterface);
       return newInterface;
       }
     };
 
   addInterfaceFactory(new AddonInterface);
+  }
+
+template <typename T> void SPropertyInformation::addStaticInterface(T *factory) const
+  {
+  addInterfaceFactory(factory);
   }
 
 #endif // SPROPERTYINFORMATION_H

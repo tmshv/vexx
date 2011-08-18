@@ -88,8 +88,8 @@ public:
 
 #define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
   class name : public TypedPointerArray<type> { \
-  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<type>, 0);}; \
-    S_IMPLEMENT_INLINE_PROPERTY(name) \
+  S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<type>, 0); }; \
+  S_IMPLEMENT_INLINE_PROPERTY(name) \
   inline SPropertyInformation *name::createTypeInformation() { \
     return SPropertyInformation::create<name>(#name); }
 

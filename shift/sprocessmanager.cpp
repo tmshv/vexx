@@ -1,4 +1,5 @@
 #include "sprocessmanager.h"
+#include "spropertyinformation.h"
 #include "sproperty.h"
 #include "QDebug"
 #include "QThreadPool"

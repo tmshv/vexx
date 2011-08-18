@@ -80,7 +80,7 @@ public:
     }
   };
 
-template <typename T> S_IMPLEMENT_PROPERTY(STypedPropertyArray<T>)
+S_IMPLEMENT_TEMPLATED_PROPERTY(template <typename T>, STypedPropertyArray<T>)
 
 template <typename T>SPropertyInformation *STypedPropertyArray<T>::createTypeInformation()
   {
