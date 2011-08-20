@@ -30,4 +30,6 @@ inline QDataStream &operator>>(QDataStream &str, XQuaternion &quat)
 
 X_DECLARE_SERIALISABLE_METATYPE(XQuaternion);
 
+Q_DECLARE_METATYPE(XQuaternion);
+
 #endif // XQUATERNION_H

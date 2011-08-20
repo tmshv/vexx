@@ -6,46 +6,49 @@
 #include "XGlobal"
 #include "XProperty"
 #include "scglobal.h"
+#include "sinterface.h"
 
 class ScPlugin;
 class QScriptContext;
 
-template <typename T> class ScWrappedClass : public QScriptClass
+class ScScriptInterface : public SStaticInterfaceBase
   {
-  XWOProperty(QScriptValue, prototype);
-  XWOProperty(QScriptValue, constructor);
-  XROProperty(QScriptEngine *, engine);
+  S_STATIC_INTERFACE_TYPE(ScScriptInterface, ScriptInterface)
+public:
+  ScScriptInterface(bool deleteOnNoReferences) : SStaticInterfaceBase(deleteOnNoReferences) { }
+  virtual QScriptClass *scriptClass() = 0;
+  };
+
+template <typename T> class ScWrappedClass : public QScriptClass, public ScScriptInterface
+  {
+  XWOProperty(QScriptValue, prototype, setPrototype);
+  XRefProperty(QScriptValue, constructor);
+  XRefProperty(QScriptEngine *, engine);
 
 public:
-  ScWrappedClass(QScriptEngine *eng, const QString &parentType)
-      : QScriptClass(eng), _engine(eng)
+  ScWrappedClass(QScriptEngine *eng)
+      : QScriptClass(eng), ScScriptInterface(false), _engine(eng)
     {
     _prototype = engine()->newObject();
     }
 
-  template <typename U> void setConstructor(const QString &name, QScriptEngine::FunctionSignature constuctor, bool defaultValueForType=true)
-    {
-    QScriptValue globalObject = engine()->globalObject();
-    _constructor = engine()->newFunction(constuctor, _prototype);
-    _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
-
-    // register the constructor
-    globalObject.setProperty(name, constructor());
-
-    if(defaultValueForType)
-      {
-      engine()->setDefaultPrototype(qMetaTypeId<T*>(), _prototype);
-      }
-    }
-
-  template <typename U> void setBlankConstructor(const QString &name)
+  template <typename U> void initiateGlobalValue(const QString &name, const QString &parent="")
     {
     QScriptValue globalObject = engine()->globalObject();
     _constructor = engine()->newFunction(blank, _prototype);
     _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
 
     // register the constructor
-    globalObject.setProperty(name, constructor());
+    _prototype.setProperty(name, constructor());
+    _prototype.setProperty("typeName", name);
+
+    if(parent != "")
+      {
+      xAssert(globalObject.property(parent).isObject());
+      _prototype.setPrototype(globalObject.property(parent));
+      }
+
+    globalObject.setProperty(name, _prototype);
     }
 
   void addMemberFunction(const QString &str, QScriptEngine::FunctionSignature sig)
@@ -61,11 +64,6 @@ public:
   virtual QScriptValue prototype() const
     {
     return _prototype;
-    }
-
-  QScriptValue constructor() const
-    {
-    return _constructor;
     }
 
   static T *getThis(QScriptContext *ctx)
@@ -95,6 +93,7 @@ private:
     {
     return QScriptValue();
     }
+  virtual QScriptClass *scriptClass() { return this; }
   };
 
 template <typename T, typename U> class ScWrappedClassNoInheritance : public ScWrappedClass<T>

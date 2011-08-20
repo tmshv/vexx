@@ -5,7 +5,13 @@
 #include "sbasepointerproperties.h"
 #include "sdatabase.h"
 
-static XSet <const SPropertyInformation *> _types;
+struct TypeData
+  {
+  XSet <const SPropertyInformation *> types;
+  XList <STypeRegistry::Observer *> observers;
+  };
+
+static TypeData _types;
 
 STypeRegistry::STypeRegistry()
   {
@@ -45,27 +51,40 @@ void STypeRegistry::initiate()
 
 const XSet <const SPropertyInformation *> &STypeRegistry::types()
   {
-  return _types;
+  return _types.types;
   }
 
-void STypeRegistry::addType(const SPropertyInformation *)
+void STypeRegistry::addType(const SPropertyInformation *t)
   {
+  foreach(Observer *o, _types.observers)
+    {
+    o->typeAdded(t);
+    }
   }
 
+void STypeRegistry::addTypeObserver(Observer *o)
+  {
+  _types.observers << o;
+  }
+
+void STypeRegistry::removeTypeObserver(Observer *o)
+  {
+  _types.observers.removeAll(o);
+  }
 
 void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
-  xAssert(!_types.contains(t));
-  if(!_types.contains(t))
+  xAssert(!_types.types.contains(t));
+  if(!_types.types.contains(t))
     {
-    _types.insert(t);
+    _types.types.insert(t);
     }
   }
 
 const SPropertyInformation *STypeRegistry::findType(const QString &in)
   {
   SProfileFunction
-  foreach(const SPropertyInformation *info, _types)
+  foreach(const SPropertyInformation *info, _types.types)
     {
     if(info->typeName() == in)
       {

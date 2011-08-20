@@ -1,4 +1,5 @@
 #include "sprocessmanager.h"
+#include "spropertyinformation.h"
 #include "sproperty.h"
 #include "QDebug"
 #include "QThreadPool"
@@ -71,6 +72,7 @@ void SProcessManager::terminate()
   {
   xAssert(g_manager);
   delete g_manager;
+  g_manager = 0;
   }
 
 SProcessManager::SProcessManager()

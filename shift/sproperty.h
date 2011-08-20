@@ -4,7 +4,6 @@
 #include "sglobal.h"
 #include "XObject"
 #include "schange.h"
-#include "spropertyinformation.h"
 #include "XFlags"
 
 class SEntity;
@@ -12,6 +11,11 @@ class SProperty;
 class SPropertyContainer;
 class SPropertyMetaData;
 class SDatabase;
+
+#define S_USER_DATA_TYPE(typeId) public: \
+  enum { UserDataType = SUserDataTypes::typeId }; \
+  virtual xuint32 userDataTypeId() const { return UserDataType; } \
+  private:
 
 #define S_REGISTER_TYPE_FUNCTION() \
   public: static SPropertyInformation *createTypeInformation(); \
@@ -21,21 +25,11 @@ class SDatabase;
 
 
 #define S_ADD_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
-    name *prop = new(ptr) name(); \
-    if(instanceInfo) { \
-    xuint8 *alignedPtr = (xuint8*)(prop+1); \
-    alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
-    xAssertIsAligned(alignedPtr); \
-    *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-    new(*instanceInfo) InstanceInformation(); \
-    (*instanceInfo)->setDynamic(true); \
-    } } \
+  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
   public: enum { Version = version };
 
 #define S_ADD_ABSTRACT_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) { \
-  xAssertFailMessage("Creating abstract type"); } \
+  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
   public: enum { Version = version };
 
 #define S_PROPERTY_ROOT(myName, version) \
@@ -45,7 +39,44 @@ class SDatabase;
   typedef void ParentType; \
   S_REGISTER_TYPE_FUNCTION()
 
+#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
+  TEMPL void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
+  { myName *prop = new(ptr) myName(); \
+  if(instanceInfo) { \
+  xuint8 *alignedPtr = (xuint8*)(prop+1); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  xAssertIsAligned(alignedPtr); \
+  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
+  new(*instanceInfo) InstanceInformation(); \
+  (*instanceInfo)->setDynamic(true); \
+  } } \
+  TEMPL const SPropertyInformation *myName::staticTypeInformation() { \
+  static const SPropertyInformation *info = 0; \
+  if(!info) { info = STypeRegistry::findType(#myName); \
+  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
+  return info;}
+
+
+#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
+  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
+  { xAssertFailMessage("Creating avbstract type") } \
+  const SPropertyInformation *myName::staticTypeInformation() { \
+  static const SPropertyInformation *info = 0; \
+  if(!info) { info = STypeRegistry::findType(#myName); \
+  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
+  return info;}
+
 #define S_IMPLEMENT_PROPERTY(myName) \
+  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
+  { myName *prop = new(ptr) myName(); \
+  if(instanceInfo) { \
+  xuint8 *alignedPtr = (xuint8*)(prop+1); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  xAssertIsAligned(alignedPtr); \
+  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
+  new(*instanceInfo) InstanceInformation(); \
+  (*instanceInfo)->setDynamic(true); \
+  } } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -53,6 +84,16 @@ class SDatabase;
   return info;}
 
 #define S_IMPLEMENT_INLINE_PROPERTY(myName) \
+  inline void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
+  { myName *prop = new(ptr) myName(); \
+  if(instanceInfo) { \
+  xuint8 *alignedPtr = (xuint8*)(prop+1); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  xAssertIsAligned(alignedPtr); \
+  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
+  new(*instanceInfo) InstanceInformation(); \
+  (*instanceInfo)->setDynamic(true); \
+  } } \
   inline const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -72,6 +113,12 @@ class SDatabase;
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()
+
+class SPropertyInstanceInformation;
+class SPropertyInformation;
+class SSaver;
+class SLoader;
+class SInterfaceBase;
 
 class SHIFT_EXPORT SProperty
   {
@@ -100,7 +147,7 @@ public:
   void disconnect(SProperty *) const;
   void disconnect() const;
 
-  bool isComputed() const { return baseInstanceInformation()->compute() != 0; }
+  bool isComputed() const;
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }
 
@@ -174,6 +221,35 @@ public:
       }
     return 0;
     }
+
+  SInterfaceBase *interface(xuint32 typeId);
+  const SInterfaceBase *interface(xuint32 typeId) const;
+
+  template <typename T> T *interface()
+    {
+    return static_cast<T *>(interface(T::InterfaceTypeId));
+    }
+
+  template <typename T> const T *interface() const
+    {
+    return static_cast<const T *>(interface(T::InterfaceTypeId));
+    }
+
+  class UserData
+    {
+    S_USER_DATA_TYPE(Invalid);
+  XProperties:
+    XROProperty(UserData *, next);
+  public:
+    // bool indicates whether the caller should delete the UserData on
+    virtual bool onPropertyDelete(SProperty *) { return false; }
+  private:
+    friend class SProperty;
+    };
+
+  UserData *firstUserData() { return _userData; }
+  void addUserData(UserData *userData);
+  void removeUserData(UserData *userData);
 
   class DataChange : public SChange
     {
@@ -263,6 +339,7 @@ private:
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
   const InstanceInformation *_instanceInfo;
+  UserData *_userData;
   mutable SEntity *_entity;
 
   enum Flags

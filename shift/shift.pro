@@ -29,13 +29,13 @@ SOURCES += \
     spropertyinformation.cpp \
     sarrayproperty.cpp \
     sdatabasemodel.cpp \
-    sdynamicpropertyinformation.cpp \
     sprocessmanager.cpp \
     siterator.cpp \
     sxmlio.cpp \
     sbinaryio.cpp \
     styperegistry.cpp \
-    sbasepointerproperties.cpp
+    sbasepointerproperties.cpp \
+    sinterface.cpp
 
 HEADERS += \
     sglobal.h \
@@ -54,11 +54,11 @@ HEADERS += \
     sloader.h \
     sarrayproperty.h \
     sdatabasemodel.h \
-    sdynamicpropertyinformation.h \
     sentityweakpointer.h \
     sprocessmanager.h \
     siterator.h \
     sxmlio.h \
     sbinaryio.h \
     styperegistry.h \
-    sbasepointerproperties.h
+    sbasepointerproperties.h \
+    sinterface.h

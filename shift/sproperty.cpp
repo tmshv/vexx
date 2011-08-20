@@ -1,4 +1,6 @@
 #include "sproperty.h"
+#include "spropertyinformation.h"
+#include "sinterface.h"
 #include "sentity.h"
 #include "sdatabase.h"
 #include "schange.h"
@@ -69,12 +71,24 @@ bool SProperty::NameChange::apply(int mode)
   }
 
 SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
-    _database(0), _parent(0), _info(0), _instanceInfo(0), _entity(0), _flags(Dirty)
+    _database(0), _parent(0), _info(0), _instanceInfo(0), _userData(0), _entity(0),
+    _flags(Dirty)
   {
   }
 
 SProperty::~SProperty()
   {
+  UserData *ud = _userData;
+  while(ud)
+    {
+    UserData *next = ud->_next;
+    if(ud->onPropertyDelete(this))
+      {
+      delete ud;
+      }
+    ud = next;
+    }
+
   if(isDynamic())
     {
     ((InstanceInformation*)instanceInformation())->~InstanceInformation();
@@ -277,6 +291,11 @@ void SProperty::connect(SProperty *prop) const
     {
     xAssertFail();
     }
+  }
+
+bool SProperty::isComputed() const
+  {
+  return baseInstanceInformation()->compute() != 0;
   }
 
 void SProperty::disconnect(SProperty *prop) const
@@ -661,4 +680,63 @@ void SProperty::preGet() const
     parent()->preGet();
     xAssert(!_flags.hasFlag(Dirty));
     }
+  }
+
+void SProperty::addUserData(UserData *userData)
+  {
+  xAssert(userData);
+  xAssert(!userData->next());
+  if(userData && !userData->next())
+    {
+    userData->_next = _userData;
+    _userData = userData;
+    }
+  }
+
+void SProperty::removeUserData(UserData *userData)
+  {
+  xAssert(userData);
+  xAssert(userData->_next);
+  UserData *last = 0;
+  UserData *ud = _userData;
+  while(ud)
+    {
+    if(ud == userData)
+      {
+      if(last)
+        {
+        last->_next = userData->_next;
+        }
+      else
+        {
+        _userData = userData->_next;
+        }
+      userData->_next = 0;
+      break;
+      }
+    last = ud;
+    ud = ud->next();
+    }
+  xAssert(!userData->_next);
+  }
+
+SInterfaceBase *SProperty::interface(xuint32 typeId)
+  {
+  const SInterfaceBaseFactory* factory = typeInformation()->interfaceFactory(typeId);
+  if(factory)
+    {
+    return const_cast<SInterfaceBaseFactory*>(factory)->classInterface(this);
+    }
+  return 0;
+  }
+
+const SInterfaceBase *SProperty::interface(xuint32 typeId) const
+  {
+  const SInterfaceBaseFactory* factory = typeInformation()->interfaceFactory(typeId);
+  if(factory)
+    {
+    return const_cast<SInterfaceBaseFactory*>(factory)->classInterface(const_cast<SProperty*>(this));
+    }
+  return 0;
+
   }

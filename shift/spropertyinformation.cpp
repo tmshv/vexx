@@ -32,6 +32,16 @@ SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
 
 SPropertyInformation::~SPropertyInformation()
   {
+  foreach(SInterfaceBaseFactory *f, _interfaceFactories)
+    {
+    xAssert(f->_referenceCount > 0);
+    --f->_referenceCount;
+    if(f->_referenceCount == 0 && f->_deleteOnNoReferences)
+      {
+      delete f;
+      }
+    }
+
   for(xsize i=0; i<childCount(); ++i)
     {
     delete [] child(i)->affects();

@@ -5,7 +5,7 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng, "SEntity")
+ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng)
   {
   addMemberFunction("addType", addType);
   }
@@ -16,7 +16,7 @@ ScShiftDatabase::~ScShiftDatabase()
 
 void ScShiftDatabase::initiate()
   {
-  setBlankConstructor<ScShiftDatabase>("SDatabase");
+  initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
@@ -62,6 +62,14 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     {
     parent = STypeRegistry::findType(tempObject.toString());
     }
+  else if(tempObject.isObject())
+    {
+    QScriptValue typeName = tempObject.property("typeName");
+    if(typeName.isString())
+      {
+      parent = STypeRegistry::findType(typeName.toString());
+      }
+    }
   if(parent == 0)
     {
     ctx->throwError(QScriptContext::SyntaxError, "Defined property type expected as 'parent' property");
@@ -96,6 +104,15 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         {
         propType = STypeRegistry::findType(tempArrayObject.toString());
         }
+      else if(tempArrayObject.isObject())
+        {
+        QScriptValue typeName = tempArrayObject.property("typeName");
+        if(typeName.isString())
+          {
+          propType = STypeRegistry::findType(typeName.toString());
+          }
+        }
+
       if(!propType)
         {
         ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'type' entry");
@@ -175,7 +192,6 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
       }
     }
 
-#warning check what happens if you embed a script type in a script type... etc, i think it will crash and burn?
   SPropertyInformation *newType = new SPropertyInformation(*parent);
 
   newType->setVersion(version);
@@ -184,6 +200,19 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   newType->setSize(endOfUsedMemory);
 
   newType->children() << parent->children() << properties;
+
+  tempObject = typeObject.property("prototype");
+  if(tempObject.isObject())
+    {
+    QScriptValue g = engine->globalObject();
+    QScriptValue parentObj = g.property(parent->typeName());
+    xAssert(parentObj.isObject());
+    if(parentObj.isObject())
+      {
+      tempObject.setPrototype(parentObj);
+      g.setProperty(name, tempObject);
+      }
+    }
 
   STypeRegistry::addType(newType);
 

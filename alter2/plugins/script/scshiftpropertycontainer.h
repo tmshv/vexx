@@ -3,10 +3,10 @@
 
 #include "scshiftproperty.h"
 
-class ScShiftPropertyContainer : public ScShiftProperty
+class ScShiftPropertyContainer : public ScWrappedClass<SProperty *>
   {
 public:
-  ScShiftPropertyContainer(QScriptEngine *engine, const QString &parentType="SProperty");
+  ScShiftPropertyContainer(QScriptEngine *engine);
   ~ScShiftPropertyContainer();
 
   virtual QueryFlags queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id);

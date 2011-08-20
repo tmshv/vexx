@@ -1,16 +1,16 @@
 #ifndef SCEMBEDDEDTYPES_H
 #define SCEMBEDDEDTYPES_H
 
-#include "scshiftdynamicpropertyinformation.h"
 #include "scshiftproperty.h"
 #include "scshiftpropertycontainer.h"
 #include "scshiftentity.h"
 #include "scshiftdatabase.h"
 #include "scshiftfloatarrayproperty.h"
+#include "styperegistry.h"
 
 class QScriptEngine;
 
-class ScEmbeddedTypes
+class ScEmbeddedTypes : STypeRegistry::Observer
   {
   XROProperty(QScriptEngine *, engine);
 public:
@@ -20,7 +20,10 @@ public:
   static QScriptValue packValue(SProperty *);
 
 private:
-  ScShiftDynamicPropertyInformation _dynamicPropertyInformation;
+  virtual void typeAdded(const SPropertyInformation *);
+  virtual void typeRemoved(const SPropertyInformation *);
+
+  void ensureTypeHierarchyAdded(const SPropertyInformation *);
 
   ScShiftProperty _property;
   ScShiftPropertyContainer _propertyContainer;

@@ -10,11 +10,37 @@
 #include "sentity.h"
 #include "schange.h"
 #include "sobserver.h"
+#include "sinterface.h"
 #include "QByteArray"
 
 template <typename T>
 class SPODInterface
   {
+  };
+
+class SPropertyVariantInterface : public SStaticInterfaceBase
+  {
+  S_STATIC_INTERFACE_TYPE(SPropertyVariantInterface, PropertyVariantInterface);
+
+public:
+  SPropertyVariantInterface(bool d) : SStaticInterfaceBase(d) { }
+  virtual QVariant asVariant(const SProperty *) const = 0;
+  virtual void setVariant(SProperty *, const QVariant &) const = 0;
+  };
+
+template <typename PROP, typename POD> class PODPropertyVariantInterface : public SPropertyVariantInterface
+  {
+public:
+  PODPropertyVariantInterface() : SPropertyVariantInterface(true) { }
+  virtual QVariant asVariant(const SProperty *p) const
+    {
+    return QVariant::fromValue<POD>(p->uncheckedCastTo<PROP>()->value());
+    }
+
+  virtual void setVariant(SProperty *p, const QVariant &v) const
+    {
+    p->uncheckedCastTo<PROP>()->assign(v.value<POD>());
+    }
   };
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
@@ -59,7 +85,10 @@ template <> class SPODInterface <type> { public: typedef name Type; \
 #define IMPLEMENT_POD_PROPERTY(name, type) \
   S_IMPLEMENT_PROPERTY(name) \
   SPropertyInformation *name::createTypeInformation() { \
-    return SPropertyInformation::create<name>(#name); } \
+    SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
+    info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); \
+    return info; \
+    } \
 name::Change::Change(const type &b, const type &a, name *prop) \
   : SProperty::DataChange(prop), _before(b), _after(a) \
   { } \

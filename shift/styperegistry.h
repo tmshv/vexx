@@ -8,6 +8,16 @@
 class SHIFT_EXPORT STypeRegistry
   {
 public:
+  class Observer
+    {
+  public:
+    virtual void typeAdded(const SPropertyInformation *) = 0;
+    virtual void typeRemoved(const SPropertyInformation *) = 0;
+    };
+
+  static void addTypeObserver(Observer *o);
+  static void removeTypeObserver(Observer *o);
+
   static void initiate();
 
   static const XSet <const SPropertyInformation *> &types();

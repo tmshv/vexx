@@ -1,6 +1,7 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
+#include "sentityweakpointer.h"
 #include "UISurface.h"
 #include "XObject"
 #include "X3DCanvas.h"
@@ -9,7 +10,6 @@
 #include "XCameraCanvasController.h"
 #include "XAbstractRenderModel.h"
 #include "XAbstractDelegate.h"
-#include "sentityweakpointer.h"
 #include "splugin.h"
 #include "XGLRenderer.h"
 

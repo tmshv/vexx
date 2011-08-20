@@ -2,7 +2,7 @@
 #include "spropertycontainer.h"
 #include "scembeddedtypes.h"
 
-ScShiftPropertyContainer::ScShiftPropertyContainer(QScriptEngine *eng, const QString &parent) : ScShiftProperty(eng, parent)
+ScShiftPropertyContainer::ScShiftPropertyContainer(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberProperty("length", size, QScriptValue::PropertyGetter);
   addMemberProperty("size", size, QScriptValue::PropertyGetter);
@@ -14,7 +14,7 @@ ScShiftPropertyContainer::~ScShiftPropertyContainer()
 
 void ScShiftPropertyContainer::initiate()
   {
-  setBlankConstructor<ScShiftPropertyContainer>("SPropertyContainer");
+  initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
   }
 
 QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *eng)

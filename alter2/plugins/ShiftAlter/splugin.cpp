@@ -10,18 +10,20 @@
 
 ALTER_PLUGIN(SPlugin);
 
-SPlugin::SPlugin()
+SPlugin::SPlugin() : _db(0)
   {
   }
 
 SAppDatabase &SPlugin::db()
   {
-  return _db;
+  xAssert(_db);
+  return *_db;
   }
 
 const SAppDatabase &SPlugin::db() const
   {
-  return _db;
+  xAssert(_db);
+  return *_db;
   }
 
 void SPlugin::load()
@@ -41,6 +43,8 @@ void SPlugin::load()
 
   SProcessManager::initiate(threadCount);
 
+  _db = new SAppDatabase();
+
   QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 
   QFile file(dataLocation + "/settings.xml");
@@ -48,7 +52,7 @@ void SPlugin::load()
     {
     SXMLLoader loader;
 
-    loader.readFromDevice(&file, &_db.settings);
+    loader.readFromDevice(&file, &_db->settings);
     }
   }
 
@@ -64,8 +68,11 @@ void SPlugin::unload()
     {
     SXMLSaver saver;
 
-    saver.writeToDevice(&file, &_db.settings);
+    saver.writeToDevice(&file, &_db->settings);
+    file.close();
     }
 
+  delete _db;
+  _db = 0;
   SProcessManager::terminate();
   }

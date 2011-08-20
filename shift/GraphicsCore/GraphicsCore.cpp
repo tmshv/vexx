@@ -34,6 +34,7 @@ void initiateGraphicsCore(SDatabase *db)
 
   STypeRegistry::addType(GCViewport::staticTypeInformation());
 
+  STypeRegistry::addType(GCViewableTransform::staticTypeInformation());
   STypeRegistry::addType(GCCamera::staticTypeInformation());
   STypeRegistry::addType(GCPerspectiveCamera::staticTypeInformation());
 

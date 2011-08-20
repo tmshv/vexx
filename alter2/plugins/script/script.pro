@@ -22,7 +22,6 @@ LIBS += -lalter \
 
 SOURCES += scplugin.cpp \
     scsurface.cpp \
-    scshiftdynamicpropertyinformation.cpp \
     scshiftproperty.cpp \
     scembeddedtypes.cpp \
     scshiftpropertycontainer.cpp \
@@ -33,7 +32,6 @@ SOURCES += scplugin.cpp \
 HEADERS += scplugin.h \
     scglobal.h \
     scsurface.h \
-    scshiftdynamicpropertyinformation.h \
     scshiftproperty.h \
     scembeddedtypes.h \
     scwrappedclass.h \
@@ -47,4 +45,3 @@ RESOURCES += \
 
 OTHER_FILES += \
     CoreUtils.js
-
