@@ -6,7 +6,7 @@
 class ScShiftFloatArrayProperty : public ScShiftProperty
   {
 public:
-  ScShiftFloatArrayProperty(QScriptEngine *engine, const QString &parentType="SProperty");
+  ScShiftFloatArrayProperty(QScriptEngine *engine);
   ~ScShiftFloatArrayProperty();
 
   void initiate();

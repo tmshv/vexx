@@ -9,3 +9,35 @@ function assert(exp)
     }
   return true;
   }
+
+
+/*
+
+// example node
+db.addType({
+  name: "NodeName",
+  parent: SEntity,
+  properties:
+    [
+      {
+      name: "AttrName",
+      type: FloatProperty,
+      affects: [ "Output" ]
+      },
+      {
+      name: "AttrName2",
+      type: IntProperty,
+      affects: [ "Output" ]
+      },
+      {
+      name: "Output",
+      type: FloatProperty,
+      compute: function()
+        {
+        this.Output = this.AttrName * this.AttrName2;
+        }
+      }
+    ]
+  });
+
+  */

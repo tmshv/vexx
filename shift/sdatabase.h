@@ -20,7 +20,7 @@ public:
   UnsignedIntProperty revision;
 
   SDatabase();
-  virtual ~SDatabase();
+  ~SDatabase();
 
   void beginBlock();
   void endBlock();

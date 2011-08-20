@@ -6,7 +6,7 @@
 class ScShiftEntity : public ScShiftPropertyContainer
   {
 public:
-  ScShiftEntity(QScriptEngine *engine, const QString &parentType="SPropertyContainer");
+  ScShiftEntity(QScriptEngine *engine);
   ~ScShiftEntity();
 
   void initiate();

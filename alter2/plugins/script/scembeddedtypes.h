@@ -6,10 +6,11 @@
 #include "scshiftentity.h"
 #include "scshiftdatabase.h"
 #include "scshiftfloatarrayproperty.h"
+#include "styperegistry.h"
 
 class QScriptEngine;
 
-class ScEmbeddedTypes
+class ScEmbeddedTypes : STypeRegistry::Observer
   {
   XROProperty(QScriptEngine *, engine);
 public:
@@ -19,6 +20,11 @@ public:
   static QScriptValue packValue(SProperty *);
 
 private:
+  virtual void typeAdded(const SPropertyInformation *);
+  virtual void typeRemoved(const SPropertyInformation *);
+
+  void ensureTypeHierarchyAdded(const SPropertyInformation *);
+
   ScShiftProperty _property;
   ScShiftPropertyContainer _propertyContainer;
   ScShiftEntity _entity;

@@ -7,7 +7,7 @@ class SProperty;
 class ScShiftProperty : public ScWrappedClass<SProperty *>
   {
 public:
-  ScShiftProperty(QScriptEngine *engine, const QString &parentType="Object");
+  ScShiftProperty(QScriptEngine *engine);
   ~ScShiftProperty();
 
   void initiate();

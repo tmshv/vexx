@@ -4,7 +4,7 @@
 #include "sdatabase.h"
 #include "sbaseproperties.h"
 
-ScShiftProperty::ScShiftProperty(QScriptEngine *eng, const QString &parent) : ScWrappedClass<SProperty *>(eng, parent)
+ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("outputs", outputs, QScriptValue::PropertyGetter);
@@ -20,7 +20,7 @@ ScShiftProperty::~ScShiftProperty()
 
 void ScShiftProperty::initiate()
   {
-  setBlankConstructor<ScShiftProperty>("SProperty");
+  initiateGlobalValue<ScShiftProperty>("SProperty");
   }
 
 QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *eng)

@@ -62,9 +62,9 @@ void ScPlugin::load()
   APlugin<SPlugin> db(this, "db");
   if(db.isValid())
     {
-    registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
-
     _types = new ScEmbeddedTypes(_engine);
+
+    registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
 
     QScriptValue dbObject = engine()->globalObject().property("db");
     foreach(const SPropertyInformation *t, STypeRegistry::types())

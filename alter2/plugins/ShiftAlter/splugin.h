@@ -55,7 +55,8 @@ public:
 
   template <typename T> T *settingProperty(const QString &ns, const QString &name)
     {
-    SEntity *nsEnt = _db.settings.findChildEntity(ns);
+    xAssert(_db);
+    SEntity *nsEnt = _db->settings.findChildEntity(ns);
     if(nsEnt)
       {
       SProperty *prop = nsEnt->findChild(name);
@@ -68,14 +69,15 @@ public:
       return nsEnt->addProperty<T>(name);
       }
 
-    nsEnt = _db.settings.addChild<SEntity>(ns);
+    nsEnt = _db->settings.addChild<SEntity>(ns);
     xAssert(nsEnt);
     return nsEnt->addProperty<T>(name);
     }
 
   template <typename T> const T *settingProperty(const QString &ns, const QString &name) const
     {
-    SEntity *nsEnt = _db.settings.findChildEntity(ns);
+    xAssert(_db);
+    SEntity *nsEnt = _db->settings.findChildEntity(ns);
     if(nsEnt)
       {
       SProperty *prop = nsEnt->findChild(name);
@@ -91,7 +93,7 @@ private:
   virtual void load();
   virtual void unload();
 
-  SAppDatabase _db;
+  SAppDatabase *_db;
   };
 
 #endif // SPLUGIN_H

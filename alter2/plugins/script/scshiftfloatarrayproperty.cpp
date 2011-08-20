@@ -4,7 +4,7 @@
 #include "sdatabase.h"
 #include "scembeddedtypes.h"
 
-ScShiftFloatArrayProperty::ScShiftFloatArrayProperty(QScriptEngine *eng, const QString &parent) : ScShiftProperty(eng, parent)
+ScShiftFloatArrayProperty::ScShiftFloatArrayProperty(QScriptEngine *eng) : ScShiftProperty(eng)
   {
   addMemberFunction("add", add);
   addMemberFunction("at", at);
@@ -16,7 +16,7 @@ ScShiftFloatArrayProperty::~ScShiftFloatArrayProperty()
 
 void ScShiftFloatArrayProperty::initiate()
   {
-  setBlankConstructor<ScShiftFloatArrayProperty>("SFloatArrayProperty");
+  initiateGlobalValue<ScShiftFloatArrayProperty>("SFloatArrayProperty", "SProperty");
   }
 
 QScriptValue ScShiftFloatArrayProperty::add(QScriptContext *ctx, QScriptEngine *)

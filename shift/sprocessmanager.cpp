@@ -72,6 +72,7 @@ void SProcessManager::terminate()
   {
   xAssert(g_manager);
   delete g_manager;
+  g_manager = 0;
   }
 
 SProcessManager::SProcessManager()
