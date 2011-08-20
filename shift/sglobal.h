@@ -38,5 +38,6 @@ S_DEFINE_USER_DATA_TYPE(InterfaceUserDataType, 0)
 
 #define S_DEFINE_INTERFACE_TYPE(name, typeId) namespace SInterfaceTypes { static const xuint32 name = typeId; }
 S_DEFINE_INTERFACE_TYPE(Invalid, 0)
+S_DEFINE_INTERFACE_TYPE(PropertyVariantInterface, 1)
 
 #endif // SHIFT_GLOBAL_H

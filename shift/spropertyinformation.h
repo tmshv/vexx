@@ -250,6 +250,7 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
 template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory) const
   {
   xAssert(factory);
+  xAssert(T::InterfaceType::InterfaceTypeId != SInterfaceTypes::Invalid);
   _interfaceFactories.insert(T::InterfaceType::InterfaceTypeId, factory);
   SInterfaceBaseFactory *facBase = factory;
   ++facBase->_referenceCount;

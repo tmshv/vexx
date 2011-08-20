@@ -97,7 +97,30 @@ QScriptValue ScShiftProperty::firstOutput(QScriptContext *ctx, QScriptEngine *en
   return QScriptValue();
   }
 
-QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *)
+QScriptValue toScriptValue(QScriptEngine *e, const QVariant &v)
+  {
+  if(v.isNull() || !v.isValid())
+    {
+    return QScriptValue();
+    }
+  else if(v.type() == QVariant::Bool)
+    {
+    return v.value<bool>();
+    }
+  else if(v.type() == QVariant::String)
+    {
+    return v.value<QString>();
+    }
+  else if(v.canConvert<double>())
+    {
+    return v.value<double>();
+    }
+
+  // arrays, objects?
+  return e->newVariant(v);
+  }
+
+QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *e)
   {
   ScProfileFunction
   SProperty **propPtr = getThis(ctx);
@@ -110,43 +133,16 @@ QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *)
       return QScriptValue();
       }
 
-    if(prop->inheritsFromType<IntProperty>())
-      {
-      return prop->uncheckedCastTo<IntProperty>()->value();
-      }
-    else if(prop->inheritsFromType<BoolProperty>())
-      {
-      return prop->uncheckedCastTo<BoolProperty>()->value();
-      }
-    else if(prop->inheritsFromType<UnsignedIntProperty>())
-      {
-      return prop->uncheckedCastTo<UnsignedIntProperty>()->value();
-      }
-    else if(prop->inheritsFromType<LongIntProperty>())
-      {
-      return (qsreal)prop->uncheckedCastTo<LongIntProperty>()->value();
-      }
-    else if(prop->inheritsFromType<LongUnsignedIntProperty>())
-      {
-      return (qsreal)prop->uncheckedCastTo<LongUnsignedIntProperty>()->value();
-      }
-    else if(prop->inheritsFromType<FloatProperty>())
-      {
-      return prop->uncheckedCastTo<FloatProperty>()->value();
-      }
-    else if(prop->inheritsFromType<DoubleProperty>())
-      {
-      return prop->uncheckedCastTo<DoubleProperty>()->value();
-      }
-    else if(prop->inheritsFromType<StringProperty>())
-      {
-      return prop->uncheckedCastTo<StringProperty>()->value();
-      }
+    SPropertyVariantInterface *varInt = prop->interface<SPropertyVariantInterface>();
 
-    xAssertFail();
-    //SPropertyData data;
-    //prop->database()->write(prop, data, SPropertyData::Ascii);
-    return "";//QString::fromUtf8(data.value());
+    if(varInt)
+      {
+      return toScriptValue(e, varInt->asVariant(prop));
+      }
+    else
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Unable to retrieve value from property.");
+      }
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
   return QScriptValue();
@@ -173,52 +169,17 @@ QScriptValue ScShiftProperty::setValue(QScriptContext *ctx, QScriptEngine *)
 
     QScriptValue arg = ctx->argument(0);
 
-    if(prop->inheritsFromType<IntProperty>())
-      {
-      prop->uncheckedCastTo<IntProperty>()->assign(arg.toInt32());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<BoolProperty>())
-      {
-      prop->uncheckedCastTo<BoolProperty>()->assign(arg.toBool());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<UnsignedIntProperty>())
-      {
-      prop->uncheckedCastTo<UnsignedIntProperty>()->assign(arg.toUInt32());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<LongIntProperty>())
-      {
-      prop->uncheckedCastTo<LongIntProperty>()->assign((xint64)arg.toNumber());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<LongUnsignedIntProperty>())
-      {
-      prop->uncheckedCastTo<LongUnsignedIntProperty>()->assign((xuint64)arg.toNumber());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<FloatProperty>())
-      {
-      prop->uncheckedCastTo<FloatProperty>()->assign(arg.toNumber());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<DoubleProperty>())
-      {
-      prop->uncheckedCastTo<DoubleProperty>()->assign(arg.toNumber());
-      return QScriptValue();
-      }
-    else if(prop->inheritsFromType<StringProperty>())
-      {
-      prop->uncheckedCastTo<StringProperty>()->assign(arg.toString());
-      return QScriptValue();
-      }
+    SPropertyVariantInterface *varInt = prop->interface<SPropertyVariantInterface>();
 
-    xAssertFail();
-    //SPropertyData data;
-    //data.setValue(arg.toString().toUtf8());
-    //prop->database()->read(prop, data, SPropertyData::Ascii);
-    return QScriptValue();
+    if(varInt)
+      {
+      varInt->setVariant(prop, arg.toVariant());
+      return QScriptValue();
+      }
+    else
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Unable to assign value to property.");
+      }
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
   return QScriptValue();
