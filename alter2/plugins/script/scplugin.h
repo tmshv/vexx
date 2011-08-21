@@ -40,6 +40,7 @@ public:
   QScriptEngine *engine();
 
   void registerScriptGlobal(QObject *);
+  void registerScriptGlobal(const QString &, QObject *);
   void registerScriptGlobal(const QString &, QScriptClass *cl);
   void registerScriptGlobal(const QString &, const QScriptValue &cl);
 
@@ -54,6 +55,9 @@ public slots:
 private:
   void initDebugger();
   bool executeFile(const QString &);
+
+  virtual void pluginAdded(const QString &type);
+  virtual void pluginRemoved(const QString &type);
 
   QScriptEngine *_engine;
   QScriptEngineDebugger *_debugger;

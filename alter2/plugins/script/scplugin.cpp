@@ -18,6 +18,7 @@ ALTER_PLUGIN(ScPlugin);
 
 ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
   {
+  setObjectName("script");
   }
 
 ScPlugin::~ScPlugin()
@@ -52,16 +53,14 @@ void ScPlugin::initDebugger()
     }
   }
 
-void ScPlugin::load()
+
+void ScPlugin::pluginAdded(const QString &type)
   {
-  XProfiler::setStringForContext(ScriptProfileScope, "Script");
-  _engine = new QScriptEngine(this);
-
-  registerScriptGlobal(this);
-
-  APlugin<SPlugin> db(this, "db");
-  if(db.isValid())
+  if(type == "db")
     {
+    APlugin<SPlugin> db(this, "db");
+    xAssert(db.isValid());
+
     _types = new ScEmbeddedTypes(_engine);
 
     registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
@@ -77,14 +76,40 @@ void ScPlugin::load()
         }
       }
     }
-
-
-  APlugin<UIPlugin> ui(this, "ui");
-  if(ui.isValid())
+  else
     {
-    _surface = new ScSurface(this);
-    ui->addSurface(_surface);
+    QObject *plug = core()->plugin(type);
+    xAssert(plug);
+    registerScriptGlobal(type, plug);
+
+    if(type == "ui")
+      {
+      _surface = new ScSurface(this);
+
+      APlugin<UIPlugin> ui(this, "ui");
+      xAssert(ui.isValid());
+      ui->addSurface(_surface);
+      }
     }
+  }
+
+void ScPlugin::pluginRemoved(const QString &type)
+  {
+  engine()->globalObject().setProperty(type, QScriptValue());
+
+  if(type == "ui")
+    {
+    delete _surface;
+    _surface = 0;
+    }
+  }
+
+void ScPlugin::load()
+  {
+  XProfiler::setStringForContext(ScriptProfileScope, "Script");
+  _engine = new QScriptEngine(this);
+
+  registerScriptGlobal(this);
 
   includePath(":/Sc/CoreUtils.js");
   }
@@ -151,6 +176,7 @@ void ScPlugin::include(const QString &filename)
       return;
       }
     }
+  qWarning() << "Failed to include file " + filename + ", couldn't locate the file in any include directory.";
   }
 
 void ScPlugin::includeFolder(const QString &folder)
@@ -187,6 +213,12 @@ void ScPlugin::registerScriptGlobal(QObject *in)
   {
   QScriptValue objectValue = _engine->newQObject(in);
   _engine->globalObject().setProperty(in->objectName(), objectValue);
+  }
+
+void ScPlugin::registerScriptGlobal(const QString &name, QObject *in)
+  {
+  QScriptValue objectValue = _engine->newQObject(in);
+  _engine->globalObject().setProperty(name, objectValue);
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, const QScriptValue &val)

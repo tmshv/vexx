@@ -33,7 +33,7 @@ QString ACore::rootPath()
         return "/";
         }
 #else
-    return QCoreApplication::applicationDirPath();
+    return QCoreApplication::applicationDirPath() + "/";
 #endif
     }
 
@@ -271,6 +271,5 @@ QObject *ACore::plugin(const QString &pluginName)
       return plugin.plugin;
       }
     }
-  qDebug() << "Failed to find plugin" << pluginName;
   return 0;
   }
