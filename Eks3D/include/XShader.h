@@ -140,6 +140,8 @@ private:
   mutable QAtomicInt _ref;
   };
 
+Q_DECLARE_METATYPE(XShader)
+
 class EKS3D_EXPORT XShaderComponent
   {
 XProperties:

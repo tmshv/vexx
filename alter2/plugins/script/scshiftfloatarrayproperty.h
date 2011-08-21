@@ -3,13 +3,11 @@
 
 #include "scshiftproperty.h"
 
-class ScShiftFloatArrayProperty : public ScShiftProperty
+class ScShiftFloatArrayProperty : public ScWrappedClass<SProperty *>
   {
 public:
   ScShiftFloatArrayProperty(QScriptEngine *engine);
   ~ScShiftFloatArrayProperty();
-
-  void initiate();
 
   static QScriptValue add(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue at(QScriptContext *ctx, QScriptEngine *);

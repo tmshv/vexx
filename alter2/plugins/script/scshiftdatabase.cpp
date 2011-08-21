@@ -6,20 +6,16 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng)
+ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberFunction("addType", addType);
   addMemberFunction("load", load);
   addMemberFunction("save", save);
+  initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
 ScShiftDatabase::~ScShiftDatabase()
   {
-  }
-
-void ScShiftDatabase::initiate()
-  {
-  initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
 QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)

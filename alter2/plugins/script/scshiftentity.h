@@ -3,13 +3,11 @@
 
 #include "scshiftpropertycontainer.h"
 
-class ScShiftEntity : public ScShiftPropertyContainer
+class ScShiftEntity : public ScWrappedClass<SProperty *>
   {
 public:
   ScShiftEntity(QScriptEngine *engine);
   ~ScShiftEntity();
-
-  void initiate();
 
   static QScriptValue addChild(QScriptContext *ctx, QScriptEngine *);
   };

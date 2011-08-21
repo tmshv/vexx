@@ -97,6 +97,7 @@ private:
 
     BufferType _type;
     };
+
 X_DECLARE_SERIALISABLE_METATYPE(XGeometry);
 Q_DECLARE_METATYPE(XGeometry)
 

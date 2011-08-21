@@ -12,15 +12,11 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
+  initiateGlobalValue<ScShiftProperty>("SProperty");
   }
 
 ScShiftProperty::~ScShiftProperty()
   {
-  }
-
-void ScShiftProperty::initiate()
-  {
-  initiateGlobalValue<ScShiftProperty>("SProperty");
   }
 
 QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *)

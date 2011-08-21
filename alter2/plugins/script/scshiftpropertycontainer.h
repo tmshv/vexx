@@ -15,8 +15,6 @@ public:
   virtual QScriptValue::PropertyFlags propertyFlags(const QScriptValue &object, const QScriptString &name, uint id);
 
   static QScriptValue size(QScriptContext *ctx, QScriptEngine *);
-
-  void initiate();
   };
 
 Q_DECLARE_METATYPE(ScShiftPropertyContainer*)
