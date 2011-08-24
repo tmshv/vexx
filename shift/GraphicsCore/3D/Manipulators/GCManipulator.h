@@ -27,9 +27,19 @@ public:
   
   FloatProperty screenSpaceScale;
   
-  virtual bool hitTest(const QPoint &widgetSpacePoint, const XVector3D &cameraPosition, const XVector3D &clickDirection, SProperty **clicked) = 0;
+  virtual bool hitTest(
+    const QPoint &widgetSpacePoint,
+    const XVector3D &cameraPosition, // in world space
+    const XVector3D &clickDirection, // in world space
+    GCVisualManipulator **clicked) = 0;
+    
   virtual void render3D(XRenderer *) { }
   virtual void render2D(QPainter *) { }
+  
+  virtual void onMouseClick(QPoint widgetPoint) = 0;
+  virtual void onMouseDoubleClick(QPoint widgetPoint) = 0;
+  virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint) = 0;
+  virtual void onMouseRelease(QPoint widgetPoint) = 0;
   };
 
 class GRAPHICSCORE_EXPORT GCVisualDragManipulator : public GCManipulator
@@ -42,9 +52,9 @@ public:
   virtual void onDrag(
     const QPoint &oldWidgetSpacePoint,
     const QPoint &widgetSpacePoint,
-    const XVector3D &cameraPosition,
-    const XVector3D &oldClickDirection,
-    const XVector3D &clickDirection);
+    const XVector3D &cameraPosition, // in world space
+    const XVector3D &oldClickDirection, // in world space
+    const XVector3D &clickDirection); // in world space
   };
 
 class GRAPHICSCORE_EXPORT GCVisualClickManipulator : public GCManipulator
@@ -70,17 +80,24 @@ public:
   virtual void onClick();
   };
 
-class GRAPHICSCORE_EXPORT GCButtonManipulator : public GCVisualClickManipulator
+class GRAPHICSCORE_EXPORT GCLinearDragManipulator : public GCVisualDragManipulator
   {
-  S_ABSTRACT_ENTITY(GCButtonManipulator, GCVisualClickManipulator, 0)
+  S_ABSTRACT_ENTITY(GCLinearDragManipulator, GCVisualDragManipulator, 0)
 
 public:
-  GCButtonManipulator();
+  GCLinearDragManipulator();
 
-  BoolProperty checked;
-  BoolProperty checkable;
+  // distance moved from click point in world space
+  FloatProperty absoluteDistance;
+  // distance moved last drag in world space
+  FloatProperty relativeDistance;
   
-  virtual void onClick();
+  virtual void onDrag(
+    const QPoint &oldWidgetSpacePoint,
+    const QPoint &widgetSpacePoint,
+    const XVector3D &cameraPosition,
+    const XVector3D &oldClickDirection,
+    const XVector3D &clickDirection);
   };
 
 #endif // GCMANIPULATOR_H
