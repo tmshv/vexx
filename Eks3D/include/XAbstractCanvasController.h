@@ -63,7 +63,7 @@ public:
     Used = 1,
     NeedsUpdate = 2
     };
-  typedef XFlags<Result> UsedFlags;
+  typedef XFlags<Result, xint32> UsedFlags;
 
   virtual xuint32 maxNumberOfPasses(xuint32) const { return 0; }
   virtual void paint(xuint32) const { }
