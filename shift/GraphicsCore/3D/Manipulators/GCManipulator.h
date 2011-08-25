@@ -6,15 +6,7 @@
 
 class XRenderer;
 
-class GRAPHICSCORE_EXPORT GCManipulator : public SProperty
-  {
-  S_ABSTRACT_ENTITY(GCViewableTransform, SProperty, 0)
-
-public:
-  GCManipulator();
-  };
-
-class GRAPHICSCORE_EXPORT GCVisualManipulator : public GCManipulator
+class GRAPHICSCORE_EXPORT GCVisualManipulator : public SPropertyContainer
   {
   S_ABSTRACT_ENTITY(GCVisualManipulator, GCManipulator, 0)
 
@@ -22,7 +14,7 @@ public:
   GCVisualManipulator();
   
   BoolProperty show;
-  Vector3Property worldPointOfInterest;
+  TransformProperty worldCentre;
   FloatProperty manipulatorsDisplayScale;
   
   FloatProperty screenSpaceScale;
@@ -41,8 +33,28 @@ public:
   virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint) = 0;
   virtual void onMouseRelease(QPoint widgetPoint) = 0;
   };
+  
+class GRAPHICSCORE_EXPORT GCVisualCompoundManipulator : public GCVisualManipulator
+  {
+  S_ABSTRACT_ENTITY(GCVisualCompoundManipulator, GCVisualManipulator, 0)
 
-class GRAPHICSCORE_EXPORT GCVisualDragManipulator : public GCManipulator
+public:
+  GCVisualCompoundManipulator();
+  
+  SPropertyArray childManipulators;
+  
+  virtual bool hitTest(
+    const QPoint &widgetSpacePoint,
+    const XVector3D &cameraPosition, // in world space
+    const XVector3D &clickDirection, // in world space
+    GCVisualManipulator **clicked);
+    
+  virtual void render3D(XRenderer *);
+  virtual void render2D(QPainter *);
+  };
+
+
+class GRAPHICSCORE_EXPORT GCVisualDragManipulator : public GCVisualManipulator
   {
   S_ABSTRACT_ENTITY(GCVisualDragManipulator, GCVisualManipulator, 0)
 
@@ -57,7 +69,7 @@ public:
     const XVector3D &clickDirection); // in world space
   };
 
-class GRAPHICSCORE_EXPORT GCVisualClickManipulator : public GCManipulator
+class GRAPHICSCORE_EXPORT GCVisualClickManipulator : public GCVisualManipulator
   {
   S_ABSTRACT_ENTITY(GCVisualClickManipulator, GCVisualManipulator, 0)
 
