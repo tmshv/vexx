@@ -32,7 +32,8 @@ HEADERS += GCGlobal.h \
     3D/GCShadingGroup.h \
     3D/GCShader.h \
     3D/Renderable/GCCuboid.h \
-    3D/GCGeometryTransform.h
+    3D/GCGeometryTransform.h \
+    3D/Manipulators/GCManipulator.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -59,6 +60,7 @@ SOURCES += \
     3D/GCShadingGroup.cpp \
     3D/GCShader.cpp \
     3D/Renderable/GCCuboid.cpp \
-    3D/GCGeometryTransform.cpp
+    3D/GCGeometryTransform.cpp \
+    3D/Manipulators/GCManipulator.cpp
 
 
