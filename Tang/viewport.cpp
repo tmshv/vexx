@@ -24,17 +24,11 @@
 
 Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
     _app(app),
-    _db(0),
-    _controller(0, this)
+    _db(0)
   {
-  setController(&_controller);
-
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
   _timer->start( 40 );
-
-  setMouseTracking( true );
-
 
   _db = &db.db();
   _db->addTreeObserver(this);
@@ -48,14 +42,15 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   vp->y.connect(&cam->viewportY);
   vp->width.connect(&cam->viewportWidth);
   vp->height.connect(&cam->viewportHeight);
-  _controller.setCamera(cam);
 
   cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
   cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
 
-  GCScene* scene = _db->addChild<GCScene>("Scene");
+  GCManipulatableScene* scene = _db->addChild<GCManipulatableScene>("Scene");
   cam->projection.connect(&scene->cameraProjection);
   cam->viewTransform.connect(&scene->cameraTransform);
+  cam->connect(&scene->activeCamera);
+  setController(scene);
 
   GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
   scene->shadingGroups.addPointer(group);
@@ -82,6 +77,8 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   transform2->geometry.setPointed(&cube->geometry);
 
   op->source.setPointed(scene);
+
+  scene->addAllManipulators();
   }
 
 Viewport::~Viewport()

@@ -10,4 +10,6 @@
 # define GRAPHICSCORE_EXPORT X_DECL_IMPORT
 #endif
 
+S_DEFINE_INTERFACE_TYPE(ManipulatableInterface, 200)
+
 #endif // GCGLOBAL_H

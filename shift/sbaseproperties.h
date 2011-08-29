@@ -150,6 +150,8 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, QString, "");
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
 
+#define EnumProperty IntProperty
+
 template <typename Derived> QTextStream & operator <<(QTextStream &str, const Eigen::PlainObjectBase <Derived> &data)
   {
   xsize width = data.cols();

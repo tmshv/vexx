@@ -6,14 +6,17 @@
 #include "sbasepointerproperties.h"
 #include "GCShader.h"
 #include "GCGeometryTransform.h"
+#include "Manipulators/GCManipulator.h"
 
-class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity
+class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity, public GCManipulatable
   {
   S_ENTITY(GCShadingGroup, SEntity, 0)
 public:
   GCShadingGroup();
 
   void render(XRenderer *r) const;
+
+  void addManipulators(SPropertyArray *);
 
   GCShaderPointer shader;
   GCGeometryTransformPointerArray geometry;

@@ -2,12 +2,15 @@
 #include "XGeometry.h"
 #include "XModeller.h"
 #include "XRenderer.h"
+#include "3D/Manipulators/GCButtonManipulator.h"
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 
 SPropertyInformation *GCShadingGroup::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCShadingGroup>("GCShadingGroup");
+
+  info->addInheritedInterface<GCShadingGroup, GCManipulatable>();
 
   info->add(&GCShadingGroup::shader, "shader");
 
@@ -36,4 +39,9 @@ void GCShadingGroup::render(XRenderer *r) const
       geo->render(r);
       }
     }
+  }
+
+void GCShadingGroup::addManipulators(SPropertyArray *a)
+  {
+  a->add<GCButtonManipulator>();
   }

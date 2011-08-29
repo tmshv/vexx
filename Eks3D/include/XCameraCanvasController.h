@@ -29,23 +29,13 @@ public:
     virtual void pan(float, float) { }
     };
 
-XProperties:
-  XProperty(CameraInterface *, camera, setCamera);
-
 public:
-  XCameraCanvasController(CameraInterface *cam, XAbstractCanvas *canvas);
+  XCameraCanvasController(XAbstractCanvas *canvas);
 
-  virtual UsedFlags mouseEvent(MouseEventType type,
-                          QPoint point,
-                          Qt::MouseButton triggerButton,
-                          Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers);
+  virtual CameraInterface *camera() = 0;
 
-  virtual UsedFlags wheelEvent(int delta,
-                               Qt::Orientation orientation,
-                               QPoint point,
-                               Qt::MouseButtons buttonsDown,
-                               Qt::KeyboardModifiers modifiers);
+  virtual UsedFlags mouseEvent(const MouseEvent &);
+  virtual UsedFlags wheelEvent(const WheelEvent &);
 
 private:
   CameraInterface::MovementType _current;

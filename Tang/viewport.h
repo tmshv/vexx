@@ -67,8 +67,6 @@ protected:
   SEntityWeakPointer _db;
   QList<GCRenderToScreen*> _screenRenderers;
   SEntityWeakPointer _viewport;
-
-  XCameraCanvasController _controller;
   };
 
 #endif // VIEWPORT_H

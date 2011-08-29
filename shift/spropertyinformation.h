@@ -205,7 +205,7 @@ public:
     }
 
   template <typename T> void addInterfaceFactory(T *factory) const;
-  template <typename T> void addInheritedInterface() const;
+  template <typename PROPTYPE, typename T> void addInheritedInterface() const;
   template <typename T> void addAddonInterface() const;
   template <typename T> void addStaticInterface(T *) const;
 
@@ -307,15 +307,16 @@ template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory)
   xAssert(interfaceFactory(T::InterfaceType::InterfaceTypeId) == factory);
   }
 
-template <typename T> void SPropertyInformation::addInheritedInterface() const
+template <typename PROPTYPE, typename T> void SPropertyInformation::addInheritedInterface() const
   {
   class InheritedInterface : public SInterfaceBaseFactory
     {
     S_INTERFACE_FACTORY_TYPE(T)
+  public:
     InheritedInterface() : SInterfaceBaseFactory(true) { }
     virtual SInterfaceBase *classInterface(SProperty *prop)
       {
-      return static_cast<T*>(prop);
+      return prop->castTo<PROPTYPE>();
       }
     };
 

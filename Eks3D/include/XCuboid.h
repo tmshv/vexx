@@ -41,7 +41,7 @@ public:
 
     bool isInside( const XVector3D & ) const;
     bool intersects( const XCuboid & ) const;
-    bool intersects( const XLine & ) const;
+    bool intersects( const XLine &, float &distance ) const;
 
     friend EKS3D_EXPORT QDataStream &operator<<(QDataStream &stream, const XCuboid &itemRequest);
     friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, XCuboid &itemRequest);

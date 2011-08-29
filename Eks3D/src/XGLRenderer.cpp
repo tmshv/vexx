@@ -264,9 +264,11 @@ void XGLRenderer::popTransform( )
     glPopMatrix() GLE;
     }
 
-void XGLRenderer::clear( )
+void XGLRenderer::clear( int c )
     {
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) GLE;
+    int realMode = ((c&ClearColour) != false) ? GL_COLOR_BUFFER_BIT : 0;
+    realMode |= ((c&ClearDepth) != false) ? GL_DEPTH_BUFFER_BIT : 0;
+    glClear( realMode ) GLE;
     }
 
 void XGLRenderer::enableRenderFlag( RenderFlags f )

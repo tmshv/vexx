@@ -1,78 +1,75 @@
 #include "XCameraCanvasController.h"
 #include "QDebug"
 
-XCameraCanvasController::XCameraCanvasController(CameraInterface *cam, XAbstractCanvas *canvas)
-    : XAbstractCanvasController(canvas), _camera(cam), _current(CameraInterface::None)
+XCameraCanvasController::XCameraCanvasController(XAbstractCanvas *canvas)
+    : XAbstractCanvasController(canvas), _current(CameraInterface::None)
   {
   }
 
 
-XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEventType type,
-                        QPoint point,
-                        Qt::MouseButton triggerButton,
-                        Qt::MouseButtons buttonsDown,
-                        Qt::KeyboardModifiers modifiers)
+XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(const MouseEvent &e)
   {
-  if(!_camera)
+  CameraInterface *cam = camera();
+  if(!cam)
     {
     return NotUsed;
     }
 
-  CameraInterface::MovementFlags supported = _camera->supportedMovements();
+  CameraInterface::MovementFlags supported = cam->supportedMovements();
 
-  if(type == Press)
+  if(e.type == Press)
     {
     if(supported.hasFlag(CameraInterface::Track) &&
-       ((triggerButton == Qt::MiddleButton && modifiers == Qt::NoModifier) || (triggerButton == Qt::LeftButton && modifiers == Qt::AltModifier)))
+       ((e.triggerButton == Qt::MiddleButton && e.modifiers == Qt::NoModifier) || (e.triggerButton == Qt::LeftButton && e.modifiers == Qt::AltModifier)))
       {
       _current = CameraInterface::Track;
       return Used;
       }
     else if(supported.hasFlag(CameraInterface::Dolly) &&
-       ((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == (Qt::ShiftModifier|Qt::AltModifier)))
+       ((e.triggerButton == Qt::MiddleButton || e.buttonsDown == (Qt::LeftButton|Qt::RightButton)) && e.modifiers == (Qt::ShiftModifier|Qt::AltModifier)))
       {
 
       _current = CameraInterface::Pan;
       return Used;
       }
     else if(supported.hasFlag(CameraInterface::Dolly) &&
-       (((triggerButton == Qt::MiddleButton || buttonsDown == (Qt::LeftButton|Qt::RightButton)) && modifiers == Qt::AltModifier) ||
-            ((triggerButton == Qt::LeftButton) && modifiers == (Qt::AltModifier|Qt::ControlModifier))))
+       (((e.triggerButton == Qt::MiddleButton || e.buttonsDown == (Qt::LeftButton|Qt::RightButton)) && e.modifiers == Qt::AltModifier) ||
+            ((e.triggerButton == Qt::LeftButton) && e.modifiers == (Qt::AltModifier|Qt::ControlModifier))))
       {
 
       _current = CameraInterface::Dolly;
       return Used;
       }
     else if(supported.hasFlag(CameraInterface::Zoom) &&
-       (triggerButton == Qt::RightButton && modifiers == Qt::AltModifier))
+       (e.triggerButton == Qt::RightButton && e.modifiers == Qt::AltModifier))
       {
-      _zoomCentre = point;
+      _zoomCentre = e.point;
       _current = CameraInterface::Zoom;
       return Used;
       }
     }
-  else if(type == Move)
+  else if(e.type == Move)
     {
-    QPoint delta = point - lastKnownMousePosition();
+    QPoint delta = e.point - lastKnownMousePosition();
     if(_current == CameraInterface::Track)
       {
-      _camera->track(delta.x(), delta.y());
+      cam->track(delta.x(), delta.y());
       return Used|NeedsUpdate;
       }
     else if(_current == CameraInterface::Dolly)
       {
-      _camera->dolly(delta.x(), delta.y());
+      cam->dolly(delta.x(), delta.y());
       return Used|NeedsUpdate;
       }
     else if(_current == CameraInterface::Pan)
       {
-      _camera->pan(delta.x(), delta.y());
+      cam->pan(delta.x(), delta.y());
       return Used|NeedsUpdate;
       }
     else if(_current == CameraInterface::Zoom)
       {
-      QPoint delta = point - lastKnownMousePosition();
-      float length = sqrt((float)(delta.x()*delta.x() + delta.y()*delta.y()));
+      QPoint delta = e.point - lastKnownMousePosition();
+      float length = sqrt(delta.x()*delta.x() + delta.y()*delta.y());
       if(delta.y() < 0.0f)
         {
         length *= -1.0f;
@@ -80,11 +77,11 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
       length *= 0.01f;
       length += 1.0f;
 
-      _camera->zoom(length, _zoomCentre.x(), _zoomCentre.y());
+      cam->zoom(length, _zoomCentre.x(), _zoomCentre.y());
       return Used|NeedsUpdate;
       }
     }
-  else if(type == Release)
+  else if(e.type == Release)
     {
     if(_current != CameraInterface::None)
       {
@@ -98,24 +95,21 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
   }
 
 
-XCameraCanvasController::UsedFlags XCameraCanvasController::wheelEvent(int delta,
-                                                                       Qt::Orientation,
-                                                                       QPoint point,
-                                                                       Qt::MouseButtons,
-                                                                       Qt::KeyboardModifiers)
+XCameraCanvasController::UsedFlags XCameraCanvasController::wheelEvent(const WheelEvent &w)
   {
-  if(!_camera)
+  CameraInterface *cam = camera();
+  if(!cam)
     {
     return NotUsed;
     }
 
-  CameraInterface::MovementFlags supported = _camera->supportedMovements();
+  CameraInterface::MovementFlags supported = cam->supportedMovements();
 
   if(supported.hasFlag(CameraInterface::Zoom))
     {
-    float length = 1.0f + (delta * 0.002f);
+    float length = 1.0f + (w.delta * 0.002f);
 
-    _camera->zoom(length, point.x(), point.y());
+    cam->zoom(length, w.point.x(), w.point.y());
     return Used|NeedsUpdate;
     }
 

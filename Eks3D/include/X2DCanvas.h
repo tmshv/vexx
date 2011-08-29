@@ -37,6 +37,8 @@ class EKS3D_EXPORT XSimple2DCanvasController : public XCameraCanvasController, X
 public:
   XSimple2DCanvasController(X2DCanvas *canvas);
 
+  XCameraCanvasController::CameraInterface *camera() { return this; }
+
 
   virtual MovementFlags supportedMovements() const;
   virtual void zoom(float factor, float x, float y);

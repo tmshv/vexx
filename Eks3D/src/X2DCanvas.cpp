@@ -31,7 +31,7 @@ void X2DCanvas::update(XAbstractRenderModel::UpdateMode c)
   QWidget::update();
   }
 
-XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCameraCanvasController(this, canvas)
+XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCameraCanvasController(canvas)
   {
   }
 

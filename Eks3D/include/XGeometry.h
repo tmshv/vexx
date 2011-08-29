@@ -65,10 +65,10 @@ public:
 
 private:
     mutable XAbstractGeometry *_internal;
-    XSet <QString> _changedA1;
-    XSet <QString> _changedA2;
-    XSet <QString> _changedA3;
-    XSet <QString> _changedA4;
+    mutable XSet <QString> _changedA1;
+    mutable XSet <QString> _changedA2;
+    mutable XSet <QString> _changedA3;
+    mutable XSet <QString> _changedA4;
     mutable bool _changedP;
     mutable bool _changedL;
     mutable bool _changedT;

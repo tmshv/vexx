@@ -11,7 +11,16 @@ XAbstractCanvasController::UsedFlags XAbstractCanvasController::triggerMouseEven
                        Qt::MouseButtons buttonsDown,
                        Qt::KeyboardModifiers modifiers)
   {
-  UsedFlags ret = mouseEvent(type, point, triggerButton, buttonsDown, modifiers);
+  MouseEvent e;
+  e.type = type;
+  e.point = point;
+  e.lastPoint = lastKnownMousePosition();
+  e.triggerButton = triggerButton;
+  e.buttonsDown = buttonsDown;
+  e.modifiers = modifiers;
+
+  UsedFlags ret = mouseEvent(e);
+
   _lastKnownMousePosition = point;
   return ret;
   }
@@ -24,7 +33,15 @@ XAbstractCanvasController::UsedFlags XAbstractCanvasController::triggerWheelEven
                        Qt::MouseButtons buttonsDown,
                        Qt::KeyboardModifiers modifiers)
   {
-  UsedFlags ret = wheelEvent(delta, orientation, point, buttonsDown, modifiers);
+  WheelEvent w;
+  w.delta = delta;
+  w.orientation = orientation;
+  w.point = point;
+  w.buttonsDown = buttonsDown;
+  w.modifiers = modifiers;
+
+  UsedFlags ret = wheelEvent(w);
+
   _lastKnownMousePosition = point;
   return ret;
   }

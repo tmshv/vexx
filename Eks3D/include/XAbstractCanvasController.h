@@ -81,17 +81,28 @@ public:
                               Qt::KeyboardModifiers modifiers);
 
 protected:
-  virtual UsedFlags mouseEvent(MouseEventType,
-                          QPoint,
-                          Qt::MouseButton,
-                          Qt::MouseButtons,
-                          Qt::KeyboardModifiers) { return NotUsed; }
+  struct MouseEvent
+    {
+    MouseEventType type;
+    QPoint point;
+    QPoint lastPoint;
+    Qt::MouseButton triggerButton;
+    Qt::MouseButtons buttonsDown;
+    Qt::KeyboardModifiers modifiers;
+    };
 
-  virtual UsedFlags wheelEvent(int,
-                               Qt::Orientation,
-                               QPoint,
-                               Qt::MouseButtons,
-                               Qt::KeyboardModifiers) { return NotUsed; }
+  struct WheelEvent
+    {
+    int delta;
+    Qt::Orientation orientation;
+    QPoint point;
+    Qt::MouseButtons buttonsDown;
+    Qt::KeyboardModifiers modifiers;
+    };
+
+  virtual UsedFlags mouseEvent(const MouseEvent &) { return NotUsed; }
+
+  virtual UsedFlags wheelEvent(const WheelEvent &) { return NotUsed; }
 
 private:
   X_DISABLE_COPY(XAbstractCanvasController);

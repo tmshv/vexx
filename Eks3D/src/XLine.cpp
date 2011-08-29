@@ -18,7 +18,8 @@ XVector3D XLine::sample( float t ) const
   return position() + ( t * direction() );
   }
 
-XLine operator*( const XTransform &tx, const XLine &line )
+void XLine::transform( const XTransform &tx )
   {
-  return XLine( tx * line.position(), tx.linear() * line.direction(), XLine::PointAndDirection );
+  _position = XVector3D(tx * _position);
+  _direction = XVector3D(tx.linear() * _direction);
   }

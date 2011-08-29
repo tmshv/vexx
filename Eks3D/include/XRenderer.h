@@ -31,7 +31,12 @@ public:
     virtual void pushTransform( const XTransform & ) = 0;
     virtual void popTransform( ) = 0;
 
-    virtual void clear() = 0;
+    enum ClearMode
+      {
+      ClearColour = 1,
+      ClearDepth = 2
+      };
+    virtual void clear(int=ClearColour|ClearDepth) = 0;
 
     // creation accessors for abstract types
     virtual XAbstractShader *getShader( ) = 0;

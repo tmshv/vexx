@@ -33,7 +33,7 @@ public:
     virtual void pushTransform( const XTransform & );
     virtual void popTransform( );
 
-    virtual void clear();
+    virtual void clear(int=ClearColour|ClearDepth);
 
     virtual void enableRenderFlag( RenderFlags );
     virtual void disableRenderFlag( RenderFlags );
