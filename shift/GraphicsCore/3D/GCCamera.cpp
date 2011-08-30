@@ -144,6 +144,9 @@ bool GCViewableTransform::unitViewportCoordinates(xuint32 x, xuint32 y, float &x
   xUnit -= 1.0f;
   yUnit -= 1.0f;
 
+  // viewport units are in positive down, flip to posisitve up
+  yUnit *= -1.0f;
+
   return true;
   }
 

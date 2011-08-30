@@ -43,7 +43,7 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
   vp->width.connect(&cam->viewportWidth);
   vp->height.connect(&cam->viewportHeight);
 
-  cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
+  cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
   cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
 
   GCManipulatableScene* scene = _db->addChild<GCManipulatableScene>("Scene");

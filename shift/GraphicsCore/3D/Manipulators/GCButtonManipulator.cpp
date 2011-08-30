@@ -29,12 +29,22 @@ public:
     {
     XLine l(camera->transform().translation(), clickDirection, XLine::PointAndDirection);
 
-    XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
-    l.transform(t);
+    XMatrix4x4 t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation()).matrix();
+    XMatrix4x4 tInv = t.inverse();
+
+    XTransform lineTransform(tInv);
+
+    l.transform(lineTransform);
 
     XCuboid c(XVector3D(0.0f, 0.0f, 0.0f), XVector3D(20.0f, 20.0f, 0.1f));
 
-    return c.intersects(l, *distance);
+    if(c.intersects(l, *distance))
+      {
+      *distance *= t.row(0).norm();
+      return true;
+      }
+
+    return false;
     }
 
   virtual void render(GCVisualManipulator *toRender,
@@ -80,4 +90,5 @@ GCButtonManipulator::~GCButtonManipulator()
 
 void GCButtonManipulator::onClick()
   {
+  qDebug() << "Click";
   }
