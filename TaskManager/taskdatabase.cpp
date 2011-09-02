@@ -4,7 +4,7 @@
 #include "styperegistry.h"
 #include "QDir"
 #include "QDesktopServices"
-#include "sjsonio.h"
+#include "Serialisation/sjsonio.h"
 
 S_IMPLEMENT_PROPERTY(TaskDatabase)
 

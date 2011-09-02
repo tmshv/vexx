@@ -7,7 +7,7 @@ TEMPLATE = lib
 
 include("../EksCore/GeneralOptions.pri")
 
-INCLUDEPATH += ../alter2/ \
+INCLUDEPATH += $$ROOT/Shift \
     $$ROOT/EksCore \
     $$ROOT/EksGui
 
@@ -31,13 +31,13 @@ SOURCES += \
     sdatabasemodel.cpp \
     sprocessmanager.cpp \
     siterator.cpp \
-    sxmlio.cpp \
-    sbinaryio.cpp \
     styperegistry.cpp \
     sbasepointerproperties.cpp \
     sinterface.cpp \
-    JsonParser/JSON_parser.c \
-    sjsonio.cpp
+    Serialisation/JsonParser/JSON_parser.c \
+    Serialisation/sxmlio.cpp \
+    Serialisation/sbinaryio.cpp \
+    Serialisation/sjsonio.cpp
 
 HEADERS += \
     sglobal.h \
@@ -59,13 +59,13 @@ HEADERS += \
     sentityweakpointer.h \
     sprocessmanager.h \
     siterator.h \
-    sxmlio.h \
-    sbinaryio.h \
     styperegistry.h \
     sbasepointerproperties.h \
     sinterface.h \
-    JsonParser/JSON_parser.h \
-    sjsonio.h
+    Serialisation/JsonParser/JSON_parser.h \
+    Serialisation/sxmlio.h \
+    Serialisation/sbinaryio.h \
+    Serialisation/sjsonio.h
 
 
 
