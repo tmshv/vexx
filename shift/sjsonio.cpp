@@ -199,7 +199,24 @@ int SJSONLoader::callback(void *ctx, int type, const JSON_value* value)
     }
   else if(ldr->_current == Children)
     {
-    if(type != JSON_T_ARRAY_END)
+    if(type == JSON_T_OBJECT_BEGIN)
+      {
+      ldr->_current = Attributes;
+      }
+    else if(type != JSON_T_ARRAY_END)
+      {
+      xAssertFail();
+      return 0;
+      }
+    ldr->_current = ChildrenEnd;
+    }
+  else if(ldr->_current == ChildrenEnd)
+    {
+    if(type == JSON_T_OBJECT_BEGIN)
+      {
+      ldr->_current = Start;
+      }
+    else if(type != JSON_T_OBJECT_END)
       {
       xAssertFail();
       return 0;
@@ -314,8 +331,15 @@ void SJSONLoader::endChildren() const
 
 void SJSONLoader::beginNextChild()
   {
-  xAssert(_current == Children || _current == AttributesEnd);
-  _current = Start;
+  if(_current != Children)
+    {
+    readNext();
+    }
+  if(_current == ChildrenEnd)
+    {
+    readNext();
+    }
+  xAssert(_current == Children);
   readAllAttributes();
 
   _currentValue = _currentAttributes.value(VALUE_KEY);
