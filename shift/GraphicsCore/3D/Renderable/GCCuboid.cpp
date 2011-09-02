@@ -1,5 +1,6 @@
 #include "GCCuboid.h"
 #include "sarrayproperty.h"
+#include "3D/Manipulators/GCDistanceManipulator.h"
 
 S_IMPLEMENT_PROPERTY(GCCuboid)
 
@@ -109,9 +110,16 @@ SPropertyInformation *GCCuboid::createTypeInformation()
   dInfo->setAffects(geoInfo);
   dInfo->setDefault(1.0f);
 
+  info->addInheritedInterface<GCCuboid, GCManipulatable>();
+
   return info;
   }
 
 GCCuboid::GCCuboid()
   {
+  }
+
+void GCCuboid::addManipulators(SPropertyArray *a)
+  {
+  a->add<GCDistanceManipulator>();
   }

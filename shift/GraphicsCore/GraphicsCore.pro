@@ -34,7 +34,8 @@ HEADERS += GCGlobal.h \
     3D/Renderable/GCCuboid.h \
     3D/GCGeometryTransform.h \
     3D/Manipulators/GCManipulator.h \
-    3D/Manipulators/GCButtonManipulator.h
+    3D/Manipulators/GCButtonManipulator.h \
+    3D/Manipulators/GCDistanceManipulator.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -63,7 +64,10 @@ SOURCES += \
     3D/Renderable/GCCuboid.cpp \
     3D/GCGeometryTransform.cpp \
     3D/Manipulators/GCManipulator.cpp \
-    3D/Manipulators/GCButtonManipulator.cpp
+    3D/Manipulators/GCButtonManipulator.cpp \
+    3D/Manipulators/GCDistanceManipulator.cpp
+
+
 
 
 

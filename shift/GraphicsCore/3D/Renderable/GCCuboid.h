@@ -3,8 +3,9 @@
 
 #include "sentity.h"
 #include "3D/GCGeometry.h"
+#include "3D/Manipulators/GCManipulator.h"
 
-class GRAPHICSCORE_EXPORT GCCuboid : public SEntity
+class GRAPHICSCORE_EXPORT GCCuboid : public SEntity, public GCManipulatable
   {
   S_PROPERTY(GCCuboid, SEntity, 0)
 
@@ -16,6 +17,8 @@ public:
   FloatProperty depth;
 
   GCGeometry geometry;
+
+  void addManipulators(SPropertyArray *);
   };
 
 #endif // GCCUBOID_H

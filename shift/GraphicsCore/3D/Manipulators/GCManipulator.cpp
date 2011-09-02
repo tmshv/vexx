@@ -192,12 +192,3 @@ SPropertyInformation *GCLinearDragManipulator::createTypeInformation()
 GCLinearDragManipulator::GCLinearDragManipulator()
   {
   }
-
-void GCLinearDragManipulator::onDrag(
-    const QPoint &oldWidgetSpacePoint,
-    const QPoint &widgetSpacePoint,
-    const XVector3D &cameraPosition,
-    const XVector3D &oldClickDirection,
-    const XVector3D &clickDirection)
-  {
-  }

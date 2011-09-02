@@ -9,6 +9,8 @@ SPropertyInformation *GCGeometryTransform::createTypeInformation()
 
   info->add(&GCGeometryTransform::geometry, "geometry");
 
+  info->addInheritedInterface<GCGeometryTransform, GCManipulatable>();
+
   return info;
   }
 
@@ -25,5 +27,21 @@ void GCGeometryTransform::render(XRenderer* r) const
     r->pushTransform(transform());
     r->drawGeometry(geo->runtimeGeometry());
     r->popTransform();
+    }
+  }
+
+void GCGeometryTransform::addManipulators(SPropertyArray *a)
+  {
+  // todo: add transform manipulators, and probably the shader manips, rather than it calling us?
+
+  const GCGeometry *geo = geometry();
+  if(geo)
+    {
+    SProperty *geoOwner = geo->parent();
+    GCManipulatable *manipulatorInterface = geoOwner->interface<GCManipulatable>();
+    if(manipulatorInterface)
+      {
+      manipulatorInterface->addManipulators(a);
+      }
     }
   }

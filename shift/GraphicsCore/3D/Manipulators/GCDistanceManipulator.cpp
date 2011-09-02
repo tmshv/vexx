@@ -1,4 +1,4 @@
-#include "GCButtonManipulator.h"
+#include "GCDistanceManipulator.h"
 #include "XModeller.h"
 #include "XRenderer.h"
 #include "XTransform.h"
@@ -6,10 +6,10 @@
 #include "XLine.h"
 #include "XCuboid.h"
 
-class ButtonDelegate : public GCVisualManipulator::Delegate
+class DistanceDelegate : public GCVisualManipulator::Delegate
   {
 public:
-  ButtonDelegate()
+  DistanceDelegate()
     {
     XTransform t;
     t = Eigen::Translation3f(10.0f, 10.0f, 0.0f);
@@ -51,13 +51,13 @@ public:
       const GCCamera *camera,
       XRenderer *r)
     {
-    /*XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
+    XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
 
     r->pushTransform(t);
     r->setShader(&_shader);
     r->drawGeometry(_geo);
     r->setShader(0);
-    r->popTransform();*/
+    r->popTransform();
     }
 
 private:
@@ -65,30 +65,25 @@ private:
   XShader _shader;
   };
 
-S_IMPLEMENT_PROPERTY(GCButtonManipulator)
+S_IMPLEMENT_PROPERTY(GCDistanceManipulator)
 
-SPropertyInformation *GCButtonManipulator::createTypeInformation()
+SPropertyInformation *GCDistanceManipulator::createTypeInformation()
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCButtonManipulator>("GCButtonManipulator");
-
-  info->add(&GCButtonManipulator::checked, "checked");
-  info->add(&GCButtonManipulator::checkable, "checkable");
+  SPropertyInformation *info = SPropertyInformation::create<GCDistanceManipulator>("GCDistanceManipulator");
 
   return info;
   }
 
-GCButtonManipulator::GCButtonManipulator()
+GCDistanceManipulator::GCDistanceManipulator()
   {
-  setDelegate(new ButtonDelegate());
+  setDelegate(new DistanceDelegate());
   }
 
-GCButtonManipulator::~GCButtonManipulator()
+void GCDistanceManipulator::onDrag(
+    const QPoint &oldWidgetSpacePoint,
+    const QPoint &widgetSpacePoint,
+    const XVector3D &cameraPosition,
+    const XVector3D &oldClickDirection,
+    const XVector3D &clickDirection)
   {
-  delete delegate();
-  setDelegate(0);
-  }
-
-void GCButtonManipulator::onClick()
-  {
-  qDebug() << "Click";
   }

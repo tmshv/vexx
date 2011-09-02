@@ -151,7 +151,7 @@ public:
     const QPoint &widgetSpacePoint,
     const XVector3D &cameraPosition,
     const XVector3D &oldClickDirection,
-    const XVector3D &clickDirection);
+    const XVector3D &clickDirection) = 0;
   };
 
 #endif // GCMANIPULATOR_H
