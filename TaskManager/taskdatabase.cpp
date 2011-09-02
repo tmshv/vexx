@@ -4,7 +4,7 @@
 #include "styperegistry.h"
 #include "QDir"
 #include "QDesktopServices"
-#include "sxmlio.h"
+#include "sjsonio.h"
 
 S_IMPLEMENT_PROPERTY(TaskDatabase)
 
@@ -59,7 +59,7 @@ void TaskDatabase::save() const
   QFile file(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "Tasks.db");
   if(file.open(QIODevice::WriteOnly))
     {
-    SXMLSaver w;
+    SJSONSaver w;
     w.writeToDevice(&file, this);
     }
   else
@@ -74,7 +74,7 @@ void TaskDatabase::load()
   if(file.open(QIODevice::ReadOnly))
     {
     _rootItem = 0;
-    SXMLLoader r;
+    SJSONLoader r;
 
     children.clear();
     r.readFromDevice(&file, this);

@@ -19,11 +19,11 @@ SPropertyInformation *Item::createTypeInformation()
   info->add(&Item::description, "description");
 
   FloatProperty::InstanceInformation* sevInfo = info->add(&Item::severity, "severity");
-  sevInfo->initiateFromDefinition(1.0f);
+  sevInfo->setDefault(1.0f);
   sevInfo->setCompute(severityCompute);
 
   FloatProperty::InstanceInformation* priInfo = info->add(&Item::priority, "priority");
-  priInfo->initiateFromDefinition(1.0f);
+  priInfo->setDefault(1.0f);
   priInfo->setAffects(sevInfo);
 
   PointerArray::InstanceInformation* linksInfo = info->add(&Item::links, "links");

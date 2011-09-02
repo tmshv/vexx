@@ -226,7 +226,7 @@ void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
 
   SProperty::saveProperty(p, l);
 
-  l.setChildCount(c->size());
+  l.beginChildren(c->size());
   for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
     {
     l.beginNextChild();
@@ -235,6 +235,7 @@ void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
 
     l.endNextChild();
     }
+  l.endChildren();
   }
 
 SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader &l)
@@ -246,12 +247,14 @@ SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader 
 
   SPropertyContainer* container = prop->uncheckedCastTo<SPropertyContainer>();
 
-  for(xsize i=0, s=l.childCount(); i<s; ++i)
+  xsize childCount = l.beginChildren();
+  for(xsize i=0; i<childCount; ++i)
     {
     l.beginNextChild();
     l.read(container);
     l.endNextChild();
     }
+  l.endChildren();
 
   return prop;
   }

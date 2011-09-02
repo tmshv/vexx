@@ -28,7 +28,8 @@ public:
 
   virtual const SPropertyInformation *type() const = 0;
 
-  virtual xsize childCount() const = 0;
+  virtual xsize beginChildren() const = 0;
+  virtual void endChildren() const = 0;
   virtual void beginNextChild() = 0;
   virtual void endNextChild() = 0;
 
@@ -64,7 +65,8 @@ public:
 
   virtual void setType(const SPropertyInformation *) = 0;
 
-  virtual void setChildCount(xsize) = 0;
+  virtual void beginChildren(xsize) = 0;
+  virtual void endChildren() = 0;
   virtual void beginNextChild() = 0;
   virtual void endNextChild() = 0;
 

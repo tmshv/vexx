@@ -2,7 +2,7 @@
 #define ITEM_H
 
 #include "sentity.h"
-#include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 #include "XList"
 #include "taskglobal.h"
 

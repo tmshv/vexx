@@ -13,7 +13,7 @@ void SBinarySaver::writeToDevice(QIODevice *device, const SEntity *ent)
   {
   _root = ent;
   _device = device;
-  
+
   xuint32 version = 0;
   _device->write(reinterpret_cast<const char*>(&version), sizeof(version));
 
@@ -30,7 +30,16 @@ void SBinarySaver::setType(const SPropertyInformation *type)
   //_currentType = type->typeName();
   }
 
-void SBinarySaver::setChildCount(xsize size)
+void SBinarySaver::beginChildren(xsize size)
+  {
+  xAssert(_inAttribute.isEmpty());
+  /*_inAttribute = "childCount";
+  _writer.writeAttribute(_inAttribute, QString::number(size));
+  _inAttribute.clear();*/
+  }
+
+
+void SBinarySaver::endChildren()
   {
   xAssert(_inAttribute.isEmpty());
   /*_inAttribute = "childCount";

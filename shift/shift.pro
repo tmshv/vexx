@@ -35,7 +35,9 @@ SOURCES += \
     sbinaryio.cpp \
     styperegistry.cpp \
     sbasepointerproperties.cpp \
-    sinterface.cpp
+    sinterface.cpp \
+    JsonParser/JSON_parser.c \
+    sjsonio.cpp
 
 HEADERS += \
     sglobal.h \
@@ -61,4 +63,10 @@ HEADERS += \
     sbinaryio.h \
     styperegistry.h \
     sbasepointerproperties.h \
-    sinterface.h
+    sinterface.h \
+    JsonParser/JSON_parser.h \
+    sjsonio.h
+
+
+
+
