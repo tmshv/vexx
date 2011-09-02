@@ -2,17 +2,21 @@
 #include "QWebView"
 #include "QNetworkAccessManager"
 #include "QNetworkRequest"
-#include "objectid.h"
+#include "object.h"
 
-#define baseHost() QString("ec2-46-51-138-106.eu-west-1.compute.amazonaws.com")
-#define baseUrlWithHttp() QString("http://ec2-46-51-138-106.eu-west-1.compute.amazonaws.com/")
+#define PERMANENT_ADDRESS "http://goo.gl/DWBZJ"
 
-WebView::WebView() : UISurface("Explore", _webView = new QWebView, UISurface::Dock)
+#define baseHost() QString("ec2-46-137-71-148.eu-west-1.compute.amazonaws.com")
+#define baseUrlWithHttp() QString("http://ec2-46-137-71-148.eu-west-1.compute.amazonaws.com/")
+
+WebView::WebView(SEntity *objectParent) : UISurface("Explore", _webView = new QWebView, UISurface::Dock)
   {
-  setObjectName("tang");
-  load(baseUrlWithHttp());
+  _objectParent = objectParent;
 
-  connect(_webView, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished()));
+  setObjectName("tang");
+  load(PERMANENT_ADDRESS);
+
+  connect(_webView, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
   }
 
 void WebView::load(const QString& url)
@@ -20,27 +24,41 @@ void WebView::load(const QString& url)
   _webView->load(url);
   }
 
-void WebView::loadObject(const ObjectId &object)
+void WebView::loadObject(const QString &id)
   {
-  QString url = baseUrlWithHttp() + "?current=" + object.toHex();
+  QString url = baseUrlWithHttp() + "?current=" + id;
   _webView->load(url);
   }
 
-void WebView::loadFinished()
+void WebView::loadFinished(bool ok)
   {
+  xAssert(ok);
   QUrl url = _webView->url();
   QString host = url.host();
   QString base(baseHost());
   if(host.right(base.length()) == base && url.hasQueryItem("current"))
     {
     QByteArray idData = QByteArray::fromHex(url.queryItemValue("current").toAscii());
-    if(idData.length() == 16)
+
+    SEntity *objectParent = _objectParent.entity();
+    if(idData.length() == 16 && objectParent)
       {
-      ObjectId id(idData);
-      emit objectChanged(id);
+      Object *object = 0;
+
+      // switch on object type?
+      Area *area = objectParent->addChild<Area>("");
+      object = area;
+
+      if(object)
+        {
+        object->setName(idData.toHex());
+        _currentObject = object;
+
+        emit objectChanged(object);
+        }
       }
+
     }
-  emit objectChanged(ObjectId());
   }
 
 void WebView::updateArea()

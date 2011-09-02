@@ -20,6 +20,7 @@
 #include "3D/GCShader.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/Renderable/GCCuboid.h"
+#include "object.h"
 
 Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
     _app(app),
@@ -116,7 +117,7 @@ void Viewport::onTreeChange(const SChange *c)
     }
   }
 
-void Viewport::setObject(const ObjectId &id)
+void Viewport::setObject(Object *id)
   {
   }
 
@@ -144,6 +145,7 @@ void Viewport::resizeGL( int w, int h )
 
 void Viewport::paintGL()
   {
+  if(_db.isValid())
   _renderer.clear();
   foreach(GCRenderToScreen *sc, _screenRenderers)
     {

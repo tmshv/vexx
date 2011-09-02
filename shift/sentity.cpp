@@ -160,12 +160,11 @@ void SEntity::informDirtyObservers(SProperty *prop)
     {
     if(obs.mode == ObserverStruct::Dirty)
       {
-      ((SDirtyObserver*)obs.observer)->onPropertyDirtied(prop);
-      database()->currentBlockObserverList() << obs.observer;
+      SDirtyObserver *observer = ((SDirtyObserver*)obs.observer);
+      observer->onPropertyDirtied(prop);
+      database()->currentBlockObserverList() << observer;
       }
     }
-
-  // todo: maybe inform up the tree?
   }
 
 void SEntity::informTreeObservers(const SChange *event)
@@ -175,8 +174,9 @@ void SEntity::informTreeObservers(const SChange *event)
     {
     if(obs.mode == ObserverStruct::Tree)
       {
-      ((STreeObserver*)obs.observer)->onTreeChange(event);
-      database()->currentBlockObserverList() << obs.observer;
+      STreeObserver *observer = ((STreeObserver*)obs.observer);
+      observer->onTreeChange(event);
+      database()->currentBlockObserverList() << observer;
       }
     }
 
@@ -194,8 +194,9 @@ void SEntity::informConnectionObservers(const SChange *event)
     {
     if(obs.mode == ObserverStruct::Connection)
       {
-      ((SConnectionObserver*)obs.observer)->onConnectionChange(event);
-      database()->currentBlockObserverList() << obs.observer;
+      SConnectionObserver *observer = ((SConnectionObserver*)obs.observer);
+      observer->onConnectionChange(event);
+      database()->currentBlockObserverList() << observer;
       }
     }
   }

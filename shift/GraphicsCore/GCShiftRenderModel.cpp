@@ -69,15 +69,18 @@ void GCShiftRenderModel::resetIterator(XAbstractRenderModel::Iterator *it) const
   slIt->reset();
   }
 
+void GCShiftRenderModel::actOnChanges()
+  {
+  // only called if a change was triggered, so no need to test.
+  update(TreeChange);
+  }
+
 void GCShiftRenderModel::onConnectionChange(const SChange *)
   {
-  update(TreeChange);
   }
 
 void GCShiftRenderModel::onTreeChange(const SChange *c)
   {
-  update(TreeChange);
-
   const SPropertyContainer::TreeChange *t = c->castTo<SPropertyContainer::TreeChange>();
   if(t)
     {

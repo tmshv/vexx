@@ -17,31 +17,42 @@ int main( int argc, char **argv )
   app.load("UI");
   app.load("script");
 
-  Application envApp;
-
-  WebView *webData = new WebView();
-
   APlugin<ScPlugin> script(app, "script");
-  if(script.isValid())
+  if(!script.isValid())
     {
-    script->registerScriptGlobal(webData);
+    return EXIT_FAILURE;
     }
 
   APlugin<UIPlugin> ui(app, "ui");
-  if(ui.isValid())
+  if(!ui.isValid())
     {
-    APlugin<SPlugin> db(app, "db");
-    if(db.isValid())
-      {
-      initiateGraphicsCore(&db->db());
-      ui->addSurface(new Viewport(&envApp, *db));
-      }
-    ui->addSurface(webData);
-
-    connect(webData, SIGNAL(objectChanged(ObjectId)), vp, SLOT(setObject))
-
-    ui->show();
+    return EXIT_FAILURE;
     }
+
+  APlugin<SPlugin> db(app, "db");
+  if(!db.isValid())
+    {
+    return EXIT_FAILURE;
+    }
+
+  initiateGraphicsCore(&db->db());
+
+
+  Application envApp;
+
+  SEntity *objectParent = &db->db().document;
+
+  WebView *webData = new WebView(objectParent);
+  script->registerScriptGlobal(webData);
+
+  Viewport *vp = new Viewport(&envApp, *db);
+  ui->addSurface(vp);
+
+  QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));
+
+  ui->addSurface(webData);
+
+  ui->show();
 
   return app.execute();
   }

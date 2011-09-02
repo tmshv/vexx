@@ -101,7 +101,7 @@ private:
       Connection
       };
     xuint8 mode;
-    SObserver *observer;
+    void *observer;
     };
   XList<ObserverStruct> _observers;
   };

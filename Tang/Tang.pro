@@ -20,7 +20,7 @@ SOURCES += main.cpp \
     assettree.cpp \
     application.cpp \
     webview.cpp \
-    objectid.cpp
+    object.cpp
 
 LIBS += -lEksCore \
     -lEks3D \
@@ -49,7 +49,7 @@ HEADERS += Interface.h \
     assettree.h \
     application.h \
     webview.h \
-    objectid.h
+    object.h
 
 FORMS += NewItemDialog.ui
 

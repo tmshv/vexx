@@ -10,6 +10,9 @@
 typedef Eigen::Affine3f XTransform;
 typedef Eigen::Projective3f XComplexTransform;
 
+Q_DECLARE_METATYPE(XTransform)
+Q_DECLARE_METATYPE(XComplexTransform)
+
 namespace XTransformUtilities
 {
 XTransform EKS3D_EXPORT lookAt(const XVector3D &eye, const XVector3D &aim, const XVector3D &up);

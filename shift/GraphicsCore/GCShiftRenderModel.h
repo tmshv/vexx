@@ -54,6 +54,7 @@ public:
 
   virtual void resetIterator(XAbstractRenderModel::Iterator *) const;
 
+  void actOnChanges();
   void onConnectionChange(const SChange *);
   void onTreeChange(const SChange *);
   };

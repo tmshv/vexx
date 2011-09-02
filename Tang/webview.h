@@ -2,31 +2,36 @@
 #define WEBVIEW_H
 
 #include "UISurface.h"
+#include "sentityweakpointer.h"
 
-class ObjectId;
+class Object;
 class QWebView;
 
 class WebView : public QObject, public UISurface
   {
   Q_OBJECT
 
+XProperties:
+  XROProperty(Object *, currentObject);
+
 public:
-  WebView();
+  WebView(SEntity *objectParent);
 
 public slots:
-  void loadObject(const ObjectId &object);
+  void loadObject(const QString& id);
   void load(const QString& url);
 
   void updateArea();
 
 signals:
-  void objectChanged(const ObjectId &object);
+  void objectChanged(Object *object);
 
 private slots:
-  void loadFinished();
+  void loadFinished(bool ok);
 
 private:
   QWebView *_webView;
+  SEntityWeakPointer _objectParent;
   };
 
 #endif // WEBVIEW_H

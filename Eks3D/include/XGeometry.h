@@ -87,6 +87,7 @@ private:
     BufferType _type;
     };
 X_DECLARE_SERIALISABLE_METATYPE(XGeometry);
+Q_DECLARE_METATYPE(XGeometry)
 
 class EKS3D_EXPORT XAbstractGeometry
     {

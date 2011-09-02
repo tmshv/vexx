@@ -20,6 +20,8 @@ class GCRenderToScreen;
 
 class EnvironmentEntity;
 
+class Object;
+
 class Viewport : public X3DCanvas, public UISurface, STreeObserver
   {
   Q_OBJECT
@@ -27,6 +29,9 @@ class Viewport : public X3DCanvas, public UISurface, STreeObserver
 public:
   Viewport(Application *env, SPlugin &);
   ~Viewport();
+
+public slots:
+  void setObject(Object *id);
 
 protected:
   void initializeGL();
@@ -39,7 +44,27 @@ protected:
   QTimer *_timer;
   Application *_app;
 
-  SAppDatabase *_db;
+  SAppDatabase *db()
+    {
+    SEntity *ent = _db->entity();
+    if(ent)
+      {
+      return ent->castTo<SAppDatabase>();
+      }
+    return 0;
+    }
+
+  const SAppDatabase *db() const
+    {
+    const SEntity *ent = _db->entity();
+    if(ent)
+      {
+      return ent->castTo<SAppDatabase>();
+      }
+    return 0;
+    }
+
+  SEntityWeakPointer _db;
   QList<GCRenderToScreen*> _screenRenderers;
   SEntityWeakPointer _viewport;
 
