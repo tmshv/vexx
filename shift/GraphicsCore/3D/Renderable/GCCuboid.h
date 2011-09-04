@@ -3,6 +3,7 @@
 
 #include "sentity.h"
 #include "3D/GCGeometry.h"
+#include "3D/GCTransform.h"
 #include "3D/Manipulators/GCManipulator.h"
 
 class GRAPHICSCORE_EXPORT GCCuboid : public SEntity, public GCManipulatable
@@ -18,7 +19,7 @@ public:
 
   GCGeometry geometry;
 
-  void addManipulators(SPropertyArray *);
+  void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
 #endif // GCCUBOID_H

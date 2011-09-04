@@ -5,9 +5,8 @@
 #include "sbasepointerproperties.h"
 #include "GCTransform.h"
 #include "GCGeometry.h"
-#include "3D/Manipulators/GCManipulator.h"
 
-class GRAPHICSCORE_EXPORT GCGeometryTransform : public GCTransform, public GCManipulatable
+class GRAPHICSCORE_EXPORT GCGeometryTransform : public GCTransform
   {
   S_PROPERTY(GCGeometryTransform, GCTransform, 0)
 public:
@@ -17,7 +16,7 @@ public:
 
   void render(XRenderer* r) const;
 
-  void addManipulators(SPropertyArray *);
+  virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
 S_TYPED_POINTER_TYPE(GCGeometryTransformPointer, GCGeometryTransform)

@@ -34,7 +34,7 @@ bool XTriangle::liesOn( const XVector3D &p ) const
 
     if( u != u || v != v )
         {
-        qDebug() << "During Triangular collision a nan was encountered.";
+        return false;
         }
 
     return ( u >= 0.0f ) && ( v >= 0.0f ) && ( u + v <= 1.0f );

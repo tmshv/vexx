@@ -58,7 +58,7 @@ SPropertyInformation *GCManipulatableScene::createTypeInformation()
   }
 
 
-GCManipulatableScene::GCManipulatableScene() : _nextController(0), _currentManipulator(0)
+GCManipulatableScene::GCManipulatableScene() : _currentManipulator(0)
   {
   }
 
@@ -104,51 +104,62 @@ void GCManipulatableScene::render(XRenderer *x) const
 
 GCManipulatableScene::UsedFlags GCManipulatableScene::mouseEvent(const MouseEvent &e)
   {
-  float chosenDistance = HUGE_VAL;
-  GCVisualManipulator *chosenManip = 0;
+  GCVisualManipulator::MouseMoveEvent manipEv;
+  manipEv.cam = activeCamera();
 
-  GCCamera *cam = activeCamera();
+  manipEv.widgetPoint = e.point;
 
-  XVector3D direction = cam->worldSpaceFromScreenSpace(e.point.x(), e.point.y());
-  direction -= cam->transform().translation();
-  direction.normalize();
+  manipEv.direction = manipEv.cam->worldSpaceFromScreenSpace(e.point.x(), e.point.y());
+  manipEv.direction -= manipEv.cam->transform().translation();
+  manipEv.direction.normalize();
 
-  for(GCVisualManipulator* m = manipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
+  if(!_currentManipulator)
     {
-    float tempDistance = HUGE_VAL;
-    GCVisualManipulator *clicked = 0;
-    if(m->hitTest(e.point, cam, direction, &tempDistance, &clicked))
+    float chosenDistance = HUGE_VAL;
+    GCVisualManipulator *chosenManip = 0;
+
+    for(GCVisualManipulator* m = manipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
       {
-      if(tempDistance < chosenDistance)
+      float tempDistance = HUGE_VAL;
+      GCVisualManipulator *clicked = 0;
+      if(m->hitTest(e.point, manipEv.cam, manipEv.direction, &tempDistance, &clicked))
         {
-        chosenManip = clicked;
-        xAssert(chosenManip);
+        if(tempDistance < chosenDistance)
+          {
+          chosenManip = clicked;
+          chosenDistance = tempDistance;
+          xAssert(chosenManip);
+          }
         }
       }
+    _currentManipulator = chosenManip;
     }
 
-  if(chosenManip)
+  if(_currentManipulator)
     {
     if(e.type == XAbstractCanvasController::Press)
       {
-      chosenManip->onMouseClick(e.point, cam, direction);
+      _currentManipulator->onMouseClick(manipEv);
       }
     else if(e.type == XAbstractCanvasController::Release)
       {
-      chosenManip->onMouseRelease(e.point, cam, direction);
+      _currentManipulator->onMouseRelease(manipEv);
+      _currentManipulator = 0;
       }
     else if(e.type == XAbstractCanvasController::DoubleClick)
       {
-      chosenManip->onMouseDoubleClick(e.point, cam, direction);
+      _currentManipulator->onMouseDoubleClick(manipEv);
+      // reset current manip?
       }
     else if(e.type == XAbstractCanvasController::Move)
       {
-      XVector3D lastDirection = cam->worldSpaceFromScreenSpace(e.lastPoint.x(), e.lastPoint.y());
-      lastDirection -= cam->transform().translation();
-      lastDirection.normalize();
+      manipEv.lastDirection = manipEv.cam->worldSpaceFromScreenSpace(e.lastPoint.x(), e.lastPoint.y());
+      manipEv.lastDirection -= manipEv.cam->transform().translation();
+      manipEv.lastDirection.normalize();
 
+      manipEv.lastWidgetPoint = e.lastPoint;
 
-      chosenManip->onMouseDrag(e.point, e.lastPoint, cam, direction, lastDirection);
+      _currentManipulator->onMouseDrag(manipEv);
       }
 
     return Used|NeedsUpdate;

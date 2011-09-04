@@ -41,9 +41,10 @@ void GCShadingGroup::render(XRenderer *r) const
     }
   }
 
-void GCShadingGroup::addManipulators(SPropertyArray *a)
+void GCShadingGroup::addManipulators(SPropertyArray *a, const GCTransform *tr)
   {
-  a->add<GCButtonManipulator>();
+  xAssert(tr == 0);
+  //a->add<GCButtonManipulator>();
 
   // todo, probably dont do this...!
   for(GCGeometryTransformPointer* geoPtr = geometry.firstChild<GCGeometryTransformPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryTransformPointer>())

@@ -28,7 +28,6 @@ class GRAPHICSCORE_EXPORT GCManipulatableScene : public GCScene
   S_ENTITY(GCManipulatableScene, GCScene, 0);
 
 XProperties:
-  XProperty(XAbstractCanvasController *, nextController, setNextController);
   XROProperty(GCVisualManipulator *, currentManipulator);
 
 public:

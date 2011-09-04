@@ -2,6 +2,8 @@
 #define GCDISTANCEMANIPULATOR_H
 
 #include "GCManipulator.h"
+#include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 
 class GCDistanceManipulator : public GCLinearDragManipulator
   {
@@ -10,11 +12,11 @@ class GCDistanceManipulator : public GCLinearDragManipulator
 public:
   GCDistanceManipulator();
 
-  void onDrag(const QPoint &oldWidgetSpacePoint,
-              const QPoint &widgetSpacePoint,
-              const XVector3D &cameraPosition,
-              const XVector3D &oldClickDirection,
-              const XVector3D &clickDirection);
+  FloatProperty scaleFactor;
+
+  void addDriven(SProperty *in);
+
+  void onDrag(const MouseMoveEvent &);
   };
 
 #endif // GCDISTANCEMANIPULATOR_H

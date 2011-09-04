@@ -3,18 +3,19 @@
 
 #include "GCGlobal.h"
 #include "spropertycontainer.h"
-#include "sbaseproperties.h"
-#include "3D/GCTransform.h"
-#include "3D/GCCamera.h"
+#include "sbasepointerproperties.h"
+#include "GCBaseProperties.h"
 
 class XRenderer;
 class QPainter;
+class GCTransform;
+class GCCamera;
 
 class GRAPHICSCORE_EXPORT GCManipulatable : public SInterfaceBase
   {
-  S_INTERFACE_TYPE(ManipulatableInterface)
+  S_INTERFACE_TYPE(ManipulatableInterface)  
 public:
-  virtual void addManipulators(SPropertyArray *) = 0;
+  virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0) = 0;
   };
 
 class GRAPHICSCORE_EXPORT GCVisualManipulator : public SPropertyContainer
@@ -28,15 +29,20 @@ public:
     virtual ~Delegate() { }
 
     virtual bool hitTest(
-      GCVisualManipulator *toRender,
+      const GCVisualManipulator *toRender,
       const QPoint &widgetSpacePoint,
       const GCCamera *camera,
       const XVector3D &clickDirection, // in world space
       float *distance) = 0;
 
-    virtual void render(GCVisualManipulator *toRender,
+    virtual void render(const GCVisualManipulator *toRender,
                         const GCCamera *camera,
                         XRenderer *) = 0;
+
+    virtual XVector3D focalPoint(const GCVisualManipulator *toRender) const
+      {
+      return toRender->worldCentre().translation();
+      }
     };
 
 XProperties:
@@ -48,6 +54,10 @@ public:
   BoolProperty show;
   TransformProperty worldCentre;
   FloatProperty manipulatorsDisplayScale;
+
+  PointerArray driven;
+
+  virtual XVector3D focalPoint() const;
   
   virtual bool hitTest(
     const QPoint &widgetSpacePoint,
@@ -56,12 +66,25 @@ public:
     float *distance,
     GCVisualManipulator **clicked);
     
-  virtual void render(const GCCamera *camera, XRenderer *);
+  virtual void render(const GCCamera *camera, XRenderer *) const;
   
-  virtual void onMouseClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction) = 0;
-  virtual void onMouseDoubleClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction) = 0;
-  virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint, const GCCamera *cam, const XVector3D &lastDirection, const XVector3D &direction) = 0;
-  virtual void onMouseRelease(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction) = 0;
+  struct MouseEvent
+    {
+    QPoint widgetPoint;
+    const GCCamera *cam;
+    XVector3D direction;
+    };
+
+  struct MouseMoveEvent : public MouseEvent
+    {
+    QPoint lastWidgetPoint;
+    XVector3D lastDirection;
+    };
+
+  virtual void onMouseClick(const MouseEvent &) = 0;
+  virtual void onMouseDoubleClick(const MouseEvent &) = 0;
+  virtual void onMouseDrag(const MouseMoveEvent &) = 0;
+  virtual void onMouseRelease(const MouseEvent &) = 0;
   };
   
 class GRAPHICSCORE_EXPORT GCVisualCompoundManipulator : public GCVisualManipulator
@@ -82,10 +105,10 @@ public:
 
   virtual void render(const GCCamera *camera, XRenderer *);
 
-  virtual void onMouseClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDoubleClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint, const GCCamera *cam, const XVector3D &lastDirection, const XVector3D &direction);
-  virtual void onMouseRelease(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
+  virtual void onMouseClick(const MouseEvent &);
+  virtual void onMouseDoubleClick(const MouseEvent &);
+  virtual void onMouseDrag(const MouseMoveEvent &);
+  virtual void onMouseRelease(const MouseEvent &);
   };
 
 
@@ -96,17 +119,12 @@ class GRAPHICSCORE_EXPORT GCVisualDragManipulator : public GCVisualManipulator
 public:
   GCVisualDragManipulator();
   
-  virtual void onDrag(
-    const QPoint &oldWidgetSpacePoint,
-    const QPoint &widgetSpacePoint,
-    const XVector3D &cameraPosition,
-    const XVector3D &oldClickDirection, // in world space
-    const XVector3D &clickDirection) = 0; // in world space
+  virtual void onDrag(const MouseMoveEvent &) = 0;
 
-  virtual void onMouseClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDoubleClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint, const GCCamera *cam, const XVector3D &lastDirection, const XVector3D &direction);
-  virtual void onMouseRelease(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
+  virtual void onMouseClick(const MouseEvent &);
+  virtual void onMouseDoubleClick(const MouseEvent &);
+  virtual void onMouseDrag(const MouseMoveEvent &);
+  virtual void onMouseRelease(const MouseEvent &);
   };
 
 class GRAPHICSCORE_EXPORT GCVisualClickManipulator : public GCVisualManipulator
@@ -118,10 +136,10 @@ public:
 
   virtual void onClick() = 0;
 
-  virtual void onMouseClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDoubleClick(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
-  virtual void onMouseDrag(QPoint lastWidgetPoint, QPoint widgetPoint, const GCCamera *cam, const XVector3D &lastDirection, const XVector3D &direction);
-  virtual void onMouseRelease(QPoint widgetPoint, const GCCamera *cam, const XVector3D &direction);
+  virtual void onMouseClick(const MouseEvent &);
+  virtual void onMouseDoubleClick(const MouseEvent &);
+  virtual void onMouseDrag(const MouseMoveEvent &);
+  virtual void onMouseRelease(const MouseEvent &);
   };
 
 class GRAPHICSCORE_EXPORT GCLinearDragManipulator : public GCVisualDragManipulator
@@ -141,17 +159,17 @@ public:
   EnumProperty lockMode;
   Vector3DProperty lockDirection; // normal for planar, direction for linear
 
+  // displacement moved from click point in world space
+  Vector3DProperty absoluteDisplacement;
+  // displacement moved from last drag point in world space
+  Vector3DProperty relativeDisplacement;
+
   // distance moved from click point in world space
   FloatProperty absoluteDistance;
   // distance moved last drag in world space
   FloatProperty relativeDistance;
-  
-  virtual void onDrag(
-    const QPoint &oldWidgetSpacePoint,
-    const QPoint &widgetSpacePoint,
-    const XVector3D &cameraPosition,
-    const XVector3D &oldClickDirection,
-    const XVector3D &clickDirection) = 0;
+
+  void onDrag(const MouseMoveEvent &);
   };
 
 #endif // GCMANIPULATOR_H

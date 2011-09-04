@@ -5,11 +5,10 @@
 #include "sentity.h"
 #include "XTransform.h"
 #include "sbaseproperties.h"
+#include "3D/Manipulators/GCManipulator.h"
+#include "GCBaseProperties.h"
 
-DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, TransformProperty, XTransform, XTransform());
-DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, ComplexTransformProperty, XComplexTransform, XComplexTransform());
-
-class GRAPHICSCORE_EXPORT GCTransform : public SEntity
+class GRAPHICSCORE_EXPORT GCTransform : public SEntity, public GCManipulatable
   {
   S_ENTITY(GCTransform, SEntity, 0)
 
@@ -17,6 +16,8 @@ public:
   GCTransform();
 
   TransformProperty transform;
+
+  virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
 #endif // GCTRANSFORM3D_H

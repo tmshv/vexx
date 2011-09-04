@@ -119,7 +119,20 @@ GCCuboid::GCCuboid()
   {
   }
 
-void GCCuboid::addManipulators(SPropertyArray *a)
+void GCCuboid::addManipulators(SPropertyArray *a, const GCTransform *tr)
   {
-  a->add<GCDistanceManipulator>();
+  GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+  manip->lockDirection = XVector3D(1.0f, 0.0f, 0.0f);
+  manip->lockMode = GCDistanceManipulator::Linear;
+  manip->scaleFactor = 0.5f;
+
+  manip->driven.addPointer(&width);
+
+  manip->connect(&width);
+
+  if(tr)
+    {
+    tr->transform.connect(&manip->worldCentre);
+    }
   }

@@ -1,4 +1,5 @@
 #include "GCButtonManipulator.h"
+#include "3D/GCCamera.h"
 #include "XModeller.h"
 #include "XRenderer.h"
 #include "XTransform.h"
@@ -21,7 +22,7 @@ public:
     }
 
   virtual bool hitTest(
-      GCVisualManipulator *toRender,
+      const GCVisualManipulator *toRender,
       const QPoint &widgetSpacePoint,
       const GCCamera *camera,
       const XVector3D &clickDirection, // in world space
@@ -47,7 +48,7 @@ public:
     return false;
     }
 
-  virtual void render(GCVisualManipulator *toRender,
+  virtual void render(const GCVisualManipulator *toRender,
       const GCCamera *camera,
       XRenderer *r)
     {

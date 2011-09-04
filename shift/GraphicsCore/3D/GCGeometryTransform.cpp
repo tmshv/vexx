@@ -30,9 +30,10 @@ void GCGeometryTransform::render(XRenderer* r) const
     }
   }
 
-void GCGeometryTransform::addManipulators(SPropertyArray *a)
+void GCGeometryTransform::addManipulators(SPropertyArray *a, const GCTransform *tr)
   {
-  // todo: add transform manipulators, and probably the shader manips, rather than it calling us?
+  xAssert(tr == 0);
+  GCTransform::addManipulators(a, tr);
 
   const GCGeometry *geo = geometry();
   if(geo)
@@ -41,7 +42,7 @@ void GCGeometryTransform::addManipulators(SPropertyArray *a)
     GCManipulatable *manipulatorInterface = geoOwner->interface<GCManipulatable>();
     if(manipulatorInterface)
       {
-      manipulatorInterface->addManipulators(a);
+      manipulatorInterface->addManipulators(a, this);
       }
     }
   }

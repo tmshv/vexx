@@ -22,6 +22,9 @@ public:
   void transform(const XTransform &);
 
   XVector3D sample(float) const;
+
+  // returns t for this line, for the closest point on that line
+  float closestPointOn(const XLine &l) const;
   };
 
 inline XLine operator*( const XTransform &tx, const XLine &line )

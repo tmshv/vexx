@@ -142,6 +142,21 @@ public:
   SProperty *output() const {return _output;}
   SProperty *nextOutput() const {return _nextOutput;}
 
+  template <typename T> T *output() const
+    {
+    SProperty *p = output();
+    while(p)
+      {
+      T *t = p->castTo<T>();
+      if(t)
+        {
+        return t;
+        }
+      p = p->nextOutput();
+      }
+    return 0;
+    }
+
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
   void disconnect(SProperty *) const;

@@ -107,7 +107,7 @@ public:
 
 namespace XMeshUtilities
 {
-bool intersect( QString semantic, const XLine &ray, const XGeometry &geo, XVector3DList &pos, XList <unsigned int> &tris );
+EKS3D_EXPORT bool intersect( QString semantic, const XLine &ray, const XGeometry &geo, XVector3DList *pos=0, XList <unsigned int> *tris=0 );
 };
 
 #endif // XGEOMETRY_H

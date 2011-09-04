@@ -430,9 +430,18 @@ namespace XMeshUtilities
 bool intersect( QString semantic,
                 const XLine &ray,
                 const XGeometry &geo,
-                XVector3DList &posOut,
-                XList <unsigned int> &triOut )
+                XVector3DList *posOut,
+                XList <unsigned int> *triOut )
   {
+  if(posOut)
+    {
+    posOut->clear();
+    }
+  if(triOut)
+    {
+    triOut->clear();
+    }
+
   xAssert( geo.attributes3D().contains(semantic) );
   const XVector<XVector3D> &positions = geo.attributes3D()[semantic];
   const XVector<unsigned int> &tris = geo.triangles();
@@ -448,11 +457,21 @@ bool intersect( QString semantic,
     XVector3D pos;
     if( XTriangle(a, b, c).intersects(ray, pos) )
       {
-      posOut << pos;
-      triOut << index;
+      if(posOut)
+        {
+        *posOut << pos;
+        if(triOut)
+          {
+          *triOut << index;
+          }
+        }
+      else
+        {
+        return true;
+        }
       }
     }
 
-  return posOut.size() > 0;
+  return posOut ? posOut->size() > 0 : false;
   }
 }
