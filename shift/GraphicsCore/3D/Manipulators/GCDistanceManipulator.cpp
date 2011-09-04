@@ -29,6 +29,8 @@ public:
     XLine l(camTrans, clickDirection, XLine::PointAndDirection);
 
     const XTransform &wC = toRender->worldCentre();
+    wc.translate(toRender->ab)
+
     XMatrix4x4 t = wC.matrix();
     XMatrix4x4 tInv = t.inverse();
     XTransform lineTransform(tInv);
