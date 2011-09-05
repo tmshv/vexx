@@ -1,9 +1,12 @@
 import QtQuick 1.0
 
 Item {
+  property string title: "Node"
+
   function move(dx, dy) {
     node.x += dx
     node.y += dy
+    print("Move " + dx + " " + dy)
   }
   Rectangle {
     id: node
@@ -14,6 +17,15 @@ Item {
     color: "red"
     border.color: "blue"
     radius: 4
+
+    MouseArea {
+      anchors.fill: parent
+      hoverEnabled: true
+
+      onEntered: parent.color = "blue"
+      onExited: parent.color = "red"
+    }
+
     Column {
       anchors.margins: 3
       anchors.fill: parent
@@ -26,7 +38,7 @@ Item {
         radius: 3
         Text {
           anchors.centerIn: parent
-          text: "Hello World"
+          text: parent.parent.parent.parent.title
         }
         MouseArea {
           property bool dragging: false
@@ -35,13 +47,14 @@ Item {
           anchors.fill: parent
           onPressed: {
             dragging = true
-            lastX = mouse.x
-            lastY = mouse.y
+            var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
+            lastX = gc.x
+            lastY = gc.y
           }
           onReleased: dragging = false
           onMousePositionChanged: {
-            var gc = mapFromItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
-            print("#" + lastX + " " + lastY)
+            var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
+            print("#" + gc.x + " " + gc.y)
             parent.parent.parent.parent.move(gc.x - lastX, gc.y - lastY)
             lastX = gc.x
             lastY = gc.y
