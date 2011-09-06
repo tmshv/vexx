@@ -29,6 +29,8 @@ SPropertyInformation *GCStandardSurface::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCStandardSurface>("GCStandardSurface", postCreate);
 
+  info->add(&GCStandardSurface::diffuse, "diffuse");
+
   info->add(&GCStandardSurface::vertex, "vertex");
   info->add(&GCStandardSurface::fragment, "fragment");
 

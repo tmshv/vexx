@@ -9,6 +9,12 @@ class GRAPHICSCORE_EXPORT GCStandardSurface : public GCShader
 public:
   GCStandardSurface();
 
+  class Colour : public ColourProperty
+    {
+    };
+
+  Colour diffuse;
+
 protected:
   GCFragmentShaderComponent fragment;
   GCVertexShaderComponent vertex;
