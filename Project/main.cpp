@@ -25,16 +25,22 @@ int main( int argc, char **argv )
   APlugin<ScPlugin> script(app, "script");
   if(script.isValid())
     {
-    script->include("startup.js");
-    script->loadPlugin("ui");
+    ScPlugin *sc = script.plugin();
+    sc->include("startup.js");
+    sc->load();
+    }
 
-
-    APlugin<UIPlugin> ui(app, "ui");
-    if(ui.isValid())
+  app.load("ui");
+  APlugin<UIPlugin> ui(app, "ui");
+  if(ui.isValid())
+    {
+    APlugin<SPlugin> db(app, "db");
+    if(db.isValid())
       {
-      UIPlugin *a = qobject_cast<UIPlugin*>(app.plugin("ui"));
-      a->showX();
+      //initiateGraphicsCore(&db->db());
       }
+
+    ui->show();
     }
 
   return app.execute();

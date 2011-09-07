@@ -25,7 +25,6 @@ HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
     ../XVariant \
-    ../XString \
     ../XSet \
     ../XMap \
     ../XList \
@@ -38,7 +37,6 @@ HEADERS += ../XObject \
     ../XVector4D \
     ../XColour \
     ../XQuaternion \
-    ../XDebug \
     ../XMatrix4x4 \
     ../XMatrix3x3 \
     ../XGenericMatrix \
@@ -131,3 +129,5 @@ HEADERS += ../XObject \
     ../Eigen/src/Core/ArrayWrapper.h \
     ../Eigen/src/Core/ArrayBase.h \
     ../Eigen/src/Core/Array.h
+
+

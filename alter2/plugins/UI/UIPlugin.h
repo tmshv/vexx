@@ -18,7 +18,7 @@ public:
   void removeSurface(QString name);
   void removeSurface(UISurface *s);
 
-  void showX();
+  void show();
 
 signals:
   void aboutToClose();

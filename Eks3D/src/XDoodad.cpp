@@ -3,7 +3,7 @@
 #include "XCuboid.h"
 #include "XRenderer.h"
 #include "XScene.h"
-#include "XDebug"
+#include "QDebug"
 #include "XTransformEvent.h"
 
 XDoodad::XDoodad( ) : XObject( )

@@ -26,7 +26,7 @@ IMPLEMENT_POD_PROPERTY(Vector2DProperty, XVector2D);
 IMPLEMENT_POD_PROPERTY(Vector3DProperty, XVector3D);
 IMPLEMENT_POD_PROPERTY(Vector4DProperty, XVector4D);
 IMPLEMENT_POD_PROPERTY(QuaternionProperty, XQuaternion);
-IMPLEMENT_POD_PROPERTY(StringProperty, XString);
+IMPLEMENT_POD_PROPERTY(StringProperty, QString);
 IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
 IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
 

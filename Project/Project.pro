@@ -1,30 +1,30 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2011-08-21T16:21:20
-#
-#-------------------------------------------------
-
-QT       += core gui xml
-
 TARGET = Project
 TEMPLATE = app
 
 include("../EksCore/GeneralOptions.pri")
 
+QT += opengl \
+    xml \
+    network \
+    script \
+    webkit
+
 SOURCES += main.cpp
 
-HEADERS  +=
-
 LIBS += -lEksCore \
+    -lEks3D \
     -lshift \
     -lalter \
     -lscript \
     -lShiftAlter \
+    -lShiftGraphicsCore \
     -lUI
 
 INCLUDEPATH += ../include \
     $$ROOT/EksCore \
+    $$ROOT/Eks3D/include \
     $$ROOT/Shift \
+    $$ROOT/Shift/GraphicsCore \
     $$ROOT/Alter2 \
     $$ROOT/EksCore \
     $$ROOT/Alter2/Plugins/UI \
@@ -34,3 +34,5 @@ INCLUDEPATH += ../include \
 OTHER_FILES += \
     startup.js \
     Project.js
+
+

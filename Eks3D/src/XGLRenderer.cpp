@@ -7,7 +7,7 @@
 #include "XMap"
 #include "QVariant"
 #include "QGLShaderProgram"
-#include "XDebug"
+#include "QDebug"
 #include "XShader.h"
 #include "QFile"
 

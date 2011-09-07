@@ -4,7 +4,7 @@
 #include "QSlider"
 #include "math.h"
 
-#include "XDebug"
+#include "QDebug"
 
 XFloatWidget::XFloatWidget( qreal val, QWidget *parent ) : QWidget( parent ),
         _layout( new QHBoxLayout( this ) ),

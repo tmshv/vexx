@@ -1,7 +1,7 @@
 #include "QFormLayout"
 #include "QWidget"
 #include "spropertydefaultui.h"
-#include "XString"
+#include "QString"
 #include "sentityui.h"
 #include "sentity.h"
 #include "sproperty.h"

@@ -145,6 +145,7 @@ void ScPlugin::hideDebugger()
 bool ScPlugin::loadPlugin(const QString &plugin)
   {
   ScProfileFunction
+  xAssert(core());
   return core()->load(plugin);
   }
 

@@ -3,7 +3,7 @@
 #include "XRenderer.h"
 #include "XCamera.h"
 
-#include "XDebug"
+#include "QDebug"
 
 XScene::XScene( XRenderer *renderer, XCamera *cam ) : _renderer( renderer ), _camera( cam ), _root( new XDoodad( ) )
     {

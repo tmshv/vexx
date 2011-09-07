@@ -4,6 +4,9 @@
 #define QT_USE_FAST_CONCATENATION
 #define QT_USE_FAST_OPERATOR_PLUS
 
+#ifdef _MSC_VER
+#include "stdexcept"
+#endif
 #include "QtGlobal"
 #include "cstdlib"
 #include "cmath"

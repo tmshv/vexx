@@ -1,3 +1,4 @@
+#if 0
 #ifndef XOBJECT_H
 #define XOBJECT_H
 
@@ -26,4 +27,5 @@ template <typename T>inline T xobject_cast( XObject *obj )
   return 0;
   }
 
+#endif
 #endif

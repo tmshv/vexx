@@ -3,7 +3,7 @@
 #include "QGLContext"
 #include "QImage"
 
-#include "XDebug"
+#include "QDebug"
 
 XAbstractTexture::~XAbstractTexture()
   {

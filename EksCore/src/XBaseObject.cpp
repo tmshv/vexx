@@ -1,7 +1,8 @@
+#if 0
 #include "XBaseObject"
 #include "XObject"
 #include "XChildEvent"
-#include "XDebug"
+#include "QDebug"
 
 XBaseObject::XBaseObject( ) : _parent( 0 ), _sender( 0 )
     {
@@ -81,3 +82,4 @@ void XBaseObject::removeChild( XBaseObject *in )
     in->_parent = 0;
     _baseChildren.removeAll( in );
     }
+#endif

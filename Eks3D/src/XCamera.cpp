@@ -1,6 +1,6 @@
 #include "XCamera.h"
 #include "XScene.h"
-#include "XDebug"
+#include "QDebug"
 
 XCamera::XCamera( XVector3D position, XVector3D aimPosition, XVector3D up )
         : _position( position ), _aimPosition( aimPosition ), _upDirection( up ),

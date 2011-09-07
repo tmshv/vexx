@@ -1,8 +1,0 @@
-#ifndef XSTRING_H
-#define XSTRING_H
-
-#include "QString"
-
-typedef QString XString;
-
-#endif

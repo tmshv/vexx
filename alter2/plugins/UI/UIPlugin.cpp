@@ -114,7 +114,7 @@ void UIPlugin::load()
     }
   }
 
-void UIPlugin::showX()
+void UIPlugin::show()
   {
   _priv->restoreStateFromDB();
   _priv->show();
