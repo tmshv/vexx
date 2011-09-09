@@ -94,6 +94,7 @@ int ACore::execute()
     {
     xAssertFail();
     }
+  return EXIT_FAILURE;
   }
 
 bool ACore::isLoaded( const QString &name ) const

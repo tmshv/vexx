@@ -302,7 +302,7 @@ DenseBase<Derived>::LinSpaced(const Scalar& low, const Scalar& high)
 /** \returns true if all coefficients in this matrix are approximately equal to \a value, to within precision \a prec */
 template<typename Derived>
 bool DenseBase<Derived>::isApproxToConstant
-(const Scalar& value, RealScalar prec) const
+(const Scalar& value, const RealScalar &prec) const
 {
   for(Index j = 0; j < cols(); ++j)
     for(Index i = 0; i < rows(); ++i)
@@ -316,7 +316,7 @@ bool DenseBase<Derived>::isApproxToConstant
   * \returns true if all coefficients in this matrix are approximately equal to \a value, to within precision \a prec */
 template<typename Derived>
 bool DenseBase<Derived>::isConstant
-(const Scalar& value, RealScalar prec) const
+(const Scalar& value, const RealScalar &prec) const
 {
   return isApproxToConstant(value, prec);
 }
@@ -468,7 +468,7 @@ DenseBase<Derived>::Zero()
   * \sa class CwiseNullaryOp, Zero()
   */
 template<typename Derived>
-bool DenseBase<Derived>::isZero(RealScalar prec) const
+bool DenseBase<Derived>::isZero(const RealScalar &prec) const
 {
   for(Index j = 0; j < cols(); ++j)
     for(Index i = 0; i < rows(); ++i)
@@ -598,7 +598,7 @@ DenseBase<Derived>::Ones()
   */
 template<typename Derived>
 bool DenseBase<Derived>::isOnes
-(RealScalar prec) const
+(const RealScalar &prec) const
 {
   return isApproxToConstant(Scalar(1), prec);
 }

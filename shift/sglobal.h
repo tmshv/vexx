@@ -1,7 +1,6 @@
 #ifndef SGLOBAL_H
 #define SGLOBAL_H
 
-#include <QtCore/qglobal.h>
 #include "XGlobal"
 #include "XList"
 #include "XProfiler"

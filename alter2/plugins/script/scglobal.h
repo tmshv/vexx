@@ -1,9 +1,9 @@
 #ifndef SCRIPT_GLOBAL_H
 #define SCRIPT_GLOBAL_H
 
+#include "sglobal.h"
 #include <QtCore/qglobal.h>
 #include "XProfiler"
-#include "sglobal.h"
 
 #if defined(SCRIPT_BUILD)
 # define SCRIPT_EXPORT Q_DECL_EXPORT

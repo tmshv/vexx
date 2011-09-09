@@ -1,6 +1,7 @@
 #ifndef SPROPERTYDEFAULTUI_H
 #define SPROPERTYDEFAULTUI_H
 
+#include "sglobal.h"
 #include "QCheckBox"
 #include "QSpinBox"
 #include "QLineEdit"
@@ -251,7 +252,7 @@ public:
     syncGUI();
     }
 private slots:
-  virtual void guiChanged( XColour col ) { propertyValue()->assign(col); }
+  virtual void guiChanged( const XColour &col ) { propertyValue()->assign(col); }
 
 private:
   void syncGUI() { setColour( propertyValue()->value() ); }

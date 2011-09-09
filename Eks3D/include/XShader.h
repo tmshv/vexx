@@ -10,7 +10,6 @@
 #include "XVector2D"
 #include "XVector3D"
 #include "XVector4D"
-#include "XMap"
 #include "XObject"
 #include "QGenericMatrix"
 #include "QVariant"
@@ -150,7 +149,7 @@ public:
 
   XShaderVariable *getVariable( QString );
 
-  XMap <QString, XShaderVariable*> variables() const;
+  QHash <QString, XShaderVariable*> variables() const;
 
   void prepareInternal( XRenderer * ) const;
   XAbstractShader *internal() const;
@@ -165,7 +164,7 @@ public:
   void restore( QDataStream &, SerialisationMode );
 
 private:
-  XMap <QString, XShaderVariable*> _variables;
+  QHash <QString, XShaderVariable*> _variables;
   mutable XAbstractShader *_internal;
   int _type;
   };

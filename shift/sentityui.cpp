@@ -1,8 +1,8 @@
+#include "sentityui.h"
 #include "QFormLayout"
 #include "QWidget"
 #include "spropertydefaultui.h"
 #include "QString"
-#include "sentityui.h"
 #include "sentity.h"
 #include "sproperty.h"
 
@@ -28,9 +28,9 @@ SEntityUI::SEntityUI(xuint32 options)
     }
   }
 
-xuint64 SEntityUI::widgetType(const SProperty *property) const
+xuint64 SEntityUI::widgetType(const SProperty *p) const
   {
-  const SPropertyInformation *actualType(property->staticTypeInformation());
+  const SPropertyInformation *actualType(p->staticTypeInformation());
   if(_uiTypes.contains(actualType))
     {
     return _uiTypes[actualType];

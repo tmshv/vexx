@@ -6,7 +6,7 @@
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform)
 
-void computeView(const SPropertyInstanceInformation *info, SPropertyContainer *ent)
+void computeView(const SPropertyInstanceInformation *, SPropertyContainer *ent)
   {
   GCViewableTransform* tr = ent->uncheckedCastTo<GCViewableTransform>();
 
@@ -109,7 +109,7 @@ XVector3D GCViewableTransform::worldSpaceFromScreenSpace(xuint32 x, xuint32 y)
   return world;
   }
 
-void GCViewableTransform::zoom(float factor, float x, float y)
+void GCViewableTransform::zoom(float factor, float, float)
   {
   XTransform t = transform();
 
@@ -202,7 +202,7 @@ GCCamera::GCCamera()
 
 S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 
-void computePerspective(const SPropertyInstanceInformation *child, SPropertyContainer *prop)
+void computePerspective(const SPropertyInstanceInformation *, SPropertyContainer *prop)
   {
   GCPerspectiveCamera *c = prop->uncheckedCastTo<GCPerspectiveCamera>();
   c->projection = XTransformUtilities::perspective(c->fieldOfView(), (float)c->viewportWidth() / (float)c->viewportHeight(), c->nearClip(), c->farClip());

@@ -1,6 +1,7 @@
 #ifndef SXMLIO_H
 #define SXMLIO_H
 
+#include "sglobal.h"
 #include "QBuffer"
 #include "sloader.h"
 #include "QXmlStreamWriter"

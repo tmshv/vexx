@@ -48,7 +48,7 @@ public:
 
     void drawCurve( const XAbstractCurve <XVector3D> &, xsize segments );
 
-    void setTransform( XTransform );
+    void setTransform( const XTransform & );
     XTransform transform( ) const;
 
     void save();

@@ -43,22 +43,22 @@ public:
         if((mask&Bits1To8) != Bits1To8)
           {
           // spare in 1-8
-          spareBit = findFirstSpareBit(mask);
+          spareBit = findFirstSpareBit((xuint8)mask);
           }
         else if((mask&Bits9To16) != Bits9To16)
           {
           // spare in 9-16
-          spareBit = findFirstSpareBit(mask >> 8) + 8;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 8)) + 8;
           }
         else if((mask&Bits17To24) != Bits17To24)
           {
           // spare in 17-24
-          spareBit = findFirstSpareBit(mask >> 16) + 16;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 16)) + 16;
           }
         else
           {
           // spare in 25-32
-          spareBit = findFirstSpareBit(mask >> 24) + 24;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 24)) + 24;
           }
 
         // mark spareBit as used.

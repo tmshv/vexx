@@ -1,8 +1,8 @@
 #ifndef SPROPERTYINFORMATION_H
 #define SPROPERTYINFORMATION_H
 
-#include "QString"
 #include "sglobal.h"
+#include "QString"
 #include "sinterface.h"
 #include "XProperty"
 #include "XHash"
@@ -47,6 +47,7 @@ public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
   // initiate or destroy them, and that the Database should handle this.
   SPropertyInstanceInformation();
+  virtual ~SPropertyInstanceInformation();
 
   void setAffects(SPropertyInstanceInformation *info);
   void setAffects(SProperty SPropertyContainer::* *affects);
@@ -134,11 +135,31 @@ public:
 
   template <typename T, typename U>
   typename U::InstanceInformation *child(U T::* location)
-    { return static_cast<typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+    {
+    union Convertor
+    {
+      U T::* in;
+      SProperty SPropertyContainer::* out;
+    };
+    Convertor c;
+    c.in = location;
+
+    return static_cast<typename U::InstanceInformation*>(child(c.out));
+  }
 
   template <typename T, typename U>
   const typename U::InstanceInformation *child(U T::* location) const
-    { return static_cast<const typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+    {
+    union Convertor
+    {
+      U T::* in;
+      SProperty SPropertyContainer::* out;
+    };
+    Convertor c;
+    c.in = location;
+
+    return static_cast<const typename U::InstanceInformation*>(child(c.out));
+    }
 
   // access the properties from offset of member
   SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location);
@@ -241,7 +262,17 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
     def = new typename U::InstanceInformation;
     }
 
-  def->initiate(U::staticTypeInformation(), name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+  union Convertor
+  {
+    U T::* in;
+    SProperty SPropertyContainer::* out;
+  };
+  Convertor c;
+  c.in = ptr;
+
+  SProperty SPropertyContainer:: *location = c.out;
+
+  def->initiate(U::staticTypeInformation(), name, _children.size(), location);
 
   _children << def;
   return def;

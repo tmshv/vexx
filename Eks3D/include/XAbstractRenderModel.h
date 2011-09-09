@@ -1,9 +1,9 @@
 #ifndef XABSTRACTRENDERMODEL_H
 #define XABSTRACTRENDERMODEL_H
 
+#include "X3DGlobal.h"
 #include "XList"
 #include "XProperty"
-#include "X3DGlobal.h"
 
 class XAbstractCanvas;
 class XAbstractDelegate;

@@ -65,8 +65,8 @@ public:
     };
   typedef XFlags<Result> UsedFlags;
 
-  virtual xuint32 maxNumberOfPasses(xuint32 modelMaxPasses) const { return 0; }
-  virtual void paint(xuint32 pass) const { }
+  virtual xuint32 maxNumberOfPasses(xuint32) const { return 0; }
+  virtual void paint(xuint32) const { }
 
   UsedFlags triggerMouseEvent(MouseEventType type,
                               QPoint point,
@@ -81,18 +81,19 @@ public:
                               Qt::KeyboardModifiers modifiers);
 
 protected:
-  virtual UsedFlags mouseEvent(MouseEventType type,
-                          QPoint point,
-                          Qt::MouseButton triggerButton,
-                          Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers) { return NotUsed; }
+  virtual UsedFlags mouseEvent(MouseEventType,
+                          QPoint,
+                          Qt::MouseButton,
+                          Qt::MouseButtons,
+                          Qt::KeyboardModifiers) { return NotUsed; }
 
-  virtual UsedFlags wheelEvent(int delta,
-                               Qt::Orientation orientation,
-                               QPoint point,
-                               Qt::MouseButtons buttonsDown,
-                               Qt::KeyboardModifiers modifiers) { return NotUsed; }
+  virtual UsedFlags wheelEvent(int,
+                               Qt::Orientation,
+                               QPoint,
+                               Qt::MouseButtons,
+                               Qt::KeyboardModifiers) { return NotUsed; }
 
+private:
   X_DISABLE_COPY(XAbstractCanvasController);
   };
 

@@ -87,7 +87,7 @@ XColladaFile::XColladaFile( QString name ) : _document( "COLLADA" )
 
     QDomElement docElement( _document.documentElement() );
 
-    int num;
+    int num = 0;
     if( !docElement.isNull() && docElement.tagName() == "COLLADA" )
         {
         QDomElement colladaElement = docElement.firstChildElement("library_geometries");

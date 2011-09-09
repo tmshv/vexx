@@ -30,13 +30,10 @@ XProfiler::ProfilingContext *XProfiler::ProfilingContext::findChildContext(xuint
     new(oldSibling->_nextSibling) ProfilingContext(this, context, mes);
     return oldSibling->_nextSibling;
     }
-  else
-    {
-    _firstChild = (ProfilingContext*)g_instance->_contextAllocator.alloc();
-    new(_firstChild) ProfilingContext(this, context, mes);
-    return _firstChild;
-    }
-  return 0;
+
+  _firstChild = (ProfilingContext*)g_instance->_contextAllocator.alloc();
+  new(_firstChild) ProfilingContext(this, context, mes);
+  return _firstChild;
   }
 
 const XProfiler::ProfilingContext *XProfiler::ProfilingContext::findChildContext(xuint32 context, const char *mes) const

@@ -1,6 +1,7 @@
 #ifndef SARRAYPROPERTY_H
 #define SARRAYPROPERTY_H
 
+#include "sglobal.h"
 #include "spropertycontainer.h"
 #include "sbaseproperties.h"
 #include "sdatabase.h"
@@ -40,7 +41,7 @@ public:
   void resize(xsize size)
     {
     EigenArray result = mData;
-    result.resize(1, width);
+    result.resize(1, size);
 
     applyChange(result);
     }

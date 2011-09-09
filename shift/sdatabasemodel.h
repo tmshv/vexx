@@ -1,6 +1,7 @@
 #ifndef SDATABASEMODEL_H
 #define SDATABASEMODEL_H
 
+#include "sglobal.h"
 #include "QAbstractItemModel"
 #include "QItemDelegate"
 #include "sobserver.h"

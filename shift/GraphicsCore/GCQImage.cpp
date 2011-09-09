@@ -11,13 +11,14 @@ QTextStream &operator <<(QTextStream &str, const QImage &data)
   QDataStream dStr(&arr, QIODevice::WriteOnly);
   dStr << data;
 
-  return str << data;
+  return str << arr.toHex();
   }
 
 QTextStream &operator >>(QTextStream &str, QImage &data)
   {
   QByteArray arr;
   str >> arr;
+  arr = QByteArray::fromHex(arr);
 
   QDataStream dStr(&arr, QIODevice::ReadOnly);
   dStr >> data;

@@ -1,8 +1,0 @@
-#ifndef XMAP_H
-#define XMAP_H
-
-#include "QMap"
-
-#define XMap QMap
-
-#endif

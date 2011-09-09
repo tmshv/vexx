@@ -159,9 +159,9 @@ void XFloatWidget::updateUsed()
     qreal ret = 0;
     while( ret > value() )
         {
-        ret = -pow( 10, ++p );
+        ret = -10 ^( ++p );
         }
-    _usedMinimum = -pow( 10, p );
+    _usedMinimum = - 10^p;
     if( _usedMinimum < minimum() )
         {
         _usedMinimum = minimum();
@@ -171,9 +171,9 @@ void XFloatWidget::updateUsed()
     ret = 0;
     while( ret < value() )
         {
-        ret = pow( 10, ++p );
+        ret = 10 ^ ++p;
         }
-    _usedMaximum = pow( 10, p );
+    _usedMaximum = 10 ^ p;
     if( _usedMaximum > maximum() )
         {
         _usedMaximum = maximum();

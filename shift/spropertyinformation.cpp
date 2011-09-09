@@ -1,10 +1,13 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
-#include <initializer_list>
 
 SPropertyInstanceInformation::SPropertyInstanceInformation()
   : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
     _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(false)
+  {
+  }
+
+SPropertyInstanceInformation::~SPropertyInstanceInformation()
   {
   }
 

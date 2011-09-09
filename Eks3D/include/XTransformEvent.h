@@ -10,10 +10,10 @@ class XTransformEvent
     {
 public:
     XROProperty( XDoodad *, object );
-    XROProperty( XTransform, oldTransform );
+    XROByRefProperty( XTransform, oldTransform );
 
 public:
-    XTransformEvent( XDoodad *doodad, XTransform old );
+    XTransformEvent( XDoodad *doodad, const XTransform &old );
     };
 
 #endif // XTRANSFORMEVENT_H

@@ -1,9 +1,9 @@
 #ifndef XABSTRACTCANVAS_H
 #define XABSTRACTCANVAS_H
 
+#include "X3DGlobal.h"
 #include "XProperty"
 #include "XAbstractRenderModel.h"
-#include "X3DGlobal.h"
 
 class XAbstractCanvasController;
 

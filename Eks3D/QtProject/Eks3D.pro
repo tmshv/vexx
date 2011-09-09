@@ -25,17 +25,11 @@ SOURCES += ../src/XDoodad.cpp \
     ../src/XModeller.cpp \
     ../src/XColladaFile.cpp \
     ../src/XShape.cpp \
-    ../src/XAbstractEnvironmentInterface.cpp \
-    ../src/XEnvironment.cpp \
-    ../src/XEnvironmentArea.cpp \
     ../src/XFrustum.cpp \
     ../src/XPlane.cpp \
     ../src/XLine.cpp \
     ../src/XTriangle.cpp \
-    ../src/XEnvironmentRequest.cpp \
     ../src/XFramebuffer.cpp \
-    ../src/XEnvironmentRenderer.cpp \
-    ../src/XEnvironmentViewer.cpp \
     ../src/XLightManager.cpp \
     ../src/XLightRig.cpp \
     ../src/XAbstractCanvas.cpp \
@@ -61,17 +55,11 @@ HEADERS += ../include/XDoodad.h \
     ../include/XModeller.h \
     ../include/XColladaFile.h \
     ../include/XShape.h \
-    ../include/XAbstractEnvironmentInterface.h \
-    ../include/XEnvironment.h \
-    ../include/XEnvironmentArea.h \
     ../include/XFrustum.h \
     ../include/XPlane.h \
     ../include/XLine.h \
     ../include/XTriangle.h \
-    ../include/XEnvironmentRequest.h \
     ../include/XFramebuffer.h \
-    ../include/XEnvironmentRenderer.h \
-    ../include/XEnvironmentViewer.h \
     ../include/XLightManager.h \
     ../include/XLightRig.h \
     ../include/XAbstractCanvas.h \
@@ -97,3 +85,15 @@ OTHER_FILES += \
     ../GLResources/shaders/default.frag \
     ../GLResources/shaders/blinn.vert \
     ../GLResources/shaders/blinn.frag
+
+
+
+
+
+
+
+
+
+
+
+

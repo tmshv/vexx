@@ -1,7 +1,7 @@
 #include "GCRenderToTexture.h"
 #include "styperegistry.h"
 
-S_IMPLEMENT_PROPERTY(GCRenderToTexture)
+/*S_IMPLEMENT_PROPERTY(GCRenderToTexture)
 
 SPropertyInformation *GCRenderToTexture::createTypeInformation()
   {
@@ -10,5 +10,5 @@ SPropertyInformation *GCRenderToTexture::createTypeInformation()
   }
 
 GCRenderToTexture::GCRenderToTexture()
-{
-}
+  {
+  }*/

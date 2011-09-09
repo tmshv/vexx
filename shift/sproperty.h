@@ -58,8 +58,8 @@ class SDatabase;
 
 
 #define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { xAssertFailMessage("Creating avbstract type") } \
+  void myName::createProperty(void *, const SPropertyInformation *, SPropertyInstanceInformation **) \
+  { xAssertFailMessage("Creating abstract type") } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \

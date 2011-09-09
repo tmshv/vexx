@@ -10,7 +10,7 @@
 
 #include "QDebug"
 
-XColourWidget::XColourWidget( XColour col, bool hA, QWidget *parent ) : QWidget(parent),
+XColourWidget::XColourWidget( const XColour &col, bool hA, QWidget *parent ) : QWidget(parent),
         _slider( new XVector3DWidget( XVector3D( 0, 0, 0 ), QStringList() << "R" << "G" << "B", this )),
         _picker( new QtColorTriangle( this ) ),
         _outerLayout( new QVBoxLayout( this ) ),
@@ -70,7 +70,7 @@ void XColourWidget::pickerChanged( QColor col )
     setColour( XColour( col.redF(), col.greenF(), col.blueF(), alpha() ) );
     }
 
-void XColourWidget::rgbChanged( XVector3D col )
+void XColourWidget::rgbChanged( const XVector3D &col )
     {
     setColour( XColour( col.x(), col.y(), col.z(), alpha() ) );
     }
@@ -82,10 +82,11 @@ void XColourWidget::setAlpha( double in )
     setColour( s );
     }
 
-void XColourWidget::setColour( XColour col )
+void XColourWidget::setColour( const XColour &inCol )
     {
     if( !_setting )
         {
+        XColour col = inCol;
         _setting = true;
 
         col.w() = alpha();

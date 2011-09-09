@@ -15,7 +15,7 @@ class ScEmbeddedTypes : STypeRegistry::Observer
   XROProperty(QScriptEngine *, engine);
 public:
   ScEmbeddedTypes(QScriptEngine *);
-  ~ScEmbeddedTypes();
+  virtual ~ScEmbeddedTypes();
 
   static QScriptValue packValue(SProperty *);
 

@@ -72,12 +72,12 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
     else if(_current == CameraInterface::Zoom)
       {
       QPoint delta = point - lastKnownMousePosition();
-      float length = sqrt(delta.x()*delta.x() + delta.y()*delta.y());
+      float length = sqrt((float)(delta.x()*delta.x() + delta.y()*delta.y()));
       if(delta.y() < 0.0f)
         {
         length *= -1.0f;
         }
-      length *= 0.01;
+      length *= 0.01f;
       length += 1.0f;
 
       _camera->zoom(length, _zoomCentre.x(), _zoomCentre.y());
@@ -99,10 +99,10 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(MouseEven
 
 
 XCameraCanvasController::UsedFlags XCameraCanvasController::wheelEvent(int delta,
-                                                                       Qt::Orientation orientation,
+                                                                       Qt::Orientation,
                                                                        QPoint point,
-                                                                       Qt::MouseButtons buttonsDown,
-                                                                       Qt::KeyboardModifiers modifiers)
+                                                                       Qt::MouseButtons,
+                                                                       Qt::KeyboardModifiers)
   {
   if(!_camera)
     {

@@ -22,7 +22,7 @@
 #include "3D/GCShadingGroup.h"
 
 
-void initiateGraphicsCore(SDatabase *db)
+void initiateGraphicsCore(SDatabase *)
   {
   STypeRegistry::addType(GCImage::staticTypeInformation());
   STypeRegistry::addType(GCQImage::staticTypeInformation());
@@ -40,7 +40,7 @@ void initiateGraphicsCore(SDatabase *db)
 
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCRenderToScreen::staticTypeInformation());
-  STypeRegistry::addType(GCRenderToTexture::staticTypeInformation());
+  //STypeRegistry::addType(GCRenderToTexture::staticTypeInformation());
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
 

@@ -17,20 +17,20 @@ class EKSGUI_EXPORT XColourWidget : public QWidget
     {
 Q_OBJECT
 public:
-    XColourWidget( XColour, bool hasAlpha=true, QWidget *parent = 0 );
+    XColourWidget( const XColour &, bool hasAlpha=true, QWidget *parent = 0 );
 
     double alpha();
     XColour colour();
 
 signals:
-    void colourChanged( XColour );
+    void colourChanged( const XColour & );
 
 public slots:
-    void setColour( XColour );
+    void setColour( const XColour & );
 
 private slots:
     void setAlpha(double);
-    void rgbChanged( XVector3D );
+    void rgbChanged( const XVector3D & );
     void pickerChanged( QColor );
 
 private:

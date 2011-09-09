@@ -11,7 +11,7 @@ QTextStream &operator>>(QTextStream &s, xuint8 &v)
   {
   xuint32 t;
   s >> t;
-  v = t;
+  v = (xuint8)t;
   return s;
   }
 
@@ -44,7 +44,7 @@ void BoolProperty::assignProperty(const SProperty *f, SProperty *t)
   const IntProperty *intProp = f->castTo<IntProperty>();
   if(intProp)
     {
-    to->assign(intProp->value());
+    to->assign((bool)intProp->value());
     return;
     }
 
@@ -58,7 +58,7 @@ void BoolProperty::assignProperty(const SProperty *f, SProperty *t)
   const UnsignedIntProperty *uIntProp = f->castTo<UnsignedIntProperty>();
   if(uIntProp)
     {
-    to->assign(uIntProp->value());
+    to->assign((bool)uIntProp->value());
     return;
     }
 
@@ -495,7 +495,7 @@ void Vector4DProperty::assignProperty(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    const XColour &col = aProp->value().head<4>();
+    XColour col(aProp->value().head<4>());
     to->assign(col);
     return;
     }
@@ -503,7 +503,8 @@ void Vector4DProperty::assignProperty(const SProperty *f, SProperty *t)
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().head<4>());
+    XColour col(bProp->value().head<4>());
+    to->assign(col);
     return;
     }
 
@@ -536,14 +537,16 @@ void QuaternionProperty::assignProperty(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().head<4>());
+    XColour col(aProp->value().head<4>());
+    to->assign(col);
     return;
     }
 
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().head<4>());
+    XColour col(bProp->value().head<4>());
+    to->assign(col);
     return;
     }
 
@@ -564,7 +567,8 @@ void QuaternionProperty::assignProperty(const SProperty *f, SProperty *t)
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().coeffs().head<4>());
+    XColour col(qProp->value().coeffs().head<4>());
+    to->assign(col);
     return;
     }
   }
@@ -576,14 +580,16 @@ void ColourProperty::assignProperty(const SProperty *f, SProperty *t)
   const Vector2DProperty *aProp = f->castTo<Vector2DProperty>();
   if(aProp)
     {
-    to->assign(aProp->value().head<4>());
+    XColour col(aProp->value().head<4>());
+    to->assign(col);
     return;
     }
 
   const Vector3DProperty *bProp = f->castTo<Vector3DProperty>();
   if(bProp)
     {
-    to->assign(bProp->value().head<4>());
+    XColour col(bProp->value().head<4>());
+    to->assign(col);
     return;
     }
 
@@ -604,7 +610,8 @@ void ColourProperty::assignProperty(const SProperty *f, SProperty *t)
   const QuaternionProperty *qProp = f->castTo<QuaternionProperty>();
   if(qProp)
     {
-    to->assign(qProp->value().coeffs().head<4>());
+    XColour col(qProp->value().coeffs().head<4>());
+    to->assign(col);
     return;
     }
   }
@@ -621,6 +628,7 @@ void StringProperty::assignProperty(const SProperty *f, SProperty *t)
     }
   }
 
-void ByteArrayProperty::assignProperty(const SProperty *f, SProperty *t)
+void ByteArrayProperty::assignProperty(const SProperty *, SProperty *)
   {
+  xAssertFail();
   }

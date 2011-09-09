@@ -1,12 +1,12 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
 
-void writeValue(SSaver &s, const XGeometry &t)
+void writeValue(SSaver &, const XGeometry &)
   {
   xAssertFail();
   }
 
-void readValue(SLoader &l, XGeometry &t)
+void readValue(SLoader &, XGeometry &)
   {
   xAssertFail();
   }
@@ -151,7 +151,7 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
 
 S_IMPLEMENT_PROPERTY(GCGeometry)
 
-void computeRuntimeGeometry(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
+void computeRuntimeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
   GCGeometry* rtGeo = cont->uncheckedCastTo<GCGeometry>();
 
@@ -195,8 +195,8 @@ void GCGeometry::removePolygons(xuint32 index, xuint32 count)
 
 namespace Triangulator
   {
-  void triangulate(const xuint32 *indexData,
-                          const XVector3D *positionData,
+  void triangulate(const xuint32 *,
+                          const XVector3D *,
                           xuint32 polySize,
                           XVector<xuint32>* triangleData,
                           xuint32 vertexStart)

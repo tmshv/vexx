@@ -11,7 +11,7 @@ SDatabaseDelegate::SDatabaseDelegate(QObject *parent) : QItemDelegate(parent), _
   {
   }
 
-QWidget *SDatabaseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *SDatabaseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
   {
   _currentIndex = index;
   if(index.isValid())
@@ -28,11 +28,11 @@ QWidget *SDatabaseDelegate::createEditor(QWidget *parent, const QStyleOptionView
   return 0;
   }
 
-void SDatabaseDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void SDatabaseDelegate::setEditorData(QWidget *, const QModelIndex &) const
   {
   }
 
-void SDatabaseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void SDatabaseDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const
   {
   }
 
@@ -236,7 +236,7 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   return QVariant();
   }
 
-bool SDatabaseModel::setData(const QModelIndex & index, const QVariant & value, int role)
+bool SDatabaseModel::setData(const QModelIndex &, const QVariant &, int)
   {
   return true;
   }

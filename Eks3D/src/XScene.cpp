@@ -50,7 +50,7 @@ void XScene::renderScene( )
         }
     else
         {
-        xDebug << "Couldnt render";
+        qDebug() << "Couldnt render";
         }
     }
 

@@ -12,7 +12,6 @@ SOURCES += ../src/XObject.cpp \
     ../src/XMessageRouter.cpp \
     ../src/XMessageHandler.cpp \
     ../src/XVariant.cpp \
-    ../src/XColour.cpp \
     ../src/XFileSequence.cpp \
     ../src/XChildEvent.cpp \
     ../src/XBaseObject.cpp \
@@ -26,9 +25,7 @@ HEADERS += ../XObject \
     ../XVector \
     ../XVariant \
     ../XSet \
-    ../XMap \
     ../XList \
-    ../XHash \
     ../XMessageRouter \
     ../XMessageHandler \
     ../XProperty \

@@ -3,7 +3,7 @@
 #include "spropertycontainer.h"
 #include "GCImageChannel.h"
 
-class GCImage : public SPropertyContainer
+class GRAPHICSCORE_EXPORT GCImage : public SPropertyContainer
 {
 public:
     GCImage();

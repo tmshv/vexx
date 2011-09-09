@@ -1,6 +1,8 @@
 #ifndef WIDGETLIBRARYGLOBAL_H
 #define WIDGETLIBRARYGLOBAL_H
 
+#include "XGlobal"
+
 #if WIN32
 #   if defined(EKSGUI_STATIC)
 #       define EKSGUI_EXPORT extern

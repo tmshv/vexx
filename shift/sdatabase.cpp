@@ -44,8 +44,10 @@ SDatabase::~SDatabase()
     destoryChangeMemory(ch);
     }
 
+#ifndef Q_CC_MSVC
   this->~SEntity();
   xAssert(_memory.empty());
+#endif
   }
 
 SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
@@ -84,7 +86,7 @@ void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)
   initiatePropertyFromMetaData(this, info, false);
   }
 
-void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool includeParents)
+void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool)
   {
   xAssert(mD);
 

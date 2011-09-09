@@ -1,6 +1,7 @@
 #ifndef SCSHIFTDATABASE_H
 #define SCSHIFTDATABASE_H
 
+#include "scglobal.h"
 #include "scshiftentity.h"
 
 class SPropertyInstanceInformation;

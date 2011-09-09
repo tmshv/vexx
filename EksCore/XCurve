@@ -1,6 +1,7 @@
 #ifndef XCURVE_H
 #define XCURVE_H
 
+#include "XGlobal"
 #include "XList"
 #include "XVector2D"
 #include "XVector3D"
