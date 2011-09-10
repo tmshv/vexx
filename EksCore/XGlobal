@@ -79,7 +79,7 @@
 #  ifdef Q_CC_MINGW
 #   define xCurrentFunction __PRETTY_FUNCTION__
 #  else
-#   define xCurrentFunction "_No Function Info Available_"
+#   define xCurrentFunction __FUNCTION__
 #  endif
 # endif
 #endif

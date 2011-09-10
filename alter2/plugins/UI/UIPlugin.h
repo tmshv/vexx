@@ -18,7 +18,7 @@ public:
   void removeSurface(QString name);
   void removeSurface(UISurface *s);
 
-  void show();
+  Q_INVOKABLE void show();
 
 signals:
   void aboutToClose();
