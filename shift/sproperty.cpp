@@ -27,11 +27,13 @@ inline void setDependantsDirty(SProperty* prop, bool force)
 
   if(child && child->affects())
     {
+    SPropertyContainer *parent = prop->parent();
+    const SPropertyInformation *parentInfo = parent->typeInformation();
     xsize i=0;
     while(child->affects()[i])
       {
-      const SProperty SPropertyContainer::* affectsPtr(child->affects()[i]);
-      SProperty *affectsProp = (SProperty*)&(prop->parent()->*affectsPtr);
+      const SPropertyInstanceInformation *propInst = parentInfo->child(child->affects()[i]);
+      SProperty *affectsProp = propInst->locateProperty(parent);
 
       xAssert(affectsProp);
       affectsProp->setDirty(force);

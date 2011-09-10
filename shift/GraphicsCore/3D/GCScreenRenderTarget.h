@@ -4,12 +4,12 @@
 #include "GCGlobal.h"
 #include "GCRenderTarget.h"
 
-class GRAPHICSCORE_EXPORT GCRenderToScreen : public GCRenderTarget
+class GRAPHICSCORE_EXPORT GCScreenRenderTarget : public GCRenderTarget
   {
-  S_ENTITY(GCRenderToScreen, GCRenderTarget, 0)
+  S_ENTITY(GCScreenRenderTarget, GCRenderTarget, 0)
 
 public:
-  GCRenderToScreen();
+  GCScreenRenderTarget();
   };
 
 #endif // GCRENDERTOSCREEN_H

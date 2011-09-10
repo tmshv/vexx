@@ -99,6 +99,7 @@ typedef unsigned short xuint16;    /* 16 bit unsigned */
 typedef int xint32;                /* 32 bit signed */
 typedef unsigned int xuint32;      /* 32 bit unsigned */
 typedef size_t xsize;
+typedef ptrdiff_t xptrdiff;
 
 #define XUINT32_MAX (xuint32)-1
 

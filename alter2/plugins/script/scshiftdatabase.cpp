@@ -145,14 +145,14 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     val = tempObject.property(i);
     while(val.isObject())
       {
-      SProperty SPropertyContainer::* *affects = 0;
+      xsize *affects = 0;
       tempArrayObject = val.property("affects");
       bool affectsIsValid = false;
       if(tempArrayObject.isArray())
         {
         affectsIsValid = true;
         xuint32 length = tempArrayObject.property("length").toUInt32();
-        affects = new SProperty SPropertyContainer::* [length+1];
+        affects = new xsize [length+1];
         affects[length] = 0;
         for(xuint32 i=0; i<length; ++i)
           {

@@ -325,3 +325,4 @@ void GCGeometry::clearAttributes()
     attributes.remove(attributes.firstChild());
     }
   }
+

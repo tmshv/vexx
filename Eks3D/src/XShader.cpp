@@ -390,7 +390,7 @@ XShaderVariable *XShader::getVariable( QString in )
   return ret;
   }
 
-XMap <QString, XShaderVariable*> XShader::variables() const
+QHash <QString, XShaderVariable*> XShader::variables() const
   {
   return _variables;
   }

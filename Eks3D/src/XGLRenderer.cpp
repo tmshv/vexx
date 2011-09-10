@@ -4,7 +4,6 @@
 #include "XGeometry.h"
 #include "XShader.h"
 #include "XTexture.h"
-#include "XMap"
 #include "QVariant"
 #include "QGLShaderProgram"
 #include "QDebug"

@@ -20,9 +20,9 @@ HEADERS += GCGlobal.h \
     GCQImage.h \
     GCGeometry.h \
     3D/GCTransform.h \
-    3D/GCRenderToTexture.h \
-    3D/GCRenderToScreen.h \
     3D/GCRenderTarget.h \
+    3D/GCTextureRenderTarget.h \
+    3D/GCScreenRenderTarget.h \
     3D/GCGeometry.h \
     3D/GCCamera.h \
     3D/GCRenderable.h \
@@ -47,9 +47,9 @@ SOURCES += \
     GCNodeController.cpp \
     GCQImage.cpp \
     3D/GCTransform.cpp \
-    3D/GCRenderToTexture.cpp \
-    3D/GCRenderToScreen.cpp \
     3D/GCRenderTarget.cpp \
+    3D/GCTextureRenderTarget.cpp \
+    3D/GCScreenRenderTarget.cpp \
     3D/GCGeometry.cpp \
     3D/GCCamera.cpp \
     3D/GCRenderable.cpp \
@@ -60,3 +60,5 @@ SOURCES += \
     3D/GCShader.cpp \
     3D/Renderable/GCCuboid.cpp \
     3D/GCGeometryTransform.cpp
+
+

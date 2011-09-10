@@ -52,8 +52,13 @@ SPropertyInformation::~SPropertyInformation()
     }
   }
 
-SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* location)
+SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr)
   {
+  SPropertyContainer *u = 0;
+  SProperty *offset = &(u->*ptr);
+  xptrdiff location = reinterpret_cast<xsize>(offset);
+  xAssert(location > 0);
+
   foreach(SPropertyInstanceInformation *i, _children)
     {
     if(i->location() == location)
@@ -64,8 +69,13 @@ SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyCon
   return 0;
   }
 
-const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* location) const
+const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr) const
   {
+  SPropertyContainer *u = 0;
+  SProperty *offset = &(u->*ptr);
+  xptrdiff location = reinterpret_cast<xsize>(offset);
+  xAssert(location > 0);
+
   foreach(const SPropertyInstanceInformation *i, _children)
     {
     if(i->location() == location)
@@ -105,12 +115,12 @@ void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info
   xAssert(!_affects);
   xAssert(info);
 
-  _affects = new SProperty SPropertyContainer::*[2];
+  _affects = new xsize[2];
   _affects[0] = info->location();
   _affects[1] = 0;
   }
 
-void SPropertyInstanceInformation::setAffects(SProperty SPropertyContainer::* *affects)
+void SPropertyInstanceInformation::setAffects(xsize *affects)
   {
   xAssert(!_affects);
   _affects = affects;
@@ -119,7 +129,7 @@ void SPropertyInstanceInformation::setAffects(SProperty SPropertyContainer::* *a
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
                  const QString &name,
                  xsize index,
-                 SProperty SPropertyContainer::* location)
+                 xsize location)
   {
   _childInformation = info;
   _name = name;
@@ -141,10 +151,12 @@ void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformati
     const SPropertyInstanceInformation *siblingInfo = prop->instanceInformation();
     if(siblingInfo->affects())
       {
+      const SPropertyInformation *contInfo = cont->typeInformation();
       xsize i=0;
       while(siblingInfo->affects()[i])
         {
-        SProperty *thisProp = (SProperty*)&(cont->*(siblingInfo->affects()[i]));
+        const SPropertyInstanceInformation *affectsInst = contInfo->child(siblingInfo->affects()[i]);
+        const SProperty *thisProp = affectsInst->locateProperty(cont);
         const SPropertyInstanceInformation *thisInfo = thisProp->instanceInformation();
         if(thisInfo == info)
           {

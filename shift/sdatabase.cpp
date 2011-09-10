@@ -96,8 +96,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child->location());
-    SProperty *thisProp = (SProperty*)&(container->*prop);
+    SProperty *thisProp = child->locateProperty(container);
 
     if(child->extra())
       {
@@ -127,8 +126,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
     const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child->location());
-    SProperty *thisProp = (SProperty*)&(container->*prop);
+    SProperty *thisProp = child->locateProperty(container);
 
     uninitiateProperty(thisProp);
 
