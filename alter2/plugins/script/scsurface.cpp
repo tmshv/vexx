@@ -35,17 +35,20 @@ void logHandler(QtMsgType msgType, const char *message)
       xAssertFail();
       }
 
+    QString htmlMessage = message;
+    htmlMessage.replace('\n', "<br>\n");
+
     if(msgType == QtDebugMsg)
       {
-      g_surface->threadSafeLog(message);
+      g_surface->threadSafeLog(htmlMessage);
       }
     else if(msgType == QtWarningMsg)
       {
-      g_surface->threadSafeLog(QString("<font color=\"#FFA824\">%1</font>").arg(message));
+      g_surface->threadSafeLog(QString("<font color=\"#FFA824\">%1</font>").arg(htmlMessage));
       }
     else
       {
-      g_surface->threadSafeLog(QString("<b><font color=\"red\">%1</font></b>").arg(message));
+      g_surface->threadSafeLog(QString("<b><font color=\"red\">%1</font></b>").arg(htmlMessage));
       }
 
     if(msgType > QtWarningMsg)

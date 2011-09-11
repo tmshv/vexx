@@ -98,10 +98,25 @@ void ScPlugin::pluginRemoved(const QString &type)
     }
   }
 
+QScriptValue printFn(QScriptContext *context, QScriptEngine *engine)
+  {
+  QString result;
+  for (int i = 0; i < context->argumentCount(); ++i)
+    {
+    result.append(context->argument(i).toString());
+    }
+
+  qDebug() << result;
+
+  return engine->undefinedValue();
+  }
+
 void ScPlugin::load()
   {
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new QScriptEngine(this);
+
+  _engine->globalObject().setProperty("print", _engine->newFunction(printFn));
 
   registerScriptGlobal(this);
 

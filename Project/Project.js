@@ -23,8 +23,7 @@ db.addType({
       },
     save: function()
       {
-      print(this.typeName);
-      db.save("json", this);
+      print(db.save("json", this));
       }
     }
   });

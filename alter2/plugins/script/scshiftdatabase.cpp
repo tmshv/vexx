@@ -59,6 +59,13 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
     readable = readableValue.toBool();
     }
 
+  bool includeRoot = true;
+  QScriptValue includeRootValue = ctx->argument(3);
+  if(includeRootValue.isBool())
+    {
+    includeRoot = includeRootValue.toBool();
+    }
+
   if(saverType == "json")
     {
     SJSONSaver s;
@@ -68,9 +75,10 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
     QBuffer b(&arr);
     b.open(QIODevice::WriteOnly);
 
-    s.writeToDevice(&b, ent);
+    s.writeToDevice(&b, ent, includeRoot);
 
-    return QString::fromUtf8(arr);
+    QString returnString = QString::fromUtf8(arr);
+    return returnString;
     }
 
 

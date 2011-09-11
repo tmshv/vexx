@@ -37,12 +37,14 @@ QByteArray escape(const QByteArray &s)
 #define END_OBJECT NEWLINE_IF_REQUIRED POP_COMMA_STACK TAB_ELEMENT _device->write("}");
 
 #define OBJECT_VALUE_CHAR_BYTEARRAY(key, valueString) COMMA_IF_REQUIRED NEWLINE_IF_REQUIRED TAB_ELEMENT _device->write("\"" key "\":\""); _device->write(escape(valueString)); _device->write("\"");
+#define OBJECT_VALUE_CHAR_CHAR(key, valueString) COMMA_IF_REQUIRED NEWLINE_IF_REQUIRED TAB_ELEMENT _device->write("\"" key "\":\"" valueString "\"");
 #define OBJECT_VALUE_BYTEARRAY_BYTEARRAY(key, valueString) COMMA_IF_REQUIRED NEWLINE_IF_REQUIRED TAB_ELEMENT _device->write("\""); _device->write(escape(key)); _device->write("\":\""); _device->write(escape(valueString));  _device->write("\"");
 
 #define TYPE_KEY "__T"
 #define CHILD_COUNT_KEY "__C"
 #define CHILDREN_KEY "__H"
 #define VALUE_KEY "__V"
+#define NO_ROOT_KEY "__N"
 
 SJSONSaver::SJSONSaver() : _autoWhitespace(false), _device(0), _root(0)
   {
@@ -54,17 +56,35 @@ SJSONSaver::SJSONSaver() : _autoWhitespace(false), _device(0), _root(0)
   setStreamDevice(Text, &_buffer);
   }
 
-void SJSONSaver::writeToDevice(QIODevice *device, const SEntity *ent)
+void SJSONSaver::writeToDevice(QIODevice *device, const SEntity *ent, bool includeRoot)
   {
   _root = ent;
 
   _device = device;
 
-  START_OBJECT
 
-  write(_root);
+  if(!includeRoot)
+    {
+    START_OBJECT
+    OBJECT_VALUE_CHAR_CHAR(NO_ROOT_KEY, "true");
+    const SPropertyContainer *c = &ent->children;
+    beginChildren(c->size());
+    for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
+      {
+      beginNextChild();
+      write(child);
+      endNextChild();
+      }
+    endChildren();
+    END_OBJECT
+    }
+  else
+    {
+    START_OBJECT
+    write(_root);
+    END_OBJECT
+    }
 
-  END_OBJECT
 
   if(_autoWhitespace)
     {
@@ -316,14 +336,21 @@ void SJSONLoader::readFromDevice(QIODevice *device, SEntity *parent)
   readNext();
   readAllAttributes();
 
-  xsize count = beginChildren();
-  for(xsize i=0; i<count; ++i)
+  if(_currentAttributes.contains(NO_ROOT_KEY))
     {
-    beginNextChild();
     read(_root);
-    endNextChild();
     }
-  endChildren();
+  else
+    {
+    xsize count = beginChildren();
+    for(xsize i=0; i<count; ++i)
+      {
+      beginNextChild();
+      read(_root);
+      endNextChild();
+      }
+    endChildren();
+    }
 
   xAssert(_current == End);
 

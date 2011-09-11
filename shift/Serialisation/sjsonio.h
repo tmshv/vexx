@@ -15,7 +15,7 @@ XProperties:
 public:
   SJSONSaver();
 
-  void writeToDevice(QIODevice *device, const SEntity *ent);
+  void writeToDevice(QIODevice *device, const SEntity *ent, bool includeRoot);
 
 private:
   void setType(const SPropertyInformation *);
