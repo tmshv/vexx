@@ -9,3 +9,7 @@ if(debug)
 script.loadPlugin("db");
 
 script.include("Project.js");
+
+var ekscore = Project.create("EksCore");
+
+ekscore.save();

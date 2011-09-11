@@ -24,6 +24,17 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
   SProperty **propPtr = getThis(ctx);
   if(propPtr && ctx->argumentCount() >= 1)
     {
+    QScriptValue typeValue = ctx->argument(0);
+    QString type;
+    if(typeValue.isObject())
+      {
+      type = typeValue.property("typeName").toString();
+      }
+    else
+      {
+      type = typeValue.toString();
+      }
+
     QString name;
     if(ctx->argumentCount() >= 2)
       {
@@ -36,14 +47,14 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
     SEntity *ent = (*propPtr)->uncheckedCastTo<SEntity>();
     if(ent)
       {
-      const SPropertyInformation *info = STypeRegistry::findType(ctx->argument(0).toString());
+      const SPropertyInformation *info = STypeRegistry::findType(type);
       if(info)
         {
         return ScEmbeddedTypes::packValue(ent->addChild(info, name));
         }
       else
         {
-        ctx->throwError(QScriptContext::SyntaxError, "Invalid type name " + ctx->argument(0).toString() + "passed to SEntity.addChild(...);");
+        ctx->throwError(QScriptContext::SyntaxError, "Invalid type name " + type + "passed to SEntity.addChild(...);");
         return QScriptValue();
         }
       }

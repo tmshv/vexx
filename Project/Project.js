@@ -4,28 +4,27 @@ db.addType({
   properties:
     [
       {
-      name: "ProjectDependancies",
+      name: "rootDirectory",
+      type: StringProperty
+      },
+      {
+      name: "projectDependancies",
       type: PointerArray
-      },
-      {
-      name: "AttrName2",
-      type: IntProperty,
-      affects: [ "Output" ]
-      },
-      {
-      name: "Output",
-      type: FloatProperty,
-      compute: function()
-        {
-        this.Output = this.AttrName * this.AttrName2;
-        }
       }
     ],
   prototype:
     {
-      open: function(file)
-        {
-             print("open " + file);
-        }
+    create: function(directory, name)
+      {
+      var pro = db.addChild(Project, name);
+      pro.rootDirectory = directory;
+
+      return pro;
+      },
+    save: function()
+      {
+      print(this.typeName);
+      db.save("json", this);
+      }
     }
   });

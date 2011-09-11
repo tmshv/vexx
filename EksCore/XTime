@@ -40,7 +40,7 @@ XProperties:
 public:
   XTimeStatistics();
 
-  XTime average() const { return total() / (double)count(); }
+  XTime average() const { if(count() == 0) { return XTime(); } return total() / (double)count(); }
 
   void append(XTime);
   void append(const XTimeStatistics &);

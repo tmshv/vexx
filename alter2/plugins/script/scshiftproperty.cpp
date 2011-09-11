@@ -23,7 +23,7 @@ void ScShiftProperty::initiate()
   initiateGlobalValue<ScShiftProperty>("SProperty");
   }
 
-QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *eng)
+QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **prop = getThis(ctx);
@@ -48,7 +48,7 @@ QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *eng)
   return QScriptValue();
   }
 
-QScriptValue ScShiftProperty::name(QScriptContext *ctx, QScriptEngine *eng)
+QScriptValue ScShiftProperty::name(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **prop = getThis(ctx);
@@ -85,7 +85,7 @@ QScriptValue ScShiftProperty::outputs(QScriptContext *ctx, QScriptEngine *eng)
   return QScriptValue();
   }
 
-QScriptValue ScShiftProperty::firstOutput(QScriptContext *ctx, QScriptEngine *eng)
+QScriptValue ScShiftProperty::firstOutput(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **prop = getThis(ctx);

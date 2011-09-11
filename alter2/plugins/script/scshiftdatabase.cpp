@@ -2,12 +2,14 @@
 #include "sdatabase.h"
 #include "styperegistry.h"
 #include "scembeddedtypes.h"
+#include "sjsonio.h"
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
 ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng)
   {
   addMemberFunction("addType", addType);
+  addMemberFunction("save", save);
   }
 
 ScShiftDatabase::~ScShiftDatabase()
@@ -17,6 +19,28 @@ ScShiftDatabase::~ScShiftDatabase()
 void ScShiftDatabase::initiate()
   {
   initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
+  }
+
+QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *engine)
+  {
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  SDatabase *db = 0;
+  if(propPtr)
+    {
+    db = (*propPtr)->uncheckedCastTo<SDatabase>();
+    }
+  if(!db)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
+    }
+
+  QString saverType = ctx->argument(0).toString();
+  SProperty *prop = (*unpackValue(ctx->argument(1)));
+
+  if(saverType == "json")
+    {
+    }
   }
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
@@ -210,6 +234,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     if(parentObj.isObject())
       {
       tempObject.setPrototype(parentObj);
+      tempObject.setProperty("typeName", name);
       g.setProperty(name, tempObject);
       }
     }

@@ -17,6 +17,7 @@ public:
 
 private:
   static QScriptValue addType(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue save(QScriptContext *ctx, QScriptEngine *);
   static void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node);
   };
 

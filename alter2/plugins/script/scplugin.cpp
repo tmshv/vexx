@@ -23,15 +23,9 @@ ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
 
 ScPlugin::~ScPlugin()
   {
-  if(_debugger)
-    {
-    _debugger->detach();
-    delete _debugger;
-    }
   delete _engine;
   delete _types;
 
-  _debugger = 0;
   _engine = 0;
   _surface = 0;
   }
