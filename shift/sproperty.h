@@ -44,7 +44,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \
@@ -71,7 +71,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \
@@ -88,7 +88,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \

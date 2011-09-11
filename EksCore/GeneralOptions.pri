@@ -14,8 +14,6 @@ BINFOLDER = $$ROOT"/bin/"
 
 export (ROOT)
 
-DEFINES += QT_NO_STL
-
 DESTDIR = $$BINFOLDER
 
 LIBS += -L$$BINFOLDER

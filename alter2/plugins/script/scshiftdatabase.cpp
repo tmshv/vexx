@@ -2,7 +2,7 @@
 #include "sdatabase.h"
 #include "styperegistry.h"
 #include "scembeddedtypes.h"
-#include "sjsonio.h"
+#include "Serialisation/sjsonio.h"
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
@@ -21,7 +21,7 @@ void ScShiftDatabase::initiate()
   initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
-QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *engine)
+QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **propPtr = getThis(ctx);
@@ -32,15 +32,50 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *engine)
     }
   if(!db)
     {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.save(...);");
     }
 
   QString saverType = ctx->argument(0).toString();
-  SProperty *prop = (*unpackValue(ctx->argument(1)));
+  SProperty *prop = *unpackValue(ctx->argument(1));
+
+  if(!prop)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return "";
+    }
+
+  SEntity *ent = prop->castTo<SEntity>();
+
+  if(!ent)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return "";
+    }
+
+  bool readable = true;
+  QScriptValue readableValue = ctx->argument(2);
+  if(readableValue.isBool())
+    {
+    readable = readableValue.toBool();
+    }
 
   if(saverType == "json")
     {
+    SJSONSaver s;
+    s.setAutoWhitespace(readable);
+
+    QByteArray arr;
+    QBuffer b(&arr);
+    b.open(QIODevice::WriteOnly);
+
+    s.writeToDevice(&b, ent);
+
+    return QString::fromUtf8(arr);
     }
+
+
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect saver type argument " + saverType + "SDatabase.save(...);");
+  return "";
   }
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
@@ -54,7 +89,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     }
   if(!db)
     {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.addType(...);");
     }
 
   if(ctx->argumentCount() != 1)

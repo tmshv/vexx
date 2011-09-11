@@ -12,4 +12,6 @@ script.include("Project.js");
 
 var ekscore = Project.create("EksCore");
 
-ekscore.save();
+var output = ekscore.save();
+
+c();

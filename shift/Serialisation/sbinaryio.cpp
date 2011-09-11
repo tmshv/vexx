@@ -23,14 +23,14 @@ void SBinarySaver::writeToDevice(QIODevice *device, const SEntity *ent)
   _root = 0;
   }
 
-void SBinarySaver::setType(const SPropertyInformation *type)
+void SBinarySaver::setType(const SPropertyInformation *)
   {
   xAssert(_buffer.data().isEmpty());
   xAssert(_inAttribute.isEmpty());
   //_currentType = type->typeName();
   }
 
-void SBinarySaver::beginChildren(xsize size)
+void SBinarySaver::beginChildren(xsize )
   {
   xAssert(_inAttribute.isEmpty());
   /*_inAttribute = "childCount";
@@ -64,7 +64,7 @@ void SBinarySaver::endNextChild()
   _writer.writeEndElement();*/
   }
 
-void SBinarySaver::write(const SProperty *prop)
+void SBinarySaver::write(const SProperty *)
   {
   /*const SPropertyInformation *info = prop->typeInformation();
   xAssert(info);

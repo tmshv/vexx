@@ -390,7 +390,7 @@ void SJSONLoader::endNextChild()
   if(_current == AttributesEnd)
     {
     readNext();
-    if(_current == Children);
+    xAssert(_current == Children);
     readNext();
     }
   if(_current == End)
@@ -427,7 +427,7 @@ void SJSONLoader::beginAttribute(const char *attr)
   textStream().seek(0);
   }
 
-void SJSONLoader::endAttribute(const char *attr)
+void SJSONLoader::endAttribute(const char *)
   {
   _buffer.close();
   _buffer.setBuffer(&_currentValue);
