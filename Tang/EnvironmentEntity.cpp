@@ -57,7 +57,7 @@ XVariant EnvironmentEntity::getData( SPropertyID id, SAttributeID attribute ) co
       }
     else if(attribute == SProperty::Name)
       {
-      return XString("ID");
+      return QString("ID");
       }
     else if(attribute == SProperty::ReadOnly)
       {
@@ -80,7 +80,7 @@ XVariant EnvironmentEntity::getData( SPropertyID id, SAttributeID attribute ) co
       }
     else if(attribute == SProperty::Name)
       {
-      return XString("Position");
+      return QString("Position");
       }
     }
   else if(id == Orientation)
@@ -91,7 +91,7 @@ XVariant EnvironmentEntity::getData( SPropertyID id, SAttributeID attribute ) co
       }
     else if(attribute == SProperty::Name)
       {
-      return XString("Orientation");
+      return QString("Orientation");
       }
     }
   return SEntity::getData(id, attribute);
@@ -99,9 +99,9 @@ XVariant EnvironmentEntity::getData( SPropertyID id, SAttributeID attribute ) co
 
 bool EnvironmentEntity::setData( SPropertyID id, SAttributeID attribute, const XVariant &value )
   {
-  if(id == SEntity::Name && attribute == SProperty::Value && value.is<XString>())
+  if(id == SEntity::Name && attribute == SProperty::Value && value.is<QString>())
     {
-    XString name = value.toString();
+    QString name = value.toString();
     QByteArray arr;
     QDataStream str(&arr, QIODevice::WriteOnly);
     str << name;

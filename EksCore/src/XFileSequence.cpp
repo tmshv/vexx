@@ -2,16 +2,16 @@
 #include "XVariant"
 #include "QRegExp"
 
-#include "XDebug"
+#include "QDebug"
 
-XFileSequence::XFileSequence( XString in, stringMode mode )
+XFileSequence::XFileSequence( QString in, stringMode mode )
     {
     setSequence( in, mode );
     }
 
 XFileSequence::XFileSequence( const char *in, stringMode mode )
     {
-    setSequence( XString( in ), mode );
+    setSequence( QString( in ), mode );
     }
 
 #if 0
@@ -39,7 +39,7 @@ XFileSequence::operator XVariant()
     }
 #endif
 
-void XFileSequence::setSequence( XString in, stringMode mode )
+void XFileSequence::setSequence( QString in, stringMode mode )
     {
     _padding = 0;
     _pre = in;
@@ -112,18 +112,18 @@ void XFileSequence::setSequence( XString in, stringMode mode )
         }
     }
 
-XString XFileSequence::niceFilename() const
+QString XFileSequence::niceFilename() const
     {
     return _pre + "X" + _post;
     }
 
-XString XFileSequence::parsedFilename( ) const
+QString XFileSequence::parsedFilename( ) const
     {
     if( _pre != "" || _post != "" )
         {
         if( _hasNumber )
             {
-            return _pre + "$" + XString::number( _padding ) + "F" + _post;
+            return _pre + "$" + QString::number( _padding ) + "F" + _post;
             }
         return _pre + _post;
         }
@@ -135,7 +135,7 @@ void XFileSequence::setHasFrameNumber( bool in )
     _hasNumber = in;
     }
 
-void XFileSequence::setPreNumberString( XString in )
+void XFileSequence::setPreNumberString( QString in )
     {
     _pre = in;
     }
@@ -145,7 +145,7 @@ void XFileSequence::setPadding( uint in )
     _padding = in;
     }
 
-void XFileSequence::setPostNumberString( XString in )
+void XFileSequence::setPostNumberString( QString in )
     {
     _post = in;
     }
@@ -155,7 +155,7 @@ bool XFileSequence::hasFrameNumber( ) const
     return _hasNumber;
     }
 
-XString XFileSequence::preNumberString( ) const
+QString XFileSequence::preNumberString( ) const
     {
     return _pre;
     }
@@ -165,12 +165,12 @@ uint XFileSequence::padding( ) const
     return _padding;
     }
 
-XString XFileSequence::postNumberString( ) const
+QString XFileSequence::postNumberString( ) const
     {
     return _post;
     }
 
-XString XFileSequence::getFilename( int frame ) const
+QString XFileSequence::getFilename( int frame ) const
     {
     if( _hasNumber )
         {

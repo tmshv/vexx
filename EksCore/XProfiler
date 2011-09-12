@@ -3,7 +3,7 @@
 
 #include "XProfiler"
 #include "XTime"
-#include "XString"
+#include "QString"
 #include "XHash"
 #include "XVector"
 #include "XRandomAccessAllocator"

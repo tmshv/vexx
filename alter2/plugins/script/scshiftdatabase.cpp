@@ -2,12 +2,15 @@
 #include "sdatabase.h"
 #include "styperegistry.h"
 #include "scembeddedtypes.h"
+#include "Serialisation/sjsonio.h"
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
 ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng)
   {
   addMemberFunction("addType", addType);
+  addMemberFunction("load", load);
+  addMemberFunction("save", save);
   }
 
 ScShiftDatabase::~ScShiftDatabase()
@@ -17,6 +20,188 @@ ScShiftDatabase::~ScShiftDatabase()
 void ScShiftDatabase::initiate()
   {
   initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
+  }
+
+QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
+  {
+  enum
+    {
+    SaverType = 0,
+    Device = 1,
+    Parent = 2
+    };
+
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  SDatabase *db = 0;
+  if(propPtr)
+    {
+    db = (*propPtr)->uncheckedCastTo<SDatabase>();
+    }
+  if(!db)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.save(...);");
+    return false;
+    }
+
+  QString saverType = ctx->argument(SaverType).toString();
+
+  QObject *deviceObject = ctx->argument(Device).toQObject();
+  if(!deviceObject)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
+    return false;
+    }
+
+  QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
+  if(!device)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
+    return false;
+    }
+
+  SProperty *prop = *unpackValue(ctx->argument(Parent));
+
+  if(!prop)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return false;
+    }
+
+  SPropertyContainer *ent = prop->castTo<SPropertyContainer>();
+
+  if(!ent)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return false;
+    }
+
+  if(saverType == "json")
+    {
+    SJSONLoader s;
+
+    SProperty *p = ent->firstChild();
+    while(p && p->nextSibling())
+      {
+      p = p->nextSibling();
+      }
+
+    s.readFromDevice(device, ent);
+
+    if(!p)
+      {
+      p = ent->firstChild();
+      }
+
+    if(p && p->nextSibling()) // array return
+      {
+      QScriptValue v;
+
+      SProperty *c = p;
+      int i = 0;
+      while(c)
+        {
+        v.setProperty(i++, ScEmbeddedTypes::packValue(c));
+        c = c->nextSibling();
+        }
+
+      return v;
+      }
+    else if(p) // one property
+      {
+      return ScEmbeddedTypes::packValue(p);
+      }
+
+    return QScriptValue();
+    }
+
+
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect saver type argument " + saverType + "SDatabase.save(...);");
+  return false;
+  }
+
+QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
+  {
+  enum
+    {
+    SaverType = 0,
+    Device = 1,
+    Entity = 2,
+    OptReadable = 3,
+    OptIncludeRoot = 4
+    };
+
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  SDatabase *db = 0;
+  if(propPtr)
+    {
+    db = (*propPtr)->uncheckedCastTo<SDatabase>();
+    }
+  if(!db)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.save(...);");
+    return false;
+    }
+
+  QString saverType = ctx->argument(SaverType).toString();
+
+  QObject *deviceObject = ctx->argument(Device).toQObject();
+  if(!deviceObject)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
+    return false;
+    }
+
+  QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
+  if(!device)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
+    return false;
+    }
+
+  SProperty *prop = *unpackValue(ctx->argument(Entity));
+
+  if(!prop)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return false;
+    }
+
+  SEntity *ent = prop->castTo<SEntity>();
+
+  if(!ent)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect entity argument to SDatabase.save(...);");
+    return false;
+    }
+
+  bool readable = true;
+  QScriptValue readableValue = ctx->argument(OptReadable);
+  if(readableValue.isBool())
+    {
+    readable = readableValue.toBool();
+    }
+
+  bool includeRoot = true;
+  QScriptValue includeRootValue = ctx->argument(OptIncludeRoot);
+  if(includeRootValue.isBool())
+    {
+    includeRoot = includeRootValue.toBool();
+    }
+
+  if(saverType == "json")
+    {
+    SJSONSaver s;
+    s.setAutoWhitespace(readable);
+
+    s.writeToDevice(device, ent, includeRoot);
+    return true;
+    }
+
+
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect saver type argument " + saverType + "SDatabase.save(...);");
+  return false;
   }
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
@@ -30,7 +215,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     }
   if(!db)
     {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.addType(...);");
     }
 
   if(ctx->argumentCount() != 1)
@@ -145,14 +330,14 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     val = tempObject.property(i);
     while(val.isObject())
       {
-      SProperty SPropertyContainer::* *affects = 0;
+      xsize *affects = 0;
       tempArrayObject = val.property("affects");
       bool affectsIsValid = false;
       if(tempArrayObject.isArray())
         {
         affectsIsValid = true;
         xuint32 length = tempArrayObject.property("length").toUInt32();
-        affects = new SProperty SPropertyContainer::* [length+1];
+        affects = new xsize [length+1];
         affects[length] = 0;
         for(xuint32 i=0; i<length; ++i)
           {
@@ -210,6 +395,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     if(parentObj.isObject())
       {
       tempObject.setPrototype(parentObj);
+      tempObject.setProperty("typeName", name);
       g.setProperty(name, tempObject);
       }
     }

@@ -2,7 +2,7 @@
 #define XFILESEQUENCE_H
 
 #include "XGlobal"
-#include "XString"
+#include "QString"
 #include "XProperty"
 
 class XVariant;
@@ -13,7 +13,7 @@ public:
     // parsed is file.$4F.jpg, numeric extract is file.1020.jpg
     enum stringMode { Auto, Parsed, NumericExtract };
     // construct a sequence sequence from the name of a file in the sequence
-    XFileSequence( XString="", stringMode=Auto );
+    XFileSequence( QString="", stringMode=Auto );
     // construct a sequence sequence from the name of a file in the sequence
     XFileSequence( const char *, stringMode=Auto );
 #if 0
@@ -25,28 +25,28 @@ public:
 #endif
 
     // set the sequence
-    void setSequence( XString, stringMode=Auto );
+    void setSequence( QString, stringMode=Auto );
 
-    XString niceFilename() const;
-    XString parsedFilename( ) const;
+    QString niceFilename() const;
+    QString parsedFilename( ) const;
 
     void setHasFrameNumber( bool );
-    void setPreNumberString( XString );
+    void setPreNumberString( QString );
     void setPadding( uint );
-    void setPostNumberString( XString );
+    void setPostNumberString( QString );
 
 
     bool hasFrameNumber( ) const;
-    XString preNumberString( ) const;
+    QString preNumberString( ) const;
     uint padding( ) const;
-    XString postNumberString( ) const;
+    QString postNumberString( ) const;
 
-    XString getFilename( int frame ) const;
+    QString getFilename( int frame ) const;
 
 private:
-    XString _pre;
+    QString _pre;
     uint _padding;
-    XString _post;
+    QString _post;
     bool _hasNumber;
     };
 

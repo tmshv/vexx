@@ -5,7 +5,7 @@
 #include "QDesktopServices"
 #include "QFile"
 #include "QDir"
-#include "sxmlio.h"
+#include "Serialisation/sjsonio.h"
 #include "styperegistry.h"
 
 ALTER_PLUGIN(SPlugin);
@@ -47,10 +47,10 @@ void SPlugin::load()
 
   QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 
-  QFile file(dataLocation + "/settings.xml");
+  QFile file(dataLocation + "/settings.json");
   if(file.open(QIODevice::ReadOnly))
     {
-    SXMLLoader loader;
+    SJSONLoader loader;
 
     loader.readFromDevice(&file, &_db->settings);
     }
@@ -63,12 +63,13 @@ void SPlugin::unload()
   QDir dir(QDir::root());
   dir.mkpath(dataLocation);
 
-  QFile file(dataLocation + "/settings.xml");
+  QFile file(dataLocation + "/settings.json");
   if(file.open(QIODevice::WriteOnly))
     {
-    SXMLSaver saver;
+    SJSONSaver saver;
+    saver.setAutoWhitespace(true);
 
-    saver.writeToDevice(&file, &_db->settings);
+    saver.writeToDevice(&file, &_db->settings, false);
     file.close();
     }
 

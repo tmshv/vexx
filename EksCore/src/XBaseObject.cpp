@@ -1,7 +1,7 @@
 #include "XBaseObject"
 #include "XObject"
 #include "XChildEvent"
-#include "XDebug"
+#include "QDebug"
 
 XBaseObject::XBaseObject( ) : _parent( 0 ), _sender( 0 )
     {

@@ -24,6 +24,8 @@ XProperties:
   XROProperty(Mode, streamMode);
 
 public:
+  virtual ~SLoader() { }
+
   void setStreamDevice(Mode m, QIODevice *d) { _streamMode = m; _ts.setDevice(d); _ds.setDevice(d); }
 
   virtual const SPropertyInformation *type() const = 0;
@@ -61,6 +63,8 @@ XProperties:
   XROProperty(Mode, streamMode);
 
 public:
+  virtual ~SSaver() { }
+
   void setStreamDevice(Mode m, QIODevice *d) { _streamMode = m; _ts.setDevice(d); _ds.setDevice(d); }
 
   virtual void setType(const SPropertyInformation *) = 0;

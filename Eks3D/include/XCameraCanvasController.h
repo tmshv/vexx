@@ -23,10 +23,10 @@ public:
 
     virtual ~CameraInterface() { }
     virtual MovementFlags supportedMovements() const { return AllMovementTypes; }
-    virtual void zoom(float factor, float x, float y) { };
-    virtual void track(float x, float y) { };
-    virtual void dolly(float x, float y) { };
-    virtual void pan(float x, float y) { };
+    virtual void zoom(float, float, float) { }
+    virtual void track(float, float) { }
+    virtual void dolly(float, float) { }
+    virtual void pan(float, float) { }
     };
 
 XProperties:

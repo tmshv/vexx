@@ -361,7 +361,7 @@ void XModeller::drawLocator( XSize size, XVector3D center )
     _normals << XVector3D() << XVector3D() << XVector3D() << XVector3D() << XVector3D() << XVector3D();
     }
 
-void XModeller::setTransform( XTransform t )
+void XModeller::setTransform( const XTransform &t )
     {
     _transform = t;
     }

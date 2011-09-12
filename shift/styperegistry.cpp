@@ -56,6 +56,7 @@ const XSet <const SPropertyInformation *> &STypeRegistry::types()
 
 void STypeRegistry::addType(const SPropertyInformation *t)
   {
+  internalAddType(t);
   foreach(Observer *o, _types.observers)
     {
     o->typeAdded(t);
@@ -74,7 +75,6 @@ void STypeRegistry::removeTypeObserver(Observer *o)
 
 void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
-  xAssert(!_types.types.contains(t));
   if(!_types.types.contains(t))
     {
     _types.types.insert(t);

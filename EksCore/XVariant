@@ -9,7 +9,7 @@
 #include "XList"
 #include "XVector"
 #include "XMap"
-#include "XString"
+#include "QString"
 #include "XVector2D"
 #include "XVector3D"
 #include "XVector4D"
@@ -20,7 +20,7 @@ class XVariant;
 
 typedef XList<XVariant> XVariantList;
 typedef XVector<XVariant> XVariantVector;
-typedef XMap<XString, XVariant> XVariantMap;
+typedef XMap<QString, XVariant> XVariantMap;
 
 X_DECLARE_METATYPE(XVariantList);
 X_DECLARE_METATYPE(XVariantVector);
@@ -58,7 +58,7 @@ public:
   X_VALUE(xint64, LongInt);
   X_VALUE(xuint64, UnsignedLongInt);
   X_VALUE(double, Double);
-  X_REFERENCE_VALUE(XString, String);
+  X_REFERENCE_VALUE(QString, String);
   X_REFERENCE_VALUE(XVector2D, Vector2D);
   X_REFERENCE_VALUE(XVector3D, Vector3D);
   X_REFERENCE_VALUE(XVector4D, Vector4D);

@@ -44,7 +44,7 @@ SDatabase::~SDatabase()
     destoryChangeMemory(ch);
     }
 
-  this->~SEntity();
+  clear();
   xAssert(_memory.empty());
   }
 
@@ -84,7 +84,7 @@ void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)
   initiatePropertyFromMetaData(this, info, false);
   }
 
-void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool includeParents)
+void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD, bool)
   {
   xAssert(mD);
 
@@ -94,8 +94,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child->location());
-    SProperty *thisProp = (SProperty*)&(container->*prop);
+    SProperty *thisProp = child->locateProperty(container);
 
     if(child->extra())
       {
@@ -125,8 +124,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
     const SPropertyInstanceInformation *child = mD->child(i);
 
     // extract the properties location from the meta data.
-    const SProperty SPropertyContainer::* prop(child->location());
-    SProperty *thisProp = (SProperty*)&(container->*prop);
+    SProperty *thisProp = child->locateProperty(container);
 
     uninitiateProperty(thisProp);
 

@@ -8,7 +8,7 @@
 class SHIFT_EXPORT SIterator
   {
 public:
-  class SHIFT_EXPORT DataCache
+  class DataCache
     {
   public:
     DataCache(SProperty *input)
@@ -16,19 +16,19 @@ public:
       reset(input);
       }
 
-    void setOutput(xsize index, SProperty *in)
+    inline void setOutput(xsize index, SProperty *in)
       {
       xAssert(index < S_ITERATOR_STACK_SIZE);
       ptr[index] = in;
       }
 
-    SProperty *output(xsize index)
+    inline SProperty *output(xsize index)
       {
       xAssert(index < S_ITERATOR_STACK_SIZE);
       return ptr[index];
       }
 
-    void reset(SProperty *prop)
+    inline void reset(SProperty *prop)
       {
       ptr[0] = prop;
       for(xsize i=1; i<S_ITERATOR_STACK_SIZE; ++i)

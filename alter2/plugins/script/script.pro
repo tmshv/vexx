@@ -27,7 +27,8 @@ SOURCES += scplugin.cpp \
     scshiftpropertycontainer.cpp \
     scshiftentity.cpp \
     scshiftdatabase.cpp \
-    scshiftfloatarrayproperty.cpp
+    scshiftfloatarrayproperty.cpp \
+    scio.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -38,10 +39,13 @@ HEADERS += scplugin.h \
     scshiftpropertycontainer.h \
     scshiftentity.h \
     scshiftdatabase.h \
-    scshiftfloatarrayproperty.h
+    scshiftfloatarrayproperty.h \
+    scio.h
 
 RESOURCES += \
     ScResources.qrc
 
 OTHER_FILES += \
     CoreUtils.js
+
+

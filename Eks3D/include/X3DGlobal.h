@@ -17,7 +17,7 @@
 #   define EKS3D_EXPORT
 #endif
 
-#if xReal == float
+#if EKS_XREAL_IS_DOUBLE == 0
 #define EKS_XREAL_GL_TYPE GL_FLOAT
 #else
 #define EKS_XREAL_GL_TYPE GL_DOUBLE

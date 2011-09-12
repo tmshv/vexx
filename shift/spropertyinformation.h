@@ -1,8 +1,8 @@
 #ifndef SPROPERTYINFORMATION_H
 #define SPROPERTYINFORMATION_H
 
-#include "QString"
 #include "sglobal.h"
+#include "QString"
 #include "sinterface.h"
 #include "XProperty"
 #include "XHash"
@@ -32,14 +32,15 @@ public:
 XProperties:
   XProperty(const SPropertyInformation *, childInformation, setChildInformation);
   XRefProperty(QString, name);
-  XProperty(SProperty SPropertyContainer::*, location, setLocation);
+  XProperty(xsize, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
-  XROProperty(SProperty SPropertyContainer::* *, affects);
+  XROProperty(xsize *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
   XProperty(bool, entityChild, setEntityChild);
   XProperty(bool, extra, setExtra);
+
   XProperty(bool, dynamic, setDynamic);
   XRORefProperty(DataHash, data);
 
@@ -47,9 +48,10 @@ public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
   // initiate or destroy them, and that the Database should handle this.
   SPropertyInstanceInformation();
+  virtual ~SPropertyInstanceInformation();
 
   void setAffects(SPropertyInstanceInformation *info);
-  void setAffects(SProperty SPropertyContainer::* *affects);
+  void setAffects(xsize *affects);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
@@ -59,13 +61,29 @@ public:
 
   void setData(DataKey, const QVariant &);
 
+  SProperty *locateProperty(SPropertyContainer *parent) const
+    {
+    xuint8* parentOffset = reinterpret_cast<xuint8*>(parent);
+    xuint8* childOffset = parentOffset + location();
+    SProperty *child = reinterpret_cast<SProperty*>(childOffset);
+    return child;
+    }
+
+  const SProperty *locateProperty(const SPropertyContainer *parent) const
+    {
+    const xuint8* parentOffset = reinterpret_cast<const xuint8*>(parent);
+    const xuint8* childOffset = parentOffset + location();
+    const SProperty *child = reinterpret_cast<const SProperty*>(childOffset);
+    return child;
+    }
+
   X_ALIGNED_OPERATOR_NEW
 
 private:
   void initiate(const SPropertyInformation *info,
                 const QString &name,
                 xsize index,
-                SProperty SPropertyContainer::* location);
+                xsize s);
 
   friend class SProperty;
   friend class SPropertyContainer;
@@ -134,11 +152,31 @@ public:
 
   template <typename T, typename U>
   typename U::InstanceInformation *child(U T::* location)
-    { return static_cast<typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+    {
+    union Convertor
+    {
+      U T::* in;
+      SProperty SPropertyContainer::* out;
+    };
+    Convertor c;
+    c.in = location;
+
+    return static_cast<typename U::InstanceInformation*>(child(c.out));
+  }
 
   template <typename T, typename U>
   const typename U::InstanceInformation *child(U T::* location) const
-    { return static_cast<const typename U::InstanceInformation*>(child(reinterpret_cast<SProperty SPropertyContainer::*>(location))); }
+    {
+    union Convertor
+    {
+      U T::* in;
+      SProperty SPropertyContainer::* out;
+    };
+    Convertor c;
+    c.in = location;
+
+    return static_cast<const typename U::InstanceInformation*>(child(c.out));
+    }
 
   // access the properties from offset of member
   SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location);
@@ -179,9 +217,15 @@ private:
     static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
       const QString &name,
       xsize index,
-      SProperty SPropertyContainer::* location)
+      SProperty SPropertyContainer::* ptr)
     {
     typename T::InstanceInformation* def = new typename T::InstanceInformation;
+
+    SPropertyContainer *u = 0;
+    SProperty *offset = &(u->*ptr);
+    xptrdiff location = reinterpret_cast<xsize>(offset);
+    xAssert(location > 0);
+
     def->initiate(type, name, index, location);
     return def;
     }
@@ -241,7 +285,13 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
     def = new typename U::InstanceInformation;
     }
 
-  def->initiate(U::staticTypeInformation(), name, _children.size(), reinterpret_cast<SProperty SPropertyContainer::*>(ptr));
+  T *u = 0;
+  SPropertyContainer *container = static_cast<SPropertyContainer *>(u);
+  U *offset = &(u->*ptr);
+  xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
+  xAssert(location > 0);
+
+  def->initiate(U::staticTypeInformation(), name, _children.size(), location);
 
   _children << def;
   return def;

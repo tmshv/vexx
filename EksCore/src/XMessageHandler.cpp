@@ -1,5 +1,5 @@
 #include "XMessageHandler"
-#include "XString"
+#include "QString"
 
 XMessageHandler::XMessageHandler()
 {
@@ -21,7 +21,7 @@ bool XMessageHandler::canHandle( int ) const
 
 qint64 XMessageHandler::writeData( const char *data, qint64 size )
 {
-    emit handle( XString( QByteArray( data, size ) ) );
+    emit handle( QString( QByteArray( data, size ) ) );
     return size;
 }
 

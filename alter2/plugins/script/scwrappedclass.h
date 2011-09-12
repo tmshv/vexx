@@ -89,7 +89,7 @@ public:
     }
 
 private:
-  static QScriptValue blank(QScriptContext *ctx, QScriptEngine *)
+  static QScriptValue blank(QScriptContext *, QScriptEngine *)
     {
     return QScriptValue();
     }

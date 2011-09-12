@@ -240,7 +240,7 @@ void SXMLLoader::beginAttribute(const char *attr)
   textStream().seek(0);
   }
 
-void SXMLLoader::endAttribute(const char *attr)
+void SXMLLoader::endAttribute(const char *)
   {
   _buffer.close();
   _buffer.setBuffer(&_currentValue);

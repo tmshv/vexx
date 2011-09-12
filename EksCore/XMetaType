@@ -264,11 +264,11 @@ private:
   friend class XMetaTypeData;
   };
 
-#include "XString"
+#include "QString"
 #include "XList"
 #include "QDebug"
 
-EKSCORE_EXPORT void xMetaConvert(const XString &, XMetaType::Type destination, void *);
+EKSCORE_EXPORT void xMetaConvert(const QString &, XMetaType::Type destination, void *);
 EKSCORE_EXPORT void xMetaConvert(bool, XMetaType::Type destination, void *);
 EKSCORE_EXPORT void xMetaConvert(xint32, XMetaType::Type destination, void *);
 EKSCORE_EXPORT void xMetaConvert(xuint32, XMetaType::Type destination, void *);
@@ -277,7 +277,7 @@ EKSCORE_EXPORT void xMetaConvert(xuint64, XMetaType::Type destination, void *);
 EKSCORE_EXPORT void xMetaConvert(float, XMetaType::Type destination, void *);
 EKSCORE_EXPORT void xMetaConvert(double, XMetaType::Type destination, void *);
 
-X_DECLARE_CONVERTABLE_SERIALISABLE_METATYPE(XString);
+X_DECLARE_CONVERTABLE_SERIALISABLE_METATYPE(QString);
 X_DECLARE_CONVERTABLE_SERIALISABLE_METATYPE(bool);
 X_DECLARE_CONVERTABLE_SERIALISABLE_METATYPE(xint32);
 X_DECLARE_CONVERTABLE_SERIALISABLE_METATYPE(xuint32);

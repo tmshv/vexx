@@ -41,6 +41,20 @@
     accessLevel: \
     XConstReadProperty( type &, name, name )
 
+#define XByRefSpecificProperty( type, name, writeName, accessLevel ) \
+    private: \
+    XPropertyMember( type, name ) \
+    accessLevel: \
+    XConstReadProperty( const type &, name, name ) \
+    XWriteProperty( type &, name, writeName )
+
+#define XROByRefSpecificProperty( type, name, accessLevel ) \
+    private: \
+    XPropertyMember( type, name ) \
+    accessLevel: \
+    XConstReadProperty( type &, name, name )
+
+
 #define XInitProperty(name, value) _##name( value )
 #define XGetPropertyMember( name ) _##name
 
@@ -51,6 +65,9 @@
 #define XRefProperty( type, name ) XRefSpecificProperty( type, name, public )
 #define XRORefProperty( type, name ) XRORefSpecificProperty( type, name, public )
 
+#define XByRefProperty(type, name, writeName) XByRefSpecificProperty( type, name, writeName, public )
+#define XROByRefProperty(type, name) XROByRefSpecificProperty( type, name, public )
+
 #define XProperties private
-    
+
 #endif // XPROPERTY_H

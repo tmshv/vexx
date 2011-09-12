@@ -26,7 +26,7 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
 
   SProperty::staticTypeInformation()->addStaticInterface(&_property);
   SPropertyContainer::staticTypeInformation()->addStaticInterface(&_propertyContainer);
-  SEntity::staticTypeInformation()->addStaticInterface(&_property);
+  SEntity::staticTypeInformation()->addStaticInterface(&_entity);
   SDatabase::staticTypeInformation()->addStaticInterface(&_database);
   SFloatArrayProperty::staticTypeInformation()->addStaticInterface(&_floatArrayProperty);
 

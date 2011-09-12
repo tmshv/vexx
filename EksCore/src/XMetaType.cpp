@@ -129,7 +129,7 @@ XMetaType::Type XMetaType::addType(const char *name,
   return type;
   }
 
-void xMetaConvert(const XString &str, XMetaType::Type outType, void *out)
+void xMetaConvert(const QString &str, XMetaType::Type outType, void *out)
   {
   if(outType == XMetaType::typeOf<xint32>())
     {

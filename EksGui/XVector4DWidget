@@ -12,12 +12,12 @@ class EKSGUI_EXPORT XVector4DWidget : public QWidget
     {
 Q_OBJECT
 public:
-    XVector4DWidget( XVector4D val=XVector4D(), QStringList labels=QStringList(), QWidget *parent = 0);
-    XVector4DWidget( XVector4D val, XVector4D min, XVector4D max, QStringList labels=QStringList(), QWidget *parent = 0);
+    XVector4DWidget( const XVector4D &val=XVector4D(), QStringList labels=QStringList(), QWidget *parent = 0);
+    XVector4DWidget( const XVector4D &val, const XVector4D &min, const XVector4D &max, QStringList labels=QStringList(), QWidget *parent = 0);
 
-    void setMaximum( XVector4D );
+    void setMaximum( const XVector4D & );
     XVector4D maximum() const;
-    void setMinimum( XVector4D );
+    void setMinimum( const XVector4D & );
     XVector4D minimum() const;
     XVector4D range() const;
     XVector4D value() const;
@@ -25,10 +25,10 @@ public:
     bool isReadOnly() const;
 
 signals:
-    void valueChanged( XVector4D );
+    void valueChanged( const XVector4D & );
 
 public slots:
-    void setValue( XVector4D );
+    void setValue( const XVector4D & );
     void setReadOnly(bool);
 
 protected:

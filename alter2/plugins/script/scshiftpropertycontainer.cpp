@@ -17,7 +17,7 @@ void ScShiftPropertyContainer::initiate()
   initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
   }
 
-QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *eng)
+QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **propPtr = getThis(ctx);

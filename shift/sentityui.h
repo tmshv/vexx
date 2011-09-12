@@ -5,11 +5,12 @@
 #include "XProperty"
 #include "XMetaType"
 #include "XList"
-#include "XMap"
+#include "QHash"
 
 class QWidget;
 class SEntity;
 class SProperty;
+class SPropertyInformation;
 
 class SHIFT_EXPORT SEntityUI
   {
@@ -18,7 +19,7 @@ public:
 
 XProperties:
   typedef XList<WidgetCreator> TypeList;
-  typedef XMap<const SPropertyInformation *, int> LookupMap;
+  typedef QHash<const SPropertyInformation *, int> LookupMap;
   XRORefProperty(TypeList, types);
   XRORefProperty(LookupMap, uiTypes);
 

@@ -1,7 +1,13 @@
 include($$PWD"/SIMD.pri")
 include($$PWD"/C++0x.pri")
 
-QMAKE_CXXFLAGS += -Wall
+win32-g++ {
+  QMAKE_CXXFLAGS += -Wall
+}
+
+win32-msvc2008 {
+  QMAKE_CXXFLAGS += /MDd
+}
 
 ROOT = $$PWD"/../"
 BINFOLDER = $$ROOT"/bin/"

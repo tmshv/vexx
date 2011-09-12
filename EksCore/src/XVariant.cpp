@@ -10,7 +10,7 @@ void xInitiateMetaTypes()
   XMetaType::typeOf<XVariantVector>();
   XMetaType::typeOf<XVariantMap>();
 
-  XMetaType::typeOf<XString>();
+  XMetaType::typeOf<QString>();
   XMetaType::typeOf<bool>();
   XMetaType::typeOf<xint32>();
   XMetaType::typeOf<xuint32>();

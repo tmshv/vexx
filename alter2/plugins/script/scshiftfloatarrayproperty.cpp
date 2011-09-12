@@ -64,8 +64,8 @@ QScriptValue ScShiftFloatArrayProperty::at(QScriptContext *ctx, QScriptEngine *)
 
     if(thisArray)
       {
-      quint32 x = ctx->argument(0).toUInt32();
-      quint32 y = ctx->argument(1).toUInt32();
+      //quint32 x = ctx->argument(0).toUInt32();
+      //quint32 y = ctx->argument(1).toUInt32();
       xAssertFail();
       return "";//thisArray->atIndex(x, y);
       }

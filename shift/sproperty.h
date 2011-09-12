@@ -44,7 +44,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \
@@ -58,8 +58,8 @@ class SDatabase;
 
 
 #define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { xAssertFailMessage("Creating avbstract type") } \
+  void myName::createProperty(void *, const SPropertyInformation *, SPropertyInstanceInformation **) \
+  { xAssertFailMessage("Creating abstract type") } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -71,7 +71,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \
@@ -88,7 +88,7 @@ class SDatabase;
   { myName *prop = new(ptr) myName(); \
   if(instanceInfo) { \
   xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(alignedPtr); \
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
   xAssertIsAligned(alignedPtr); \
   *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
   new(*instanceInfo) InstanceInformation(); \

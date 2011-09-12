@@ -33,7 +33,7 @@ QString ACore::rootPath()
         return "/";
         }
 #else
-    return QCoreApplication::applicationDirPath();
+    return QCoreApplication::applicationDirPath() + "/";
 #endif
     }
 
@@ -94,6 +94,7 @@ int ACore::execute()
     {
     xAssertFail();
     }
+  return EXIT_FAILURE;
   }
 
 bool ACore::isLoaded( const QString &name ) const
@@ -271,6 +272,5 @@ QObject *ACore::plugin(const QString &pluginName)
       return plugin.plugin;
       }
     }
-  qDebug() << "Failed to find plugin" << pluginName;
   return 0;
   }

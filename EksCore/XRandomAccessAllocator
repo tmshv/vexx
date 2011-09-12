@@ -19,7 +19,7 @@ public:
     xAssertIsAligned(objectSize);
     xAssert((count % 32) == 0);
     _alloc = new xuint8[_count*_size + (_count / 8) + X_ALIGN_BYTE_COUNT];
-    _memory = X_ROUND_TO_ALIGNMENT(_alloc);
+    _memory = X_ROUND_TO_ALIGNMENT(xuint8 *, _alloc);
     _masks = (xuint32*)((xuint8*)_memory + (_count*_size));
 
     for(xsize i=0, s=(_count/32); i<s; ++i)
@@ -43,22 +43,22 @@ public:
         if((mask&Bits1To8) != Bits1To8)
           {
           // spare in 1-8
-          spareBit = findFirstSpareBit(mask);
+          spareBit = findFirstSpareBit((xuint8)mask);
           }
         else if((mask&Bits9To16) != Bits9To16)
           {
           // spare in 9-16
-          spareBit = findFirstSpareBit(mask >> 8) + 8;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 8)) + 8;
           }
         else if((mask&Bits17To24) != Bits17To24)
           {
           // spare in 17-24
-          spareBit = findFirstSpareBit(mask >> 16) + 16;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 16)) + 16;
           }
         else
           {
           // spare in 25-32
-          spareBit = findFirstSpareBit(mask >> 24) + 24;
+          spareBit = findFirstSpareBit((xuint8)(mask >> 24)) + 24;
           }
 
         // mark spareBit as used.
@@ -226,7 +226,7 @@ public:
     }
   void *alloc(xsize size)
     {
-    size = X_ROUND_TO_ALIGNMENT(size);
+    size = X_ROUND_TO_ALIGNMENT(xsize, size);
 
     if(!_internal.contains(size))
       {

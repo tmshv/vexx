@@ -12,7 +12,6 @@ SOURCES += ../src/XObject.cpp \
     ../src/XMessageRouter.cpp \
     ../src/XMessageHandler.cpp \
     ../src/XVariant.cpp \
-    ../src/XColour.cpp \
     ../src/XFileSequence.cpp \
     ../src/XChildEvent.cpp \
     ../src/XBaseObject.cpp \
@@ -25,11 +24,8 @@ HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
     ../XVariant \
-    ../XString \
     ../XSet \
-    ../XMap \
     ../XList \
-    ../XHash \
     ../XMessageRouter \
     ../XMessageHandler \
     ../XProperty \
@@ -38,7 +34,6 @@ HEADERS += ../XObject \
     ../XVector4D \
     ../XColour \
     ../XQuaternion \
-    ../XDebug \
     ../XMatrix4x4 \
     ../XMatrix3x3 \
     ../XGenericMatrix \
@@ -131,3 +126,5 @@ HEADERS += ../XObject \
     ../Eigen/src/Core/ArrayWrapper.h \
     ../Eigen/src/Core/ArrayBase.h \
     ../Eigen/src/Core/Array.h
+
+

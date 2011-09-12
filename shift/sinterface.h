@@ -18,7 +18,7 @@ XProperties:
 
 public:
   SInterfaceBaseFactory(bool del) : _referenceCount(0), _deleteOnNoReferences(del) { }
-  virtual SInterfaceBase *classInterface(SProperty *prop) { return 0; }
+  virtual SInterfaceBase *classInterface(SProperty *) { return 0; }
 
 private:
   friend class SPropertyInformation;

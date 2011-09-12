@@ -39,7 +39,7 @@ XVector3D operator+( const XVector3D &vec, const XSize &siz )
     return XVector3D( vec.x() + siz.x(), vec.y() + siz.y(), vec.z() + siz.z() );
     }
 
-XSize &EKSCORE_EXPORT operator*=( XSize &size, float in )
+XSize &operator*=( XSize &size, float in )
     {
     size.setX( size.x() * in );
     size.setY( size.y() * in );

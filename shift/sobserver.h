@@ -1,8 +1,8 @@
 #ifndef SOBSERVER_H
 #define SOBSERVER_H
 
-#include "XVector"
 #include "sglobal.h"
+#include "XVector"
 #include "sproperty.h"
 
 class SChange;

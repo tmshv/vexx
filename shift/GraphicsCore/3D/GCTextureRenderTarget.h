@@ -4,12 +4,12 @@
 #include "GCGlobal.h"
 #include "GCRenderTarget.h"
 
-class GRAPHICSCORE_EXPORT GCRenderToTexture : public GCRenderTarget
+class GRAPHICSCORE_EXPORT GCTextureRenderTarget : public GCRenderTarget
   {
-  S_ENTITY(GCRenderToTexture, GCRenderTarget, 0)
+  S_ENTITY(GCTextureRenderTarget, GCRenderTarget, 0)
 
 public:
-  GCRenderToTexture();
+  GCTextureRenderTarget();
   };
 
 #endif // GCRENDERTOTEXTURE_H

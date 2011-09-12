@@ -4,7 +4,7 @@
 #include "XGlobal"
 #include "QObject"
 #include "QIODevice"
-#include "XString"
+#include "QString"
 #include "XProperty"
 #include "XList"
 
@@ -12,8 +12,8 @@
 class EKSCORE_EXPORT XMessageHandler : public QIODevice
 {
     Q_OBJECT
-    XROProperty( XString, triggerFile )
-    XROProperty( XString, triggerFunction )
+    XROProperty( QString, triggerFile )
+    XROProperty( QString, triggerFunction )
     XROProperty( unsigned int, triggerLine )
     XROProperty( int, triggerType )
 public:
@@ -23,7 +23,7 @@ public:
     virtual bool canHandle( int level ) const;
 
 signals:
-    void handle( XString message );
+    void handle( QString message );
 
 protected:
     virtual qint64 readData(char *data, qint64 maxlen);

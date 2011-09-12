@@ -138,15 +138,33 @@ bool SPropertyContainer::contains(SProperty *child) const
 
 SPropertyContainer::~SPropertyContainer()
   {
+  clear();
+  }
+
+void SPropertyContainer::clear()
+  {
   xAssert(database());
 
   SProperty *prop = _child;
+  SProperty *previous = 0;
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
     if(prop->index() >= _containedProperties)
       {
+      if(previous)
+        {
+        previous->_nextSibling = next;
+        }
+      else
+        {
+        _child = next;
+        }
       database()->deleteDynamicProperty(prop);
+      }
+    else
+      {
+      previous = prop;
       }
     prop = next;
     }

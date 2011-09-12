@@ -2,7 +2,7 @@
 
 S_IMPLEMENT_PROPERTY(GCViewport)
 
-void computeAspectRatio(const SPropertyInstanceInformation *child, SPropertyContainer *prop)
+void computeAspectRatio(const SPropertyInstanceInformation *, SPropertyContainer *prop)
   {
   GCViewport *vp = prop->uncheckedCastTo<GCViewport>();
   vp->aspectRatio = (float)vp->width() / (float)vp->height();
