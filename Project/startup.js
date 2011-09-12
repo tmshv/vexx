@@ -19,6 +19,9 @@ var config = Config.create("Conf");
   config.rootDirectory.setValue("F:/CodeVexxLocal/");
   }
 
-var ekscore = Project.create(config, "EksCore", "Project");
+var EksCore = Project.create(config, "EksCore", "EksCore");
+
+var EksGui = Project.create(config, "EksGui", "EksGui");
+EksGui.projectDependancies.addDependancy(EksCore)
 
 ekscore.save();
