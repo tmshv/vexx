@@ -12,17 +12,19 @@
 #include "aplugin.h"
 #include "QDebug"
 #include "QMainWindow"
+#include "scio.h"
 
 
 ALTER_PLUGIN(ScPlugin);
 
-ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0)
+ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0)
   {
   setObjectName("script");
   }
 
 ScPlugin::~ScPlugin()
   {
+  delete _io;
   delete _engine;
   delete _types;
 
@@ -117,6 +119,9 @@ void ScPlugin::load()
   _engine = new QScriptEngine(this);
 
   _engine->globalObject().setProperty("print", _engine->newFunction(printFn));
+
+  _io = new ScIO;
+  registerScriptGlobal(_io);
 
   registerScriptGlobal(this);
 

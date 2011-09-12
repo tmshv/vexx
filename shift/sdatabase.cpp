@@ -44,10 +44,8 @@ SDatabase::~SDatabase()
     destoryChangeMemory(ch);
     }
 
-#ifndef Q_CC_MSVC
-  this->~SEntity();
+  clear();
   xAssert(_memory.empty());
-#endif
   }
 
 SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)

@@ -13,6 +13,7 @@ class ScObject;
 class ScInputThread;
 class ScSurface;
 class ScEmbeddedTypes;
+class ScIO;
 
 class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
   {
@@ -64,6 +65,7 @@ private:
 
   ScSurface *_surface;
   ScEmbeddedTypes *_types;
+  ScIO *_io;
   };
 
 #endif // SCPLUGIN_H

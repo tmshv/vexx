@@ -7,7 +7,7 @@ SPropertyInformation *SAppDatabase::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SAppDatabase>("SAppDatabase");
   info->add(&SAppDatabase::document, "document");
-  info->add(&SAppDatabase::settings, "settings2");
+  info->add(&SAppDatabase::settings, "settings");
   return info;
   }
 

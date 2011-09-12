@@ -11,8 +11,14 @@ if(debug)
 script.loadPlugin("db");
 
 script.include("Project.js");
+script.include("Config.js");
 
-var ekscore = Project.create("EksCore");
+// project init.
+var config = Config.create("Conf");
+  {
+  config.rootDirectory.setValue("F:/CodeVexxLocal/");
+  }
+
+var ekscore = Project.create(config, "EksCore", "Project");
+
 ekscore.save();
-
-print("-- Started Up --");

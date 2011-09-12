@@ -325,7 +325,7 @@ void SJSONLoader::readAllAttributes()
     }
   }
 
-void SJSONLoader::readFromDevice(QIODevice *device, SEntity *parent)
+void SJSONLoader::readFromDevice(QIODevice *device, SPropertyContainer *parent)
   {
   _root = parent;
 
@@ -336,7 +336,7 @@ void SJSONLoader::readFromDevice(QIODevice *device, SEntity *parent)
   readNext();
   readAllAttributes();
 
-  if(_currentAttributes.contains(NO_ROOT_KEY))
+  if(!_currentAttributes.contains(NO_ROOT_KEY))
     {
     read(_root);
     }

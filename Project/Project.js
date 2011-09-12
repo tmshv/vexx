@@ -10,20 +10,51 @@ db.addType({
       {
       name: "projectDependancies",
       type: PointerArray
+      },
+      {
+      name: "config",
+      type: Pointer
       }
     ],
   prototype:
     {
-    create: function(directory, name)
+    filePath: function(config, dir, name)
       {
-      var pro = db.addChild(Project, name);
-      pro.rootDirectory = directory;
+      var path = dir + "/" + name + ".proj.json";
+      if(config.input)
+        {
+        path = config.input.rootDirectory.value() + "/" + path;
+        }
+      return path;
+      },
+    create: function(config, directory, name)
+      {
+      var path = this.filePath(config, directory, name);
+      var file = io.createFile(path);
+      if(file.open("read"))
+        {
+        print("Loading from '" + path + "'");
+        var pro = db.load("json", file, db.children);
 
+        return pro;
+        }
+
+      print("Creating project '" + path + "'");
+
+      var pro = db.addChild(Project, name);
+      pro.rootDirectory.setValue(directory);
+      pro.config.input = config;
       return pro;
       },
     save: function()
       {
-      print(db.save("json", this));
+      var path = this.filePath(this.config, this.rootDirectory.value(), this.name);
+      print("Saving to '" + path + "'");
+
+      var file = io.createFile(path);
+      file.open("write");
+      db.save("json", file, this);
+      file.close();
       }
     }
   });

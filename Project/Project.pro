@@ -33,6 +33,8 @@ INCLUDEPATH += ../include \
 
 OTHER_FILES += \
     startup.js \
-    Project.js
+    Project.js \
+    Config.js
+
 
 

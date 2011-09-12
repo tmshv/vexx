@@ -84,6 +84,8 @@ protected:
   SProperty *at(xsize i);
   const SProperty *at(xsize i) const;
 
+  void clear();
+
 private:
   SProperty *_child;
   xsize _containedProperties;

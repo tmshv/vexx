@@ -47,7 +47,7 @@ public:
   SJSONLoader();
   ~SJSONLoader();
 
-  void readFromDevice(QIODevice *device, SEntity *parent);
+  void readFromDevice(QIODevice *device, SPropertyContainer *parent);
 
 private:
   const SPropertyInformation *type() const;
@@ -71,7 +71,7 @@ private:
   mutable bool _parseError;
   JSON_parser_struct* _jc;
   mutable QIODevice *_device;
-  SEntity *_root;
+  SPropertyContainer *_root;
   QHash <QString, QByteArray> _currentAttributes;
   QByteArray _currentValue;
 
