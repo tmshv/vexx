@@ -4,8 +4,6 @@
 #include "splugin.h"
 #include "UIPlugin.h"
 #include "Viewport.h"
-#include "assettree.h"
-#include "application.h"
 #include "webview.h"
 #include "GraphicsCore.h"
 
@@ -38,14 +36,12 @@ int main( int argc, char **argv )
   initiateGraphicsCore(&db->db());
 
 
-  Application envApp;
-
   SEntity *objectParent = &db->db().document;
 
   WebView *webData = new WebView(objectParent);
   script->registerScriptGlobal(webData);
 
-  Viewport *vp = new Viewport(&envApp, *db);
+  Viewport *vp = new Viewport(*db);
   ui->addSurface(vp);
 
   QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));

@@ -13,12 +13,7 @@ QT += opengl \
     webkit
 
 SOURCES += main.cpp \
-    Interface.cpp \
     viewport.cpp \
-    NewItemDialog.cpp \
-    EnvironmentEntity.cpp \
-    assettree.cpp \
-    application.cpp \
     webview.cpp \
     object.cpp
 
@@ -42,16 +37,20 @@ INCLUDEPATH += ../include \
     $$ROOT/Alter2/Plugins/Script \
     $$ROOT/Alter2/Plugins/ShiftAlter
 
-HEADERS += Interface.h \
+HEADERS += \
     viewport.h \
-    NewItemDialog.h \
-    EnvironmentEntity.h \
-    assettree.h \
-    application.h \
     webview.h \
     object.h
+RESOURCES +=
 
-FORMS += NewItemDialog.ui
 
-RESOURCES += \
-    TangResources.qrc
+
+
+
+
+
+
+
+
+
+

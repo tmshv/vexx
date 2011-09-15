@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/tang">
-        <file>resources/Folder.svg</file>
-        <file>resources/Texture.svg</file>
-    </qresource>
-</RCC>

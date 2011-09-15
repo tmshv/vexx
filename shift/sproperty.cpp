@@ -629,7 +629,7 @@ void SProperty::postSet()
 
 void SProperty::setDirty(bool force)
   {
-  if(!_flags.hasFlag(Dirty) || force)
+  if((!_flags.hasAnyFlags(Dirty|PreGetting)) || force)
     {
     _flags.setFlag(Dirty);
 

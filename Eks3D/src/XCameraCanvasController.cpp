@@ -69,7 +69,7 @@ XCameraCanvasController::UsedFlags XCameraCanvasController::mouseEvent(const Mou
     else if(_current == CameraInterface::Zoom)
       {
       QPoint delta = e.point - lastKnownMousePosition();
-      float length = sqrt(delta.x()*delta.x() + delta.y()*delta.y());
+      float length = sqrt((float)(delta.x()*delta.x() + delta.y()*delta.y()));
       if(delta.y() < 0.0f)
         {
         length *= -1.0f;

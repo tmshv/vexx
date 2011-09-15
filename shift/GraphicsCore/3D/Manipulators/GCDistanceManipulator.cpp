@@ -19,17 +19,17 @@ public:
 
   virtual bool hitTest(
       const GCVisualManipulator *manip,
-      const QPoint &widgetSpacePoint,
+      const QPoint &,
       const GCCamera *camera,
       const XVector3D &clickDirection, // in world space
       float *distance)
     {
-    GCDistanceManipulator *toRender = manip->uncheckedCastTo<GCDistanceManipulator>();
+    const GCDistanceManipulator *toRender = manip->uncheckedCastTo<GCDistanceManipulator>();
     const XVector3D &camTrans = camera->transform().translation();
     XLine l(camTrans, clickDirection, XLine::PointAndDirection);
 
-    const XTransform &wC = toRender->worldCentre();
-    wc.translate(toRender->ab)
+    XTransform wC = toRender->worldCentre();
+    wC.translate(toRender->absoluteDisplacement());
 
     XMatrix4x4 t = wC.matrix();
     XMatrix4x4 tInv = t.inverse();
@@ -85,10 +85,17 @@ void GCDistanceManipulator::onDrag(const MouseMoveEvent &e)
 
   float rel = relativeDistance() * scaleFactor();
 
-  SProperty *p = driven.firstChild();
+  qDebug() << rel;
+
+  Pointer *p = driven.firstChild<Pointer>();
   while(p)
     {
-    FloatProperty *f = p->castTo<FloatProperty>();
+    SProperty *input = p->input();
+    if(!input)
+      {
+      continue;
+      }
+    FloatProperty *f = input->castTo<FloatProperty>();
     if(f)
       {
       *f = f->value() + rel;
@@ -97,6 +104,6 @@ void GCDistanceManipulator::onDrag(const MouseMoveEvent &e)
       {
       xAssertFail();
       }
-    p = p->nextSibling();
+    p = p->nextSibling<Pointer>();
     }
   }

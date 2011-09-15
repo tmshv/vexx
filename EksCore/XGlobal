@@ -33,8 +33,13 @@
 // assert is best on windows because of the debug break...
 // but i think i prefered Q_ASSERT on linux?
 #ifdef Q_OS_WIN
-# include "assert.h"
-# define xAssert( arg ) assert(arg)
+# ifdef Q_CC_MSVC
+#  include <crtdbg.h>
+#  define xAssert( arg ) _ASSERT(arg)
+# else
+#  include <assert.h>
+#  define xAssert( arg ) assert(arg)
+# endif
 #else
 # define xAssert( arg ) Q_ASSERT( arg )
 #endif

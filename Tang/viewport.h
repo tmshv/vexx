@@ -16,7 +16,7 @@
 class XEnvironmentRenderer;
 class Application;
 
-class GCRenderToScreen;
+class GCScreenRenderTarget;
 
 class EnvironmentEntity;
 
@@ -27,7 +27,7 @@ class Viewport : public X3DCanvas, public UISurface, STreeObserver
   Q_OBJECT
 
 public:
-  Viewport(Application *env, SPlugin &);
+  Viewport(SPlugin &);
   ~Viewport();
 
 public slots:
@@ -42,7 +42,6 @@ protected:
 
   XGLRenderer _renderer;
   QTimer *_timer;
-  Application *_app;
 
   SAppDatabase *db()
     {
@@ -65,7 +64,7 @@ protected:
     }
 
   SEntityWeakPointer _db;
-  QList<GCRenderToScreen*> _screenRenderers;
+  QList<GCScreenRenderTarget*> _screenRenderers;
   SEntityWeakPointer _viewport;
   };
 

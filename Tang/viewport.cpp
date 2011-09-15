@@ -7,23 +7,17 @@
 #include "QVBoxLayout"
 #include "XGLRenderer.h"
 #include "XScene.h"
-#include "Interface.h"
-#include "NewItemDialog.h"
-#include "EnvironmentEntity.h"
-#include "XEnvironmentRenderer.h"
 #include "sentityui.h"
-#include "application.h"
-#include "3D/GCRenderToScreen.h"
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
 #include "3D/GCShader.h"
 #include "3D/GCShadingGroup.h"
+#include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
 #include "object.h"
 
-Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
-    _app(app),
+Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
     _db(0)
   {
   _timer = new QTimer;
@@ -35,7 +29,7 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
 
   GCViewport* vp = _db->addChild<GCViewport>("Viewport");
   _viewport = vp;
-  GCRenderToScreen* op = _db->addChild<GCRenderToScreen>("Output");
+  GCScreenRenderTarget* op = _db->addChild<GCScreenRenderTarget>("Output");
 
   GCPerspectiveCamera* cam = _db->addChild<GCPerspectiveCamera>("Camera");
   vp->x.connect(&cam->viewportX);
@@ -95,7 +89,7 @@ void Viewport::onTreeChange(const SChange *c)
     return;
     }
 
-  GCRenderToScreen *prop = t->property()->castTo<GCRenderToScreen>();
+  GCScreenRenderTarget *prop = t->property()->castTo<GCScreenRenderTarget>();
   if(!prop)
     {
     return;
@@ -144,7 +138,7 @@ void Viewport::paintGL()
   {
   if(_db.isValid())
   _renderer.clear();
-  foreach(GCRenderToScreen *sc, _screenRenderers)
+  foreach(GCScreenRenderTarget *sc, _screenRenderers)
     {
     const GCRenderable* renderable = sc->source();
     if(renderable)

@@ -23,7 +23,7 @@ public:
 
   virtual bool hitTest(
       const GCVisualManipulator *toRender,
-      const QPoint &widgetSpacePoint,
+      const QPoint &,
       const GCCamera *camera,
       const XVector3D &clickDirection, // in world space
       float *distance)

@@ -91,7 +91,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
   for(xsize i=0, s=mD->childCount(); i<s; ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInstanceInformation *child = mD->child(i);
+    const SPropertyInstanceInformation *child = mD->childFromIndex(i);
 
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
@@ -121,7 +121,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
   for(xsize i=0; i<mD->childCount(); ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInstanceInformation *child = mD->child(i);
+    const SPropertyInstanceInformation *child = mD->childFromIndex(i);
 
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);

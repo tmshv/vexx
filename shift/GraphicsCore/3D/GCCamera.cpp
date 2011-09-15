@@ -19,7 +19,7 @@ void computeView(const SPropertyInstanceInformation *, SPropertyContainer *ent)
   tr->viewTransform = inv;
   }
 
-void computeInverseProjection(const SPropertyInstanceInformation *info, SPropertyContainer *ent)
+void computeInverseProjection(const SPropertyInstanceInformation *, SPropertyContainer *ent)
   {
   GCViewableTransform* tr = ent->uncheckedCastTo<GCViewableTransform>();
 

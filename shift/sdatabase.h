@@ -93,16 +93,15 @@ public:
         xAssertFailMessage("Change failed"); \
       } } \
     setStateStorageEnabled(oldStateStorageEnabled); \
-    } \
+    }
 
-  template <typename CLS, typename T0> void doChange(T0 t0)
+  template <typename CLS, typename T0> void doChange(const T0 &t0)
     DO_CHANGE_IMPL(t0)
-
-  template <typename CLS, typename T0, typename T1> void doChange(T0 t0, T0 t1)
+  template <typename CLS, typename T0, typename T1> void doChange(const T0 &t0, const T1 &t1)
     DO_CHANGE_IMPL(t0, t1)
-  template <typename CLS, typename T0, typename T1, typename T2> void doChange(T0 t0, T1 t1, T2 t2)
+  template <typename CLS, typename T0, typename T1, typename T2> void doChange(const T0 &t0, const T1 &t1, const T2 &t2)
     DO_CHANGE_IMPL(t0, t1, t2)
-  template <typename CLS, typename T0, typename T1, typename T2, typename T3> void doChange(T0 t0, T1 t1, T2 t2, T3 t3)
+  template <typename CLS, typename T0, typename T1, typename T2, typename T3> void doChange(const T0 &t0, const T1 &t1, const T2 &t2, const T3 &t3)
     DO_CHANGE_IMPL(t0, t1, t2, t3)
 #endif
 

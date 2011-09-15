@@ -182,9 +182,12 @@ public:
   SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location);
   const SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location) const;
 
+  SPropertyInstanceInformation *child(xsize location);
+  const SPropertyInstanceInformation *child(xsize location) const;
+
   // access child instance information
-  SPropertyInstanceInformation *child(xsize index);
-  const SPropertyInstanceInformation *child(xsize index) const;
+  SPropertyInstanceInformation *childFromIndex(xsize index);
+  const SPropertyInstanceInformation *childFromIndex(xsize index) const;
 
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
