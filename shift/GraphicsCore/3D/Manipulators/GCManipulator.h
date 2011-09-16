@@ -55,8 +55,6 @@ public:
   TransformProperty worldCentre;
   FloatProperty manipulatorsDisplayScale;
 
-  PointerArray driven;
-
   virtual XVector3D focalPoint() const;
   
   virtual bool hitTest(
@@ -157,19 +155,12 @@ public:
     };
 
   EnumProperty lockMode;
-  Vector3DProperty lockDirection; // normal for planar, direction for linear
+  Vector3DProperty lockDirection; // normal for planar, direction for linear, local space
 
-  // displacement moved from click point in world space
+  // displacement moved from click point in local space
   Vector3DProperty absoluteDisplacement;
-  // displacement moved from last drag point in world space
-  Vector3DProperty relativeDisplacement;
 
-  // distance moved from click point in world space
-  FloatProperty absoluteDistance;
-  // distance moved last drag in world space
-  FloatProperty relativeDistance;
-
-  void onDrag(const MouseMoveEvent &);
+  void onDrag(const MouseMoveEvent &, XVector3D &rel);
   };
 
 #endif // GCMANIPULATOR_H

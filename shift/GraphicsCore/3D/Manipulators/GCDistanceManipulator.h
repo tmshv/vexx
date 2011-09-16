@@ -12,11 +12,15 @@ class GCDistanceManipulator : public GCLinearDragManipulator
 public:
   GCDistanceManipulator();
 
+  FloatProperty distance;
   FloatProperty scaleFactor;
 
-  void addDriven(SProperty *in);
+  void addDriven(FloatProperty *in);
 
   void onDrag(const MouseMoveEvent &);
+
+private:
+  QVector <FloatProperty *> _driven;
   };
 
 #endif // GCDISTANCEMANIPULATOR_H

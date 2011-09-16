@@ -13,8 +13,6 @@ SPropertyInformation *GCVisualManipulator::createTypeInformation()
   info->add(&GCVisualManipulator::worldCentre, "worldCentre");
   info->add(&GCVisualManipulator::manipulatorsDisplayScale, "manipulatorsDisplayScale");
 
-  info->add(&GCVisualManipulator::driven, "driven");
-
   return info;
   }
 
@@ -191,18 +189,6 @@ void GCVisualClickManipulator::onMouseRelease(const MouseEvent &)
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCLinearDragManipulator)
 
-void computeRelDist(const SPropertyInstanceInformation *, SPropertyContainer *c)
-  {
-  GCLinearDragManipulator *manip = c->uncheckedCastTo<GCLinearDragManipulator>();
-  manip->relativeDistance = manip->relativeDisplacement().norm();
-  }
-
-void computeAbsDist(const SPropertyInstanceInformation *, SPropertyContainer *c)
-  {
-  GCLinearDragManipulator *manip = c->uncheckedCastTo<GCLinearDragManipulator>();
-  manip->absoluteDistance = manip->absoluteDisplacement().norm();
-  }
-
 SPropertyInformation *GCLinearDragManipulator::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCLinearDragManipulator>("GCLinearDragManipulator");
@@ -210,15 +196,7 @@ SPropertyInformation *GCLinearDragManipulator::createTypeInformation()
   info->add(&GCLinearDragManipulator::lockMode, "lockMode");
   info->add(&GCLinearDragManipulator::lockDirection, "lockDirection");
 
-  FloatProperty::InstanceInformation *relDistInfo = info->add(&GCLinearDragManipulator::relativeDistance, "relativeDistance");
-  relDistInfo->setCompute(computeRelDist);
-  FloatProperty::InstanceInformation *absDistInfo = info->add(&GCLinearDragManipulator::absoluteDistance, "absoluteDistance");
-  absDistInfo->setCompute(computeAbsDist);
-
-  Vector3DProperty::InstanceInformation *relInfo = info->add(&GCLinearDragManipulator::relativeDisplacement, "relativeDisplacement");
-  relInfo->setAffects(relDistInfo);
-  Vector3DProperty::InstanceInformation *absInfo = info->add(&GCLinearDragManipulator::absoluteDisplacement, "absoluteDisplacement");
-  absInfo->setAffects(absDistInfo);
+  info->add(&GCLinearDragManipulator::absoluteDisplacement, "absoluteDisplacement");
 
   return info;
   }
@@ -227,7 +205,7 @@ GCLinearDragManipulator::GCLinearDragManipulator()
   {
   }
 
-void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e)
+void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e, XVector3D &rel)
   {
   XVector3D focus = focalPoint();
   const XVector3D &camPosition = e.cam->transform().translation();
@@ -236,14 +214,14 @@ void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e)
   xuint32 lock = lockMode();
   if(lock == Linear)
     {
-    XLine p(focus, lockDirection(), XLine::TwoPoints);
+    XLine p(focus, lockDirection(), XLine::PointAndDirection);
     XLine a(camPosition, e.lastDirection, XLine::PointAndDirection);
     XLine b(camPosition, e.direction, XLine::PointAndDirection);
 
     XVector3D lastHit = p.sample(p.closestPointOn(a));
     XVector3D hit = p.sample(p.closestPointOn(b));
 
-    relativeDisplacement = hit - lastHit;
+    rel = hit - lastHit;
     }
   else if(lock == Planar)
     {
@@ -254,16 +232,13 @@ void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e)
     XVector3D lastHit = a.sample(p.intersection(a));
     XVector3D hit = b.sample(p.intersection(b));
 
-    relativeDisplacement = hit - lastHit;
+    rel = hit - lastHit;
     }
   else // Free.
     {
     XVector3D a = camPosition + e.lastDirection*focalDistanceFromCamera;
     XVector3D b = camPosition + e.direction*focalDistanceFromCamera;
 
-    relativeDisplacement = b - a;
+    rel = b - a;
     }
-
-  // fix up the absolulte displacement
-  absoluteDisplacement = relativeDisplacement() + absoluteDisplacement();
   }

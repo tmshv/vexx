@@ -121,18 +121,57 @@ GCCuboid::GCCuboid()
 
 void GCCuboid::addManipulators(SPropertyArray *a, const GCTransform *tr)
   {
-  GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
-
-  manip->lockDirection = XVector3D(1.0f, 0.0f, 0.0f);
-  manip->lockMode = GCDistanceManipulator::Linear;
-  manip->scaleFactor = 0.5f;
-
-  manip->driven.addPointer(&width);
-
-  manip->connect(&width);
-
-  if(tr)
+  // X
     {
-    tr->transform.connect(&manip->worldCentre);
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(1.0f, 0.0f, 0.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    width.connect(&manip->distance);
+
+    manip->addDriven(&width);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
+    }
+
+  // Y
+    {
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(0.0f, 1.0f, 0.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    height.connect(&manip->distance);
+
+    manip->addDriven(&height);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
+    }
+
+  // Z
+    {
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(0.0f, 0.0f, 1.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    depth.connect(&manip->distance);
+
+    manip->addDriven(&depth);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
     }
   }

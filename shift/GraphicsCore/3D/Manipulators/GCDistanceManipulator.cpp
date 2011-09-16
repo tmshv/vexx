@@ -46,15 +46,29 @@ public:
     return false;
     }
 
-  virtual void render(const GCVisualManipulator *toRender,
-      const GCCamera *camera,
+  virtual void render(const GCVisualManipulator *manip,
+      const GCCamera *,
       XRenderer *r)
     {
-    r->pushTransform(toRender->worldCentre());
+    const GCDistanceManipulator *toRender = manip->uncheckedCastTo<GCDistanceManipulator>();
+
+    XTransform wC = toRender->worldCentre();
+    wC.translate(toRender->absoluteDisplacement());
+
+    r->pushTransform(wC);
     r->setShader(&_shader);
     r->drawGeometry(_geo);
     r->setShader(0);
     r->popTransform();
+    }
+
+  virtual XVector3D focalPoint(const GCVisualManipulator *manip) const
+    {
+    const GCDistanceManipulator *toRender = manip->uncheckedCastTo<GCDistanceManipulator>();
+
+    XTransform wC = toRender->worldCentre();
+    wC.translate(toRender->absoluteDisplacement());
+    return wC.translation();
     }
 
 private:
@@ -64,12 +78,26 @@ private:
 
 S_IMPLEMENT_PROPERTY(GCDistanceManipulator)
 
+void computeAbsDisp(const SPropertyInstanceInformation *, SPropertyContainer *c)
+  {
+  GCDistanceManipulator *d = c->uncheckedCastTo<GCDistanceManipulator>();
+
+  d->absoluteDisplacement = d->lockDirection().normalized() * (d->distance() * d->scaleFactor());
+  }
 
 SPropertyInformation *GCDistanceManipulator::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCDistanceManipulator>("GCDistanceManipulator");
 
-  info->add(&GCDistanceManipulator::scaleFactor, "scaleFactor");
+  Vector3DProperty::InstanceInformation *absDispInfo = info->child(&GCDistanceManipulator::absoluteDisplacement);
+  absDispInfo->setCompute(computeAbsDisp);
+
+  Vector3DProperty::InstanceInformation *dirInfo = info->child(&GCDistanceManipulator::lockDirection);
+  dirInfo->setAffects(absDispInfo);
+  FloatProperty::InstanceInformation *distInfo = info->add(&GCDistanceManipulator::distance, "distance");
+  distInfo->setAffects(absDispInfo);
+  FloatProperty::InstanceInformation *sfInfo = info->add(&GCDistanceManipulator::scaleFactor, "scaleFactor");
+  sfInfo->setAffects(absDispInfo);
 
   return info;
   }
@@ -79,31 +107,25 @@ GCDistanceManipulator::GCDistanceManipulator()
   setDelegate(new DistanceDelegate());
   }
 
+void GCDistanceManipulator::addDriven(FloatProperty *in)
+  {
+  _driven << in;
+  }
+
 void GCDistanceManipulator::onDrag(const MouseMoveEvent &e)
   {
-  GCLinearDragManipulator::onDrag(e);
+  XVector3D relativeDisp;
+  GCLinearDragManipulator::onDrag(e, relativeDisp);
 
-  float rel = relativeDistance() * scaleFactor();
+  float rel = relativeDisp.norm() / scaleFactor();
 
-  qDebug() << rel;
-
-  Pointer *p = driven.firstChild<Pointer>();
-  while(p)
+  if(relativeDisp.dot(lockDirection()) < 0.0f)
     {
-    SProperty *input = p->input();
-    if(!input)
-      {
-      continue;
-      }
-    FloatProperty *f = input->castTo<FloatProperty>();
-    if(f)
-      {
-      *f = f->value() + rel;
-      }
-    else
-      {
-      xAssertFail();
-      }
-    p = p->nextSibling<Pointer>();
+    rel *= -1.0f;
+    }
+
+  foreach(FloatProperty *f, _driven)
+    {
+    *f = f->value() + rel;
     }
   }
