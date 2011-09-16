@@ -409,7 +409,7 @@ XVector <XVector3D> XModeller::transformPoints( const XVector <XVector3D> &list 
 
 XVector3D XModeller::transformNormal( XVector3D in )
     {
-    return _transform * in;
+    return _transform.linear() * in;
     }
 
 XVector <XVector3D> XModeller::transformNormals( const XVector <XVector3D> &list )
