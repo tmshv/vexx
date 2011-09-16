@@ -44,6 +44,13 @@ public:
     virtual XAbstractTexture *getTexture() = 0;
     virtual XAbstractFramebuffer *getFramebuffer( int options, int colourFormat, int depthFormat, int width, int height ) = 0;
 
+    enum DebugLocatorMode
+      {
+      None=0,
+      ClearShader=1
+      };
+    virtual void debugRenderLocator(DebugLocatorMode) = 0;
+
     // destroy abstract types
     virtual void destroyShader( XAbstractShader * ) = 0;
     virtual void destroyGeometry( XAbstractGeometry * ) = 0;

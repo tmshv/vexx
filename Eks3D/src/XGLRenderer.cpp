@@ -271,6 +271,25 @@ void XGLRenderer::clear( int c )
     glClear( realMode ) GLE;
     }
 
+void XGLRenderer::debugRenderLocator(DebugLocatorMode m)
+  {
+  if((m&ClearShader) != 0)
+    {
+    _currentShader = 0;
+    glUseProgram(0);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+  glBegin(GL_LINES);
+    glVertex3f(-0.5, 0, 0);
+    glVertex3f(0.5, 0, 0);
+    glVertex3f(0, -0.5, 0);
+    glVertex3f(0, 0.5, 0);
+    glVertex3f(0, 0, -0.5);
+    glVertex3f(0, 0, 0.5);
+  glEnd();
+  }
+
 void XGLRenderer::enableRenderFlag( RenderFlags f )
     {
     if( f == AlphaBlending )

@@ -25,6 +25,8 @@ public:
     virtual XAbstractTexture *getTexture();
     virtual XAbstractFramebuffer *getFramebuffer( int options, int cf, int df, int width, int heightg );
 
+    virtual void debugRenderLocator(DebugLocatorMode m);
+
     virtual void destroyShader( XAbstractShader * );
     virtual void destroyGeometry( XAbstractGeometry * );
     virtual void destroyTexture( XAbstractTexture * );
