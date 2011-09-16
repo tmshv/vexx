@@ -189,7 +189,7 @@ void GCViewableTransform::track(float x, float y)
 
   x *= -1.0f;
 
-  t.pretranslate(x * across + y * up);
+  t.translate(x * across + y * up);
 
   transform = t;
   }
