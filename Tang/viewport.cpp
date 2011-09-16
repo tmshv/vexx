@@ -136,7 +136,6 @@ void Viewport::resizeGL( int w, int h )
 
 void Viewport::paintGL()
   {
-  if(_db.isValid())
   _renderer.clear();
   foreach(GCScreenRenderTarget *sc, _screenRenderers)
     {
