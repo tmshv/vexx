@@ -52,7 +52,7 @@ void SPlugin::load()
     {
     SJSONLoader loader;
 
-    loader.readFromDevice(&file, &_db->settings);
+    loader.readFromDevice(&file, &_db->settings.children);
     }
   }
 
@@ -69,7 +69,7 @@ void SPlugin::unload()
     SJSONSaver saver;
     saver.setAutoWhitespace(true);
 
-    saver.writeToDevice(&file, &_db->settings, false);
+    saver.writeToDevice(&file, &_db->settings.children, false);
     file.close();
     }
 
