@@ -6,6 +6,7 @@ S_IMPLEMENT_PROPERTY(GCCuboid)
 
 void computeCube(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
+  GCProfileFunction
   GCCuboid *cube = cont->uncheckedCastTo<GCCuboid>();
   GCGeometry &geo = cube->geometry;
 

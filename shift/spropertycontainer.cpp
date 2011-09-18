@@ -332,14 +332,16 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
     newProp->_database = _database;
     }
 
-  if(input() || _flags.hasFlag(ParentHasInput) || instanceInformation()->isComputed())
+  // is any prop in
+  bool parentComputed = isComputed() || _flags.hasFlag(ParentHasInput);
+  if(input() || _flags.hasFlag(ParentHasInput) || parentComputed)
     {
-    SProperty::ConnectionChange::setParentHasInputConnection(newProp);
+    newProp->_flags.setFlag(ParentHasInput);
     }
 
   if(output() || _flags.hasFlag(ParentHasOutput) || instanceInformation()->affectsSiblings())
     {
-    SProperty::ConnectionChange::setParentHasOutputConnection(newProp);
+    newProp->_flags.setFlag(ParentHasOutput);
     }
   }
 

@@ -28,6 +28,8 @@ public:
 
   virtual void update(XAbstractRenderModel::UpdateMode);
 
+  virtual bool isShown();
+
 protected:
   virtual void paintEvent(QPaintEvent *);
   };

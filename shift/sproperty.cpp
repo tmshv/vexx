@@ -41,6 +41,20 @@ inline void setDependantsDirty(SProperty* prop, bool force)
       }
     }
 
+  if(prop->input() || prop->isComputed() || prop->_flags.hasFlag(SProperty::ParentHasInput))
+    {
+    SPropertyContainer *c = prop->castTo<SPropertyContainer>();
+    if(c)
+      {
+      SProperty *child = c->_child;
+      while(child)
+        {
+        child->setDirty(force);
+        child = child->_nextSibling;
+        }
+      }
+    }
+
   // if we know the parent has an output
   if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
     {
@@ -48,7 +62,13 @@ inline void setDependantsDirty(SProperty* prop, bool force)
     while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
       {
       parent = parent->parent();
-      parent->setDirty(force);
+      // so we hit here when a child has been updated,
+      // having a parent dirty when a child is up to date is a bit weird (possibly just wrong)
+      // so we dirty the outputs of the parent, which do need to be updated.
+      for(SProperty *o=parent->output(); o; o = o->nextOutput())
+        {
+        o->setDirty(force);
+        }
       }
     }
   }
@@ -277,11 +297,6 @@ SEntity *SProperty::entity() const
   return _entity;
   }
 
-void *SProperty::getChangeMemory(size_t size) const
-  {
-  return parent()->database()->allocateChangeMemory(size);
-  }
-
 void SProperty::connect(SProperty *prop) const
   {
   SProfileFunction
@@ -295,15 +310,15 @@ void SProperty::connect(SProperty *prop) const
     }
   }
 
-bool SProperty::isComputed() const
-  {
-  return baseInstanceInformation()->compute() != 0;
-  }
-
 void SProperty::disconnect(SProperty *prop) const
   {
   SProfileFunction
   ((SDatabase*)database())->doChange<ConnectionChange>(ConnectionChange::Disconnect, (SProperty*)this, prop);
+  }
+
+bool SProperty::isComputed() const
+  {
+  return baseInstanceInformation()->compute() != 0;
   }
 
 void SProperty::disconnect() const
@@ -369,6 +384,8 @@ bool SProperty::ConnectionChange::apply(int mode)
 void SProperty::ConnectionChange::setParentHasInputConnection(SProperty *prop)
   {
   xAssert(prop);
+  prop->_flags.setFlag(ParentHasInput);
+
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
@@ -642,46 +659,42 @@ void SProperty::setDirty(bool force)
     }
   }
 
-void SProperty::preGet() const
+void SProperty::update() const
   {
   SProfileFunction
-  if(_flags.hasFlag(Dirty))
-    {
-    bool stateStorageEnabled = database()->stateStorageEnabled();
-    const_cast<SDatabase*>(database())->setStateStorageEnabled(false);
+  bool stateStorageEnabled = database()->stateStorageEnabled();
+  const_cast<SDatabase*>(database())->setStateStorageEnabled(false);
 
-    // this is a const function, but because we delay computation we may need to assign here
-    SProperty *prop = const_cast<SProperty*>(this);
-    prop->_flags.clearFlag(Dirty);
-    prop->_flags.setFlag(PreGetting);
-
-    const SPropertyInstanceInformation *child = baseInstanceInformation();
-    if(child && child->compute())
-      {
-      xAssert(parent());
-      SProcessManager::preCompute(child, parent());
-      child->compute()(child, parent());
-      }
-    else if(input())
-      {
-      prop->assign(input());
-      }
-
-    // dirty can be set again in compute functions.
-    prop->_flags.clearFlag(Dirty);
-    prop->_flags.clearFlag(PreGetting);
-
-    const_cast<SDatabase*>(database())->setStateStorageEnabled(stateStorageEnabled);
-
-    xAssert(!_flags.hasFlag(Dirty));
-    return;
-    }
+  SProperty *prop = const_cast<SProperty*>(this);
+  prop->_flags.setFlag(PreGetting);
 
   if(_flags.hasFlag(ParentHasInput))
     {
     parent()->preGet();
-    xAssert(!_flags.hasFlag(Dirty));
     }
+
+  // this is a const function, but because we delay computation we may need to assign here
+  prop->_flags.clearFlag(Dirty);
+
+  const SPropertyInstanceInformation *child = baseInstanceInformation();
+  if(child && child->compute())
+    {
+    xAssert(parent());
+    SProcessManager::preCompute(child, parent());
+    child->compute()(child, parent());
+    }
+  else if(input())
+    {
+    prop->assign(input());
+    }
+
+  // dirty can be set again in compute functions.
+  prop->_flags.clearFlag(Dirty);
+  prop->_flags.clearFlag(PreGetting);
+
+  const_cast<SDatabase*>(database())->setStateStorageEnabled(stateStorageEnabled);
+
+  xAssert(!_flags.hasFlag(Dirty));
   }
 
 void SProperty::addUserData(UserData *userData)

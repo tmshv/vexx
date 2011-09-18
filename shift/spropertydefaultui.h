@@ -41,6 +41,7 @@ private:
     }
   virtual void actOnChanges()
     {
+    SProfileFunction
     if(_dirty)
       {
       _isAlreadySetting = true;

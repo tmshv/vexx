@@ -29,19 +29,14 @@
 # define EKSCORE_EXPORT X_DECL_IMPORT
 #endif
 
-// todo: check the behaviour of both of these asserts in non windows oses and choose the nicest...
-// assert is best on windows because of the debug break...
-// but i think i prefered Q_ASSERT on linux?
-#ifdef Q_OS_WIN
-# ifdef Q_CC_MSVC
-#  include <crtdbg.h>
-#  define xAssert( arg ) _ASSERT(arg)
-# else
-#  include <assert.h>
-#  define xAssert( arg ) assert(arg)
-# endif
+EKSCORE_EXPORT void xDoAssert(const char *assertion, const char *file, int line);
+inline void xNoOp() { }
+
+#ifndef QT_NO_DEBUG
+# define X_DEBUG
+# define xAssert(cond) ((!(cond)) ? xDoAssert(#cond, __FILE__, __LINE__) : xNoOp())
 #else
-# define xAssert( arg ) Q_ASSERT( arg )
+# define xAssert(cond)
 #endif
 
 #define X_ASSERTS_ENABLED 1
@@ -53,12 +48,11 @@
 #define X_ROUND_TO_ALIGNMENT(type, exp) ((type)(exp + (ptrdiff_t)X_ALIGN_BYTE_COUNT - (((ptrdiff_t)exp)&((ptrdiff_t)X_ALIGN_BYTE_COUNT-1))))
 #define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&(X_ALIGN_BYTE_COUNT-1)) == 0);
 
-#ifndef QT_NO_DEBUG
-# define X_DEBUG
+#ifdef X_DEBUG
 # define X_PROFILING_ENABLED
-# define xVerify(x) x
+# define xVerify(x) xAssert(x)
 #else
-# define xVerify(x) xAssert(x);
+# define xVerify(x) x
 #endif
 
 

@@ -11,6 +11,12 @@ void X3DCanvas::paintGL()
 
 void X3DCanvas::update(XAbstractRenderModel::UpdateMode c)
   {
+  X3DDataModelFunction
   XAbstractCanvas::update(c);
   QGLWidget::updateGL();
+  }
+
+bool X3DCanvas::isShown()
+  {
+  return !isHidden() && hasFocus();
   }

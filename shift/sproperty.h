@@ -193,7 +193,14 @@ public:
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
 
   void postSet();
-  void preGet() const;
+  void preGet() const
+    {
+    if(_flags.hasFlag(Dirty))
+      {
+      update();
+      }
+    }
+  void update() const;
 
   bool isDynamic() const;
   xsize index() const;
@@ -332,12 +339,6 @@ public:
 
   X_ALIGNED_OPERATOR_NEW
 
-protected:
-  template <typename T> T *getChange() const
-    {
-    return reinterpret_cast<T*>(getChangeMemory(sizeof(T)));
-    }
-
 private:
   void setDirty(bool force=false);
   friend void setDependantsDirty(SProperty* prop, bool force=false);
@@ -345,7 +346,6 @@ private:
 
   void connectInternal(SProperty *) const;
   void disconnectInternal(SProperty *) const;
-  void *getChangeMemory(size_t size) const;
   SProperty *_nextSibling;
   SProperty *_input;
   SProperty *_output;

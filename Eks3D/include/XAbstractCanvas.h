@@ -20,10 +20,14 @@ public:
   virtual void update(XAbstractRenderModel::UpdateMode);
   virtual void paint();
 
+  virtual bool isShown() = 0;
+
   void setModel(XAbstractRenderModel *);
 
 private:
+  void doUpdate();
   XAbstractRenderModel::Iterator *_iterator;
+  bool _delayedUpdate;
   };
 
 #endif // XABSTRACTCANVAS_H

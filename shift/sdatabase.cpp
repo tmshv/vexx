@@ -64,6 +64,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
 
 void SDatabase::deleteDynamicProperty(SProperty *prop)
   {
+  xAssert(!prop->_flags.hasFlag(PreGetting));
   uninitiateProperty(prop);
 
   SEntity *ent = prop->castTo<SEntity>();

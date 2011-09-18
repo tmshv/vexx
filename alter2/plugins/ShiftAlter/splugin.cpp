@@ -1,5 +1,6 @@
 #include "splugin.h"
 #include "sglobal.h"
+#include "GraphicsCore/GCGlobal.h"
 #include "sprocessmanager.h"
 #include "QThread"
 #include "QDesktopServices"
@@ -31,6 +32,8 @@ void SPlugin::load()
   STypeRegistry::initiate();
   STypeRegistry::addType(SAppDatabase::staticTypeInformation());
 
+  XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
+  XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope
   XProfiler::setStringForContext(ShiftCoreProfileScope, "ShiftCore");
   XProfiler::setStringForContext(ShiftDataModelProfileScope, "ShiftDataModel");
 

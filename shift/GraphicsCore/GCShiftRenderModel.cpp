@@ -71,6 +71,7 @@ void GCShiftRenderModel::resetIterator(XAbstractRenderModel::Iterator *it) const
 
 void GCShiftRenderModel::actOnChanges()
   {
+  GCProfileFunction
   // only called if a change was triggered, so no need to test.
   update(TreeChange);
   }

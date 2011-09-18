@@ -19,7 +19,8 @@ SOURCES += ../src/XObject.cpp \
     ../src/XCurve.cpp \
     ../src/XMetaType.cpp \
     ../src/XTime.cpp \
-    ../src/XProfiler.cpp
+    ../src/XProfiler.cpp \
+    ../src/XGlobal.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -126,5 +127,6 @@ HEADERS += ../XObject \
     ../Eigen/src/Core/ArrayWrapper.h \
     ../Eigen/src/Core/ArrayBase.h \
     ../Eigen/src/Core/Array.h
+
 
 

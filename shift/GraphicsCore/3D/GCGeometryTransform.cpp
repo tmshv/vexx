@@ -20,6 +20,7 @@ GCGeometryTransform::GCGeometryTransform()
 
 void GCGeometryTransform::render(XRenderer* r) const
   {
+  GCProfileFunction
   const GCGeometry *geo = geometry();
 
   if(geo)
