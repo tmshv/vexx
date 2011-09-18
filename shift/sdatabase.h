@@ -116,6 +116,7 @@ protected:
 private:
   SProperty *createDynamicProperty(const SPropertyInformation *info);
   void deleteDynamicProperty(SProperty *);
+  void deleteProperty(SProperty *);
 
   void destoryChangeMemory(SChange *);
 

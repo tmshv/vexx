@@ -26,17 +26,7 @@ SDatabase::SDatabase() : _blockLevel(0)
 
 SDatabase::~SDatabase()
   {
-  // clear out our child elements before the allocator is destroyed.
-  SProperty *prop = _child;
-  while(prop)
-    {
-    SProperty *next = prop->_nextSibling;
-    if(prop->index() >= _containedProperties)
-      {
-      database()->deleteDynamicProperty(prop);
-      }
-    prop = next;
-    }
+  clear();
   _child = 0;
 
   foreach(SChange *ch, _done)
@@ -44,7 +34,6 @@ SDatabase::~SDatabase()
     destoryChangeMemory(ch);
     }
 
-  clear();
   xAssert(_memory.empty());
   }
 
@@ -62,20 +51,17 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   return prop;
   }
 
-void SDatabase::deleteDynamicProperty(SProperty *prop)
+void SDatabase::deleteProperty(SProperty *prop)
   {
   xAssert(!prop->_flags.hasFlag(PreGetting));
   uninitiateProperty(prop);
 
-  SEntity *ent = prop->castTo<SEntity>();
-  if(ent)
-    {
-    if(ent->parentEntity())
-      {
-      ent->parentEntity()->children.internalRemoveProperty(ent);
-      }
-    }
   prop->~SProperty();
+  }
+
+void SDatabase::deleteDynamicProperty(SProperty *prop)
+  {
+  deleteProperty(prop);
   _memory.free(prop);
   }
 

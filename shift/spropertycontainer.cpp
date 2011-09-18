@@ -164,6 +164,7 @@ void SPropertyContainer::clear()
       }
     else
       {
+      database()->deleteProperty(prop);
       previous = prop;
       }
     prop = next;

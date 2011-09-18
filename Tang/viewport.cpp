@@ -78,7 +78,10 @@ Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
 Viewport::~Viewport()
   {
   _screenRenderers.clear();
-  _db->removeTreeObserver(this);
+  if(_db.isValid())
+    {
+    _db->removeTreeObserver(this);
+    }
   }
 
 void Viewport::onTreeChange(const SChange *c)
