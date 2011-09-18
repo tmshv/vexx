@@ -7,6 +7,7 @@
 #include "XList"
 #include "XGeometry.h"
 #include "XSize"
+#include "XColour"
 #include "XTransform.h"
 
 template <typename T> class XAbstractCurve;
@@ -41,6 +42,8 @@ public:
     void drawGeometry( XList <XVector3D> positions, const XGeometry & );
 
     void drawWireCube( const XCuboid &cube );
+
+    void drawCone(const XVector3D &point, const XVector3D &direction, float length, float radius, xuint32 divs=6);
 
     void drawCube( XVector3D horizontal=XVector3D(1,0,0), XVector3D vertical=XVector3D(0,1,0), XVector3D depth=XVector3D(0,0,1), float tX=0.0, float tY=0.0 );
     void drawQuad( XVector3D horizontal, XVector3D vertical );

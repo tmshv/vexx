@@ -202,6 +202,51 @@ void XModeller::drawWireCube( const XCuboid &cube )
                 << sI+7 << sI+3;
     }
 
+void XModeller::drawCone(const XVector3D &point, const XVector3D &direction, float length, float radius, xuint32 divs)
+  {
+  XVector3D dirNorm = direction.normalized();
+
+  _vertex.reserve(1 + divs);
+  _normals.reserve(1 + divs);
+  _texture.reserve(1 + divs);
+  _triIndices.reserve(3 * divs);
+
+  xuint32 eIndex = _vertex.size();
+  _vertex << transformPoint(point + dirNorm * length);
+  _normals << transformNormal(dirNorm);
+
+  XVector2D t = XVector2D::Zero();
+
+  XVector3D up = XVector3D(0.0f, 1.0f, 0.0f);
+  if(up.dot(dirNorm) > 0.98f)
+    {
+    up = XVector3D(1.0f, 0.0f, 0.0f);
+    }
+  XVector3D across = dirNorm.cross(up).normalized();
+
+  for(xuint32 i=0; i<divs; ++i)
+    {
+    float percent = (float)i/(float)divs * 2.0f * (float)M_PI;
+    float c = cos(percent);
+    float s = sin(percent);
+
+    XVector3D ptDir = (up * s) + (across * c);
+
+    _vertex << transformPoint(point + (ptDir * radius));
+    _normals << transformNormal(ptDir);
+    _texture << t;
+
+    if(i == divs-1)
+      {
+      _triIndices << eIndex << eIndex + i + 1 << eIndex + 1;
+      }
+    else
+      {
+      _triIndices << eIndex << eIndex + i + 1 << eIndex + i + 2;
+      }
+    }
+  }
+
 void XModeller::drawCube( XVector3D h, XVector3D v, XVector3D d, float pX, float pY )
     {
     h *= 0.5; v *= 0.5; d *= 0.5;

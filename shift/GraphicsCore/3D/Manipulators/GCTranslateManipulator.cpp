@@ -74,6 +74,10 @@ public:
       m.vertex(0.0f, 0.0f, 0.0f);
       m.vertex(1.0f, 0.0f, 0.0f);
     m.end();
+
+    m.drawCone(XVector3D(0.8f, 0.0f, 0.0f), XVector3D(1.0f, 0.0f, 0.0f), 0.2f, 0.06f);
+
+    _shader.setType(XShader::ColourShader);
     }
 
   virtual bool hitTest(
@@ -108,9 +112,9 @@ public:
       float pixelSizeX, pixelSizeY;
       camera->approximatePixelSizeAtDistance(*distance, pixelSizeX, pixelSizeY);
 
-      float pixelDist = worldDist * pixelSizeX;
+      float maxWorld = maxPixels * pixelSizeX;
 
-      if(pixelDist >= 0.0f && pixelDist < maxPixels)
+      if(worldDist >= 0.0f && worldDist < maxWorld)
         {
         return true;
         }
@@ -132,10 +136,16 @@ public:
     if(lockDir.dot(x) < 0.99f)
       {
       XVector3D dir = x.cross(lockDir);
-      Eigen::AngleAxisf a(M_PI/2.0f, dir);
+      Eigen::AngleAxisf a((float)M_PI/2.0f, dir);
 
       wC.rotate(a);
       }
+
+    XVector4D col;
+    col(3) = 1.0f;
+    col.head<3>() = toRender->lockDirection();
+
+    _shader.getVariable("colour")->setValue(col);
 
     r->pushTransform(wC);
     r->setShader(&_shader);

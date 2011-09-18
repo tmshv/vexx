@@ -116,6 +116,7 @@ private:
     QGLShaderProgram shader;
     friend class XGLRenderer;
     friend class XGLShaderVariable;
+    XGLRenderer *_renderer;
     };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -697,6 +698,7 @@ QString getVertex( int type )
   switch( type )
     {
   case XShader::AmbientShader: file = "blinn"; break;
+  case XShader::ColourShader: file = "plainColour"; break;
   case XShader::Default: break;
     }
 
@@ -714,6 +716,7 @@ QString getFragment( int type )
   switch( type )
     {
   case XShader::AmbientShader: file = "blinn"; break;
+  case XShader::ColourShader: file = "plainColour"; break;
   case XShader::Default: break;
     }
 
@@ -725,9 +728,10 @@ QString getFragment( int type )
   return "";
   }
 
-XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() )
-    {
-    }
+XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() ),
+    _renderer(renderer)
+  {
+  }
 
 void XGLShader::setType( int type )
     {
@@ -812,6 +816,8 @@ void XGLShaderVariable::setValue( const XVector3D &value )
 void XGLShaderVariable::setValue( const XVector4D &value )
   {
   clear();
+  GL_SHADER_VARIABLE_PARENT->_renderer->_currentShader = 0;
+  GL_SHADER_VARIABLE_PARENT->shader.bind();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 

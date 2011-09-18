@@ -140,7 +140,7 @@ XProperties:
   XROProperty( XRenderer *, renderer );
 
 public:
-  enum PredefinedShaders { Default, AmbientShader };
+  enum PredefinedShaders { Default, AmbientShader, ColourShader };
   XShader( int = Default );
   XShader( const XShader & );
   virtual ~XShader();

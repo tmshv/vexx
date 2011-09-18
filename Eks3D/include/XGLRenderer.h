@@ -49,9 +49,8 @@ public:
 
     virtual void setFramebuffer( const XFramebuffer * );
 
-
     QSize viewportSize();
-private:
+
     QGLContext *_context;
     XGLShader *_currentShader;
     QSize _size;
