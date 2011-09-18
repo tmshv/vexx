@@ -373,10 +373,14 @@ bool SProperty::ConnectionChange::apply(int mode)
 
   if(mode&Inform)
     {
-    xAssert(_driver->entity());
-    xAssert(_driven->entity());
-    _driver->entity()->informConnectionObservers(this);
-    _driven->entity()->informConnectionObservers(this);
+    if(_driver->entity())
+      {
+      _driver->entity()->informConnectionObservers(this);
+      }
+    if(_driven->entity())
+      {
+      _driven->entity()->informConnectionObservers(this);
+      }
     }
   return true;
   }

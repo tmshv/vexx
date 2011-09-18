@@ -282,7 +282,6 @@ SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader 
 void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newProp, xsize index)
   {
   xAssert(newProp->_parent == 0);
-  xAssert(newProp->_entity == 0);
   xAssert(newProp->_nextSibling == 0);
 
   if(_child)

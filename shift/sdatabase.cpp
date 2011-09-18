@@ -134,6 +134,18 @@ void SDatabase::initiateProperty(SProperty *prop)
 
     initiatePropertyFromMetaData(container, metaData);
     }
+
+  const SPropertyInformation *info = prop->typeInformation();
+  while(info)
+    {
+    SPropertyInformation::PostCreateFunction postCreate = info->postCreate();
+    if(postCreate)
+      {
+      postCreate(prop);
+      }
+    info = info->parentTypeInformation();
+    }
+
   xAssert(prop->database());
   }
 

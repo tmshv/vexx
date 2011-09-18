@@ -20,13 +20,16 @@ private:
   QVector <TransformProperty *> _driven;
   };
 
-class GCTranslateManipulator : public GCLinearDragManipulator
+class GCTranslateManipulator : public GCVisualCompoundManipulator
   {
   S_PROPERTY_CONTAINER(GCTranslateManipulator, GCVisualCompoundManipulator, 0);
 
 public:
   GCTranslateManipulator();
 
+  GCSingularTranslateManipulator x;
+  GCSingularTranslateManipulator y;
+  GCSingularTranslateManipulator z;
   GCSingularTranslateManipulator central;
 
   void addDriven(TransformProperty *in);

@@ -95,6 +95,7 @@ class SHIFT_EXPORT SPropertyInformation
   {
 public:
   typedef void (*CreateFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
+  typedef void (*PostCreateFunction)(void *data);
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const SPropertyInformation *type,
                                                                             const QString &name,
                                                                             xsize index,
@@ -113,6 +114,7 @@ XProperties:
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
   XProperty(AssignFunction, assign, setAssign);
+  XProperty(PostCreateFunction, postCreate, setPostCreate);
 
   XProperty(xuint32, version, setVersion);
 
@@ -130,8 +132,8 @@ XProperties:
   XROProperty(xsize, instances);
 
 public:
-  template <typename PropType> static SPropertyInformation *create(const QString &typeName);
-  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName);
+  template <typename PropType> static SPropertyInformation *create(const QString &typeName, void postCreate(PropType *) = 0);
+  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName, void postCreate(PropType *) = 0);
 
   SPropertyInformation();
   SPropertyInformation(const SPropertyInformation &info);
@@ -243,11 +245,12 @@ private:
 
 #include "sproperty.h"
 
-template <typename PropType> SPropertyInformation *SPropertyInformation::create(const QString &typeName)
+template <typename PropType> SPropertyInformation *SPropertyInformation::create(const QString &typeName, void postCreate(PropType *))
   {
   SPropertyInformation *info = PropType::ParentType::createTypeInformation();
 
   info->setCreate(PropType::createProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
@@ -261,11 +264,12 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   return info;
   }
 
-template <typename PropType> SPropertyInformation *SPropertyInformation::createNoParent(const QString &typeName)
+template <typename PropType> SPropertyInformation *SPropertyInformation::createNoParent(const QString &typeName, void postCreate(PropType *))
   {
   SPropertyInformation *info = new SPropertyInformation();
 
   info->setCreate(PropType::createProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);

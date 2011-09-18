@@ -106,8 +106,8 @@ bool name::Change::apply(int mode) \
     } \
   if(mode&Inform) \
     { \
-    xAssert(property()->entity()); \
-    property()->entity()->informDirtyObservers(property()); \
+    if(property()->entity()) { \
+    property()->entity()->informDirtyObservers(property()); } \
     } \
   return true; \
   } \

@@ -12,7 +12,7 @@ SPropertyInstanceInformation::~SPropertyInstanceInformation()
   }
 
 SPropertyInformation::SPropertyInformation()
-    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0),
+    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0), _postCreate(0),
     _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
     _dynamic(false), _instances(0)
   {
@@ -24,6 +24,7 @@ SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
     _save(info.save()),
     _load(info.load()),
     _assign(info.assign()),
+    _postCreate(info.postCreate()),
     _version(info.version()),
     _parentTypeInformation(info.parentTypeInformation()),
     _size(info.size()),

@@ -38,3 +38,10 @@ float XLine::closestPointOn(const XLine &l) const
 
   return HUGE_VAL;
   }
+
+float XLine::closestPointTo(const XVector3D &l) const
+  {
+  XVector3D lineToPt = l - position();
+
+  return direction().dot(lineToPt) / direction().squaredNorm();
+  }

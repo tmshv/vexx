@@ -25,6 +25,9 @@ public:
 
   // returns t for this line, for the closest point on that line
   float closestPointOn(const XLine &l) const;
+
+  // returns the closest t to l
+  float closestPointTo(const XVector3D &l) const;
   };
 
 inline XLine operator*( const XTransform &tx, const XLine &line )

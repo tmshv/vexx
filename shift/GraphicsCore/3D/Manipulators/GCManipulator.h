@@ -92,8 +92,6 @@ class GRAPHICSCORE_EXPORT GCVisualCompoundManipulator : public GCVisualManipulat
 public:
   GCVisualCompoundManipulator();
   
-  SPropertyArray childManipulators;
-  
   virtual bool hitTest(
     const QPoint &widgetSpacePoint,
     const GCCamera *camera,
@@ -101,7 +99,7 @@ public:
     float *distance,
     GCVisualManipulator **clicked);
 
-  virtual void render(const GCCamera *camera, XRenderer *);
+  virtual void render(const GCCamera *camera, XRenderer *r) const;
 
   virtual void onMouseClick(const MouseEvent &);
   virtual void onMouseDoubleClick(const MouseEvent &);

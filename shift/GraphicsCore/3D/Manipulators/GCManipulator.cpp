@@ -61,8 +61,6 @@ SPropertyInformation *GCVisualCompoundManipulator::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCVisualCompoundManipulator>("GCVisualCompoundManipulator");
 
-  info->add(&GCVisualCompoundManipulator::childManipulators, "childManipulators");
-
   return info;
   }
 
@@ -84,7 +82,7 @@ bool GCVisualCompoundManipulator::hitTest(
   *distance = HUGE_VAL;
 
   float tempDistance = HUGE_VAL;
-  for(GCVisualManipulator *m = childManipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
+  for(GCVisualManipulator *m = firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
     {
     if(m->hitTest(widgetSpacePoint, camera, clickDirection, &tempDistance, clicked) &&
        tempDistance < *distance)
@@ -96,9 +94,9 @@ bool GCVisualCompoundManipulator::hitTest(
   return *clicked != 0;
   }
 
-void GCVisualCompoundManipulator::render(const GCCamera *camera, XRenderer *r)
+void GCVisualCompoundManipulator::render(const GCCamera *camera, XRenderer *r) const
   {
-  for(GCVisualManipulator *m = childManipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
+  for(GCVisualManipulator *m = firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
     {
     m->render(camera, r);
     }
@@ -218,23 +216,27 @@ void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e, XVector3D &rel)
     XLine a(camPosition, e.lastDirection, XLine::PointAndDirection);
     XLine b(camPosition, e.direction, XLine::PointAndDirection);
 
-    if(fabs(p.direction().dot(a.direction())) > 0.05f &&
-       fabs(p.direction().dot(b.direction())) > 0.05f)
+    float lastHitT = a.closestPointOn(p);
+    float hitT = b.closestPointOn(p);
+
+    xAssert(fabs(lastHitT) < HUGE_VAL);
+    xAssert(fabs(hitT) < HUGE_VAL);
+
+    if(lastHitT > 0.0f && lastHitT < HUGE_VAL &&
+       hitT > 0.0f && hitT < HUGE_VAL)
       {
-      float lastHitT = a.closestPointOn(p);
-      float hitT = b.closestPointOn(p);
+      XVector3D lastHit = a.sample(lastHitT);
+      XVector3D hit = b.sample(hitT);
 
-      if(lastHitT > 0.0f && lastHitT < HUGE_VAL &&
-         hitT > 0.0f && hitT < HUGE_VAL)
+      float lastPT = p.closestPointTo(lastHit);
+      float pT = p.closestPointTo(hit);
+
+      rel = p.sample(pT) - p.sample(lastPT);
+      xAssert(fabs(rel.normalized().dot(p.direction())) > 0.97f);
+
+      if(rel.norm() > HUGE_VAL)
         {
-        XVector3D lastHit = a.sample(lastHitT);
-        XVector3D hit = b.sample(hitT);
-
-        rel = hit - lastHit;
-        if(rel.norm() > HUGE_VAL)
-          {
-          xAssertFail();
-          }
+        xAssertFail();
         }
       }
     }
