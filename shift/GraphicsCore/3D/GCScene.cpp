@@ -113,7 +113,7 @@ GCManipulatableScene::UsedFlags GCManipulatableScene::mouseEvent(const MouseEven
   manipEv.direction -= manipEv.cam->transform().translation();
   manipEv.direction.normalize();
 
-  if(!_currentManipulator)
+  if(!_currentManipulator && e.type == XAbstractCanvasController::Press)
     {
     float chosenDistance = HUGE_VAL;
     GCVisualManipulator *chosenManip = 0;

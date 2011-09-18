@@ -1,5 +1,6 @@
 #include "3D/GCTransform.h"
 #include "styperegistry.h"
+#include "Manipulators/GCTranslateManipulator.h"
 #include "sdatabase.h"
 
 void TransformProperty::assignProperty(const SProperty *f, SProperty *t)
@@ -60,5 +61,10 @@ GCTransform::GCTransform()
 void GCTransform::addManipulators(SPropertyArray *a, const GCTransform *tr)
   {
   xAssert(tr == 0);
-  // todo add transform manips...
+
+  GCTranslateManipulator *manip = a->add<GCTranslateManipulator>();
+
+  manip->addDriven(&transform);
+
+  transform.connect(&manip->worldCentre);
   }

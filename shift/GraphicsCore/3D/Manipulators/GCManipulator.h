@@ -157,9 +157,6 @@ public:
   EnumProperty lockMode;
   Vector3DProperty lockDirection; // normal for planar, direction for linear, local space
 
-  // displacement moved from click point in local space
-  Vector3DProperty absoluteDisplacement;
-
   void onDrag(const MouseMoveEvent &, XVector3D &rel);
   };
 

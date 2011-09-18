@@ -89,7 +89,7 @@ SPropertyInformation *GCDistanceManipulator::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCDistanceManipulator>("GCDistanceManipulator");
 
-  Vector3DProperty::InstanceInformation *absDispInfo = info->child(&GCDistanceManipulator::absoluteDisplacement);
+  Vector3DProperty::InstanceInformation *absDispInfo = info->add(&GCDistanceManipulator::absoluteDisplacement, "absoluteDisplacement");
   absDispInfo->setCompute(computeAbsDisp);
 
   Vector3DProperty::InstanceInformation *dirInfo = info->child(&GCDistanceManipulator::lockDirection);
@@ -126,6 +126,14 @@ void GCDistanceManipulator::onDrag(const MouseMoveEvent &e)
 
   foreach(FloatProperty *f, _driven)
     {
-    *f = f->value() + rel;
+    float newVal = f->value() + rel;
+    if(newVal == newVal && newVal < HUGE_VAL)
+      {
+      *f = newVal;
+      }
+    else
+      {
+      xAssertFail();
+      }
     }
   }

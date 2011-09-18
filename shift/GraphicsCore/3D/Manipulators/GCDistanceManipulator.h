@@ -15,6 +15,9 @@ public:
   FloatProperty distance;
   FloatProperty scaleFactor;
 
+  // displacement moved from click point in local space
+  Vector3DProperty absoluteDisplacement;
+
   void addDriven(FloatProperty *in);
 
   void onDrag(const MouseMoveEvent &);

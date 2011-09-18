@@ -196,8 +196,6 @@ SPropertyInformation *GCLinearDragManipulator::createTypeInformation()
   info->add(&GCLinearDragManipulator::lockMode, "lockMode");
   info->add(&GCLinearDragManipulator::lockDirection, "lockDirection");
 
-  info->add(&GCLinearDragManipulator::absoluteDisplacement, "absoluteDisplacement");
-
   return info;
   }
 
@@ -207,6 +205,8 @@ GCLinearDragManipulator::GCLinearDragManipulator()
 
 void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e, XVector3D &rel)
   {
+  rel = XVector3D::Zero();
+
   XVector3D focus = focalPoint();
   const XVector3D &camPosition = e.cam->transform().translation();
   float focalDistanceFromCamera = (camPosition - focus).norm();
@@ -218,10 +218,25 @@ void GCLinearDragManipulator::onDrag(const MouseMoveEvent &e, XVector3D &rel)
     XLine a(camPosition, e.lastDirection, XLine::PointAndDirection);
     XLine b(camPosition, e.direction, XLine::PointAndDirection);
 
-    XVector3D lastHit = p.sample(p.closestPointOn(a));
-    XVector3D hit = p.sample(p.closestPointOn(b));
+    if(fabs(p.direction().dot(a.direction())) > 0.05f &&
+       fabs(p.direction().dot(b.direction())) > 0.05f)
+      {
+      float lastHitT = a.closestPointOn(p);
+      float hitT = b.closestPointOn(p);
 
-    rel = hit - lastHit;
+      if(lastHitT > 0.0f && lastHitT < HUGE_VAL &&
+         hitT > 0.0f && hitT < HUGE_VAL)
+        {
+        XVector3D lastHit = a.sample(lastHitT);
+        XVector3D hit = b.sample(hitT);
+
+        rel = hit - lastHit;
+        if(rel.norm() > HUGE_VAL)
+          {
+          xAssertFail();
+          }
+        }
+      }
     }
   else if(lock == Planar)
     {
