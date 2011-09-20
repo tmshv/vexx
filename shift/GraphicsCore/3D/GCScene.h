@@ -4,6 +4,7 @@
 #include "GCShadingGroup.h"
 #include "GCRenderable.h"
 #include "GCCamera.h"
+#include "XFrustum.h"
 
 class GRAPHICSCORE_EXPORT GCScene : public GCRenderable, public XCameraCanvasController
   {
@@ -34,11 +35,20 @@ public:
   GCManipulatableScene();
 
   SPropertyArray manipulators;
+  SPropertyArray selection;
 
   void render(XRenderer *) const;
 
   void clearManipulators();
   void addAllManipulators();
+
+  void beginMouseSelection(const XVector3D &sel);
+  void moveMouseSelection(const XVector3D &sel);
+  void endMouseSelection(const XVector3D &sel);
+  bool isMouseSelecting() const;
+
+  void raySelect(const XVector3D &sel);
+  void marqueeSelect(const XFrustum &frus);
 
   virtual UsedFlags mouseEvent(const MouseEvent &);
   virtual UsedFlags wheelEvent(const WheelEvent &);
