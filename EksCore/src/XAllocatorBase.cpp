@@ -1,5 +1,7 @@
 #include "XAllocatorBase"
 
+X_IMPLEMENT_EVENT(xTotalGlobalAllocatorSize, xsize, XEventLogger<xsize>::Large);
+
 XGlobalAllocator g_allocator;
 
 XGlobalAllocator *XGlobalAllocator::instance()

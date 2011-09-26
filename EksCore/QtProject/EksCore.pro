@@ -22,7 +22,8 @@ SOURCES += ../src/XObject.cpp \
     ../src/XProfiler.cpp \
     ../src/XAllocatorBase.cpp \
     ../src/XUnorderedMap.cpp \
-    ../src/XGlobal.cpp
+    ../src/XGlobal.cpp \
+    ../src/XEventLogger.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -130,7 +131,12 @@ HEADERS += ../XObject \
     ../Eigen/src/Core/Array.h \
     ../XAllocatorBase \
     ../XBucketAllocator \
-    ../XUnorderedMap
+    ../XUnorderedMap \
+    ../XEventLogger
+
+
+
+
 
 
 

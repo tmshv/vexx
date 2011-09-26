@@ -1,0 +1,91 @@
+#ifndef XEVENTLOGGER_H
+#define XEVENTLOGGER_H
+
+#include "XTime"
+#include "QMetaType"
+
+class XEventManager
+  {
+  XEventLoggerInternal *firstEvent();
+  static void addEvent(XEventLoggerInternal *);
+  };
+
+class XEventLoggerInternal
+  {
+public:
+  XEventLoggerInternal(const char *name, int type, xsize size, xsize count);
+
+  QString name;
+  int type;
+  xsize size;
+  xsize count;
+  xsize used;
+  XEventLoggerInternal *next;
+
+  xuint8 *first;
+  xuint8 *data[1];
+
+  const void *at(xsize index) const;
+  const void *last() const;
+  void *last();
+  void add();
+
+  template <typename T> static XEventLoggerInternal *init(const char *name, xsize size)
+    {
+    XEventLoggerInternal *ev = (XEventLoggerInternal *)malloc(sizeof(XEventLoggerInternal)+(sizeof(T)*(size-1)));
+    new(ev) XEventLoggerInternal(name, qMetaTypeId<T>(), sizeof(T), size);
+    return ev;
+    }
+  };
+
+#define X_IMPLEMENT_EVENT(name, type, size) XEventLoggerInternal *name = XEventLoggerInternal::init<type>(#name, size)
+#define X_DECLARE_EVENT(exp, name) exp extern XEventLoggerInternal *name
+
+template <typename T> class XEventLogger
+  {
+public:
+  enum
+    {
+    Small = 128,
+    Large = 1024
+    };
+
+  struct Pair
+    {
+    XTime time;
+    T value;
+    };
+
+  XEventLogger(XEventLoggerInternal *l) : logger(l)
+    {
+    xAssert(l->type == qMetaTypeId<T>());
+    }
+
+  xsize size() const
+    {
+    return logger->used;
+    }
+
+  const Pair &at(xsize index) const
+    {
+    void *p = logger->at(index);
+    return *(Pair*)p;
+    }
+
+  const Pair &last() const
+    {
+    void *p = logger->last();
+    return *(Pair*)p;
+    }
+
+  Pair &addNext()
+    {
+    logger->add();
+    return last();
+    }
+
+private:
+  XEventLogger *logger;
+  };
+
+#endif // XEVENTLOGGER_H
