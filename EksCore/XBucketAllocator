@@ -296,7 +296,8 @@ public:
     XFixedSizeBucketAllocator *b = _internal.value(size, 0);
     if(!b)
       {
-      _internal.insert(size, xAllocateAndConstruct(_allocator, XFixedSizeBucketAllocator, size, _defaultSize, _expandSize, _allocator));
+      b = xAllocateAndConstruct(_allocator, XFixedSizeBucketAllocator, size, _defaultSize, _expandSize, _allocator);
+      _internal.insert(size, b);
       }
 
     return b->alloc();
