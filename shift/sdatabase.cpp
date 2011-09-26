@@ -31,7 +31,7 @@ SDatabase::~SDatabase()
 
   foreach(SChange *ch, _done)
     {
-    destoryChangeMemory(ch);
+    xDestroyAndFree(changeAllocator(), SChange, ch);
     }
 
   xAssert(_memory.empty());
@@ -183,11 +183,6 @@ QString SDatabase::pathSeparator()
   return "/";
   }
 
-QString SDatabase::propertySeparator()
-  {
-  return ":";
-  }
-
 SBlock::SBlock(SDatabase *db) : _db(db)
   {
   _db->beginBlock();
@@ -196,19 +191,6 @@ SBlock::SBlock(SDatabase *db) : _db(db)
 SBlock::~SBlock()
   {
   _db->endBlock();
-  }
-
-void *SDatabase::allocateChangeMemory(xsize s)
-  {
-  SProfileFunction
-  return _memory.alloc(s);
-  }
-
-void SDatabase::destoryChangeMemory(SChange *ptr)
-  {
-  SProfileFunction
-  ptr->~SChange();
-  _memory.free(ptr);
   }
 
 void SDatabase::inform()

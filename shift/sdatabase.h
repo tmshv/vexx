@@ -24,14 +24,7 @@ public:
   void beginBlock();
   void endBlock();
 
-  //void write(const SProperty *, SPropertyData &, SPropertyData::Mode mode) const;
-  //SProperty *read(const SPropertyData &, SPropertyContainer *parent, SPropertyData::Mode mode);
-
   static QString pathSeparator();
-  static QString propertySeparator();
-
-  void *allocateChangeMemory(xsize);
-
 
 #ifdef X_CPPOX_SUPPORT
   template <typename CLS, typename ...CLSARGS> void doChange(CLSARGS&&... params)
@@ -58,7 +51,7 @@ public:
         }
 #endif
       QMutexLocker l(&_doChange);
-      void *mem = allocateChangeMemory(sizeof(CLS));
+      void *mem = changeAllocator()->alloc(sizeof(CLS));
       SChange* change = new(mem) CLS(std::forward<CLSARGS>(params)...);
 
       bool result = change->apply(mode);
@@ -84,7 +77,7 @@ public:
       ((SChange&)change).apply(mode); \
     }else { \
       QMutexLocker l(&_doChange); \
-      void *mem = allocateChangeMemory(sizeof(CLS)); \
+      void *mem = changeAllocator()->alloc(sizeof(CLS)); \
       SChange* change = new(mem) CLS(__VA_ARGS__); \
       bool result = change->apply(mode); \
       if(result) { \
@@ -118,7 +111,10 @@ private:
   void deleteDynamicProperty(SProperty *);
   void deleteProperty(SProperty *);
 
-  void destoryChangeMemory(SChange *);
+  XAllocatorBase *changeAllocator()
+    {
+    return &_memory;
+    }
 
   template <typename T> static T *createHelper()
     {
