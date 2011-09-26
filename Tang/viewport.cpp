@@ -71,8 +71,6 @@ Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
   transform2->geometry.setPointed(&cube->geometry);
 
   op->source.setPointed(scene);
-
-  scene->addAllManipulators();
   }
 
 Viewport::~Viewport()

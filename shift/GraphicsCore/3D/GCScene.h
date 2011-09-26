@@ -35,12 +35,12 @@ public:
   GCManipulatableScene();
 
   SPropertyArray manipulators;
-  SPropertyArray selection;
+  PointerArray selection;
 
   void render(XRenderer *) const;
 
   void clearManipulators();
-  void addAllManipulators();
+  void refreshManipulators();
 
   void beginMouseSelection(const XVector3D &sel);
   void moveMouseSelection(const XVector3D &sel);
@@ -52,6 +52,12 @@ public:
 
   virtual UsedFlags mouseEvent(const MouseEvent &);
   virtual UsedFlags wheelEvent(const WheelEvent &);
+
+private:
+  bool _mouseSelecting;
+  bool _hasMouseMoved;
+  XVector3D _initialRay;
+  XVector3D _finalRay;
   };
 
 #endif // GCSCENE_H

@@ -48,18 +48,26 @@ void GCScene::render(XRenderer *r) const
 
 S_IMPLEMENT_PROPERTY(GCManipulatableScene)
 
+void computeManips(const SPropertyInstanceInformation *inst, SPropertyContainer *cont)
+  {
+  GCManipulatableScene *s = cont->uncheckedCastTo<GCManipulatableScene>();
+  s->refreshManipulators();
+  }
+
 SPropertyInformation *GCManipulatableScene::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCManipulatableScene>("GCManipulatableScene");
 
-  info->add(&GCManipulatableScene::manipulators, "manipulators");
-  info->add(&GCManipulatableScene::selection, "selection");
+  SPropertyArray::InstanceInformation *manInfo = info->add(&GCManipulatableScene::manipulators, "manipulators");
+  manInfo->setCompute(computeManips);
+
+  PointerArray::InstanceInformation *selInfo = info->add(&GCManipulatableScene::selection, "selection");
+  selInfo->setAffects(manInfo);
 
   return info;
   }
 
-
-GCManipulatableScene::GCManipulatableScene() : _currentManipulator(0)
+GCManipulatableScene::GCManipulatableScene() : _currentManipulator(0), _mouseSelecting(false)
   {
   }
 
@@ -68,7 +76,7 @@ void GCManipulatableScene::clearManipulators()
   manipulators.clear();
   }
 
-void GCManipulatableScene::addAllManipulators()
+void GCManipulatableScene::refreshManipulators()
   {
   SBlock b(database());
 
@@ -197,4 +205,51 @@ GCManipulatableScene::UsedFlags GCManipulatableScene::mouseEvent(const MouseEven
 GCManipulatableScene::UsedFlags GCManipulatableScene::wheelEvent(const WheelEvent &w)
   {
   return XCameraCanvasController::wheelEvent(w);
+  }
+
+
+void GCManipulatableScene::beginMouseSelection(const XVector3D &sel)
+  {
+  _mouseSelecting = true;
+  _hasMouseMoved = false;
+  _initialRay = sel;
+  }
+
+void GCManipulatableScene::moveMouseSelection(const XVector3D &sel)
+  {
+  _hasMouseMoved = true;
+  _finalRay = sel;
+  }
+
+void GCManipulatableScene::endMouseSelection(const XVector3D &sel)
+  {
+  _mouseSelecting = false;
+  _finalRay = sel;
+
+  if(_hasMouseMoved)
+    {
+    //marqueeSelect();
+    raySelect(_initialRay);
+    }
+  else
+    {
+    raySelect(_initialRay);
+    }
+  }
+
+bool GCManipulatableScene::isMouseSelecting() const
+  {
+  return _mouseSelecting;
+  }
+
+void GCManipulatableScene::raySelect(const XVector3D &sel)
+  {
+  GCShadingGroup *g = shadingGroups.firstChild<GCShadingGroup>();
+  GCGeometryTransform *t = g->geometry.firstChild()->input()->castTo<GCGeometryTransform>();
+
+  }
+
+void GCManipulatableScene::marqueeSelect(const XFrustum &frus)
+  {
+  xAssertFail();
   }

@@ -343,8 +343,11 @@ bool SProperty::ConnectionChange::apply(int mode)
     if(_mode == Connect)
       {
       _driver->connectInternal(_driven);
-      setParentHasInputConnection(_driven);
-      setParentHasOutputConnection(_driver);
+      //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
+        {
+        setParentHasInputConnection(_driven);
+        setParentHasOutputConnection(_driver);
+        }
       setDependantsDirty(_driver, true);
       }
     else if(_mode == Disconnect)
@@ -365,8 +368,11 @@ bool SProperty::ConnectionChange::apply(int mode)
     else if(_mode == Disconnect)
       {
       _driver->connectInternal(_driven);
-      setParentHasInputConnection(_driven);
-      setParentHasOutputConnection(_driver);
+      //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
+        {
+        setParentHasInputConnection(_driven);
+        setParentHasOutputConnection(_driver);
+        }
       setDependantsDirty(_driver, true);
       }
     }
