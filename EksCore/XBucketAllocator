@@ -289,9 +289,9 @@ public:
       }
     }
 
-  void *alloc(xsize size)
+  void *alloc(xsize size, xsize alignment=X_ALIGN_BYTE_COUNT)
     {
-    size = X_ROUND_TO_ALIGNMENT(xsize, size);
+    size = X_ROUND_TO_SPECIFIC_ALIGNMENT(xsize, size, alignment);
 
     XFixedSizeBucketAllocator *b = _internal.value(size, 0);
     if(!b)

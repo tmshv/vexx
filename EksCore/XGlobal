@@ -46,7 +46,8 @@ inline void xNoOp() { }
 
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #define X_ALIGN_BYTE_COUNT 16
-#define X_ROUND_TO_ALIGNMENT(type, exp) ((type)(exp + (ptrdiff_t)X_ALIGN_BYTE_COUNT - (((ptrdiff_t)exp)&((ptrdiff_t)X_ALIGN_BYTE_COUNT-1))))
+#define X_ROUND_TO_ALIGNMENT(type, exp) X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, X_ALIGN_BYTE_COUNT)
+#define X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, align) ((type)(exp + (ptrdiff_t)align - (((ptrdiff_t)exp)&((ptrdiff_t)align-1))))
 #define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&(X_ALIGN_BYTE_COUNT-1)) == 0);
 
 #ifdef X_DEBUG
