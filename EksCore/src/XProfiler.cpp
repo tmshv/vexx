@@ -111,8 +111,8 @@ void XProfiler::clearResults()
   if(g_instance)
     {
     g_instance->_currentContexts.clear();
-    g_instance->_contextAllocator.~XRandomAccessFixedSizeAllocator();
-    new(&g_instance->_contextAllocator) XRandomAccessFixedSizeAllocator(sizeof(ProfilingContext), 256, 1024);
+    g_instance->_contextAllocator.~XFixedSizeBucketAllocator();
+    new(&g_instance->_contextAllocator) XFixedSizeBucketAllocator(sizeof(ProfilingContext), 256, 1024);
 
     g_instance->_rootContext = (ProfilingContext *)g_instance->_contextAllocator.alloc();
     new(g_instance->_rootContext) ProfilingContext(0, X_UINT32_SENTINEL, "");

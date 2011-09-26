@@ -14,7 +14,6 @@
 #include "XGLRenderer.h"
 
 class XEnvironmentRenderer;
-class Application;
 
 class GCScreenRenderTarget;
 

@@ -4,7 +4,7 @@
 #include "sglobal.h"
 #include "sentity.h"
 #include "sbaseproperties.h"
-#include "XRandomAccessAllocator"
+#include "XBucketAllocator"
 #include "sloader.h"
 
 class SChange;
@@ -139,7 +139,7 @@ private:
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 
-  XRandomAccessAllocator _memory;
+  XBucketAllocator _memory;
 
   friend class SProperty;
   friend class SPropertyContainer;
