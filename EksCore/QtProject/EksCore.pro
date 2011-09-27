@@ -23,7 +23,8 @@ SOURCES += ../src/XObject.cpp \
     ../src/XAllocatorBase.cpp \
     ../src/XUnorderedMap.cpp \
     ../src/XGlobal.cpp \
-    ../src/XEventLogger.cpp
+    ../src/XEventLogger.cpp \
+    ../src/XBucketAllocator.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
