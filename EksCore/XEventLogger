@@ -4,42 +4,43 @@
 #include "XTime"
 #include "QMetaType"
 
-class XEventManager
-  {
-  XEventLoggerInternal *firstEvent();
-  static void addEvent(XEventLoggerInternal *);
-  };
-
 class XEventLoggerInternal
   {
 public:
-  XEventLoggerInternal(const char *name, int type, xsize size, xsize count);
+  XEventLoggerInternal(const char *name, int type, xsize size, xsize count, const char *units);
 
   QString name;
+  QString units;
   int type;
   xsize size;
   xsize count;
-  xsize used;
   XEventLoggerInternal *next;
 
-  xuint8 *first;
-  xuint8 *data[1];
+  xuint8 *firstData;
+  xuint8 *nextData;
+  xuint8 data[1];
 
+  xsize used() const;
   const void *at(xsize index) const;
   const void *last() const;
   void *last();
   void add();
 
-  template <typename T> static XEventLoggerInternal *init(const char *name, xsize size)
+  template <typename T> static XEventLoggerInternal *init(const char *name, xsize size, const char *units)
     {
     XEventLoggerInternal *ev = (XEventLoggerInternal *)malloc(sizeof(XEventLoggerInternal)+(sizeof(T)*(size-1)));
-    new(ev) XEventLoggerInternal(name, qMetaTypeId<T>(), sizeof(T), size);
+    new(ev) XEventLoggerInternal(name, qMetaTypeId<T>(), sizeof(XEventLogger<T>::Pair), size, units);
     return ev;
     }
   };
 
-#define X_IMPLEMENT_EVENT(name, type, size) XEventLoggerInternal *name = XEventLoggerInternal::init<type>(#name, size)
-#define X_DECLARE_EVENT(exp, name) exp extern XEventLoggerInternal *name
+#define X_IMPLEMENT_LOGGER(name, type, size, units) XEventLoggerInternal *name = XEventLoggerInternal::init<type>(#name, size, units)
+#define X_DECLARE_LOGGER(exp, name) exp extern XEventLoggerInternal *name
+
+#define X_IMPLEMENT_MEMORY_LOGGER(name) X_IMPLEMENT_LOGGER(name, xsize, XEventLogger<xsize>::Large, "bytes")
+#define X_DECLARE_MEMORY_LOGGER X_DECLARE_LOGGER
+#define X_MEMORY_LOGGER_ALLOC(name, s) { XEventLogger<xsize> l(name); if(l.size()) { l.logNow(s + l.last().value); } else { l.logNow(s); } }
+#define X_MEMORY_LOGGER_FREE(name, s) { XEventLogger<xsize> l(name); xAssert(l.size()); l.logNow(l.last().value - s); }
 
 template <typename T> class XEventLogger
   {
@@ -56,36 +57,63 @@ public:
     T value;
     };
 
-  XEventLogger(XEventLoggerInternal *l) : logger(l)
+  XEventLogger(XEventLoggerInternal *l) : _logger(l)
     {
     xAssert(l->type == qMetaTypeId<T>());
     }
 
   xsize size() const
     {
-    return logger->used;
+    return _logger->used();
     }
 
   const Pair &at(xsize index) const
     {
-    void *p = logger->at(index);
+    void *p = _logger->at(index);
     return *(Pair*)p;
+    }
+
+  Pair &last()
+    {
+    void *p = _logger->last();
+    Pair *pair = (Pair*)p;
+    return *pair;
     }
 
   const Pair &last() const
     {
-    void *p = logger->last();
-    return *(Pair*)p;
+    const void *p = _logger->last();
+    const Pair *pair = (Pair*)p;
+    return *pair;
     }
 
   Pair &addNext()
     {
-    logger->add();
+    _logger->add();
     return last();
     }
 
+  void log(const T &t, const XTime& time)
+    {
+    Pair &p(addNext());
+    p.time = time;
+    p.value = t;
+    }
+
+  void logNow(const T &t)
+    {
+    log(t, XTime::now());
+    }
+
 private:
-  XEventLogger *logger;
+  XEventLoggerInternal *_logger;
+  };
+
+class XEventManager
+  {
+public:
+  XEventLoggerInternal *firstEvent();
+  static void addEvent(XEventLoggerInternal *);
   };
 
 #endif // XEVENTLOGGER_H

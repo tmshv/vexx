@@ -23,6 +23,6 @@ public:
 #define xAllocateAndConstruct(a, t, ...) new(a->alloc(sizeof(t))) t(__VA_ARGS__)
 #define xDestroyAndFree(a, t, m) m-> ~##t (); a->free(m)
 
-X_DECLARE_EVENT(EKSCORE_EXPORT, xTotalGlobalAllocatorSize);
+X_DECLARE_MEMORY_LOGGER(EKSCORE_EXPORT, xTotalGlobalAllocatorSize);
 
 #endif // XALLOCATORBASE_H

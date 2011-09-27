@@ -13,17 +13,34 @@ void XEventManager::addEvent(XEventLoggerInternal *e)
   g_firstEvent = e;
   }
 
-XEventLoggerInternal::XEventLoggerInternal(const char *n, int t, xsize s, xsize c)
-    : name(n), type(t), size(s), count(c), used(0), next(0), first(0)
+XEventLoggerInternal::XEventLoggerInternal(const char *n, int t, xsize s, xsize c, const char *units)
+    : name(n), units(units), type(t), size(s), count(c), firstData(0), nextData(data)
   {
   XEventManager::addEvent(this);
   }
 
+
+xsize XEventLoggerInternal::used() const
+  {
+  if(nextData == data)
+    {
+    return 0;
+    }
+
+  if(nextData == firstData)
+    {
+    return count;
+    }
+
+  return (nextData - firstData) / size;
+  }
+
 const void *XEventLoggerInternal::at(xsize index) const
   {
-  xuint8 *d = first + (index *(sizeof(XTime) + size));
+  xAssert(firstData);
+  xuint8 *d = firstData + (index * size);
 
-  const xsize s = (count * (sizeof(XTime) + size));
+  const xsize s = (count * size);
   if(d > (data + s))
     {
     d -= s;
@@ -34,28 +51,53 @@ const void *XEventLoggerInternal::at(xsize index) const
 
 const void *XEventLoggerInternal::last() const
   {
-  if(used == 0)
+  if(nextData == data)
     {
     return 0;
     }
 
-  if(used == count && first != data)
+  xuint8 *p = nextData - size;
+  if(p < data)
     {
-    return first - (sizeof(XTime) + size);
+    p += (used() * size);
     }
 
-  return data + (used *(sizeof(XTime) + size));
+  return p;
   }
 
 void *XEventLoggerInternal::last()
   {
-  if(used == count && first != data)
+  if(nextData == data)
     {
-    return first - (sizeof(XTime) + size);
+    return 0;
     }
-  return data + (used *(sizeof(XTime) + size));
+
+  xuint8 *p = nextData - size;
+  if(p < data)
+    {
+    p += (used() * size);
+    }
+
+  return p;
   }
 
 void XEventLoggerInternal::add()
   {
+  bool syncFirst = nextData == firstData;
+
+  if(!firstData)
+    {
+    firstData = data;
+    }
+
+  nextData += size;
+  if(nextData > (data + count * size))
+    {
+    nextData = data;
+    }
+
+  if(syncFirst)
+    {
+    firstData = nextData;
+    }
   }
