@@ -14,7 +14,7 @@ void XEventManager::addEvent(XEventLoggerInternal *e)
   }
 
 XEventLoggerInternal::XEventLoggerInternal(const char *n, int t, xsize s, xsize c, const char *units)
-    : name(n), units(units), type(t), size(s), count(c), firstData(0), nextData(data)
+    : name(n), units(units), type(t), size(s), count(c), next(0), firstData(0), nextData(data)
   {
   XEventManager::addEvent(this);
   }

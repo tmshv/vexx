@@ -1,10 +1,11 @@
 #ifndef XEVENTLOGGER_H
 #define XEVENTLOGGER_H
 
+#include "XGlobal"
 #include "XTime"
 #include "QMetaType"
 
-class XEventLoggerInternal
+class EKSCORE_EXPORT XEventLoggerInternal
   {
 public:
   XEventLoggerInternal(const char *name, int type, xsize size, xsize count, const char *units);

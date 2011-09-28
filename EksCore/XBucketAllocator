@@ -26,16 +26,20 @@ public:
     XProperty(Bucket *, next, setNext);
 
   public:
-    Bucket(XAllocatorBase *allocator, xsize objectSize, xsize count)
-        : _allocator(allocator), _count(count), _size(objectSize), _next(0)
+    Bucket(xsize objectSize, xsize count)
+        : _count(count), _size(objectSize), _next(0)
       {
       xAssertIsAligned(objectSize);
       xAssert((count % 32) == 0);
-      xAssert(_allocator);
 
-      _alloc = (xuint8*)_allocator->alloc(_count*_size + (_count / 8) + X_ALIGN_BYTE_COUNT);
+      void *a = _alloc;
+
       _memory = X_ROUND_TO_ALIGNMENT(xuint8 *, _alloc);
+      xAssertIsAligned(_memory);
       _masks = (xuint32*)((xuint8*)_memory + (_count*_size));
+
+      void *b = _memory;
+      void *c = _masks;
 
       for(xsize i=0, s=(_count/32); i<s; ++i)
         {
@@ -45,7 +49,6 @@ public:
 
     ~Bucket()
       {
-      _allocator->free(_alloc);
       }
 
     void *alloc()
@@ -80,7 +83,16 @@ public:
 
           // mark spareBit as used.
           _masks[i] = mask|(1<<spareBit);
-          return (void*)&(_memory[_size*((i*32)+spareBit)]);
+
+          xsize block = i * 32 + spareBit;
+          xsize offset = block * _size;
+
+          xuint8* data = _memory;
+          data += offset;
+
+          void *memory = (void *)data;
+          xAssertIsAligned(data);
+          return memory;
           }
         }
       return 0;
@@ -149,8 +161,7 @@ public:
     xsize _size;
     xuint32 *_masks;
     xuint8 *_memory;
-    xuint8 *_alloc;
-    XAllocatorBase *_allocator;
+    xuint8 _alloc[1];
     };
 
   XFixedSizeBucketAllocator(xsize s, xsize d=128, xsize e=1024, XAllocatorBase *allocator=XGlobalAllocator::instance())
@@ -160,7 +171,7 @@ public:
 
     if(d != 0)
       {
-      _first = xAllocateAndConstruct(_allocator, Bucket, _allocator, _size, _defaultSize);
+      _first = createBucket(_defaultSize);
       }
     }
 
@@ -170,9 +181,25 @@ public:
     while(b)
       {
       Bucket *b2 = b->next();
-      xDestroyAndFree(_allocator, Bucket, b);
+      destroyBucket(b);
       b = b2;
       }
+    }
+
+  Bucket *createBucket(xsize count)
+    {
+    xsize extraBucketSize = count*_size + (count / 8) + X_ALIGN_BYTE_COUNT - 1;
+    void *alloc = _allocator->alloc(sizeof(Bucket) + extraBucketSize);
+
+    // create the new bucket, with the extra space at the end.
+    new(alloc) Bucket(_size, count);
+
+    return (Bucket *)alloc;
+    }
+
+  void destroyBucket(Bucket *b)
+    {
+    xDestroyAndFree(_allocator, Bucket, b);
     }
 
   void *alloc()
@@ -194,7 +221,7 @@ public:
       b = b->next();
       }
 
-    Bucket* newBlock = xAllocateAndConstruct(_allocator, Bucket, _allocator, _size, _expandSize);
+    Bucket* newBlock = createBucket(_defaultSize);
 
     // add the new bucket to the end.
     if(_first)
@@ -313,7 +340,9 @@ public:
       _internal.insert(size, b);
       }
 
-    return b->alloc();
+    void *mem = b->alloc();
+    xAssertIsSpecificAligned(mem, alignment);
+    return mem;
     }
 
   void free(void *ptr)
