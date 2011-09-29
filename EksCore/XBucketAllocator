@@ -31,15 +31,9 @@ public:
       {
       xAssertIsAligned(objectSize);
       xAssert((count % 32) == 0);
-
-      void *a = _alloc;
-
       _memory = X_ROUND_TO_ALIGNMENT(xuint8 *, _alloc);
       xAssertIsAligned(_memory);
       _masks = (xuint32*)((xuint8*)_memory + (_count*_size));
-
-      void *b = _memory;
-      void *c = _masks;
 
       for(xsize i=0, s=(_count/32); i<s; ++i)
         {

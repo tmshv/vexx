@@ -110,10 +110,12 @@ private:
   XEventLoggerInternal *_logger;
   };
 
-class XEventManager
+class EKSCORE_EXPORT XEventManager
   {
 public:
-  XEventLoggerInternal *firstEvent();
+  static void totalAvailableTime(XTime &min, XTime &max);
+
+  static XEventLoggerInternal *firstEvent();
   static void addEvent(XEventLoggerInternal *);
   };
 

@@ -1,5 +1,43 @@
 #include "XEventLogger"
 
+void XEventManager::totalAvailableTime(XTime &min, XTime &max)
+  {
+  min = XTime();
+  max = XTime();
+  bool init = false;
+  XEventLoggerInternal *e = firstEvent();
+  while(e)
+    {
+    if(e->used() > 0)
+      {
+      const void *data = e->at(0);
+      xAssert(data);
+      const XTime *t = (const XTime *)data;
+
+      if(*t < min || init == false)
+        {
+        min = *t;
+        }
+
+      data = e->last();
+      xAssert(data);
+      t = (XTime *)data;
+
+      if(*t > max || init == false)
+        {
+        max = *t;
+        }
+
+      if(init == false)
+        {
+        init = true;
+        }
+      }
+
+    e = e->next;
+    }
+  }
+
 XEventLoggerInternal *g_firstEvent = 0;
 XEventLoggerInternal *XEventManager::firstEvent()
   {
