@@ -23,6 +23,7 @@ public:
 
   xsize used() const;
   const void *at(xsize index) const;
+  const void *dataAt(xsize index) const;
   const void *last() const;
   void *last();
   void add();

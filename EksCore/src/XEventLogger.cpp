@@ -87,6 +87,17 @@ const void *XEventLoggerInternal::at(xsize index) const
   return d;
   }
 
+const void *XEventLoggerInternal::dataAt(xsize index) const
+  {
+  const void *d = at(index);
+  if(d)
+    {
+    d = (xuint8*)d + sizeof(XTime);
+    }
+
+  return d;
+  }
+
 const void *XEventLoggerInternal::last() const
   {
   if(nextData == data)

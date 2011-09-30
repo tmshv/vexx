@@ -16,6 +16,7 @@ public:
   void onEventsLogged();
   void paintEvent(QPaintEvent *);
   QSize sizeHint() const;
+  float typeToUnscaledHeight(int type, const void *d);
 
   };
 
