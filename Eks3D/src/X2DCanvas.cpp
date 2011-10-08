@@ -31,7 +31,13 @@ void X2DCanvas::update(XAbstractRenderModel::UpdateMode c)
   QWidget::update();
   }
 
-XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCameraCanvasController(this, canvas)
+bool X2DCanvas::isShown()
+  {
+  return !isHidden() && hasFocus();
+  }
+
+
+XSimple2DCanvasController::XSimple2DCanvasController(X2DCanvas *canvas) : XCameraCanvasController(canvas)
   {
   }
 

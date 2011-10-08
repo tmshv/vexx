@@ -25,6 +25,8 @@ public:
     virtual XAbstractTexture *getTexture();
     virtual XAbstractFramebuffer *getFramebuffer( int options, int cf, int df, int width, int heightg );
 
+    virtual void debugRenderLocator(DebugLocatorMode m);
+
     virtual void destroyShader( XAbstractShader * );
     virtual void destroyGeometry( XAbstractGeometry * );
     virtual void destroyTexture( XAbstractTexture * );
@@ -33,7 +35,7 @@ public:
     virtual void pushTransform( const XTransform & );
     virtual void popTransform( );
 
-    virtual void clear();
+    virtual void clear(int=ClearColour|ClearDepth);
 
     virtual void enableRenderFlag( RenderFlags );
     virtual void disableRenderFlag( RenderFlags );
@@ -47,9 +49,8 @@ public:
 
     virtual void setFramebuffer( const XFramebuffer * );
 
-
     QSize viewportSize();
-private:
+
     QGLContext *_context;
     XGLShader *_currentShader;
     QSize _size;

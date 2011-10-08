@@ -65,10 +65,10 @@ public:
 
 private:
     mutable XAbstractGeometry *_internal;
-    XSet <QString> _changedA1;
-    XSet <QString> _changedA2;
-    XSet <QString> _changedA3;
-    XSet <QString> _changedA4;
+    mutable XSet <QString> _changedA1;
+    mutable XSet <QString> _changedA2;
+    mutable XSet <QString> _changedA3;
+    mutable XSet <QString> _changedA4;
     mutable bool _changedP;
     mutable bool _changedL;
     mutable bool _changedT;
@@ -107,7 +107,7 @@ public:
 
 namespace XMeshUtilities
 {
-bool intersect( QString semantic, const XLine &ray, const XGeometry &geo, XVector3DList &pos, XList <unsigned int> &tris );
+EKS3D_EXPORT bool intersect( QString semantic, const XLine &ray, const XGeometry &geo, XVector3DList *pos=0, XList <unsigned int> *tris=0 );
 };
 
 #endif // XGEOMETRY_H

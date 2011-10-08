@@ -31,13 +31,25 @@ public:
     virtual void pushTransform( const XTransform & ) = 0;
     virtual void popTransform( ) = 0;
 
-    virtual void clear() = 0;
+    enum ClearMode
+      {
+      ClearColour = 1,
+      ClearDepth = 2
+      };
+    virtual void clear(int=ClearColour|ClearDepth) = 0;
 
     // creation accessors for abstract types
     virtual XAbstractShader *getShader( ) = 0;
     virtual XAbstractGeometry *getGeometry( XGeometry::BufferType ) = 0;
     virtual XAbstractTexture *getTexture() = 0;
     virtual XAbstractFramebuffer *getFramebuffer( int options, int colourFormat, int depthFormat, int width, int height ) = 0;
+
+    enum DebugLocatorMode
+      {
+      None=0,
+      ClearShader=1
+      };
+    virtual void debugRenderLocator(DebugLocatorMode) = 0;
 
     // destroy abstract types
     virtual void destroyShader( XAbstractShader * ) = 0;

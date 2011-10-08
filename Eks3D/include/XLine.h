@@ -19,9 +19,22 @@ public:
 
   XLine( XVector3D, XVector3D, ConstructionMode=TwoPoints );
 
+  void transform(const XTransform &);
+
   XVector3D sample(float) const;
+
+  // returns t for this line, for the closest point on that line
+  float closestPointOn(const XLine &l) const;
+
+  // returns the closest t to l
+  float closestPointTo(const XVector3D &l) const;
   };
 
-XLine operator*( const XTransform &tx, const XLine &line );
+inline XLine operator*( const XTransform &tx, const XLine &line )
+  {
+  XLine l(line);
+  l.transform(tx);
+  return l;
+  }
 
 #endif // XLINE_H

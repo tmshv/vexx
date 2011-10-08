@@ -3,7 +3,8 @@
 #include "XAbstractDelegate.h"
 #include "XAbstractCanvasController.h"
 
-XAbstractCanvas::XAbstractCanvas(XAbstractRenderModel *m, XAbstractCanvasController *c) : _model(0), _controller(c), _iterator(0)
+XAbstractCanvas::XAbstractCanvas(XAbstractRenderModel *m, XAbstractCanvasController *c)
+    : _model(0), _controller(c), _iterator(0), _delayedUpdate(false)
   {
   setModel(m);
   }
@@ -13,8 +14,9 @@ XAbstractCanvas::~XAbstractCanvas()
   setModel(0);
   }
 
-void XAbstractCanvas::update(XAbstractRenderModel::UpdateMode)
+void XAbstractCanvas::doUpdate()
   {
+  X3DDataModelFunction
   xAssert(!_model || (_model && _iterator));
   if(_model && _iterator)
     {
@@ -30,8 +32,26 @@ void XAbstractCanvas::update(XAbstractRenderModel::UpdateMode)
     }
   }
 
+void XAbstractCanvas::update(XAbstractRenderModel::UpdateMode)
+  {
+  if(isShown())
+    {
+    doUpdate();
+    }
+  else
+    {
+    _delayedUpdate = true;
+    }
+  }
+
 void XAbstractCanvas::paint()
   {
+  if(_delayedUpdate)
+    {
+    doUpdate();
+    _delayedUpdate = false;
+    }
+
   xAssert(_model && _iterator);
   if(_model && _iterator)
     {

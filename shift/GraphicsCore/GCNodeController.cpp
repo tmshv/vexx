@@ -21,22 +21,18 @@ GCNodeController::~GCNodeController()
     }
   }
 
-GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
-                                     QPoint widgetSpacePoint,
-                                     Qt::MouseButton triggerButton,
-                                     Qt::MouseButtons buttonsDown,
-                                     Qt::KeyboardModifiers modifiers)
+GCNodeController::UsedFlags GCNodeController::mouseEvent(const MouseEvent &e)
   {
   QTransform transform = static_cast<X2DCanvas*>(canvas())->transform().inverted();
 
 
-  UsedFlags result = XSimple2DCanvasController::mouseEvent(type, widgetSpacePoint, triggerButton, buttonsDown, modifiers);
+  UsedFlags result = XSimple2DCanvasController::mouseEvent(e);
   if(result != NotUsed)
     {
     return result;
     }
 
-  QPoint graphSpacePoint = transform.map(widgetSpacePoint);
+  QPoint graphSpacePoint = transform.map(e.point);
   QPoint lKP = transform.map(lastKnownMousePosition());
 
   QPoint mouseDelta(graphSpacePoint - lKP);
@@ -46,7 +42,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
     _iterator = canvas()->model()->createIterator();
     }
 
-  if(type == Move && _controlMode == MovingEntity && _interactionEntity)
+  if(e.type == Move && _controlMode == MovingEntity && _interactionEntity)
     {
     xAssert(_interactionDelegate);
     xAssert(_interactionEntity);
@@ -54,13 +50,13 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
 
     result |= Used|NeedsUpdate;
     }
-  if(type == Move && (_controlMode == ConnectingProperty || _controlMode == ConnectingEntity) && _interactionEntity)
+  if(e.type == Move && (_controlMode == ConnectingProperty || _controlMode == ConnectingEntity) && _interactionEntity)
     {
     result = Used|NeedsUpdate;
     }
-  if(triggerButton == Qt::LeftButton)
+  if(e.triggerButton == Qt::LeftButton)
     {
-    if(type == Press)
+    if(e.type == Press)
       {
       xAssert(_interactionEntity == 0);
       xAssert(_controlMode == None);
@@ -108,7 +104,7 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
 
       result |= Used;
       }
-    else if(type == Release && _controlMode != None)
+    else if(e.type == Release && _controlMode != None)
       {
       if(_controlMode == ConnectingEntity)
         {
@@ -166,9 +162,9 @@ GCNodeController::UsedFlags GCNodeController::mouseEvent(MouseEventType type,
       result |= Used|NeedsUpdate;
       }
     }
-  else if(type == Press && triggerButton == Qt::RightButton)
+  else if(e.type == Press && e.triggerButton == Qt::RightButton)
     {
-    emit onContextMenu(widgetSpacePoint);
+    emit onContextMenu(e.point);
     }
   return result;
   }

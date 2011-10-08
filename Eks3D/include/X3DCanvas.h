@@ -16,6 +16,8 @@ public:
   virtual void update(XAbstractRenderModel::UpdateMode);
 
   virtual void paintGL();
+
+  virtual bool isShown();
   };
 
 #endif // X3DCANVAS_H

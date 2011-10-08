@@ -23,6 +23,12 @@
 #define EKS_XREAL_GL_TYPE GL_DOUBLE
 #endif
 
+#include "XProfiler"
+
+#define X3DDataModelProfileScope 496
+#define X3DDataModelFunction XProfileFunction(X3DDataModelProfileScope)
+#define X3DDataModelFunctionScopedBlock(mess) XProfileScopedBlock(X3DDataModelProfileScope, mess)
+
 typedef xuint64 XEnvironmentID;
 
 enum TextureFormat

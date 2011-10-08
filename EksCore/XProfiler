@@ -6,7 +6,7 @@
 #include "QString"
 #include "XHash"
 #include "XVector"
-#include "XRandomAccessAllocator"
+#include "XBucketAllocator"
 #include "QMutex"
 
 class EKSCORE_EXPORT XProfiler
@@ -66,7 +66,7 @@ private:
 
   ProfilingContext *_rootContext;
   XHash<QThread *, ProfilingContext *> _currentContexts;
-  XRandomAccessFixedSizeAllocator _contextAllocator;
+  XFixedSizeBucketAllocator _contextAllocator;
   QHash<xuint32, QString> _contextStrings;
   QMutex _lock;
   };

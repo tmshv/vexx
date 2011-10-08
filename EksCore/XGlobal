@@ -14,6 +14,7 @@
 # pragma warning(disable: 4702) /* unreachable code */
 # pragma warning(disable: 4181) /* qualifier applied to reference type */
 # pragma warning(disable: 4946) /* reinterpret_cast used between related classes: '...' and '...') */
+# pragma warning(disable: 4345) /* behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized */
 #endif
 
 #include "QtGlobal"
@@ -29,14 +30,14 @@
 # define EKSCORE_EXPORT X_DECL_IMPORT
 #endif
 
-// todo: check the behaviour of both of these asserts in non windows oses and choose the nicest...
-// assert is best on windows because of the debug break...
-// but i think i prefered Q_ASSERT on linux?
-#ifdef Q_OS_WIN
-# include "assert.h"
-# define xAssert( arg ) assert(arg)
+EKSCORE_EXPORT void xDoAssert(const char *assertion, const char *file, int line);
+inline void xNoOp() { }
+
+#ifndef QT_NO_DEBUG
+# define X_DEBUG
+# define xAssert(cond) ((!(cond)) ? xDoAssert(#cond, __FILE__, __LINE__) : xNoOp())
 #else
-# define xAssert( arg ) Q_ASSERT( arg )
+# define xAssert(cond)
 #endif
 
 #define X_ASSERTS_ENABLED 1
@@ -45,15 +46,16 @@
 
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #define X_ALIGN_BYTE_COUNT 16
-#define X_ROUND_TO_ALIGNMENT(type, exp) ((type)(exp + (ptrdiff_t)X_ALIGN_BYTE_COUNT - (((ptrdiff_t)exp)&((ptrdiff_t)X_ALIGN_BYTE_COUNT-1))))
-#define xAssertIsAligned(ptr) xAssert(((xsize)(ptr)&(X_ALIGN_BYTE_COUNT-1)) == 0);
+#define X_ROUND_TO_ALIGNMENT(type, exp) X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, X_ALIGN_BYTE_COUNT)
+#define X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, align) ((type)((xuint8*)exp + ((ptrdiff_t)align - (((ptrdiff_t)exp)&((ptrdiff_t)align-1)))))
+#define xAssertIsAligned(ptr) xAssertIsSpecificAligned(ptr, X_ALIGN_BYTE_COUNT);
+#define xAssertIsSpecificAligned(ptr, alignment) alignment > 0 ? xAssert(((xsize)(ptr)&(alignment-1)) == 0) : xNoOp();
 
-#ifndef QT_NO_DEBUG
-# define X_DEBUG
+#ifdef X_DEBUG
 # define X_PROFILING_ENABLED
-# define xVerify(x) x
+# define xVerify(x) xAssert(x)
 #else
-# define xVerify(x) xAssert(x);
+# define xVerify(x) x
 #endif
 
 

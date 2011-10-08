@@ -15,7 +15,7 @@ XProperties:
 public:
   SJSONSaver();
 
-  void writeToDevice(QIODevice *device, const SEntity *ent, bool includeRoot);
+  void writeToDevice(QIODevice *device, const SPropertyContainer *ent, bool includeRoot);
 
 private:
   void setType(const SPropertyInformation *);
@@ -31,7 +31,7 @@ private:
   void endAttribute(const char *);
 
   QIODevice *_device;
-  const SEntity *_root;
+  const SPropertyContainer *_root;
 
   QVector <bool> _commaStack;
 

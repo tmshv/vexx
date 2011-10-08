@@ -279,28 +279,12 @@ void XGeometry::prepareInternal( XRenderer *r ) const
   if( !_internal )
     {
     _internal = _renderer->getGeometry( _type );
-    _internal->setPoints( _points );
-    _internal->setLines( _lines );
-    _internal->setTriangles( _triangles );
 
-    _internal->setAttributesSize( _attributeSize, _attr1.size(), _attr2.size(), _attr3.size(), _attr4.size() );
-
-    foreach( QString na, _attr1.keys() )
-      {
-      _internal->setAttribute( na, _attr1[na] );
-      }
-    foreach( QString na, _attr2.keys() )
-      {
-      _internal->setAttribute( na, _attr2[na] );
-      }
-    foreach( QString na, _attr3.keys() )
-      {
-      _internal->setAttribute( na, _attr3[na] );
-      }
-    foreach( QString na, _attr4.keys() )
-      {
-      _internal->setAttribute( na, _attr4[na] );
-      }
+    _attributeSizeChanged = true;
+    _changedAttrs = true;
+    _changedP = true;
+    _changedL = true;
+    _changedT = true;
     }
 
   if( _changedP )
@@ -374,8 +358,13 @@ void XGeometry::prepareInternal( XRenderer *r ) const
           }
         }
       }
-    _changedAttrs = 0;
     }
+
+  _changedA1.clear();
+  _changedA2.clear();
+  _changedA3.clear();
+  _changedA4.clear();
+  _changedAttrs = 0;
   }
 
 XAbstractGeometry *XGeometry::internal() const
@@ -441,9 +430,18 @@ namespace XMeshUtilities
 bool intersect( QString semantic,
                 const XLine &ray,
                 const XGeometry &geo,
-                XVector3DList &posOut,
-                XList <unsigned int> &triOut )
+                XVector3DList *posOut,
+                XList <unsigned int> *triOut )
   {
+  if(posOut)
+    {
+    posOut->clear();
+    }
+  if(triOut)
+    {
+    triOut->clear();
+    }
+
   xAssert( geo.attributes3D().contains(semantic) );
   const XVector<XVector3D> &positions = geo.attributes3D()[semantic];
   const XVector<unsigned int> &tris = geo.triangles();
@@ -459,11 +457,21 @@ bool intersect( QString semantic,
     XVector3D pos;
     if( XTriangle(a, b, c).intersects(ray, pos) )
       {
-      posOut << pos;
-      triOut << index;
+      if(posOut)
+        {
+        *posOut << pos;
+        if(triOut)
+          {
+          *triOut << index;
+          }
+        }
+      else
+        {
+        return true;
+        }
       }
     }
 
-  return posOut.size() > 0;
+  return posOut ? posOut->size() > 0 : false;
   }
 }

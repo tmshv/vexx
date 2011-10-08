@@ -12,7 +12,7 @@ SPropertyInstanceInformation::~SPropertyInstanceInformation()
   }
 
 SPropertyInformation::SPropertyInformation()
-    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0),
+    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0), _postCreate(0),
     _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
     _dynamic(false), _instances(0)
   {
@@ -24,6 +24,7 @@ SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
     _save(info.save()),
     _load(info.load()),
     _assign(info.assign()),
+    _postCreate(info.postCreate()),
     _version(info.version()),
     _parentTypeInformation(info.parentTypeInformation()),
     _size(info.size()),
@@ -58,7 +59,20 @@ SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyCon
   SProperty *offset = &(u->*ptr);
   xptrdiff location = reinterpret_cast<xsize>(offset);
   xAssert(location > 0);
+  return child(location);
+  }
 
+const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr) const
+  {
+  SPropertyContainer *u = 0;
+  SProperty *offset = &(u->*ptr);
+  xptrdiff location = reinterpret_cast<xsize>(offset);
+  xAssert(location > 0);
+  return child(location);
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::child(xsize location)
+  {
   foreach(SPropertyInstanceInformation *i, _children)
     {
     if(i->location() == location)
@@ -69,13 +83,8 @@ SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyCon
   return 0;
   }
 
-const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr) const
+const SPropertyInstanceInformation *SPropertyInformation::child(xsize location) const
   {
-  SPropertyContainer *u = 0;
-  SProperty *offset = &(u->*ptr);
-  xptrdiff location = reinterpret_cast<xsize>(offset);
-  xAssert(location > 0);
-
   foreach(const SPropertyInstanceInformation *i, _children)
     {
     if(i->location() == location)
@@ -86,13 +95,13 @@ const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPrope
   return 0;
   }
 
-const SPropertyInstanceInformation *SPropertyInformation::child(xsize index) const
+const SPropertyInstanceInformation *SPropertyInformation::childFromIndex(xsize index) const
   {
   xAssert(index < childCount());
   return _children[index];
   }
 
-SPropertyInstanceInformation *SPropertyInformation::child(xsize index)
+SPropertyInstanceInformation *SPropertyInformation::childFromIndex(xsize index)
   {
   xAssert(index < childCount());
   return _children[index];

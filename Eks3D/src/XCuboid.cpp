@@ -120,12 +120,13 @@ bool XCuboid::intersects( const XCuboid &in ) const
             in.maximum().z() < _minimum.z() && in.minimum().z() > _maximum.z();
     }
 
-bool XCuboid::intersects( const XLine &in ) const
+bool XCuboid::intersects( const XLine &in, float &dist ) const
     {
     XVector3D t = in.sample(XPlane(maximum(), XVector3D(0, 1, 0)).intersection(in));
     if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
         t.z() <= maximum().z() && t.z() >= minimum().z() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 
@@ -133,6 +134,7 @@ bool XCuboid::intersects( const XLine &in ) const
     if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
         t.z() <= maximum().z() && t.z() >= minimum().z() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 
@@ -140,6 +142,7 @@ bool XCuboid::intersects( const XLine &in ) const
     if( t.y() <= maximum().y() && t.y() >= minimum().y() &&
         t.z() <= maximum().z() && t.z() >= minimum().z() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 
@@ -147,6 +150,7 @@ bool XCuboid::intersects( const XLine &in ) const
     if( t.y() <= maximum().y() && t.y() >= minimum().y() &&
         t.z() <= maximum().z() && t.z() >= minimum().z() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 
@@ -154,6 +158,7 @@ bool XCuboid::intersects( const XLine &in ) const
     if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
         t.y() <= maximum().y() && t.y() >= minimum().y() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 
@@ -161,6 +166,7 @@ bool XCuboid::intersects( const XLine &in ) const
     if( t.x() <= maximum().x() && t.x() >= minimum().x() &&
         t.y() <= maximum().y() && t.y() >= minimum().y() )
       {
+      dist = (in.position() - t).norm();
       return true;
       }
 

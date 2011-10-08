@@ -7,55 +7,44 @@
 #include "QVBoxLayout"
 #include "XGLRenderer.h"
 #include "XScene.h"
-#include "Interface.h"
-#include "NewItemDialog.h"
-#include "EnvironmentEntity.h"
-#include "XEnvironmentRenderer.h"
 #include "sentityui.h"
-#include "application.h"
-#include "3D/GCRenderToScreen.h"
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
 #include "3D/GCShader.h"
 #include "3D/GCShadingGroup.h"
+#include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
 #include "object.h"
 
-Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
-    _app(app),
-    _db(0),
-    _controller(0, this)
+Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
+    _db(0)
   {
-  setController(&_controller);
-
   _timer = new QTimer;
   connect( _timer, SIGNAL(timeout()), this, SLOT(updateGL()) );
   _timer->start( 40 );
-
-  setMouseTracking( true );
-
 
   _db = &db.db();
   _db->addTreeObserver(this);
 
   GCViewport* vp = _db->addChild<GCViewport>("Viewport");
   _viewport = vp;
-  GCRenderToScreen* op = _db->addChild<GCRenderToScreen>("Output");
+  GCScreenRenderTarget* op = _db->addChild<GCScreenRenderTarget>("Output");
 
   GCPerspectiveCamera* cam = _db->addChild<GCPerspectiveCamera>("Camera");
   vp->x.connect(&cam->viewportX);
   vp->y.connect(&cam->viewportY);
   vp->width.connect(&cam->viewportWidth);
   vp->height.connect(&cam->viewportHeight);
-  _controller.setCamera(cam);
 
-  cam->setPosition(XVector3D(0.0f, 5.0f, 10.0f));
+  cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
   cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
 
-  GCScene* scene = _db->addChild<GCScene>("Scene");
+  GCManipulatableScene* scene = _db->addChild<GCManipulatableScene>("Scene");
   cam->projection.connect(&scene->cameraProjection);
   cam->viewTransform.connect(&scene->cameraTransform);
+  cam->connect(&scene->activeCamera);
+  setController(scene);
 
   GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
   scene->shadingGroups.addPointer(group);
@@ -87,7 +76,10 @@ Viewport::Viewport(Application *app, SPlugin &db) : UISurface("Viewport", this, 
 Viewport::~Viewport()
   {
   _screenRenderers.clear();
-  _db->removeTreeObserver(this);
+  if(_db.isValid())
+    {
+    _db->removeTreeObserver(this);
+    }
   }
 
 void Viewport::onTreeChange(const SChange *c)
@@ -98,7 +90,7 @@ void Viewport::onTreeChange(const SChange *c)
     return;
     }
 
-  GCRenderToScreen *prop = t->property()->castTo<GCRenderToScreen>();
+  GCScreenRenderTarget *prop = t->property()->castTo<GCScreenRenderTarget>();
   if(!prop)
     {
     return;
@@ -145,9 +137,8 @@ void Viewport::resizeGL( int w, int h )
 
 void Viewport::paintGL()
   {
-  if(_db.isValid())
   _renderer.clear();
-  foreach(GCRenderToScreen *sc, _screenRenderers)
+  foreach(GCScreenRenderTarget *sc, _screenRenderers)
     {
     const GCRenderable* renderable = sc->source();
     if(renderable)

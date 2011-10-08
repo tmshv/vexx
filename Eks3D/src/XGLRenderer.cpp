@@ -116,6 +116,7 @@ private:
     QGLShaderProgram shader;
     friend class XGLRenderer;
     friend class XGLShaderVariable;
+    XGLRenderer *_renderer;
     };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -264,10 +265,31 @@ void XGLRenderer::popTransform( )
     glPopMatrix() GLE;
     }
 
-void XGLRenderer::clear( )
+void XGLRenderer::clear( int c )
     {
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) GLE;
+    int realMode = ((c&ClearColour) != false) ? GL_COLOR_BUFFER_BIT : 0;
+    realMode |= ((c&ClearDepth) != false) ? GL_DEPTH_BUFFER_BIT : 0;
+    glClear( realMode ) GLE;
     }
+
+void XGLRenderer::debugRenderLocator(DebugLocatorMode m)
+  {
+  if((m&ClearShader) != 0)
+    {
+    _currentShader = 0;
+    glUseProgram(0);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+  glBegin(GL_LINES);
+    glVertex3f(-0.5, 0, 0);
+    glVertex3f(0.5, 0, 0);
+    glVertex3f(0, -0.5, 0);
+    glVertex3f(0, 0.5, 0);
+    glVertex3f(0, 0, -0.5);
+    glVertex3f(0, 0, 0.5);
+  glEnd();
+  }
 
 void XGLRenderer::enableRenderFlag( RenderFlags f )
     {
@@ -676,6 +698,7 @@ QString getVertex( int type )
   switch( type )
     {
   case XShader::AmbientShader: file = "blinn"; break;
+  case XShader::ColourShader: file = "plainColour"; break;
   case XShader::Default: break;
     }
 
@@ -693,6 +716,7 @@ QString getFragment( int type )
   switch( type )
     {
   case XShader::AmbientShader: file = "blinn"; break;
+  case XShader::ColourShader: file = "plainColour"; break;
   case XShader::Default: break;
     }
 
@@ -704,9 +728,10 @@ QString getFragment( int type )
   return "";
   }
 
-XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() )
-    {
-    }
+XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() ),
+    _renderer(renderer)
+  {
+  }
 
 void XGLShader::setType( int type )
     {
@@ -791,6 +816,8 @@ void XGLShaderVariable::setValue( const XVector3D &value )
 void XGLShaderVariable::setValue( const XVector4D &value )
   {
   clear();
+  GL_SHADER_VARIABLE_PARENT->_renderer->_currentShader = 0;
+  GL_SHADER_VARIABLE_PARENT->shader.bind();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 

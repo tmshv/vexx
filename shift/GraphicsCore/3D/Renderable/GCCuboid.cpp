@@ -1,10 +1,12 @@
 #include "GCCuboid.h"
 #include "sarrayproperty.h"
+#include "3D/Manipulators/GCDistanceManipulator.h"
 
 S_IMPLEMENT_PROPERTY(GCCuboid)
 
 void computeCube(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
+  GCProfileFunction
   GCCuboid *cube = cont->uncheckedCastTo<GCCuboid>();
   GCGeometry &geo = cube->geometry;
 
@@ -109,9 +111,68 @@ SPropertyInformation *GCCuboid::createTypeInformation()
   dInfo->setAffects(geoInfo);
   dInfo->setDefault(1.0f);
 
+  info->addInheritedInterface<GCCuboid, GCManipulatable>();
+
   return info;
   }
 
 GCCuboid::GCCuboid()
   {
+  }
+
+void GCCuboid::addManipulators(SPropertyArray *a, const GCTransform *tr)
+  {
+  // X
+    {
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(1.0f, 0.0f, 0.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    width.connect(&manip->distance);
+
+    manip->addDriven(&width);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
+    }
+
+  // Y
+    {
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(0.0f, 1.0f, 0.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    height.connect(&manip->distance);
+
+    manip->addDriven(&height);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
+    }
+
+  // Z
+    {
+    GCDistanceManipulator *manip = a->add<GCDistanceManipulator>();
+
+    manip->lockDirection = XVector3D(0.0f, 0.0f, 1.0f);
+    manip->lockMode = GCDistanceManipulator::Linear;
+    manip->scaleFactor = 0.5f;
+
+    depth.connect(&manip->distance);
+
+    manip->addDriven(&depth);
+
+    if(tr)
+      {
+      tr->transform.connect(&manip->worldCentre);
+      }
+    }
   }

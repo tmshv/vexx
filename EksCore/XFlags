@@ -9,6 +9,8 @@ public:
   XFlags(CONTAINER c) : _internal(c) { }
 
   bool hasFlag(ENUM c) const { return (_internal & c ) != 0; }
+  bool hasAllFlags(CONTAINER c) const { return (_internal & c ) == c; }
+  bool hasAnyFlags(CONTAINER c) const { return (_internal & c ) != 0; }
   void clearFlag(ENUM c) { _internal = ~(~_internal | c); }
   void setFlag(ENUM c) { _internal = _internal|c; }
   void setFlag(ENUM c, bool val) { if(val) { setFlag(c); } else { clearFlag(c); } }

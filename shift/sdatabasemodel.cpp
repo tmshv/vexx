@@ -223,10 +223,12 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
     {
     if(_options.hasFlag(ShowValues) && index.column() == 1)
       {
-      //SPropertyData data;
-      //_db->write(prop, data, SPropertyData::Ascii);
-      //return QString::fromUtf8(data.value());
-      return "Not Yet Implemented";
+      SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
+      if(interface)
+        {
+        return interface->asVariant(prop);
+        }
+      return QVariant();;
       }
     else
       {

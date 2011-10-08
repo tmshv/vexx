@@ -15,6 +15,8 @@ public:
   GCGeometryPointer geometry;
 
   void render(XRenderer* r) const;
+
+  virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
 S_TYPED_POINTER_TYPE(GCGeometryTransformPointer, GCGeometryTransform)

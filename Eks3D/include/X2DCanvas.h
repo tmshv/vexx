@@ -28,6 +28,8 @@ public:
 
   virtual void update(XAbstractRenderModel::UpdateMode);
 
+  virtual bool isShown();
+
 protected:
   virtual void paintEvent(QPaintEvent *);
   };
@@ -36,6 +38,8 @@ class EKS3D_EXPORT XSimple2DCanvasController : public XCameraCanvasController, X
   {
 public:
   XSimple2DCanvasController(X2DCanvas *canvas);
+
+  XCameraCanvasController::CameraInterface *camera() { return this; }
 
 
   virtual MovementFlags supportedMovements() const;

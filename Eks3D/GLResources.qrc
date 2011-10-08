@@ -4,5 +4,7 @@
         <file>GLResources/shaders/blinn.vert</file>
         <file>GLResources/shaders/default.frag</file>
         <file>GLResources/shaders/default.vert</file>
+        <file>GLResources/shaders/plainColour.frag</file>
+        <file>GLResources/shaders/plainColour.vert</file>
     </qresource>
 </RCC>

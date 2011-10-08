@@ -142,6 +142,21 @@ public:
   SProperty *output() const {return _output;}
   SProperty *nextOutput() const {return _nextOutput;}
 
+  template <typename T> T *output() const
+    {
+    SProperty *p = output();
+    while(p)
+      {
+      T *t = p->castTo<T>();
+      if(t)
+        {
+        return t;
+        }
+      p = p->nextOutput();
+      }
+    return 0;
+    }
+
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
   void disconnect(SProperty *) const;
@@ -178,7 +193,14 @@ public:
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
 
   void postSet();
-  void preGet() const;
+  void preGet() const
+    {
+    if(_flags.hasFlag(Dirty))
+      {
+      update();
+      }
+    }
+  void update() const;
 
   bool isDynamic() const;
   xsize index() const;
@@ -317,12 +339,6 @@ public:
 
   X_ALIGNED_OPERATOR_NEW
 
-protected:
-  template <typename T> T *getChange() const
-    {
-    return reinterpret_cast<T*>(getChangeMemory(sizeof(T)));
-    }
-
 private:
   void setDirty(bool force=false);
   friend void setDependantsDirty(SProperty* prop, bool force=false);
@@ -330,7 +346,6 @@ private:
 
   void connectInternal(SProperty *) const;
   void disconnectInternal(SProperty *) const;
-  void *getChangeMemory(size_t size) const;
   SProperty *_nextSibling;
   SProperty *_input;
   SProperty *_output;

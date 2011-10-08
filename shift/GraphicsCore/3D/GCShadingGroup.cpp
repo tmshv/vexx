@@ -2,12 +2,15 @@
 #include "XGeometry.h"
 #include "XModeller.h"
 #include "XRenderer.h"
+#include "3D/Manipulators/GCButtonManipulator.h"
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 
 SPropertyInformation *GCShadingGroup::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCShadingGroup>("GCShadingGroup");
+
+  info->addInheritedInterface<GCShadingGroup, GCManipulatable>();
 
   info->add(&GCShadingGroup::shader, "shader");
 
@@ -34,6 +37,22 @@ void GCShadingGroup::render(XRenderer *r) const
     if(geo)
       {
       geo->render(r);
+      }
+    }
+  }
+
+void GCShadingGroup::addManipulators(SPropertyArray *a, const GCTransform *tr)
+  {
+  xAssert(tr == 0);
+  //a->add<GCButtonManipulator>();
+
+  // todo, probably dont do this...!
+  for(GCGeometryTransformPointer* geoPtr = geometry.firstChild<GCGeometryTransformPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryTransformPointer>())
+    {
+    GCGeometryTransform* geo = geoPtr->pointed();
+    if(geo)
+      {
+      geo->addManipulators(a);
       }
     }
   }

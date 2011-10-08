@@ -23,6 +23,9 @@ template <typename T> class TypedPointer : public Pointer
 public:
   typedef T Type;
 
+  T *pointed() { return input() ? input()->castTo<T>() : 0; }
+  T *operator()() { return pointed(); }
+
   const T *pointed() const { return input() ? input()->castTo<T>() : 0; }
   const T *operator()() const { return pointed(); }
 

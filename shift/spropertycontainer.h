@@ -87,6 +87,7 @@ protected:
   void clear();
 
 private:
+  friend void setDependantsDirty(SProperty* prop, bool force);
   SProperty *_child;
   xsize _containedProperties;
 

@@ -9,6 +9,8 @@ SPropertyInformation *GCGeometryTransform::createTypeInformation()
 
   info->add(&GCGeometryTransform::geometry, "geometry");
 
+  info->addInheritedInterface<GCGeometryTransform, GCManipulatable>();
+
   return info;
   }
 
@@ -18,6 +20,7 @@ GCGeometryTransform::GCGeometryTransform()
 
 void GCGeometryTransform::render(XRenderer* r) const
   {
+  GCProfileFunction
   const GCGeometry *geo = geometry();
 
   if(geo)
@@ -25,5 +28,22 @@ void GCGeometryTransform::render(XRenderer* r) const
     r->pushTransform(transform());
     r->drawGeometry(geo->runtimeGeometry());
     r->popTransform();
+    }
+  }
+
+void GCGeometryTransform::addManipulators(SPropertyArray *a, const GCTransform *tr)
+  {
+  xAssert(tr == 0);
+  GCTransform::addManipulators(a, tr);
+
+  const GCGeometry *geo = geometry();
+  if(geo)
+    {
+    SProperty *geoOwner = geo->parent();
+    GCManipulatable *manipulatorInterface = geoOwner->interface<GCManipulatable>();
+    if(manipulatorInterface)
+      {
+      manipulatorInterface->addManipulators(a, this);
+      }
     }
   }

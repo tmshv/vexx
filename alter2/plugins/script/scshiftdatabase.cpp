@@ -168,7 +168,7 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
     return false;
     }
 
-  SEntity *ent = prop->castTo<SEntity>();
+  SPropertyContainer *ent = prop->castTo<SPropertyContainer>();
 
   if(!ent)
     {

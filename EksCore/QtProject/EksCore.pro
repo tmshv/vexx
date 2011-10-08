@@ -19,7 +19,12 @@ SOURCES += ../src/XObject.cpp \
     ../src/XCurve.cpp \
     ../src/XMetaType.cpp \
     ../src/XTime.cpp \
-    ../src/XProfiler.cpp
+    ../src/XProfiler.cpp \
+    ../src/XAllocatorBase.cpp \
+    ../src/XUnorderedMap.cpp \
+    ../src/XGlobal.cpp \
+    ../src/XEventLogger.cpp \
+    ../src/XBucketAllocator.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -46,7 +51,6 @@ HEADERS += ../XObject \
     ../XShared \
     ../XMetaType \
     ../XFlags \
-    ../XRandomAccessAllocator \
     ../XWeakShared \
     ../XTime \
     ../XProfiler \
@@ -125,6 +129,23 @@ HEADERS += ../XObject \
     ../Eigen/src/Core/Assign.h \
     ../Eigen/src/Core/ArrayWrapper.h \
     ../Eigen/src/Core/ArrayBase.h \
-    ../Eigen/src/Core/Array.h
+    ../Eigen/src/Core/Array.h \
+    ../XAllocatorBase \
+    ../XBucketAllocator \
+    ../XUnorderedMap \
+    ../XEventLogger
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

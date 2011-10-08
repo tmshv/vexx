@@ -26,25 +26,14 @@ SDatabase::SDatabase() : _blockLevel(0)
 
 SDatabase::~SDatabase()
   {
-  // clear out our child elements before the allocator is destroyed.
-  SProperty *prop = _child;
-  while(prop)
-    {
-    SProperty *next = prop->_nextSibling;
-    if(prop->index() >= _containedProperties)
-      {
-      database()->deleteDynamicProperty(prop);
-      }
-    prop = next;
-    }
+  clear();
   _child = 0;
 
   foreach(SChange *ch, _done)
     {
-    destoryChangeMemory(ch);
+    xDestroyAndFree(changeAllocator(), SChange, ch);
     }
 
-  clear();
   xAssert(_memory.empty());
   }
 
@@ -62,19 +51,17 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   return prop;
   }
 
-void SDatabase::deleteDynamicProperty(SProperty *prop)
+void SDatabase::deleteProperty(SProperty *prop)
   {
+  xAssert(!prop->_flags.hasFlag(PreGetting));
   uninitiateProperty(prop);
 
-  SEntity *ent = prop->castTo<SEntity>();
-  if(ent)
-    {
-    if(ent->parentEntity())
-      {
-      ent->parentEntity()->children.internalRemoveProperty(ent);
-      }
-    }
   prop->~SProperty();
+  }
+
+void SDatabase::deleteDynamicProperty(SProperty *prop)
+  {
+  deleteProperty(prop);
   _memory.free(prop);
   }
 
@@ -91,7 +78,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
   for(xsize i=0, s=mD->childCount(); i<s; ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInstanceInformation *child = mD->child(i);
+    const SPropertyInstanceInformation *child = mD->childFromIndex(i);
 
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
@@ -121,7 +108,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
   for(xsize i=0; i<mD->childCount(); ++i)
     {
     // no contained properties with duplicated names...
-    const SPropertyInstanceInformation *child = mD->child(i);
+    const SPropertyInstanceInformation *child = mD->childFromIndex(i);
 
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
@@ -147,6 +134,18 @@ void SDatabase::initiateProperty(SProperty *prop)
 
     initiatePropertyFromMetaData(container, metaData);
     }
+
+  const SPropertyInformation *info = prop->typeInformation();
+  while(info)
+    {
+    SPropertyInformation::PostCreateFunction postCreate = info->postCreate();
+    if(postCreate)
+      {
+      postCreate(prop);
+      }
+    info = info->parentTypeInformation();
+    }
+
   xAssert(prop->database());
   }
 
@@ -184,11 +183,6 @@ QString SDatabase::pathSeparator()
   return "/";
   }
 
-QString SDatabase::propertySeparator()
-  {
-  return ":";
-  }
-
 SBlock::SBlock(SDatabase *db) : _db(db)
   {
   _db->beginBlock();
@@ -197,19 +191,6 @@ SBlock::SBlock(SDatabase *db) : _db(db)
 SBlock::~SBlock()
   {
   _db->endBlock();
-  }
-
-void *SDatabase::allocateChangeMemory(xsize s)
-  {
-  SProfileFunction
-  return _memory.alloc(s);
-  }
-
-void SDatabase::destoryChangeMemory(SChange *ptr)
-  {
-  SProfileFunction
-  ptr->~SChange();
-  _memory.free(ptr);
   }
 
 void SDatabase::inform()

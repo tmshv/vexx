@@ -15,11 +15,7 @@ public:
   GCNodeController(X2DCanvas *c);
   ~GCNodeController();
 
-  virtual UsedFlags mouseEvent(MouseEventType type,
-                          QPoint point,
-                          Qt::MouseButton triggerButton,
-                          Qt::MouseButtons buttonsDown,
-                          Qt::KeyboardModifiers modifiers);
+  virtual UsedFlags mouseEvent(const MouseEvent &m);
   virtual xuint32 maxNumberOfPasses(xuint32 modelMaxPasses) const;
   virtual void paint(xuint32 pass) const;
 

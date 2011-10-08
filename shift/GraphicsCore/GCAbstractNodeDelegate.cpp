@@ -184,6 +184,7 @@ void GCSimpleNodeDelegate::update(const XAbstractCanvas *,
                     const XAbstractRenderModel::Iterator *aIt,
                     const XAbstractRenderModel *) const
   {
+  GCProfileFunction
   const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(aIt);
   const SEntity *ent = it->entity();
   xAssert(ent);
@@ -206,6 +207,7 @@ void GCSimpleNodeDelegate::paint(xuint32 pass,
                                 const XAbstractRenderModel::Iterator *aIt,
                                 const XAbstractRenderModel *) const
   {
+  GCProfileFunction
   const GCShiftRenderModel::Iterator *it = static_cast<const GCShiftRenderModel::Iterator *>(aIt);
   const SEntity *ent = it->entity();
   xAssert(ent);

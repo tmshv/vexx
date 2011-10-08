@@ -56,7 +56,7 @@ SJSONSaver::SJSONSaver() : _autoWhitespace(false), _device(0), _root(0)
   setStreamDevice(Text, &_buffer);
   }
 
-void SJSONSaver::writeToDevice(QIODevice *device, const SEntity *ent, bool includeRoot)
+void SJSONSaver::writeToDevice(QIODevice *device, const SPropertyContainer *ent, bool includeRoot)
   {
   _root = ent;
 
@@ -67,9 +67,8 @@ void SJSONSaver::writeToDevice(QIODevice *device, const SEntity *ent, bool inclu
     {
     START_OBJECT
     OBJECT_VALUE_CHAR_CHAR(NO_ROOT_KEY, "true");
-    const SPropertyContainer *c = &ent->children;
-    beginChildren(c->size());
-    for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
+    beginChildren(_root->size());
+    for(const SProperty *child=_root->firstChild(); child; child=child->nextSibling())
       {
       beginNextChild();
       write(child);

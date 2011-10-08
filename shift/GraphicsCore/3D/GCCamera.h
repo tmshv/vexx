@@ -17,7 +17,9 @@ public:
 
   Vector3DProperty upVector;
   FloatProperty focalDistance;
+
   ComplexTransformProperty projection;
+  ComplexTransformProperty inverseProjection;
 
   UnsignedIntProperty viewportX;
   UnsignedIntProperty viewportY;
@@ -31,9 +33,12 @@ public:
   void setFocalPoint(const XVector3D &point);
   XVector3D focalPoint() const;
 
-  bool unitViewportCoordinates(xuint32 x, xuint32 y, float &xUnit, float &yUnit);
-  XVector3D worldSpaceFromScreenSpace(xuint32 x, xuint32 y);
-  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth) = 0;
+  void approximatePixelSizeAtDistance(float distance, float &x, float &y) const;
+  XTransform getPixelScaleFacingTransform(const XVector3D &worldPosition) const;
+
+  bool unitViewportCoordinates(xuint32 x, xuint32 y, float &xUnit, float &yUnit) const;
+  XVector3D worldSpaceFromScreenSpace(xuint32 x, xuint32 y) const;
+  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth) const = 0;
 
   void zoom(float factor, float x, float y);
   void track(float x, float y);
@@ -57,7 +62,7 @@ class GRAPHICSCORE_EXPORT GCPerspectiveCamera : public GCCamera
 public:
   GCPerspectiveCamera();
 
-  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth);
+  virtual XVector3D worldSpaceAtDepthFromScreenSpace(xuint32 x, xuint32 y, float depth) const;
 
   FloatProperty fieldOfView;
 
