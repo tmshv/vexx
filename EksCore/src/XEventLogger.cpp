@@ -1,4 +1,5 @@
 #include "XEventLogger"
+#include "QDebug"
 
 void XEventManager::totalAvailableTime(XTime &min, XTime &max)
   {
@@ -60,7 +61,7 @@ XEventLoggerInternal::XEventLoggerInternal(const char *n, int t, xsize s, xsize 
 
 xsize XEventLoggerInternal::used() const
   {
-  if(nextData == data)
+  if(firstData == 0)
     {
     return 0;
     }
@@ -100,7 +101,7 @@ const void *XEventLoggerInternal::dataAt(xsize index) const
 
 const void *XEventLoggerInternal::last() const
   {
-  if(nextData == data)
+  if(firstData == 0)
     {
     return 0;
     }
@@ -116,7 +117,7 @@ const void *XEventLoggerInternal::last() const
 
 void *XEventLoggerInternal::last()
   {
-  if(nextData == data)
+  if(firstData == 0)
     {
     return 0;
     }

@@ -27,14 +27,23 @@ void EventLoggerWidget::paintEvent(QPaintEvent *pE)
   {
   QPainter p(this);
 
+  const xint32 drawXOffset = SafeBorder;
+  const xint32 drawYOffset = SafeBorder;
+
+  QRect rect = pE->rect();
+  p.setClipRect(rect);
+
+  p.fillRect(rect, Qt::black);
+
   // available time, should be stretched form 0 to width
   XTime minAvailableTime, maxAvailableTime;
   XEventManager::totalAvailableTime(minAvailableTime, maxAvailableTime);
   XTime availableTime = maxAvailableTime - minAvailableTime;
 
-  QRect rect = pE->rect();
-  float minRatio = (float)rect.x() / (float)width();
-  float maxRatio = (float)rect.right() / (float)width();
+  rect.moveBottomLeft(QPoint(drawXOffset, 0));
+
+  float minRatio = 0.0f;//(float)rect.x() / (float)width();
+  float maxRatio = 1.0f;//(float)rect.right() / (float)width();
 
   XTime min = minAvailableTime + (availableTime * minRatio);
   XTime max = minAvailableTime + (availableTime * maxRatio);
@@ -61,6 +70,12 @@ void EventLoggerWidget::paintEvent(QPaintEvent *pE)
 
         float millisecondX = (*t - min).milliseconds();
         float unscaledHeight = typeToUnscaledHeight(e->type, tStoredData);
+
+        if(!inside)
+          {
+          poly << QPointF(millisecondX - (_millisecondToPixelsScaleFactor*SafeBorder), unscaledHeight);
+          }
+
         poly << QPointF(millisecondX, unscaledHeight);
 
         if(unscaledHeight > maxUnscaledHeight)
@@ -96,12 +111,14 @@ void EventLoggerWidget::paintEvent(QPaintEvent *pE)
     return;
     }
 
-  float drawHeight = height();
+  p.setRenderHint(QPainter::Antialiasing, true);
+  float drawHeight = height() - 2*SafeBorder;
   for(xsize i = 0, s=polys.size(); i<s; ++i)
     {
     QPolygonF &poly = polys[i];
 
     // scale to fit in widget
+    float lastX = 0;
     for(xsize j=0, t=poly.size(); j<t; ++j)
       {
       QPointF &pt = poly[j];
@@ -109,31 +126,54 @@ void EventLoggerWidget::paintEvent(QPaintEvent *pE)
       float y = pt.y();
 
       y -= minUnscaledHeight;
-      y *= drawHeight;
       y /= maxUnscaledHeight - minUnscaledHeight;
-      y = drawHeight - y; // flip to y points upward
+      y *= drawHeight;
+      y = drawYOffset + drawHeight - y; // flip to y points upward
+      xAssert(y >= drawYOffset);
+      xAssert(y <= drawHeight + drawYOffset);
 
       pt.setY(y);
 
       float x = pt.x();
       x *= _millisecondToPixelsScaleFactor; // convert x from milliseconds to pixels
+      if(j == 0)
+        {
+        x = 0;
+        }
 
       pt.setX(x);
-
-      qDebug() << pt;
+      lastX = x;
       }
+
+    QPointF pt = poly.back();
+    pt.setX(width());
+    poly << pt;
+
+    poly << QPointF(width(), height());
+    poly << QPointF(0, height());
 
     QPainterPath path;
     path.addPolygon(poly);
 
+    p.setPen(Qt::white);
+
     p.drawPath(path);
+
+    for(xsize j=1, t=(poly.size()-3); j<t; ++j)
+      {
+      QPointF &pt = poly[j];
+
+      QColor col(255, 255, 255, 128);
+      p.setPen(col);
+      p.drawEllipse(pt, 2, 2);
+      }
     }
   }
 
 void EventLoggerWidget::onEventsLogged()
   {
   updateGeometry();
-  update();
+  update(rect());
   }
 
 QSize EventLoggerWidget::sizeHint() const
@@ -142,7 +182,7 @@ QSize EventLoggerWidget::sizeHint() const
   XEventManager::totalAvailableTime(minTime, maxTime);
 
   XTime availableTime = maxTime - minTime;
-  return QSize(_millisecondToPixelsScaleFactor * availableTime.milliseconds(), 1);
+  return QSize(_millisecondToPixelsScaleFactor * availableTime.milliseconds() + (SafeBorder * 2), 1);
   }
 
 UIEventLoggerSurface::UIEventLoggerSurface()

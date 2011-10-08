@@ -11,6 +11,10 @@ XProperties:
   XProperty(float, millisecondToPixelsScaleFactor, millisetSecondToPixelsScaleFactor);
 
 public:
+  enum
+    {
+    SafeBorder = 5
+    };
   EventLoggerWidget(QWidget *parent = 0);
 
   void onEventsLogged();
