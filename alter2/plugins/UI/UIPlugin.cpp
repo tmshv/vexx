@@ -18,6 +18,7 @@
 #include "UIDatabaseDebugSurface.h"
 #include "UIGraphDebugSurface.h"
 #include "UIProfilerSurface.h"
+#include "UIEventLoggerSurface.h"
 
 ALTER_PLUGIN(UIPlugin);
 
@@ -111,6 +112,8 @@ void UIPlugin::load()
 #ifdef X_PROFILING_ENABLED
     addSurface(new UIProfilerSurface);
 #endif
+
+    addSurface(new UIEventLoggerSurface());
     }
   }
 

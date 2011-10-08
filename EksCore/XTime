@@ -17,12 +17,16 @@ public:
   double nanoseconds() const { return ((double)_secs * 1000000000.0) + (double)_nanosecs; }
 
   XTime &operator+=(const XTime &t);
+  XTime operator+(const XTime &t);
 
   XTime operator-(const XTime &t) const;
   XTime operator/(double d) const;
+  XTime operator*(double d) const;
 
   bool operator<(const XTime &t) const;
   bool operator>(const XTime &t) const;
+
+  static XTime fromMilliseconds(double ms);
 
 private:
   XTime(xint64, xint32);

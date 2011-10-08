@@ -171,8 +171,8 @@ void XUnorderedMapData::free_helper(void (*node_delete)(Node *))
             }
         }
     }
-    delete [] buckets;
-    delete this;
+    allocator->free(buckets);
+    allocator->free(this);
 }
 
 XUnorderedMapData::Node *XUnorderedMapData::nextNode(Node *node)

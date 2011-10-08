@@ -19,7 +19,8 @@ SOURCES += UIPlugin.cpp \
     UIDatabaseDebugSurface.cpp \
     UIGraphDebugSurface.cpp \
     UISurfacePrivate.cpp \
-    UIProfilerSurface.cpp
+    UIProfilerSurface.cpp \
+    UIEventLoggerSurface.cpp
 
 HEADERS += UIPlugin.h \
     UIGlobal.h \
@@ -32,10 +33,13 @@ HEADERS += UIPlugin.h \
     UIDatabaseDebugSurface.h \
     UIGraphDebugSurface.h \
     UISurfacePrivate.h \
-    UIProfilerSurface.h
+    UIProfilerSurface.h \
+    UIEventLoggerSurface.h
 
 
 INCLUDEPATH += ../../ $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
 
 LIBS += -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
+
+
 
