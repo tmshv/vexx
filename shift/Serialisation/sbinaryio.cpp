@@ -30,7 +30,7 @@ void SBinarySaver::setType(const SPropertyInformation *)
   //_currentType = type->typeName();
   }
 
-void SBinarySaver::beginChildren(xsize )
+void SBinarySaver::beginChildren()
   {
   xAssert(_inAttribute.isEmpty());
   /*_inAttribute = "childCount";

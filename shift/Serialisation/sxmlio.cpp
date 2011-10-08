@@ -32,12 +32,13 @@ void SXMLSaver::setType(const SPropertyInformation *type)
   _writer.writeStartElement(type->typeName());
   }
 
-void SXMLSaver::beginChildren(xsize size)
+void SXMLSaver::beginChildren()
   {
   xAssert(_inAttribute.isEmpty());
   _inAttribute = "childCount";
-  _writer.writeAttribute(_inAttribute, QString::number(size));
+  //_writer.writeAttribute(_inAttribute, QString::number(size));
   _inAttribute.clear();
+  xAssertFail();
   }
 
 void SXMLSaver::endChildren()
@@ -123,14 +124,7 @@ void SXMLLoader::readFromDevice(QIODevice *device, SEntity *parent)
 
       _currentAttributes = _reader.attributes();
 
-      xsize count = beginChildren();
-      for(xsize i=0; i<count; ++i)
-        {
-        beginNextChild();
-        read(_root);
-        endNextChild();
-        }
-      endChildren();
+      loadChildren(_root);
 
       findNext(false);
       xAssert(_reader.isEndElement());
@@ -169,11 +163,9 @@ const SPropertyInformation *SXMLLoader::type() const
   return info;
   }
 
-xsize SXMLLoader::beginChildren() const
+void SXMLLoader::beginChildren() const
   {
   _scratch.clear();
-  _currentAttributes.value(_childCount).appendTo(&_scratch);
-  return _scratch.toULongLong();
   }
 
 void SXMLLoader::endChildren() const

@@ -258,6 +258,37 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   return prop;
   }
 
+bool SProperty::shouldSavePropertyValue(const SProperty *p)
+  {
+  if(p->hasInput())
+    {
+    return false;
+    }
+
+  if(p->isComputed())
+    {
+    return false;
+    }
+
+  return true;
+  }
+
+bool SProperty::shouldSaveProperty(const SProperty *p)
+  {
+  if(p->isDynamic())
+    {
+    return true;
+    }
+
+  const SPropertyInformation *info = p->typeInformation();
+  if(info->shouldSaveValue()(p))
+    {
+    return true;
+    }
+
+  return false;
+  }
+
 bool SProperty::inheritsFromType(const SPropertyInformation *type) const
   {
   SProfileFunction

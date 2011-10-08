@@ -43,41 +43,109 @@ public:
     }
   };
 
+template <typename T, typename DERIVED> class SPODProperty : public SProperty
+  {
+XProperties:
+  XRORefProperty(T, value);
+
+public:
+  class InstanceInformation : public SProperty::InstanceInformation
+    {
+  XProperties:
+    XByRefProperty(T, defaultValue, setDefault);
+
+  public:
+    InstanceInformation(const T& d) : _defaultValue(d)
+      {
+      }
+
+    virtual void initiateProperty(SProperty *propertyToInitiate) const
+      {
+      propertyToInitiate->uncheckedCastTo<DERIVED>()->_value = defaultValue();
+      }
+    };
+
+  const T &operator()() const
+    {
+    return _value;
+    }
+
+  void assign(const T &in);
+
+  static void saveProperty(const SProperty *p, SSaver &l )
+    {
+    SProperty::saveProperty(p, l);
+    const DERIVED *ptr = p->uncheckedCastTo<DERIVED>();
+    writeValue(l, ptr->_value);
+    }
+
+  static SProperty *loadProperty(SPropertyContainer *parent, SLoader &l)
+    {
+    SProperty *prop = SProperty::loadProperty(parent, l);
+    DERIVED *ptr = prop->uncheckedCastTo<DERIVED>();
+    readValue(l, ptr->_value);
+    return prop;
+    }
+
+  static bool shouldSavePropertyValue(const SProperty *p)
+    {
+    const DERIVED *ptr = p->uncheckedCastTo<DERIVED>();
+
+    bool def = ptr->value() == ptr->instanceInformation()->defaultValue();
+
+    return !def && SProperty::shouldSavePropertyValue(p);
+    }
+
+private:
+  class Change : public SProperty::DataChange
+    {
+    S_CHANGE(Change, SChange, Type);
+
+  XProperties:
+    XRORefProperty(T, before);
+    XRORefProperty(T, after);
+
+  public:
+    Change(const T &b, const T &a, SPODProperty<T, DERIVED> *prop)
+      : SProperty::DataChange(prop), _before(b), _after(a)
+      { }
+
+  private:
+    bool apply(int mode)
+      {
+      if(mode&Forward)
+        {
+        property()->uncheckedCastTo<DERIVED>()->_value = after();
+        property()->postSet();
+        }
+      else if(mode&Backward)
+        {
+        property()->uncheckedCastTo<DERIVED>()->_value = before();
+        property()->postSet();
+        }
+      if(mode&Inform)
+        {
+        if(property()->entity())
+          {
+          property()->entity()->informDirtyObservers(property());
+          }
+        }
+      return true;
+      }
+    };
+  };
+
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
-class EXPORT_MODE name : public SProperty \
-  { \
-public: \
-  class InstanceInformation : public SProperty::InstanceInformation { public: \
-    InstanceInformation() : _defaultValue(defaultDefault) { } \
-    XProperties: XRORefProperty(type, defaultValue); \
-    void setDefault(const type &def) { _defaultValue = def; } \
-    virtual void initiateProperty(SProperty *propertyToInitiate) const \
-      { static_cast<name*>(propertyToInitiate)->_value = defaultValue(); } }; \
+class EXPORT_MODE name : public SPODProperty<type, name> { public: \
   S_PROPERTY(name, SProperty, 0); \
-  class Change : public SProperty::DataChange \
-    { \
-    S_CHANGE( Change, SChange, Type); \
-  public: \
-    Change(const type &b, const type &a, name *prop); \
-    const type &before() const {return _before;} \
-    const type &after() const {return _after;} \
-  private: \
-    type _before; \
-    type _after; \
-    bool apply(int mode); \
-    }; \
+public: class InstanceInformation : public SPODProperty<type, name>::InstanceInformation \
+    { public: \
+    InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
   name(); \
-  name(const type &def); \
-  name &operator=(const type &in); \
-  void assign(const type &in); \
-  const type &value() const {preGet(); return _value;} \
-  const type &operator()() const {preGet(); return _value;} \
-  static void assignProperty(const SProperty *, SProperty * ); \
-  static void saveProperty(const SProperty *p, SSaver &l ); \
-  static SProperty *loadProperty(SPropertyContainer *parent, SLoader &l); \
-protected: \
-  type _value; \
-  }; \
+  name &operator=(const type &in) { \
+    assign(in); \
+    return *this; } \
+  static void assignProperty(const SProperty *p, SProperty *l ); }; \
 template <> class SPODInterface <type> { public: typedef name Type; \
   static void assign(name* s, const type& val) { s->assign(val); } \
   static const type& value(const name* s) { return s->value(); } };
@@ -87,53 +155,24 @@ template <> class SPODInterface <type> { public: typedef name Type; \
   SPropertyInformation *name::createTypeInformation() { \
     SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
     info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); \
-    return info; \
-    } \
-name::Change::Change(const type &b, const type &a, name *prop) \
-  : SProperty::DataChange(prop), _before(b), _after(a) \
-  { } \
-bool name::Change::apply(int mode) \
-  { \
-  if(mode&Forward) \
-    { \
-    ((name*)property())->_value = after(); \
-    property()->postSet(); \
-    } \
-  else if(mode&Backward) \
-    { \
-    ((name*)property())->_value = before(); \
-    property()->postSet(); \
-    } \
-  if(mode&Inform) \
-    { \
-    if(property()->entity()) { \
-    property()->entity()->informDirtyObservers(property()); } \
-    } \
-  return true; \
-  } \
-name::name() \
-  { \
-  } \
-name::name(const type &def) : _value(def) \
-  { \
-  } \
-name &name::operator=(const type &in) \
-  { \
-  database()->doChange<Change>(_value, in, this); \
-  return *this; \
-  } \
-void name::assign(const type &in) \
-  { \
-  database()->doChange<Change>(_value, in, this); \
-  } \
-void name::saveProperty(const SProperty *p, SSaver &l ) { \
-  SProperty::saveProperty(p, l); \
-  const name *ptr = p->uncheckedCastTo<name>(); \
-  writeValue(l, ptr->_value); } \
-SProperty * name::loadProperty(SPropertyContainer *parent, SLoader &l) { \
-  SProperty *prop = SProperty::loadProperty(parent, l); \
-  name *ptr = prop->uncheckedCastTo<name>(); \
-  readValue(l, ptr->_value); return prop; }
+    return info; } \
+  name::name() { }
+
+namespace
+{
+QTextStream &operator<<(QTextStream &s, xuint8 v)
+  {
+  return s << (xuint32)v;
+  }
+
+QTextStream &operator>>(QTextStream &s, xuint8 &v)
+  {
+  xuint32 t;
+  s >> t;
+  v = (xuint8)t;
+  return s;
+  }
+}
 
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0);
@@ -229,5 +268,14 @@ template <typename Derived> QDataStream & operator >>(QDataStream &str, Eigen::P
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
   static void assign(BoolProperty* s, const bool &val) { s->assign(val); } \
   static const xuint8 &value(const BoolProperty* s) { return s->value(); } };
+
+
+
+#include "sdatabase.h"
+
+template <typename T, typename DERIVED> void SPODProperty<T, DERIVED>::assign(const T &in)
+  {
+  database()->doChange<Change>(_value, in, this);
+  }
 
 #endif // SBASEPROPERTIES_H

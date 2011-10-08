@@ -18,7 +18,7 @@
 
 namespace SPropertyDefaultUI
 {
-template <typename T, typename U> class SUIBase : private SDirtyObserver
+template <typename T> class SUIBase : private SDirtyObserver
   {
 XProperties:
   XProperty(bool, isAlreadySetting, setAlreadySetting);
@@ -54,11 +54,11 @@ private:
   bool _dirty;
   };
 
-class Bool : public QCheckBox, private SUIBase<BoolProperty, BoolProperty::Change>
+class Bool : public QCheckBox, private SUIBase<BoolProperty>
   {
   Q_OBJECT
 public:
-  Bool( SProperty *prop, bool readOnly, QWidget *parent ) : QCheckBox(parent), SUIBase<BoolProperty, BoolProperty::Change>(prop)
+  Bool( SProperty *prop, bool readOnly, QWidget *parent ) : QCheckBox(parent), SUIBase<BoolProperty>(prop)
     {
     connect( this, SIGNAL(toggled(bool)), this, SLOT(guiChanged(bool)));
     syncGUI();
@@ -69,11 +69,11 @@ public:
   void syncGUI() { setChecked( propertyValue()->value() ); }
   };
 
-class Int32 : public QSpinBox, private SUIBase<IntProperty, IntProperty::Change>
+class Int32 : public QSpinBox, private SUIBase<IntProperty>
  {
  Q_OBJECT
 public:
- Int32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<IntProperty, IntProperty::Change>(prop)
+ Int32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<IntProperty>(prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -88,11 +88,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class UInt32 : public QSpinBox, private SUIBase<UnsignedIntProperty, UnsignedIntProperty::Change>
+class UInt32 : public QSpinBox, private SUIBase<UnsignedIntProperty>
  {
  Q_OBJECT
 public:
- UInt32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<UnsignedIntProperty, UnsignedIntProperty::Change>(prop)
+ UInt32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<UnsignedIntProperty>(prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -107,11 +107,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class Int64 : public QSpinBox, private SUIBase<LongIntProperty, LongIntProperty::Change>
+class Int64 : public QSpinBox, private SUIBase<LongIntProperty>
  {
  Q_OBJECT
 public:
- Int64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongIntProperty, LongIntProperty::Change>(prop)
+ Int64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongIntProperty>(prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -126,11 +126,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class UInt64 : public QSpinBox, private SUIBase<LongUnsignedIntProperty, LongUnsignedIntProperty::Change>
+class UInt64 : public QSpinBox, private SUIBase<LongUnsignedIntProperty>
  {
  Q_OBJECT
 public:
- UInt64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongUnsignedIntProperty, LongUnsignedIntProperty::Change>(prop)
+ UInt64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongUnsignedIntProperty>(prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -145,11 +145,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class Float : public XFloatWidget, private SUIBase<FloatProperty, FloatProperty::Change>
+class Float : public XFloatWidget, private SUIBase<FloatProperty>
   {
   Q_OBJECT
 public:
-  Float( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<FloatProperty, FloatProperty::Change>(prop)
+  Float( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<FloatProperty>(prop)
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
@@ -160,11 +160,11 @@ public:
   void syncGUI() { setValue(propertyValue()->value()); }
   };
 
-class Double : public XFloatWidget, private SUIBase<DoubleProperty, DoubleProperty::Change>
+class Double : public XFloatWidget, private SUIBase<DoubleProperty>
   {
   Q_OBJECT
 public:
-  Double( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<DoubleProperty, DoubleProperty::Change>(prop)
+  Double( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<DoubleProperty>(prop)
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
@@ -175,11 +175,11 @@ public:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class String : public QLineEdit, private SUIBase<StringProperty, StringProperty::Change>
+class String : public QLineEdit, private SUIBase<StringProperty>
   {
   Q_OBJECT
 public:
-  String( SProperty *prop, bool readOnly, QWidget *parent ) : QLineEdit(parent), SUIBase<StringProperty, StringProperty::Change>(prop)
+  String( SProperty *prop, bool readOnly, QWidget *parent ) : QLineEdit(parent), SUIBase<StringProperty>(prop)
     {
     connect( this, SIGNAL(editingFinished()), this, SLOT(guiChanged()) );
     syncGUI();
@@ -190,11 +190,11 @@ public:
   void syncGUI() { setText(propertyValue()->value()); }
   };
 
-class LongString : public QTextEdit, private SUIBase<StringProperty, StringProperty::Change>
+class LongString : public QTextEdit, private SUIBase<StringProperty>
   {
   Q_OBJECT
 public:
-  LongString( SProperty *prop, bool readOnly, QWidget *parent ) : QTextEdit(parent), SUIBase<StringProperty, StringProperty::Change>(prop)
+  LongString( SProperty *prop, bool readOnly, QWidget *parent ) : QTextEdit(parent), SUIBase<StringProperty>(prop)
     {
     connect( this, SIGNAL(textChanged()), this, SLOT(guiChanged()) );
     syncGUI();
@@ -206,11 +206,11 @@ public:
   void syncGUI() { setText( propertyValue()->value() ); }
   };
 
-class Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty, Vector2DProperty::Change>
+class Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty>
   {
   Q_OBJECT
 public:
-  Vector2D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector2DWidget( XVector2D(), QStringList(), parent ), SUIBase<Vector2DProperty, Vector2DProperty::Change>(prop)
+  Vector2D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector2DWidget( XVector2D(), QStringList(), parent ), SUIBase<Vector2DProperty>(prop)
     {
     connect( this, SIGNAL(valueChanged(XVector2D)), this, SLOT(guiChanged(XVector2D)));
     setReadOnly(readOnly);
@@ -224,11 +224,11 @@ private:
   };
 
 
-class Vector3D : public XVector3DWidget, private SUIBase<Vector3DProperty, Vector3DProperty::Change>
+class Vector3D : public XVector3DWidget, private SUIBase<Vector3DProperty>
   {
   Q_OBJECT
 public:
-  Vector3D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector3DWidget( XVector3D(), QStringList(), parent), SUIBase<Vector3DProperty, Vector3DProperty::Change>(prop)
+  Vector3D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector3DWidget( XVector3D(), QStringList(), parent), SUIBase<Vector3DProperty>(prop)
     {
     connect( this, SIGNAL(valueChanged(XVector3D)), this, SLOT(guiChanged(XVector3D)));
     setReadOnly(readOnly);
@@ -242,11 +242,11 @@ private:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class Colour : public XColourWidget, private SUIBase<ColourProperty, ColourProperty::Change>
+class Colour : public XColourWidget, private SUIBase<ColourProperty>
   {
   Q_OBJECT
 public:
-  Colour( SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent ) : XColourWidget( XColour(), false, parent ), SUIBase<ColourProperty, ColourProperty::Change>(prop)
+  Colour( SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent ) : XColourWidget( XColour(), false, parent ), SUIBase<ColourProperty>(prop)
     {
     connect( this, SIGNAL(colourChanged(XColour)), this, SLOT(guiChanged(XColour)));
     // setReadOnly(readOnly); <- implement this...
