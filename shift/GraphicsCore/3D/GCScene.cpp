@@ -244,9 +244,12 @@ bool GCManipulatableScene::isMouseSelecting() const
 
 void GCManipulatableScene::raySelect(const XVector3D &sel)
   {
-  GCShadingGroup *g = shadingGroups.firstChild<GCShadingGroup>();
-  GCGeometryTransform *t = g->geometry.firstChild()->input()->castTo<GCGeometryTransform>();
+  /*GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>();
+  GCShadingGroup* g = groupPtr->input()->uncheckedCastTo<GCShadingGroup>();
+  GCGeometryTransform *t = g->geometry.firstChild()->input()->castTo<GCGeometryTransform>();*/
 
+  // todo, fill this in.
+  xAssertFail();
   }
 
 void GCManipulatableScene::marqueeSelect(const XFrustum &frus)
