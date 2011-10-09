@@ -52,13 +52,13 @@ public:
       const GCCamera *camera,
       XRenderer *r)
     {
-    /*XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
+    XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
 
     r->pushTransform(t);
     r->setShader(&_shader);
     r->drawGeometry(_geo);
     r->setShader(0);
-    r->popTransform();*/
+    r->popTransform();
     }
 
 private:

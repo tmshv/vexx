@@ -48,7 +48,7 @@ void GCScene::render(XRenderer *r) const
 
 S_IMPLEMENT_PROPERTY(GCManipulatableScene)
 
-void computeManips(const SPropertyInstanceInformation *inst, SPropertyContainer *cont)
+void computeManips(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
   GCManipulatableScene *s = cont->uncheckedCastTo<GCManipulatableScene>();
   s->refreshManipulators();
@@ -242,7 +242,7 @@ bool GCManipulatableScene::isMouseSelecting() const
   return _mouseSelecting;
   }
 
-void GCManipulatableScene::raySelect(const XVector3D &sel)
+void GCManipulatableScene::raySelect(const XVector3D &)
   {
   /*GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>();
   GCShadingGroup* g = groupPtr->input()->uncheckedCastTo<GCShadingGroup>();
@@ -252,7 +252,7 @@ void GCManipulatableScene::raySelect(const XVector3D &sel)
   xAssertFail();
   }
 
-void GCManipulatableScene::marqueeSelect(const XFrustum &frus)
+void GCManipulatableScene::marqueeSelect(const XFrustum &)
   {
   xAssertFail();
   }

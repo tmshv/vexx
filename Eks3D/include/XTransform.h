@@ -24,6 +24,12 @@ template <typename A, int B, int C, int D> QDebug operator <<(QDebug str, const 
   return str << data.matrix();
   }
 
+template <typename A, int B, int C, int D, typename E, int F, int G, int H>
+    bool operator ==(const Eigen::Transform <A, B, C, D> &a, const Eigen::Transform <E, F, G, H> &b)
+  {
+  return a.matrix() == b.matrix();
+  }
+
 typedef XList <XTransform> XTransformList;
 
 #endif // XTRANSFORM_H

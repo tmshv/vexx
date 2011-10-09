@@ -1,16 +1,6 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
 
-void writeValue(SSaver &, const XGeometry &)
-  {
-  xAssertFail();
-  }
-
-void readValue(SLoader &, XGeometry &)
-  {
-  xAssertFail();
-  }
-
 IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry, XGeometry)
 
 void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)

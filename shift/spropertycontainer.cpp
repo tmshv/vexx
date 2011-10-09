@@ -265,7 +265,21 @@ SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader 
 bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   {
   const SPropertyContainer *ptr = p->uncheckedCastTo<SPropertyContainer>();
-  return ptr->_containedProperties < ptr->size();
+  if(ptr->_containedProperties < ptr->size())
+    {
+    return true;
+    }
+
+  for(SProperty *p=ptr->firstChild(); p; p=p->nextSibling())
+    {
+    const SPropertyInformation *info = p->typeInformation();
+    if(info->shouldSave()(p))
+      {
+      return true;
+      }
+    }
+
+  return false;
   }
 
 
