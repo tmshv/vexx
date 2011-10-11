@@ -24,6 +24,7 @@ void SLoader::read(SPropertyContainer *read)
   bool shouldLoad = true;
   if(info->inheritsFromType(SPropertyContainer::staticTypeInformation()))
     {
+
     shouldLoad =
     }
   else

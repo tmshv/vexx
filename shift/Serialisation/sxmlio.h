@@ -21,8 +21,6 @@ private:
   void beginNextChild();
   void endNextChild();
 
-  void write(const SProperty *);
-
   void beginAttribute(const char *);
   void endAttribute(const char *);
 
@@ -46,9 +44,8 @@ private:
   void beginChildren() const;
   void endChildren() const;
   void beginNextChild();
+  bool childHasValue() const;
   void endNextChild();
-
-  void read(SPropertyContainer *);
 
   void beginAttribute(const char *);
   void endAttribute(const char *);

@@ -46,6 +46,7 @@ private:
   void beginChildren() const;
   void endChildren() const;
   void beginNextChild();
+  bool childHasValue() const;
   void endNextChild();
 
   void read(SPropertyContainer *);

@@ -126,15 +126,6 @@ void SJSONSaver::endNextChild()
   END_OBJECT
   }
 
-void SJSONSaver::write(const SProperty *prop)
-  {
-  const SPropertyInformation *info = prop->typeInformation();
-  xAssert(info);
-  xAssert(info->save());
-
-  info->save()(prop, *this);
-  }
-
 void SJSONSaver::beginAttribute(const char *attrName)
   {
   xAssert(_inAttribute.isEmpty());
@@ -413,6 +404,16 @@ void SJSONLoader::beginNextChild()
   readAllAttributes();
 
   _currentValue = _currentAttributes.value(VALUE_KEY);
+
+  _buffer.close();
+  _buffer.setBuffer(&_currentValue);
+  _buffer.open(QIODevice::ReadOnly);
+  textStream().seek(0);
+  }
+
+bool SJSONLoader::childHasValue() const
+  {
+  return !_currentValue.isEmpty()();
   }
 
 void SJSONLoader::endNextChild()
@@ -428,21 +429,6 @@ void SJSONLoader::endNextChild()
     readNext();
     }
   xAssert(_current == ChildrenEnd || _current == Attributes);
-  }
-
-void SJSONLoader::read(SPropertyContainer *read)
-  {
-  _buffer.close();
-  _buffer.setBuffer(&_currentValue);
-  _buffer.open(QIODevice::ReadOnly);
-  textStream().seek(0);
-
-  const SPropertyInformation *info = type();
-  xAssert(info);
-
-  xAssert(info->load());
-
-  info->load()(read, *this);
   }
 
 void SJSONLoader::beginAttribute(const char *attr)

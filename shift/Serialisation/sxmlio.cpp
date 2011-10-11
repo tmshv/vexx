@@ -62,15 +62,6 @@ void SXMLSaver::endNextChild()
   _writer.writeEndElement();
   }
 
-void SXMLSaver::write(const SProperty *prop)
-  {
-  const SPropertyInformation *info = prop->typeInformation();
-  xAssert(info);
-  xAssert(info->save());
-
-  info->save()(prop, *this);
-  }
-
 void SXMLSaver::beginAttribute(const char *attrName)
   {
   xAssert(_inAttribute.isEmpty());
@@ -195,6 +186,16 @@ void SXMLLoader::beginNextChild()
 
     xAssert(_reader.isEndElement() || _reader.isStartElement());
     }
+
+  _buffer.close();
+  _buffer.setBuffer(&_currentValue);
+  _buffer.open(QIODevice::ReadOnly);
+  textStream().seek(0);
+  }
+
+bool SXMLLoader::childHasValue() const
+  {
+  return !_currentValue.isEmpty();
   }
 
 void SXMLLoader::endNextChild()
@@ -202,21 +203,6 @@ void SXMLLoader::endNextChild()
   findNext(false);
   xAssert(_reader.isEndElement());
   _typeName.clear();
-  }
-
-void SXMLLoader::read(SPropertyContainer *read)
-  {
-  _buffer.close();
-  _buffer.setBuffer(&_currentValue);
-  _buffer.open(QIODevice::ReadOnly);
-  textStream().seek(0);
-
-  const SPropertyInformation *info = type();
-  xAssert(info);
-
-  xAssert(info->load());
-
-  info->load()(read, *this);
   }
 
 void SXMLLoader::beginAttribute(const char *attr)

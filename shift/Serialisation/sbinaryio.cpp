@@ -208,6 +208,12 @@ void SXMLLoader::beginNextChild()
     }
   }
 
+bool childHasValue() const
+  {
+  xAssertFail();
+  return true;
+  }
+
 void SXMLLoader::endNextChild()
   {
   findNext(false);
