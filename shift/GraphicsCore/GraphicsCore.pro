@@ -19,6 +19,7 @@ HEADERS += GCGlobal.h \
     GCNodeController.h \
     GCQImage.h \
     GCGeometry.h \
+    GCBaseProperties.h \
     3D/GCTransform.h \
     3D/GCRenderTarget.h \
     3D/GCTextureRenderTarget.h \
@@ -36,7 +37,6 @@ HEADERS += GCGlobal.h \
     3D/Manipulators/GCManipulator.h \
     3D/Manipulators/GCButtonManipulator.h \
     3D/Manipulators/GCDistanceManipulator.h \
-    GCBaseProperties.h \
     3D/Manipulators/GCTranslateManipulator.h \
     3D/Shaders/GCStandardSurface.h
 
@@ -52,6 +52,7 @@ SOURCES += \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
     GCQImage.cpp \
+    GCBaseProperties.cpp \
     3D/GCTransform.cpp \
     3D/GCRenderTarget.cpp \
     3D/GCTextureRenderTarget.cpp \
@@ -69,6 +70,5 @@ SOURCES += \
     3D/Manipulators/GCManipulator.cpp \
     3D/Manipulators/GCButtonManipulator.cpp \
     3D/Manipulators/GCDistanceManipulator.cpp \
-    GCBaseProperties.cpp \
-    3D/Manipulators/GCTranslateManipulator.cpp
+    3D/Manipulators/GCTranslateManipulator.cpp \
     3D/Shaders/GCStandardSurface.cpp

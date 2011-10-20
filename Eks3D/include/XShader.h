@@ -132,6 +132,7 @@ public:
     };
   virtual bool addComponent(ComponentType c, const QString& source) = 0;
   virtual bool build() = 0;
+  virtual bool isValid() = 0;
 
   virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * ) = 0;
   virtual void destroyVariable( XAbstractShaderVariable * ) = 0;
@@ -163,7 +164,9 @@ public:
   void addComponent(XAbstractShader::ComponentType, const QString &source);
   void clear();
 
-  XShaderVariable *getVariable( QString );
+  XShaderVariable *getVariable(const QString &type);
+
+  void setToDefinedType(const QString &type);
 
   QHash <QString, XShaderVariable*> variables() const;
 
@@ -182,5 +185,6 @@ private:
 
   mutable XAbstractShader *_internal;
   };
+
 
 #endif // XABSTRACTSHADER_H

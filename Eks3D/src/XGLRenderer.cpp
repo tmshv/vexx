@@ -109,6 +109,7 @@ public:
 private:
     virtual bool addComponent(ComponentType c, const QString &source);
     virtual bool build();
+    virtual bool isValid();
 
     virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * );
     virtual void destroyVariable( XAbstractShaderVariable * );
@@ -116,7 +117,6 @@ private:
     QGLShaderProgram shader;
     friend class XGLRenderer;
     friend class XGLShaderVariable;
-    XGLRenderer *_renderer;
     };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -721,6 +721,12 @@ bool XGLShader::build()
   return result;
   }
 
+bool XGLShader::isValid()
+  {
+  bool result = shader.isLinked() GLE;
+  return result;
+  }
+
 XAbstractShaderVariable *XGLShader::createVariable( QString in, XAbstractShader *s )
   {
   return new XGLShaderVariable( s, in );
@@ -787,7 +793,8 @@ void XGLShaderVariable::setValue( const XVector3D &value )
 void XGLShaderVariable::setValue( const XVector4D &value )
   {
   clear();
-  GL_SHADER_VARIABLE_PARENT->_renderer->_currentShader = 0;
+  XRenderer *r = GL_SHADER_VARIABLE_PARENT->renderer();
+  static_cast<XGLRenderer*>(r)->_currentShader = 0;
   GL_SHADER_VARIABLE_PARENT->shader.bind();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }

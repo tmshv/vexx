@@ -7,6 +7,7 @@
 #include "QVector2D"
 #include "QVector3D"
 #include "QVector4D"
+#include "QFile"
 
 template <typename T> XVector <T> toVector( const QVariantList &variantList )
   {
@@ -382,7 +383,7 @@ void XShader::clear()
     }
   }
 
-XShaderVariable *XShader::getVariable( QString in )
+XShaderVariable *XShader::getVariable(const QString &in )
   {
   if( _variables.contains( in ) )
     {
@@ -400,6 +401,19 @@ XShaderVariable *XShader::getVariable( QString in )
   return ret;
   }
 
+void XShader::setToDefinedType(const QString &type)
+  {
+  clear();
+
+  QFile v(":/GLResources/shaders/" + type + ".vert");
+  QFile f(":/GLResources/shaders/" + type + ".frag");
+  if(v.open(QIODevice::ReadOnly) && f.open(QIODevice::ReadOnly))
+    {
+    addComponent(XAbstractShader::Vertex, v.readAll());
+    addComponent(XAbstractShader::Fragment, f.readAll());
+    }
+  }
+
 QHash <QString, XShaderVariable*> XShader::variables() const
   {
   return _variables;
@@ -409,13 +423,23 @@ void XShader::prepareInternal( XRenderer *renderer ) const
   {
   if( !_internal )
     {
+    if(_components.isEmpty())
+      {
+      qWarning() << "Empty shader used, setting to default";
+      ((XShader*)this)->setToDefinedType("default");
+      }
+
     _internal = renderer->getShader( );
     xAssert( _internal );
+
     foreach(const Component &c, _components)
       {
-      _internal->addComponent(c.type, c.source);
+      bool result = _internal->addComponent(c.type, c.source);
+      xAssert(result);
       }
-    _internal->build();
+    bool result = _internal->build();
+    xAssert(result);
+    xAssert(_internal->isValid());
 
     foreach( XShaderVariable *var, _variables )
       {
