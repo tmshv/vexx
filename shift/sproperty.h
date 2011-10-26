@@ -193,6 +193,7 @@ public:
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
 
   void postSet();
+  void setDependantsDirty(bool force=false);
   void preGet() const
     {
     if(_flags.hasFlag(Dirty))
@@ -336,6 +337,7 @@ public:
   static void assignProperty(const SProperty *, SProperty *);
   static void saveProperty(const SProperty *, SSaver & );
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+  static void postChildSet(SPropertyContainer *, SProperty *) { xAssertFail(); }
 
   // should this properties value be saved, for example not when the value
   // is this property's value the default as it is when created.

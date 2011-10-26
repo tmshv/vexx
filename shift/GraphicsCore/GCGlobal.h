@@ -16,4 +16,6 @@ S_DEFINE_INTERFACE_TYPE(ManipulatableInterface, 200)
 #define GCProfileFunction XProfileFunction(GCProfileScope)
 #define GCProfileFunctionScopedBlock(mess) XProfileScopedBlock(GCProfileScope, mess)
 
+S_DEFINE_INTERFACE_TYPE(GCShaderBindableInterface, 50)
+
 #endif // GCGLOBAL_H

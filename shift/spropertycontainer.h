@@ -73,6 +73,8 @@ public:
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
   static bool shouldSavePropertyValue(const SProperty *);
 
+  static void postChildSet(SPropertyContainer *, SProperty *);
+
 protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.
   // you cannot add another contained property once dynamic properties have been added, this bool

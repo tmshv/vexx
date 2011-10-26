@@ -58,33 +58,48 @@ SPropertyInformation *GCVertexShaderComponent::createTypeInformation()
 
 S_IMPLEMENT_PROPERTY(GCShader)
 
-void computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
+void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
   {
   GCShader* shader = cont->uncheckedCastTo<GCShader>();
 
-  XShader rtShader;
-  for(const GCShaderComponentPointer* cmpPtr = shader->components.firstChild<GCShaderComponentPointer>(); cmpPtr; cmpPtr = cmpPtr->nextSibling<GCShaderComponentPointer>())
+  if(shader->_rebuildShader)
     {
-    const GCShaderComponent* cmp = cmpPtr->pointed();
-    if(cmp)
+    XShader rtShader;
+    for(const GCShaderComponentPointer* cmpPtr = shader->components.firstChild<GCShaderComponentPointer>(); cmpPtr; cmpPtr = cmpPtr->nextSibling<GCShaderComponentPointer>())
       {
-      XAbstractShader::ComponentType t;
-      if(cmp->castTo<GCFragmentShaderComponent>())
+      const GCShaderComponent* cmp = cmpPtr->pointed();
+      if(cmp)
         {
-        t = XAbstractShader::Fragment;
+        XAbstractShader::ComponentType t;
+        if(cmp->castTo<GCFragmentShaderComponent>())
+          {
+          t = XAbstractShader::Fragment;
+          }
+        else if(cmp->castTo<GCVertexShaderComponent>())
+          {
+          t = XAbstractShader::Vertex;
+          }
+        else
+          {
+          xAssertFail();
+          }
+        rtShader.addComponent(t, cmp->source());
         }
-      else if(cmp->castTo<GCVertexShaderComponent>())
+      }
+    shader->runtimeShader = rtShader;
+    }
+  else
+    {
+    xAssert(shader->_setVariables);
+    for(const SProperty* p = shader->runtimeShader.nextSibling(); p; p = p->nextSibling())
+      {
+      const GCShaderBindableData *binder = p->interface<GCShaderBindableData>();
+      if(binder)
         {
-        t = XAbstractShader::Vertex;
+        binder->bindData(&shader->runtimeShader(), p);
         }
-      else
-        {
-        xAssertFail();
-        }
-      rtShader.addComponent(t, cmp->source());
       }
     }
-  shader->runtimeShader = rtShader;
   }
 
 SPropertyInformation *GCShader::createTypeInformation()
@@ -102,9 +117,33 @@ SPropertyInformation *GCShader::createTypeInformation()
 
 GCShader::GCShader()
   {
+  _setVariables = true;
+  _rebuildShader = true;
   }
 
 void GCShader::bind(XRenderer *r) const
   {
   r->setShader(&runtimeShader());
+  }
+
+void GCShader::postChildSet(SPropertyContainer *c, SProperty *p)
+  {
+  ParentType::postChildSet(c, p);
+
+  GCShader *shader = c->uncheckedCastTo<GCShader>();
+
+  if(p == &shader->components)
+    {
+    if(!_rebuildShader && )
+      {
+      _rebuildShader = true;
+      }
+    }
+  else
+    {
+    if(!_setVariables && )
+      {
+      _setVariables = true;
+      }
+    }
   }

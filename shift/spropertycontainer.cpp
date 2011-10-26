@@ -285,6 +285,12 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   return false;
   }
 
+void SPropertyContainer::postChildSet(SPropertyContainer *c, SProperty *p)
+  {
+  p->_flags.clearFlag(Dirty);
+
+  p->setDependantsDirty();
+  }
 
 void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newProp, xsize index)
   {
