@@ -337,6 +337,13 @@ public:
   static void saveProperty(const SProperty *, SSaver & );
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
 
+  // should this properties value be saved, for example not when the value
+  // is this property's value the default as it is when created.
+  static bool shouldSavePropertyValue(const SProperty *);
+  // should the property definition itself be saved, note this function must be true if the above is true
+  // but the above can be false when this is true.
+  static bool shouldSaveProperty(const SProperty *);
+
   X_ALIGNED_OPERATOR_NEW
 
 private:

@@ -103,6 +103,7 @@ public:
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
+  typedef bool (*SaveQueryFunction)( const SProperty * );
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
@@ -113,6 +114,8 @@ XProperties:
   XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
+  XProperty(SaveQueryFunction, shouldSave, setShouldSave);
+  XProperty(SaveQueryFunction, shouldSaveValue, setShouldSaveValue);
   XProperty(AssignFunction, assign, setAssign);
   XProperty(PostCreateFunction, postCreate, setPostCreate);
 
@@ -254,6 +257,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
+  info->setShouldSave(PropType::shouldSaveProperty);
+  info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
@@ -273,6 +278,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
+  info->setShouldSave(PropType::shouldSaveProperty);
+  info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;

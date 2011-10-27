@@ -30,7 +30,7 @@ void SBinarySaver::setType(const SPropertyInformation *)
   //_currentType = type->typeName();
   }
 
-void SBinarySaver::beginChildren(xsize )
+void SBinarySaver::beginChildren()
   {
   xAssert(_inAttribute.isEmpty());
   /*_inAttribute = "childCount";
@@ -206,6 +206,12 @@ void SXMLLoader::beginNextChild()
     _hasNextElement = true;
     xAssert(_reader.isEndElement() || _reader.isStartElement());
     }
+  }
+
+bool childHasValue() const
+  {
+  xAssertFail();
+  return true;
   }
 
 void SXMLLoader::endNextChild()

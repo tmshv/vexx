@@ -58,6 +58,19 @@ public:
   SUIntArrayProperty polygons;
   };
 
+namespace
+{
+void writeValue(SSaver &, const XGeometry &)
+  {
+  xAssertFail();
+  }
+
+void readValue(SLoader &, XGeometry &)
+  {
+  xAssertFail();
+  }
+}
+
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry())
 
 class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer

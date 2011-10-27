@@ -2,29 +2,6 @@
 #include "sdatabase.h"
 #include "styperegistry.h"
 
-
-QTextStream &operator <<(QTextStream &str, const QImage &data)
-  {
-  QByteArray arr;
-  // approximate hopeful size?
-  arr.resize(data.byteCount() + 64);
-  QDataStream dStr(&arr, QIODevice::WriteOnly);
-  dStr << data;
-
-  return str << arr.toHex();
-  }
-
-QTextStream &operator >>(QTextStream &str, QImage &data)
-  {
-  QByteArray arr;
-  str >> arr;
-  arr = QByteArray::fromHex(arr);
-
-  QDataStream dStr(&arr, QIODevice::ReadOnly);
-  dStr >> data;
-  return str;
-  }
-
 IMPLEMENT_POD_PROPERTY(GCQImage, QImage)
 
 

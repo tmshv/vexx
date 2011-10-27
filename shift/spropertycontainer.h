@@ -71,6 +71,7 @@ public:
   static void assignProperty(const SProperty *, SProperty *);
   static void saveProperty(const SProperty *, SSaver & );
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
+  static bool shouldSavePropertyValue(const SProperty *);
 
 protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.

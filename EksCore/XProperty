@@ -45,8 +45,8 @@
     private: \
     XPropertyMember( type, name ) \
     accessLevel: \
-    XConstReadProperty( const type &, name, name ) \
-    XWriteProperty( type &, name, writeName )
+    XConstReadProperty( type &, name, name ) \
+    XWriteProperty( const type &, name, writeName )
 
 #define XROByRefSpecificProperty( type, name, accessLevel ) \
     private: \

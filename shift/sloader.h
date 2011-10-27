@@ -30,12 +30,17 @@ public:
 
   virtual const SPropertyInformation *type() const = 0;
 
-  virtual xsize beginChildren() const = 0;
+  void loadChildren(SPropertyContainer *parent);
+
+  virtual void beginChildren() const = 0;
   virtual void endChildren() const = 0;
+  virtual bool hasNextChild() const = 0;
+
   virtual void beginNextChild() = 0;
+  virtual bool childHasValue() const = 0;
   virtual void endNextChild() = 0;
 
-  virtual void read(SPropertyContainer *parent) = 0;
+  void read(SPropertyContainer *parent);
 
   virtual void beginAttribute(const char *) = 0;
   virtual void endAttribute(const char *) = 0;
@@ -69,12 +74,14 @@ public:
 
   virtual void setType(const SPropertyInformation *) = 0;
 
-  virtual void beginChildren(xsize) = 0;
+  void saveChildren(const SPropertyContainer *c);
+
+  virtual void beginChildren() = 0;
   virtual void endChildren() = 0;
   virtual void beginNextChild() = 0;
   virtual void endNextChild() = 0;
 
-  virtual void write(const SProperty *) = 0;
+  void write(const SProperty *);
 
   virtual void beginAttribute(const char *) = 0;
   virtual void endAttribute(const char *) = 0;

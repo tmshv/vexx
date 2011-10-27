@@ -16,7 +16,7 @@ public:
 private:
   void setType(const SPropertyInformation *);
 
-  void beginChildren(xsize);
+  void beginChildren();
   void endChildren();
   void beginNextChild();
   void endNextChild();
@@ -43,9 +43,10 @@ public:
 private:
   const SPropertyInformation *type() const;
 
-  xsize beginChildren() const;
+  void beginChildren() const;
   void endChildren() const;
   void beginNextChild();
+  bool childHasValue() const;
   void endNextChild();
 
   void read(SPropertyContainer *);

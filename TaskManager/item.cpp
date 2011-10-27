@@ -33,7 +33,7 @@ SPropertyInformation *Item::createTypeInformation()
   }
 
 
-Item::Item() : priority(0)
+Item::Item()
   {
   }
 

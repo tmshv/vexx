@@ -37,7 +37,8 @@ SOURCES += \
     Serialisation/JsonParser/JSON_parser.c \
     Serialisation/sxmlio.cpp \
     Serialisation/sbinaryio.cpp \
-    Serialisation/sjsonio.cpp
+    Serialisation/sjsonio.cpp \
+    sloader.cpp
 
 HEADERS += \
     sglobal.h \
@@ -66,6 +67,7 @@ HEADERS += \
     Serialisation/sxmlio.h \
     Serialisation/sbinaryio.h \
     Serialisation/sjsonio.h
+
 
 
 

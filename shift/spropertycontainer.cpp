@@ -245,16 +245,7 @@ void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
 
   SProperty::saveProperty(p, l);
 
-  l.beginChildren(c->size());
-  for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
-    {
-    l.beginNextChild();
-
-    l.write(child);
-
-    l.endNextChild();
-    }
-  l.endChildren();
+  l.saveChildren(c);
   }
 
 SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader &l)
@@ -266,16 +257,29 @@ SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader 
 
   SPropertyContainer* container = prop->uncheckedCastTo<SPropertyContainer>();
 
-  xsize childCount = l.beginChildren();
-  for(xsize i=0; i<childCount; ++i)
-    {
-    l.beginNextChild();
-    l.read(container);
-    l.endNextChild();
-    }
-  l.endChildren();
+  l.loadChildren(container);
 
   return prop;
+  }
+
+bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
+  {
+  const SPropertyContainer *ptr = p->uncheckedCastTo<SPropertyContainer>();
+  if(ptr->_containedProperties < ptr->size())
+    {
+    return true;
+    }
+
+  for(SProperty *p=ptr->firstChild(); p; p=p->nextSibling())
+    {
+    const SPropertyInformation *info = p->typeInformation();
+    if(info->shouldSave()(p))
+      {
+      return true;
+      }
+    }
+
+  return false;
   }
 
 

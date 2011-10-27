@@ -8,6 +8,16 @@
 
 typedef Eigen::Quaternion<xReal> XQuaternion;
 
+inline bool operator==(const XQuaternion &a, const XQuaternion& b)
+  {
+  return a.coeffs() == b.coeffs();
+  }
+
+inline bool operator!=(const XQuaternion &a, const XQuaternion& b)
+  {
+  return a.coeffs() != b.coeffs();
+  }
+
 inline QTextStream &operator<<(QTextStream &str, const XQuaternion &quat)
   {
   return str << quat.x() << " " << quat.y() << " " << quat.z() << " " << quat.w();

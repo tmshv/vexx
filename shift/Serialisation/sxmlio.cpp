@@ -32,12 +32,13 @@ void SXMLSaver::setType(const SPropertyInformation *type)
   _writer.writeStartElement(type->typeName());
   }
 
-void SXMLSaver::beginChildren(xsize size)
+void SXMLSaver::beginChildren()
   {
   xAssert(_inAttribute.isEmpty());
   _inAttribute = "childCount";
-  _writer.writeAttribute(_inAttribute, QString::number(size));
+  //_writer.writeAttribute(_inAttribute, QString::number(size));
   _inAttribute.clear();
+  xAssertFail();
   }
 
 void SXMLSaver::endChildren()
@@ -59,15 +60,6 @@ void SXMLSaver::endNextChild()
     textStream().seek(0);
     }
   _writer.writeEndElement();
-  }
-
-void SXMLSaver::write(const SProperty *prop)
-  {
-  const SPropertyInformation *info = prop->typeInformation();
-  xAssert(info);
-  xAssert(info->save());
-
-  info->save()(prop, *this);
   }
 
 void SXMLSaver::beginAttribute(const char *attrName)
@@ -123,14 +115,7 @@ void SXMLLoader::readFromDevice(QIODevice *device, SEntity *parent)
 
       _currentAttributes = _reader.attributes();
 
-      xsize count = beginChildren();
-      for(xsize i=0; i<count; ++i)
-        {
-        beginNextChild();
-        read(_root);
-        endNextChild();
-        }
-      endChildren();
+      loadChildren(_root);
 
       findNext(false);
       xAssert(_reader.isEndElement());
@@ -169,11 +154,9 @@ const SPropertyInformation *SXMLLoader::type() const
   return info;
   }
 
-xsize SXMLLoader::beginChildren() const
+void SXMLLoader::beginChildren() const
   {
   _scratch.clear();
-  _currentAttributes.value(_childCount).appendTo(&_scratch);
-  return _scratch.toULongLong();
   }
 
 void SXMLLoader::endChildren() const
@@ -203,6 +186,16 @@ void SXMLLoader::beginNextChild()
 
     xAssert(_reader.isEndElement() || _reader.isStartElement());
     }
+
+  _buffer.close();
+  _buffer.setBuffer(&_currentValue);
+  _buffer.open(QIODevice::ReadOnly);
+  textStream().seek(0);
+  }
+
+bool SXMLLoader::childHasValue() const
+  {
+  return !_currentValue.isEmpty();
   }
 
 void SXMLLoader::endNextChild()
@@ -210,21 +203,6 @@ void SXMLLoader::endNextChild()
   findNext(false);
   xAssert(_reader.isEndElement());
   _typeName.clear();
-  }
-
-void SXMLLoader::read(SPropertyContainer *read)
-  {
-  _buffer.close();
-  _buffer.setBuffer(&_currentValue);
-  _buffer.open(QIODevice::ReadOnly);
-  textStream().seek(0);
-
-  const SPropertyInformation *info = type();
-  xAssert(info);
-
-  xAssert(info->load());
-
-  info->load()(read, *this);
   }
 
 void SXMLLoader::beginAttribute(const char *attr)

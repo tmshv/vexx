@@ -67,14 +67,9 @@ void SJSONSaver::writeToDevice(QIODevice *device, const SPropertyContainer *ent,
     {
     START_OBJECT
     OBJECT_VALUE_CHAR_CHAR(NO_ROOT_KEY, "true");
-    beginChildren(_root->size());
-    for(const SProperty *child=_root->firstChild(); child; child=child->nextSibling())
-      {
-      beginNextChild();
-      write(child);
-      endNextChild();
-      }
-    endChildren();
+
+    saveChildren(_root);
+
     END_OBJECT
     }
   else
@@ -101,10 +96,9 @@ void SJSONSaver::setType(const SPropertyInformation *type)
   OBJECT_VALUE_CHAR_BYTEARRAY(TYPE_KEY, type->typeName().toUtf8());
   }
 
-void SJSONSaver::beginChildren(xsize size)
+void SJSONSaver::beginChildren()
   {
   xAssert(_inAttribute.isEmpty());
-  OBJECT_VALUE_CHAR_BYTEARRAY(CHILD_COUNT_KEY, QString::number(size).toUtf8());
   START_ARRAY_IN_OBJECT_CHAR(CHILDREN_KEY);
   }
 
@@ -130,15 +124,6 @@ void SJSONSaver::endNextChild()
     textStream().seek(0);
     }
   END_OBJECT
-  }
-
-void SJSONSaver::write(const SProperty *prop)
-  {
-  const SPropertyInformation *info = prop->typeInformation();
-  xAssert(info);
-  xAssert(info->save());
-
-  info->save()(prop, *this);
   }
 
 void SJSONSaver::beginAttribute(const char *attrName)
@@ -341,14 +326,7 @@ void SJSONLoader::readFromDevice(QIODevice *device, SPropertyContainer *parent)
     }
   else
     {
-    xsize count = beginChildren();
-    for(xsize i=0; i<count; ++i)
-      {
-      beginNextChild();
-      read(_root);
-      endNextChild();
-      }
-    endChildren();
+    loadChildren(_root);
     }
 
   xAssert(_current == End);
@@ -379,13 +357,10 @@ const SPropertyInformation *SJSONLoader::type() const
   }
 
 
-xsize SJSONLoader::beginChildren() const
+void SJSONLoader::beginChildren() const
   {
   readNext();
   xAssert(_current == Children);
-  _scratch.clear();
-  _scratch = _currentAttributes.value(CHILD_COUNT_KEY);
-  return _scratch.toULongLong();
   }
 
 void SJSONLoader::endChildren() const
@@ -399,16 +374,46 @@ void SJSONLoader::endChildren() const
   xAssert(_current == End);
   }
 
-void SJSONLoader::beginNextChild()
+bool SJSONLoader::hasNextChild() const
   {
-  _currentAttributes.clear();
   if(_current == Children)
     {
     readNext();
     }
+
+  if(_current == ChildrenEnd)
+    {
+    return false;
+    }
+
+  if(_current == Attributes)
+    {
+    return true;
+    }
+
+
+  xAssertFail();
+  return false;
+  }
+
+void SJSONLoader::beginNextChild()
+  {
+  _currentAttributes.clear();
+  xAssert(_current != ChildrenEnd);
+  xAssert(_current != Children);
   readAllAttributes();
 
   _currentValue = _currentAttributes.value(VALUE_KEY);
+
+  _buffer.close();
+  _buffer.setBuffer(&_currentValue);
+  _buffer.open(QIODevice::ReadOnly);
+  textStream().seek(0);
+  }
+
+bool SJSONLoader::childHasValue() const
+  {
+  return !_currentValue.isEmpty()();
   }
 
 void SJSONLoader::endNextChild()
@@ -424,21 +429,6 @@ void SJSONLoader::endNextChild()
     readNext();
     }
   xAssert(_current == ChildrenEnd || _current == Attributes);
-  }
-
-void SJSONLoader::read(SPropertyContainer *read)
-  {
-  _buffer.close();
-  _buffer.setBuffer(&_currentValue);
-  _buffer.open(QIODevice::ReadOnly);
-  textStream().seek(0);
-
-  const SPropertyInformation *info = type();
-  xAssert(info);
-
-  xAssert(info->load());
-
-  info->load()(read, *this);
   }
 
 void SJSONLoader::beginAttribute(const char *attr)
