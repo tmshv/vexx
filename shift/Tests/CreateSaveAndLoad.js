@@ -16,7 +16,7 @@
 
   var tier2 = function(ent) { addChildren(ent, "SEntity", 10, tier1 ); };
 
-  var tier3 = function(ent) { addChildren(ent, "SEntity", 10, tier2 ); };
+  var tier3 = function(ent) { addChildren(ent, "SEntity", 100, tier2 ); };
 
   var parent = db.addChild("SEntity");
   tier3(parent);

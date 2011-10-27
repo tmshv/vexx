@@ -186,5 +186,34 @@ private:
   mutable XAbstractShader *_internal;
   };
 
+inline bool operator==(const XShader&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator<<(const QTextStream&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator<<(const QDataStream&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator>>(QTextStream&, XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator>>(QDataStream&, XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
 
 #endif // XABSTRACTSHADER_H

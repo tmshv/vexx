@@ -429,7 +429,7 @@ void SJSONLoader::beginNextChild()
 
 bool SJSONLoader::childHasValue() const
   {
-  return !_currentValue.isEmpty()();
+  return !_currentValue.isEmpty();
   }
 
 void SJSONLoader::endNextChild()

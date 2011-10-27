@@ -24,8 +24,7 @@ void SLoader::read(SPropertyContainer *read)
   bool shouldLoad = true;
   if(info->inheritsFromType(SPropertyContainer::staticTypeInformation()))
     {
-
-    shouldLoad =
+    shouldLoad = true;
     }
   else
     {
@@ -54,7 +53,7 @@ void SSaver::saveChildren(const SPropertyContainer *c)
     if(info->shouldSave()(child))
       {
       beginNextChild();
-      if(info->shouldSaveValue())
+      //if(info->shouldSaveValue())
         {
         write(child);
         }
