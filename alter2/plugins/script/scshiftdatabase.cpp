@@ -50,7 +50,7 @@ QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
     }
 
   QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
-  if(!device)
+  if(!device || !device->isReadable())
     {
     ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
     return false;
@@ -150,7 +150,7 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
     }
 
   QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
-  if(!device)
+  if(!device || !device->isWritable())
     {
     ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
     return false;

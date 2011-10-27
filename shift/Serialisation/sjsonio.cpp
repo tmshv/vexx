@@ -58,6 +58,7 @@ SJSONSaver::SJSONSaver() : _autoWhitespace(false), _device(0), _root(0)
 
 void SJSONSaver::writeToDevice(QIODevice *device, const SPropertyContainer *ent, bool includeRoot)
   {
+  SProfileFunction
   _root = ent;
 
   _device = device;
@@ -90,6 +91,7 @@ void SJSONSaver::writeToDevice(QIODevice *device, const SPropertyContainer *ent,
 
 void SJSONSaver::setType(const SPropertyInformation *type)
   {
+  SProfileFunction
   xAssert(_buffer.data().isEmpty());
   xAssert(_inAttribute.isEmpty());
 
@@ -98,24 +100,28 @@ void SJSONSaver::setType(const SPropertyInformation *type)
 
 void SJSONSaver::beginChildren()
   {
+  SProfileFunction
   xAssert(_inAttribute.isEmpty());
   START_ARRAY_IN_OBJECT_CHAR(CHILDREN_KEY);
   }
 
 void SJSONSaver::endChildren()
   {
+  SProfileFunction
   xAssert(_inAttribute.isEmpty());
   END_ARRAY
   }
 
 void SJSONSaver::beginNextChild()
   {
+  SProfileFunction
   xAssert(_buffer.data().isEmpty());
   START_OBJECT
   }
 
 void SJSONSaver::endNextChild()
   {
+  SProfileFunction
   textStream().flush();
   if(!_buffer.buffer().isEmpty())
     {
@@ -128,6 +134,7 @@ void SJSONSaver::endNextChild()
 
 void SJSONSaver::beginAttribute(const char *attrName)
   {
+  SProfileFunction
   xAssert(_inAttribute.isEmpty());
   _inAttribute = attrName;
   xAssert(!_inAttribute.isEmpty());
@@ -138,6 +145,7 @@ void SJSONSaver::beginAttribute(const char *attrName)
 
 void SJSONSaver::endAttribute(const char *attrName)
   {
+  SProfileFunction
   xAssert(!_inAttribute.isEmpty());
   xAssert(_inAttribute == attrName);
 
@@ -179,6 +187,7 @@ SJSONLoader::~SJSONLoader()
 
 int SJSONLoader::callback(void *ctx, int type, const JSON_value* value)
   {
+  SProfileFunction
   SJSONLoader *ldr = (SJSONLoader*)ctx;
 
   if(ldr->_current == Start)
@@ -279,6 +288,7 @@ int SJSONLoader::callback(void *ctx, int type, const JSON_value* value)
 
 void SJSONLoader::readNext() const
   {
+  SProfileFunction
   xAssert(_parseError == false);
   _readNext = false;
   while(!_device->atEnd() && !_readNext)
@@ -298,6 +308,7 @@ void SJSONLoader::readNext() const
 
 void SJSONLoader::readAllAttributes()
   {
+  SProfileFunction
   xAssert(_current == Attributes);
   while(_current != AttributesEnd && _current != End)
     {
@@ -311,6 +322,7 @@ void SJSONLoader::readAllAttributes()
 
 void SJSONLoader::readFromDevice(QIODevice *device, SPropertyContainer *parent)
   {
+  SProfileFunction
   _root = parent;
 
   _device = device;
@@ -349,6 +361,7 @@ void SJSONLoader::readFromDevice(QIODevice *device, SPropertyContainer *parent)
 
 const SPropertyInformation *SJSONLoader::type() const
   {
+  SProfileFunction
   xAssert(_root);
 
   const SPropertyInformation *info = STypeRegistry::findType(_currentAttributes.value(TYPE_KEY));
@@ -359,12 +372,14 @@ const SPropertyInformation *SJSONLoader::type() const
 
 void SJSONLoader::beginChildren() const
   {
+  SProfileFunction
   readNext();
   xAssert(_current == Children);
   }
 
 void SJSONLoader::endChildren() const
   {
+  SProfileFunction
   if(_current == Children)
     {
     readNext();
@@ -376,6 +391,7 @@ void SJSONLoader::endChildren() const
 
 bool SJSONLoader::hasNextChild() const
   {
+  SProfileFunction
   if(_current == Children)
     {
     readNext();
@@ -418,6 +434,7 @@ bool SJSONLoader::childHasValue() const
 
 void SJSONLoader::endNextChild()
   {
+  SProfileFunction
   if(_current == AttributesEnd)
     {
     readNext();
@@ -433,6 +450,7 @@ void SJSONLoader::endNextChild()
 
 void SJSONLoader::beginAttribute(const char *attr)
   {
+  SProfileFunction
   xAssert(_currentAttributeValue.isEmpty());
   _scratch.clear();
   _currentAttributeValue = _currentAttributes.value(attr);
@@ -445,6 +463,7 @@ void SJSONLoader::beginAttribute(const char *attr)
 
 void SJSONLoader::endAttribute(const char *)
   {
+  SProfileFunction
   _buffer.close();
   _buffer.setBuffer(&_currentValue);
   _buffer.open(QIODevice::ReadOnly);
@@ -455,5 +474,6 @@ void SJSONLoader::endAttribute(const char *)
 
 void SJSONLoader::resolveInputAfterLoad(SProperty *prop, const QString &path)
   {
+  SProfileFunction
   _resolveAfterLoad.insert(prop, path);
   }

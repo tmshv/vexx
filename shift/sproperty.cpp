@@ -177,6 +177,7 @@ void SProperty::assignProperty(const SProperty *, SProperty *)
 
 void SProperty::saveProperty(const SProperty *p, SSaver &l)
   {
+  SProfileFunction
   const SPropertyInformation *type = p->typeInformation();
 
   l.setType(type);
@@ -211,6 +212,7 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
 
 SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
+  SProfileFunction
   const SPropertyInformation *type = l.type();
   xAssert(type);
 

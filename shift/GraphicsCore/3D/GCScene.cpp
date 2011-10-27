@@ -84,10 +84,15 @@ void GCManipulatableScene::refreshManipulators()
 
   for(GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCShadingGroupPointer>())
     {
-    GCShadingGroup* group = groupPtr->input()->uncheckedCastTo<GCShadingGroup>(); // pointer() only returns const...
-    if(group)
+    SProperty* inp = groupPtr->input();
+
+    if(inp)
       {
-      group->addManipulators(&manipulators);
+      GCShadingGroup* group = inp->uncheckedCastTo<GCShadingGroup>(); // pointer() only returns const...
+      if(group)
+        {
+        group->addManipulators(&manipulators);
+        }
       }
     }
   }
