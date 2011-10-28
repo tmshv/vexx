@@ -65,6 +65,32 @@ public:
       }
     };
 
+  class Lock
+    {
+  public:
+    Lock(SPODProperty<T, DERIVED> *ptr) : _ptr(ptr)
+      {
+      xAssert(ptr);
+      _oldData = _ptr->value();
+      _data = &_ptr->_value;
+      }
+    ~Lock()
+      {
+      _ptr->database()->doChange<Change>(_oldData, *_data, _ptr);
+      _data = 0;
+      }
+
+    T* data()
+      {
+      return _data;
+      }
+
+  private:
+    SPODProperty<T, DERIVED> *_ptr;
+    T* _data;
+    T _oldData;
+    };
+
   const T &operator()() const
     {
     preGet();
@@ -140,6 +166,8 @@ private:
       return true;
       }
     };
+
+  friend class Lock;
   };
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \

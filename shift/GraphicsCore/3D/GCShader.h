@@ -12,7 +12,7 @@ class GCShaderBindableData : public SStaticInterfaceBase
   S_STATIC_INTERFACE_TYPE(GCShaderBindableData, GCShaderBindableInterface)
 public:
   GCShaderBindableData(bool deleteOnNoReferences) : SStaticInterfaceBase(deleteOnNoReferences) { }
-  virtual void bindData(XShader *, SProperty *) const = 0;
+  virtual void bindData(XShader *, const SProperty *) const = 0;
   };
 
 class GRAPHICSCORE_EXPORT GCShaderComponent : public SEntity
@@ -56,7 +56,7 @@ public:
 private:
   bool _rebuildShader;
   bool _setVariables;
-  void computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont);
+  static void computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont);
   };
 
 S_TYPED_POINTER_TYPE(GCShaderPointer, GCShader);

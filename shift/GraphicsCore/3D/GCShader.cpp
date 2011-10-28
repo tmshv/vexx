@@ -90,13 +90,14 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SP
     }
   else
     {
+    GCRuntimeShader::Lock lock(&shader->runtimeShader);
     xAssert(shader->_setVariables);
     for(const SProperty* p = shader->runtimeShader.nextSibling(); p; p = p->nextSibling())
       {
       const GCShaderBindableData *binder = p->interface<GCShaderBindableData>();
       if(binder)
         {
-        binder->bindData(&shader->runtimeShader(), p);
+        binder->bindData(lock.data(), p);
         }
       }
     }
@@ -134,16 +135,10 @@ void GCShader::postChildSet(SPropertyContainer *c, SProperty *p)
 
   if(p == &shader->components)
     {
-    if(!_rebuildShader && )
-      {
-      _rebuildShader = true;
-      }
+    shader->_rebuildShader = true;
     }
   else
     {
-    if(!_setVariables && )
-      {
-      _setVariables = true;
-      }
+    shader->_setVariables = true;
     }
   }
