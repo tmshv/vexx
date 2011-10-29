@@ -46,7 +46,7 @@ public:
 template <typename T, typename DERIVED> class SPODProperty : public SProperty
   {
 XProperties:
-  XRORefProperty(T, value);
+  XPropertyMember(T, value);
 
 public:
   class InstanceInformation : public SProperty::InstanceInformation
@@ -67,6 +67,13 @@ public:
 
   const T &operator()() const
     {
+    preGet();
+    return _value;
+    }
+
+  const T &value() const
+    {
+    preGet();
     return _value;
     }
 
