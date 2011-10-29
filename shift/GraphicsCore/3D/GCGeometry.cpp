@@ -1,20 +1,6 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
 
-IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry, XGeometry)
-
-void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
-  {
-  GCRuntimeGeometry *to = t->uncheckedCastTo<GCRuntimeGeometry>();
-
-  const GCRuntimeGeometry *sProp = f->castTo<GCRuntimeGeometry>();
-  if(sProp)
-    {
-    to->assign(sProp->value());
-    return;
-    }
-  }
-
 S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
 SPropertyInformation *GCGeometryAttribute::createTypeInformation()

@@ -1,30 +1,6 @@
 #include "GCShader.h"
 #include "XRenderer.h"
 
-void writeValue(SSaver &s, const XShader &t)
-  {
-  xAssertFail();
-  }
-
-void readValue(SLoader &l, XShader &t)
-  {
-  xAssertFail();
-  }
-
-IMPLEMENT_POD_PROPERTY(GCRuntimeShader, XShader)
-
-void GCRuntimeShader::assignProperty(const SProperty *f, SProperty *t)
-  {
-  GCRuntimeShader *to = t->uncheckedCastTo<GCRuntimeShader>();
-
-  const GCRuntimeShader *sProp = f->castTo<GCRuntimeShader>();
-  if(sProp)
-    {
-    to->assign(sProp->value());
-    return;
-    }
-  }
-
 S_IMPLEMENT_PROPERTY(GCShaderComponent)
 
 SPropertyInformation *GCShaderComponent::createTypeInformation()
@@ -62,9 +38,11 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SP
   {
   GCShader* shader = cont->uncheckedCastTo<GCShader>();
 
+  GCRuntimeShader::ComputeLock lock(&shader->runtimeShader);
+
   if(shader->_rebuildShader)
     {
-    XShader rtShader;
+    lock.data()->clear();
     for(const GCShaderComponentPointer* cmpPtr = shader->components.firstChild<GCShaderComponentPointer>(); cmpPtr; cmpPtr = cmpPtr->nextSibling<GCShaderComponentPointer>())
       {
       const GCShaderComponent* cmp = cmpPtr->pointed();
@@ -83,14 +61,12 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SP
           {
           xAssertFail();
           }
-        rtShader.addComponent(t, cmp->source());
+        lock.data()->addComponent(t, cmp->source());
         }
       }
-    shader->runtimeShader = rtShader;
     }
   else
     {
-    GCRuntimeShader::Lock lock(&shader->runtimeShader);
     xAssert(shader->_setVariables);
     for(const SProperty* p = shader->runtimeShader.nextSibling(); p; p = p->nextSibling())
       {

@@ -2,7 +2,6 @@
 #include "styperegistry.h"
 
 #include "GCImage.h"
-#include "GCQImage.h"
 
 #include "3D/GCGeometry.h"
 #include "3D/GCScreenRenderTarget.h"

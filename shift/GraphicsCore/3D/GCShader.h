@@ -6,6 +6,7 @@
 #include "sbaseproperties.h"
 #include "sbasepointerproperties.h"
 #include "XShader.h"
+#include "GCBaseProperties.h  "
 
 class GCShaderBindableData : public SStaticInterfaceBase
   {
@@ -37,8 +38,6 @@ class GRAPHICSCORE_EXPORT GCVertexShaderComponent : public GCShaderComponent
 S_TYPED_POINTER_TYPE(GCShaderComponentPointer, GCShaderComponent);
 
 S_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray, GCShaderComponentPointer);
-
-DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeShader, XShader, XShader())
 
 class GRAPHICSCORE_EXPORT GCShader : public SEntity
   {

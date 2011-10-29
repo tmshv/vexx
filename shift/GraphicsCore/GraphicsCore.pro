@@ -17,7 +17,6 @@ HEADERS += GCGlobal.h \
     GCShiftRenderModel.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
-    GCQImage.h \
     GCGeometry.h \
     GCBaseProperties.h \
     3D/GCTransform.h \
@@ -51,7 +50,6 @@ SOURCES += \
     GCShiftRenderModel.cpp \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
-    GCQImage.cpp \
     GCBaseProperties.cpp \
     3D/GCTransform.cpp \
     3D/GCRenderTarget.cpp \
@@ -72,3 +70,5 @@ SOURCES += \
     3D/Manipulators/GCDistanceManipulator.cpp \
     3D/Manipulators/GCTranslateManipulator.cpp \
     3D/Shaders/GCStandardSurface.cpp
+
+
