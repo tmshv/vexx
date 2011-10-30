@@ -3,6 +3,7 @@
 #include "XRenderer.h"
 #include "XMatrix4x4"
 #include "siterator.h"
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
@@ -84,16 +85,23 @@ void GCManipulatableScene::refreshManipulators()
 
   for(GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCShadingGroupPointer>())
     {
-    GCShadingGroup* group = groupPtr->input()->uncheckedCastTo<GCShadingGroup>(); // pointer() only returns const...
-    if(group)
+    SProperty* inp = groupPtr->input();
+
+    if(inp)
       {
-      group->addManipulators(&manipulators);
+      GCShadingGroup* group = inp->uncheckedCastTo<GCShadingGroup>(); // pointer() only returns const...
+      if(group)
+        {
+        group->addManipulators(&manipulators);
+        }
       }
     }
   }
 
 void GCManipulatableScene::render(XRenderer *x) const
   {
+  xAssert(SProcessManager::isMainThread());
+
   GCScene::render(x);
 
   const GCCamera *cam = activeCamera();

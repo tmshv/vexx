@@ -7,13 +7,11 @@
 class SPropertyInstanceInformation;
 class SPropertyContainer;
 
-class ScShiftDatabase : public ScShiftEntity
+class ScShiftDatabase : public ScWrappedClass<SProperty *>
   {
 public:
   ScShiftDatabase(QScriptEngine *engine);
   ~ScShiftDatabase();
-
-  void initiate();
 
 private:
   static QScriptValue addType(QScriptContext *ctx, QScriptEngine *);

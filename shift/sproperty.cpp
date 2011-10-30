@@ -16,24 +16,24 @@ SPropertyInformation *SProperty::createTypeInformation()
   return SPropertyInformation::createNoParent<SProperty>("SProperty");
   }
 
-inline void setDependantsDirty(SProperty* prop, bool force)
+void SProperty::setDependantsDirty(bool force)
   {
-  for(SProperty *o=prop->output(); o; o = o->nextOutput())
+  for(SProperty *o=output(); o; o = o->nextOutput())
     {
     o->setDirty(force);
     }
 
-  const SPropertyInstanceInformation *child = prop->baseInstanceInformation();
+  const SPropertyInstanceInformation *child = baseInstanceInformation();
 
   if(child && child->affects())
     {
-    SPropertyContainer *parent = prop->parent();
-    const SPropertyInformation *parentInfo = parent->typeInformation();
+    SPropertyContainer *par = parent();
+    const SPropertyInformation *parentInfo = par->typeInformation();
     xsize i=0;
     while(child->affects()[i])
       {
       const SPropertyInstanceInformation *propInst = parentInfo->child(child->affects()[i]);
-      SProperty *affectsProp = propInst->locateProperty(parent);
+      SProperty *affectsProp = propInst->locateProperty(par);
 
       xAssert(affectsProp);
       affectsProp->setDirty(force);
@@ -41,9 +41,9 @@ inline void setDependantsDirty(SProperty* prop, bool force)
       }
     }
 
-  if(prop->input() || prop->isComputed() || prop->_flags.hasFlag(SProperty::ParentHasInput))
+  if(input() || isComputed() || _flags.hasFlag(SProperty::ParentHasInput))
     {
-    SPropertyContainer *c = prop->castTo<SPropertyContainer>();
+    SPropertyContainer *c = castTo<SPropertyContainer>();
     if(c)
       {
       SProperty *child = c->_child;
@@ -56,9 +56,9 @@ inline void setDependantsDirty(SProperty* prop, bool force)
     }
 
   // if we know the parent has an output
-  if(prop->_flags.hasFlag(SProperty::ParentHasOutput))
+  if(_flags.hasFlag(SProperty::ParentHasOutput))
     {
-    SProperty *parent = prop;
+    SProperty *parent = this;
     while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
       {
       parent = parent->parent();
@@ -177,6 +177,7 @@ void SProperty::assignProperty(const SProperty *, SProperty *)
 
 void SProperty::saveProperty(const SProperty *p, SSaver &l)
   {
+  SProfileFunction
   const SPropertyInformation *type = p->typeInformation();
 
   l.setType(type);
@@ -211,6 +212,7 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
 
 SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
+  SProfileFunction
   const SPropertyInformation *type = l.type();
   xAssert(type);
 
@@ -379,7 +381,7 @@ bool SProperty::ConnectionChange::apply(int mode)
         setParentHasInputConnection(_driven);
         setParentHasOutputConnection(_driver);
         }
-      setDependantsDirty(_driver, true);
+      _driver->setDependantsDirty(true);
       }
     else if(_mode == Disconnect)
       {
@@ -404,7 +406,7 @@ bool SProperty::ConnectionChange::apply(int mode)
         setParentHasInputConnection(_driven);
         setParentHasOutputConnection(_driver);
         }
-      setDependantsDirty(_driver, true);
+      _driver->setDependantsDirty(true);
       }
     }
 
@@ -680,6 +682,9 @@ void SProperty::internalSetName(const QString &name)
 void SProperty::postSet()
   {
   SProfileFunction
+  SPropertyContainer *c = parent();
+  const SPropertyInformation *info = c->typeInformation();
+  info->postChildSet()(c, this);
   _flags.clearFlag(Dirty);
 
   setDependantsDirty(this);
@@ -691,7 +696,7 @@ void SProperty::setDirty(bool force)
     {
     _flags.setFlag(Dirty);
 
-    setDependantsDirty(this, force);
+    setDependantsDirty(force);
 
     if(entity())
       {

@@ -65,6 +65,55 @@ public:
       }
     };
 
+  class ComputeLock
+    {
+  public:
+    ComputeLock(SPODProperty<T, DERIVED> *ptr) : _ptr(ptr)
+      {
+      xAssert(ptr);
+      _data = &_ptr->_value;
+      }
+    ~ComputeLock()
+      {
+      _ptr->database()->doChange<ComputeChange>(_ptr);
+      }
+
+    T* data()
+      {
+      return _data;
+      }
+
+  private:
+    SPODProperty<T, DERIVED> *_ptr;
+    T* _data;
+    };
+
+  class Lock
+    {
+  public:
+    Lock(SPODProperty<T, DERIVED> *ptr) : _ptr(ptr)
+      {
+      xAssert(ptr);
+      _oldData = _ptr->value();
+      _data = &_ptr->_value;
+      }
+    ~Lock()
+      {
+      _ptr->database()->doChange<Change>(_oldData, *_data, _ptr);
+      _data = 0;
+      }
+
+    T* data()
+      {
+      return _data;
+      }
+
+  private:
+    SPODProperty<T, DERIVED> *_ptr;
+    T* _data;
+    T _oldData;
+    };
+
   const T &operator()() const
     {
     preGet();
@@ -104,9 +153,42 @@ public:
     }
 
 private:
-  class Change : public SProperty::DataChange
+  class ComputeChange : public SProperty::DataChange
     {
-    S_CHANGE(Change, SChange, Type);
+    S_CHANGE(ComputeChange, SProperty::DataChange, DERIVED::Type);
+
+  public:
+    ComputeChange(SPODProperty<T, DERIVED> *prop)
+      : SProperty::DataChange(prop)
+      {
+      xAssert(!prop->database()->stateStorageEnabled());
+      }
+
+  private:
+    bool apply(int mode)
+      {
+      if(mode&Forward)
+        {
+        // changes already applied.
+        }
+      else if(mode&Backward)
+        {
+        xAssertFail();
+        }
+      if(mode&Inform)
+        {
+        if(property()->entity())
+          {
+          property()->entity()->informDirtyObservers(property());
+          }
+        }
+      return true;
+      }
+    };
+
+  class Change : public ComputeChange
+    {
+    S_CHANGE(Change, ComputeChange, DERIVED::Type + 1000);
 
   XProperties:
     XRORefProperty(T, before);
@@ -114,7 +196,7 @@ private:
 
   public:
     Change(const T &b, const T &a, SPODProperty<T, DERIVED> *prop)
-      : SProperty::DataChange(prop), _before(b), _after(a)
+      : ComputeChange(prop), _before(b), _after(a)
       { }
 
   private:
@@ -140,10 +222,14 @@ private:
       return true;
       }
     };
+
+  friend class Lock;
+  friend class ComputeLock;
   };
 
-#define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault) \
+#define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault, typeID) \
 class EXPORT_MODE name : public SPODProperty<type, name> { public: \
+  enum { Type = typeID }; \
   S_PROPERTY(name, SProperty, 0); \
 public: class InstanceInformation : public SPODProperty<type, name>::InstanceInformation \
     { public: \
@@ -181,20 +267,20 @@ QTextStream &operator>>(QTextStream &s, xuint8 &v)
   }
 }
 
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongIntProperty, xint64, 0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, UnsignedIntProperty, xuint32, 0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongUnsignedIntProperty, xuint64, 0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, FloatProperty, float, 0.0f);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, DoubleProperty, double, 0.0);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector2DProperty, XVector2D, XVector2D(0.0f, 0.0f));
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f));
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f));
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion());
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, QString, "");
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f));
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray());
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0, 101);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongIntProperty, xint64, 0, 102);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, UnsignedIntProperty, xuint32, 0, 103);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongUnsignedIntProperty, xuint64, 0, 104);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, FloatProperty, float, 0.0f, 105);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, DoubleProperty, double, 0.0, 106);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector2DProperty, XVector2D, XVector2D(0.0f, 0.0f), 107);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f), 108);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f), 109);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion(), 110);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, QString, "", 111);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f), 112);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray(), 113);
 
 #define EnumProperty IntProperty
 

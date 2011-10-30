@@ -7,6 +7,7 @@
 #include "QVector2D"
 #include "QVector3D"
 #include "QVector4D"
+#include "QFile"
 
 template <typename T> XVector <T> toVector( const QVariantList &variantList )
   {
@@ -66,7 +67,7 @@ void XShaderVariable::setValue( unsigned int value )
 
 void XShaderVariable::setValue( const XColour &value )
   {
-  _value.setValue(value);
+  _value.setValue((XVector4D&)value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
@@ -340,11 +341,11 @@ XAbstractShader::~XAbstractShader()
   {
   }
 
-XShader::XShader( int shadertype ) : _renderer( 0 ), _internal( 0 ), _type( shadertype )
+XShader::XShader() : _renderer( 0 ), _internal( 0 )
   {
   }
 
-XShader::XShader( const XShader &c ) : _renderer( 0 ), _internal( 0 ), _type( c._type )
+XShader::XShader( const XShader &c ) : _renderer( 0 ), _components(c._components), _internal( 0 )
   {
   foreach( QString n, c._variables.keys() )
     {
@@ -355,24 +356,35 @@ XShader::XShader( const XShader &c ) : _renderer( 0 ), _internal( 0 ), _type( c.
 
 XShader::~XShader()
   {
+  clear();
+  }
+
+
+void XShader::addComponent(XAbstractShader::ComponentType t, const QString &source)
+  {
+  Component c;
+  c.source = source;
+  c.type = t;
+  _components << c;
+
+  delete _internal;
+  _internal = 0;
+  }
+
+void XShader::clear()
+  {
+  _components.clear();
+
   foreach( XShaderVariable *var, _variables )
     {
     delete var;
     }
+
   delete _internal;
+  _internal = 0;
   }
 
-void XShader::setType( int type )
-  {
-  _type = type;
-  if( _internal )
-    {
-    delete _internal;
-    _internal = 0;
-    }
-  }
-
-XShaderVariable *XShader::getVariable( QString in )
+XShaderVariable *XShader::getVariable(const QString &in )
   {
   if( _variables.contains( in ) )
     {
@@ -390,6 +402,19 @@ XShaderVariable *XShader::getVariable( QString in )
   return ret;
   }
 
+void XShader::setToDefinedType(const QString &type)
+  {
+  clear();
+
+  QFile v(":/GLResources/shaders/" + type + ".vert");
+  QFile f(":/GLResources/shaders/" + type + ".frag");
+  if(v.open(QIODevice::ReadOnly) && f.open(QIODevice::ReadOnly))
+    {
+    addComponent(XAbstractShader::Vertex, v.readAll());
+    addComponent(XAbstractShader::Fragment, f.readAll());
+    }
+  }
+
 QHash <QString, XShaderVariable*> XShader::variables() const
   {
   return _variables;
@@ -399,9 +424,24 @@ void XShader::prepareInternal( XRenderer *renderer ) const
   {
   if( !_internal )
     {
+    if(_components.isEmpty())
+      {
+      qWarning() << "Empty shader used, setting to default";
+      ((XShader*)this)->setToDefinedType("default");
+      }
+
     _internal = renderer->getShader( );
     xAssert( _internal );
-    _internal->setType( _type );
+
+    foreach(const Component &c, _components)
+      {
+      bool result = _internal->addComponent(c.type, c.source);
+      xAssert(result);
+      }
+    bool result = _internal->build();
+    xAssert(result);
+    xAssert(_internal->isValid());
+
     foreach( XShaderVariable *var, _variables )
       {
       var->prepareInternal();
@@ -413,45 +453,4 @@ void XShader::prepareInternal( XRenderer *renderer ) const
 XAbstractShader *XShader::internal( ) const
   {
   return _internal;
-  }
-
-void XShader::save( QDataStream &stream, SerialisationMode mode ) const
-  {
-  if( (mode & Shader) != false )
-    {
-    stream << _type;
-    }
-  if( (mode & Variables ) != false )
-    {
-    stream << _variables.size();
-    foreach( QString str, _variables.keys() )
-      {
-      stream << str << _variables.value(str)->value();
-      }
-    }
-  }
-
-void XShader::restore( QDataStream &stream, SerialisationMode mode )
-  {
-  delete _internal;
-  _internal = 0;
-
-  if( (mode & Shader) != false )
-    {
-    stream >> _type;
-    }
-  if( (mode & Variables ) != false )
-    {
-    int size;
-    stream >> size;
-    for( int i=0; i<size; ++i )
-      {
-      QString str;
-      QVariant value;
-      stream >> str;
-      stream >> value;
-      XShaderVariable *var = getVariable( str );
-      var->setVariantValue( value );
-      }
-    }
   }

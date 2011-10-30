@@ -4,19 +4,15 @@
 #include "sdatabase.h"
 #include "scembeddedtypes.h"
 
-ScShiftFloatArrayProperty::ScShiftFloatArrayProperty(QScriptEngine *eng) : ScShiftProperty(eng)
+ScShiftFloatArrayProperty::ScShiftFloatArrayProperty(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberFunction("add", add);
   addMemberFunction("at", at);
+  initiateGlobalValue<ScShiftFloatArrayProperty>("SFloatArrayProperty", "SProperty");
   }
 
 ScShiftFloatArrayProperty::~ScShiftFloatArrayProperty()
   {
-  }
-
-void ScShiftFloatArrayProperty::initiate()
-  {
-  initiateGlobalValue<ScShiftFloatArrayProperty>("SFloatArrayProperty", "SProperty");
   }
 
 QScriptValue ScShiftFloatArrayProperty::add(QScriptContext *ctx, QScriptEngine *)

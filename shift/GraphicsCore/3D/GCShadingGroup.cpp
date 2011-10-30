@@ -3,6 +3,7 @@
 #include "XModeller.h"
 #include "XRenderer.h"
 #include "3D/Manipulators/GCButtonManipulator.h"
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 
@@ -25,6 +26,8 @@ GCShadingGroup::GCShadingGroup()
 
 void GCShadingGroup::render(XRenderer *r) const
   {
+  xAssert(SProcessManager::isMainThread());
+
   const GCShader *s = shader.pointed();
   if(s)
     {

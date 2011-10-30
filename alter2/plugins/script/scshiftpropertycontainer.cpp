@@ -6,15 +6,11 @@ ScShiftPropertyContainer::ScShiftPropertyContainer(QScriptEngine *eng) : ScWrapp
   {
   addMemberProperty("length", size, QScriptValue::PropertyGetter);
   addMemberProperty("size", size, QScriptValue::PropertyGetter);
+  initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
   }
 
 ScShiftPropertyContainer::~ScShiftPropertyContainer()
   {
-  }
-
-void ScShiftPropertyContainer::initiate()
-  {
-  initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
   }
 
 QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *)

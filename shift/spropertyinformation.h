@@ -34,6 +34,7 @@ XProperties:
   XRefProperty(QString, name);
   XProperty(xsize, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
+  XProperty(bool, computeLockedToMainThread, setComputeLockedToMainThread);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
   XROProperty(xsize *, affects);
   // this index is internal to this instance information only
@@ -96,6 +97,7 @@ class SHIFT_EXPORT SPropertyInformation
 public:
   typedef void (*CreateFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
   typedef void (*PostCreateFunction)(void *data);
+  typedef void (*PostSetFunction)(SPropertyContainer *cont, SProperty *data);
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const SPropertyInformation *type,
                                                                             const QString &name,
                                                                             xsize index,
@@ -118,6 +120,7 @@ XProperties:
   XProperty(SaveQueryFunction, shouldSaveValue, setShouldSaveValue);
   XProperty(AssignFunction, assign, setAssign);
   XProperty(PostCreateFunction, postCreate, setPostCreate);
+  XProperty(PostSetFunction, postChildSet, setPostChildSet);
 
   XProperty(xuint32, version, setVersion);
 
@@ -260,6 +263,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setShouldSave(PropType::shouldSaveProperty);
   info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
+  info->setPostChildSet(PropType::postChildSet);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
   info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
@@ -281,6 +286,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
   info->setShouldSave(PropType::shouldSaveProperty);
   info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
+  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
+  info->setPostCreate(0);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
   info->setSize(sizeof(PropType));

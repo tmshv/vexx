@@ -5,9 +5,9 @@
 #include "sglobal.h"
 #include "XObject"
 
-#define S_CHANGE_ROOT(id) public: enum {Type = id}; virtual xuint32 type() const { return id; } X_CASTABLE_ROOT( SChange, id, static_cast<T*>(0)->Type )
+#define S_CHANGE_ROOT(id) public: enum {Type = (id)}; virtual xuint32 type() const { return id; } X_CASTABLE_ROOT( SChange, id, static_cast<T*>(0)->Type )
 
-#define S_CHANGE(cl, supCl, id) public: enum {Type = id}; virtual xuint32 type() const { return id; } X_CASTABLE( cl, supCl, id, SChange )
+#define S_CHANGE(cl, supCl, id) public: enum {Type = (id)}; virtual xuint32 type() const { return id; } X_CASTABLE( cl, supCl, id, SChange )
 
 class SChange
   {

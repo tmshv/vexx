@@ -86,7 +86,11 @@ OTHER_FILES += \
     ../GLResources/shaders/blinn.vert \
     ../GLResources/shaders/blinn.frag \
     ../GLResources/shaders/plainColour.frag \
-    ../GLResources/shaders/plainColour.vert
+    ../GLResources/shaders/plainColour.vert \
+    ../GLResources/shaders/standardSurface.frag \
+    ../GLResources/shaders/standardSurface.vert
+
+
 
 
 

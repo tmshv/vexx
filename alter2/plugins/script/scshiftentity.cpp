@@ -4,18 +4,14 @@
 #include "scembeddedtypes.h"
 #include "styperegistry.h"
 
-ScShiftEntity::ScShiftEntity(QScriptEngine *eng) : ScShiftPropertyContainer(eng)
+ScShiftEntity::ScShiftEntity(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberFunction("addChild", addChild);
+  initiateGlobalValue<ScShiftEntity>("SEntity", "SPropertyContainer");
   }
 
 ScShiftEntity::~ScShiftEntity()
   {
-  }
-
-void ScShiftEntity::initiate()
-  {
-  initiateGlobalValue<ScShiftEntity>("SEntity", "SPropertyContainer");
   }
 
 QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)

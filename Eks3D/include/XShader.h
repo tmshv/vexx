@@ -123,50 +123,97 @@ XProperties:
 public:
   XAbstractShader( XRenderer * );
   virtual ~XAbstractShader();
-  virtual void setType( int ) = 0;
+
+  enum ComponentType
+    {
+    Fragment,
+    Vertex,
+    Geometry
+    };
+  virtual bool addComponent(ComponentType c, const QString& source) = 0;
+  virtual bool build() = 0;
+  virtual bool isValid() = 0;
+
   virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * ) = 0;
   virtual void destroyVariable( XAbstractShaderVariable * ) = 0;
-
-  virtual QByteArray save() = 0;
-  virtual void load( QByteArray ) = 0;
 
 private:
   mutable QAtomicInt _ref;
   };
 
-class EKS3D_EXPORT XShader : public XObject
+Q_DECLARE_METATYPE(XShader)
+
+class EKS3D_EXPORT XShaderComponent
   {
 XProperties:
   XROProperty( XRenderer *, renderer );
 
 public:
-  enum PredefinedShaders { Default, AmbientShader, ColourShader };
-  XShader( int = Default );
+  };
+
+class EKS3D_EXPORT XShader
+  {
+XProperties:
+  XROProperty( XRenderer *, renderer );
+
+public:
+  XShader();
   XShader( const XShader & );
-  virtual ~XShader();
+  ~XShader();
 
-  void setType( int );
+  void addComponent(XAbstractShader::ComponentType, const QString &source);
+  void clear();
 
-  XShaderVariable *getVariable( QString );
+  XShaderVariable *getVariable(const QString &type);
+
+  void setToDefinedType(const QString &type);
 
   QHash <QString, XShaderVariable*> variables() const;
 
   void prepareInternal( XRenderer * ) const;
   XAbstractShader *internal() const;
 
-  enum SerialisationMode
-    {
-    Shader = 1,
-    Variables = 2,
-    Full = Shader|Variables
-    };
-  void save( QDataStream &, SerialisationMode ) const;
-  void restore( QDataStream &, SerialisationMode );
-
 private:
   QHash <QString, XShaderVariable*> _variables;
+
+  struct Component
+    {
+    XAbstractShader::ComponentType type;
+    QString source;
+    };
+  XList<Component> _components;
+
   mutable XAbstractShader *_internal;
-  int _type;
   };
+
+inline bool operator==(const XShader&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator<<(const QTextStream&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator<<(const QDataStream&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator>>(QTextStream&, XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator>>(QDataStream&, XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
 
 #endif // XABSTRACTSHADER_H

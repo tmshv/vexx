@@ -77,7 +77,7 @@ public:
 
     m.drawCone(XVector3D(0.8f, 0.0f, 0.0f), XVector3D(1.0f, 0.0f, 0.0f), 0.2f, 0.06f);
 
-    _shader.setType(XShader::ColourShader);
+    _shader.setToDefinedType("plainColour");
     }
 
   virtual bool hitTest(

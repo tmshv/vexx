@@ -204,6 +204,7 @@ void SPropertyContainer::removeProperty(SProperty *oldProp)
 
 void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
   {
+  SProfileFunction
   const SPropertyContainer *from = f->uncheckedCastTo<SPropertyContainer>();
   SPropertyContainer *to = t->uncheckedCastTo<SPropertyContainer>();
 
@@ -240,6 +241,7 @@ void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
 
 void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
   {
+  SProfileFunction
   const SPropertyContainer *c = p->uncheckedCastTo<SPropertyContainer>();
   xAssert(c);
 
@@ -250,6 +252,7 @@ void SPropertyContainer::saveProperty(const SProperty *p, SSaver &l)
 
 SProperty *SPropertyContainer::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
+  SProfileFunction
   xAssert(parent);
 
   SProperty *prop = SProperty::loadProperty(parent, l);
@@ -282,9 +285,16 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   return false;
   }
 
+void SPropertyContainer::postChildSet(SPropertyContainer *c, SProperty *p)
+  {
+  p->_flags.clearFlag(Dirty);
+
+  p->setDependantsDirty();
+  }
 
 void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newProp, xsize index)
   {
+  // xAssert(newProp->_entity == 0); may be true because of pose init
   xAssert(newProp->_parent == 0);
   xAssert(newProp->_nextSibling == 0);
 

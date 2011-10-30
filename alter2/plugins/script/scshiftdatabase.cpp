@@ -6,20 +6,16 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftEntity(eng)
+ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   addMemberFunction("addType", addType);
   addMemberFunction("load", load);
   addMemberFunction("save", save);
+  initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
 ScShiftDatabase::~ScShiftDatabase()
   {
-  }
-
-void ScShiftDatabase::initiate()
-  {
-  initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
 QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
@@ -54,7 +50,7 @@ QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
     }
 
   QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
-  if(!device)
+  if(!device || !device->isReadable())
     {
     ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
     return false;
@@ -154,7 +150,7 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
     }
 
   QIODevice *device = qobject_cast<QIODevice*>(deviceObject);
-  if(!device)
+  if(!device || !device->isWritable())
     {
     ctx->throwError(QScriptContext::SyntaxError, "Incorrect device argument to SDatabase.save(...);");
     return false;

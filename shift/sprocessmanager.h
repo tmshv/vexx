@@ -12,6 +12,8 @@ class SHIFT_EXPORT SProcessManager
 public:
   static void preCompute(const SPropertyInstanceInformation *info, SPropertyContainer *ent);
 
+  static bool isMainThread();
+
   static void initiate(xsize processes);
   static void terminate();
 

@@ -2,7 +2,6 @@
 #include "styperegistry.h"
 
 #include "GCImage.h"
-#include "GCQImage.h"
 
 #include "3D/GCGeometry.h"
 #include "3D/GCScreenRenderTarget.h"
@@ -19,12 +18,14 @@
 #include "3D/GCViewport.h"
 
 #include "3D/GCShader.h"
+#include "3D/GCShaderDataBindings.h"
 #include "3D/GCShadingGroup.h"
+
+#include "3D/Shaders/GCStandardSurface.h"
 
 
 void initiateGraphicsCore(SDatabase *)
   {
-
   STypeRegistry::addType(GCImage::staticTypeInformation());
   STypeRegistry::addType(GCQImage::staticTypeInformation());
 
@@ -52,4 +53,8 @@ void initiateGraphicsCore(SDatabase *)
 
   STypeRegistry::addType(GCShadingGroup::staticTypeInformation());
   STypeRegistry::addType(GCShader::staticTypeInformation());
+
+  STypeRegistry::addType(GCStandardSurface::staticTypeInformation());
+
+  ColourProperty::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::Vector4);
   }

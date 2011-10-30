@@ -1,19 +1,6 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
-
-IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry, XGeometry)
-
-void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
-  {
-  GCRuntimeGeometry *to = t->uncheckedCastTo<GCRuntimeGeometry>();
-
-  const GCRuntimeGeometry *sProp = f->castTo<GCRuntimeGeometry>();
-  if(sProp)
-    {
-    to->assign(sProp->value());
-    return;
-    }
-  }
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
@@ -143,6 +130,8 @@ S_IMPLEMENT_PROPERTY(GCGeometry)
 
 void computeRuntimeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
+  xAssert(SProcessManager::isMainThread());
+
   GCGeometry* rtGeo = cont->uncheckedCastTo<GCGeometry>();
 
   XGeometry x;
@@ -156,6 +145,7 @@ SPropertyInformation *GCGeometry::createTypeInformation()
 
   GCRuntimeGeometry::InstanceInformation *rtGeo = info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
   rtGeo->setCompute(computeRuntimeGeometry);
+  rtGeo->setComputeLockedToMainThread(true);
 
   STypedPropertyArray<GCGeometryAttribute>::InstanceInformation *attrs = info->add(&GCGeometry::attributes, "attributes");
   attrs->setAffects(rtGeo);

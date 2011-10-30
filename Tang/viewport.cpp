@@ -3,6 +3,7 @@
 #include "QTimer"
 #include "QAction"
 #include "QKeyEvent"
+#include "QFile"
 #include "QMouseEvent"
 #include "QVBoxLayout"
 #include "XGLRenderer.h"
@@ -11,7 +12,7 @@
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
-#include "3D/GCShader.h"
+#include "3D/Shaders/GCStandardSurface.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
@@ -49,7 +50,7 @@ Viewport::Viewport(SPlugin &db) : UISurface("Viewport", this, UISurface::Dock),
   GCShadingGroup *group = _db->addChild<GCShadingGroup>("Groups");
   scene->shadingGroups.addPointer(group);
 
-  GCShader *shader = _db->addChild<GCShader>("Shader");
+  GCStandardSurface *shader = _db->addChild<GCStandardSurface>("Shader");
   group->shader.setPointed(shader);
 
   XTransform tr = XTransform::Identity();

@@ -2,8 +2,9 @@
 #include "spropertycontainer.h"
 
 SPropertyInstanceInformation::SPropertyInstanceInformation()
-  : _childInformation(0), _name(""), _location(0), _compute(0), _queueCompute(defaultQueue),
-    _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false), _extra(false), _dynamic(false)
+  : _childInformation(0), _name(""), _location(0), _compute(0), _computeLockedToMainThread(false),
+    _queueCompute(defaultQueue), _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false),
+    _extra(false), _dynamic(false)
   {
   }
 
@@ -158,7 +159,7 @@ void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformati
   for(SProperty *prop=cont->firstChild(); prop; prop=prop->nextSibling())
     {
     const SPropertyInstanceInformation *siblingInfo = prop->instanceInformation();
-    if(siblingInfo->affects())
+    if(siblingInfo->affects() && !siblingInfo->computeLockedToMainThread())
       {
       const SPropertyInformation *contInfo = cont->typeInformation();
       xsize i=0;

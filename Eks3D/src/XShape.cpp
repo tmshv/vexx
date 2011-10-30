@@ -105,7 +105,7 @@ QDataStream &operator<<(QDataStream &stream, const XShape &child)
          << hasShader;
   if( hasShader )
     {
-    child._d.constPtr()->_shader->save( stream, XShader::Full );
+    //child._d.constPtr()->_shader->save( stream, XShader::Full );
     }
   return stream;
   }
@@ -122,7 +122,7 @@ QDataStream &operator>>(QDataStream &stream, XShape &child)
       {
       child._d->_shader = new XShader();
       }
-    child._d->_shader->restore( stream, XShader::Full );
+    //child._d->_shader->restore( stream, XShader::Full );
     }
   else if( child._d->_shader )
     {
