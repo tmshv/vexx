@@ -6,7 +6,7 @@
 #include "sbaseproperties.h"
 #include "sbasepointerproperties.h"
 #include "XShader.h"
-#include "GCBaseProperties.h  "
+#include "GCBaseProperties.h"
 
 class GCShaderBindableData : public SStaticInterfaceBase
   {
@@ -47,8 +47,8 @@ public:
 
   void bind(XRenderer *r) const;
 
-  GCShaderComponentPointerArray components;
   GCRuntimeShader runtimeShader;
+  GCShaderComponentPointerArray components;
 
   static void postChildSet(SPropertyContainer *, SProperty *);
 

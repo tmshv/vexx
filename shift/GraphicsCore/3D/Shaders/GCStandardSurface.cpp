@@ -4,7 +4,7 @@
 void GCStandardSurface::postCreate(GCStandardSurface *surface)
   {
     {
-    QFile shaderResource(":/GLResources/shaders/default.frag");
+    QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
     if(shaderResource.open(QIODevice::ReadOnly))
       {
       surface->fragment.source = shaderResource.readAll();
@@ -12,7 +12,7 @@ void GCStandardSurface::postCreate(GCStandardSurface *surface)
     }
 
     {
-    QFile shaderResource(":/GLResources/shaders/default.vert");
+    QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
     if(shaderResource.open(QIODevice::ReadOnly))
       {
       surface->vertex.source = shaderResource.readAll();
@@ -29,7 +29,11 @@ SPropertyInformation *GCStandardSurface::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCStandardSurface>("GCStandardSurface", postCreate);
 
-  info->add(&GCStandardSurface::diffuse, "diffuse");
+  SPropertyInstanceInformation *rtShader = info->child(&GCStandardSurface::runtimeShader);
+
+  ColourProperty::InstanceInformation *diffuse = info->add(&GCStandardSurface::diffuse, "diffuse");
+  diffuse->setDefault(XColour(0.6f, 0.6f, 0.6f, 1.0f));
+  diffuse->setAffects(rtShader);
 
   info->add(&GCStandardSurface::vertex, "vertex");
   info->add(&GCStandardSurface::fragment, "fragment");

@@ -3,6 +3,7 @@
 #include "XRenderer.h"
 #include "XMatrix4x4"
 #include "siterator.h"
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
@@ -99,6 +100,8 @@ void GCManipulatableScene::refreshManipulators()
 
 void GCManipulatableScene::render(XRenderer *x) const
   {
+  xAssert(SProcessManager::isMainThread());
+
   GCScene::render(x);
 
   const GCCamera *cam = activeCamera();

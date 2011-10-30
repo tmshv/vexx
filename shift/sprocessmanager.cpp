@@ -5,6 +5,7 @@
 #include "QThreadPool"
 #include "QRunnable"
 #include "QThread"
+#include "QCoreApplication"
 
 class WorkerThread : public QRunnable
   {
@@ -77,6 +78,11 @@ void SProcessManager::terminate()
 
 SProcessManager::SProcessManager()
   {
+  }
+
+bool SProcessManager::isMainThread()
+  {
+  return QThread::currentThread() == QCoreApplication::instance()->thread();
   }
 
 void SProcessManager::preCompute(const SPropertyInstanceInformation *info, SPropertyContainer *ent)

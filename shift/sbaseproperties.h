@@ -75,8 +75,7 @@ public:
       }
     ~ComputeLock()
       {
-      _ptr->database()->doChange<ComputeChange>(*_data, _ptr);
-      _data = 0;
+      _ptr->database()->doChange<ComputeChange>(_ptr);
       }
 
     T* data()
@@ -158,13 +157,12 @@ private:
     {
     S_CHANGE(ComputeChange, SProperty::DataChange, DERIVED::Type);
 
-  XProperties:
-    XRORefProperty(T, after);
-
   public:
-    ComputeChange(const T &a, SPODProperty<T, DERIVED> *prop)
-      : SProperty::DataChange(prop), _after(a)
-      { }
+    ComputeChange(SPODProperty<T, DERIVED> *prop)
+      : SProperty::DataChange(prop)
+      {
+      xAssert(!prop->database()->stateStorageEnabled());
+      }
 
   private:
     bool apply(int mode)
@@ -194,10 +192,11 @@ private:
 
   XProperties:
     XRORefProperty(T, before);
+    XRORefProperty(T, after);
 
   public:
     Change(const T &b, const T &a, SPODProperty<T, DERIVED> *prop)
-      : ComputeChange(a, prop), _before(b)
+      : ComputeChange(prop), _before(b), _after(a)
       { }
 
   private:

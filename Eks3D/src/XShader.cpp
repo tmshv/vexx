@@ -67,7 +67,7 @@ void XShaderVariable::setValue( unsigned int value )
 
 void XShaderVariable::setValue( const XColour &value )
   {
-  _value.setValue(value);
+  _value.setValue((XVector4D&)value);
   _internal ? _internal->setValue( value ) : xNoop();
   }
 
@@ -374,13 +374,14 @@ void XShader::addComponent(XAbstractShader::ComponentType t, const QString &sour
 void XShader::clear()
   {
   _components.clear();
-  delete _internal;
-  _internal = 0;
 
   foreach( XShaderVariable *var, _variables )
     {
     delete var;
     }
+
+  delete _internal;
+  _internal = 0;
   }
 
 XShaderVariable *XShader::getVariable(const QString &in )

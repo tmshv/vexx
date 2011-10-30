@@ -1,5 +1,6 @@
 #include "GCGeometry.h"
 #include "styperegistry.h"
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
@@ -129,6 +130,8 @@ S_IMPLEMENT_PROPERTY(GCGeometry)
 
 void computeRuntimeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
+  xAssert(SProcessManager::isMainThread());
+
   GCGeometry* rtGeo = cont->uncheckedCastTo<GCGeometry>();
 
   XGeometry x;
@@ -142,6 +145,7 @@ SPropertyInformation *GCGeometry::createTypeInformation()
 
   GCRuntimeGeometry::InstanceInformation *rtGeo = info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
   rtGeo->setCompute(computeRuntimeGeometry);
+  rtGeo->setComputeLockedToMainThread(true);
 
   STypedPropertyArray<GCGeometryAttribute>::InstanceInformation *attrs = info->add(&GCGeometry::attributes, "attributes");
   attrs->setAffects(rtGeo);

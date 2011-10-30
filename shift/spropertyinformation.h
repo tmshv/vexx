@@ -34,6 +34,7 @@ XProperties:
   XRefProperty(QString, name);
   XProperty(xsize, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
+  XProperty(bool, computeLockedToMainThread, setComputeLockedToMainThread);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
   XROProperty(xsize *, affects);
   // this index is internal to this instance information only

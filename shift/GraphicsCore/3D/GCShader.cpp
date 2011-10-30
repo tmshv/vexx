@@ -1,5 +1,6 @@
 #include "GCShader.h"
 #include "XRenderer.h"
+#include "sprocessmanager.h"
 
 S_IMPLEMENT_PROPERTY(GCShaderComponent)
 
@@ -34,8 +35,9 @@ SPropertyInformation *GCVertexShaderComponent::createTypeInformation()
 
 S_IMPLEMENT_PROPERTY(GCShader)
 
-void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont)
+void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   {
+  xAssert(SProcessManager::isMainThread());
   GCShader* shader = cont->uncheckedCastTo<GCShader>();
 
   GCRuntimeShader::ComputeLock lock(&shader->runtimeShader);
@@ -65,10 +67,11 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SP
         }
       }
     }
-  else
+
+  if(shader->_setVariables || shader->_rebuildShader)
     {
     xAssert(shader->_setVariables);
-    for(const SProperty* p = shader->runtimeShader.nextSibling(); p; p = p->nextSibling())
+    for(const SProperty* p = shader->components.nextSibling(); p; p = p->nextSibling())
       {
       const GCShaderBindableData *binder = p->interface<GCShaderBindableData>();
       if(binder)
@@ -77,6 +80,9 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *info, SP
         }
       }
     }
+
+  shader->_rebuildShader = false;
+  shader->_setVariables = false;
   }
 
 SPropertyInformation *GCShader::createTypeInformation()
@@ -85,6 +91,7 @@ SPropertyInformation *GCShader::createTypeInformation()
 
   GCRuntimeShader::InstanceInformation *rtInfo = info->add(&GCShader::runtimeShader, "runtimeShader");
   rtInfo->setCompute(computeShaderRuntime);
+  rtInfo->setComputeLockedToMainThread(true);
 
   GCShaderComponentPointerArray::InstanceInformation *comInfo = info->add(&GCShader::components, "components");
   comInfo->setAffects(rtInfo);
