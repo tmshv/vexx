@@ -6,6 +6,7 @@
 #include "Viewport.h"
 #include "webview.h"
 #include "GraphicsCore.h"
+#include "saparteditor.h"
 
 int main( int argc, char **argv )
   {
@@ -49,6 +50,9 @@ int main( int argc, char **argv )
   ui->addSurface(webData);
 
   ui->show();
+
+  SPartEditor* editor = SPartEditor::editNewPart("SEntity", "", &db->db().document);
+  editor->show();
 
   return app.execute();
   }

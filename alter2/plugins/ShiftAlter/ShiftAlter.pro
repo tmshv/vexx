@@ -11,14 +11,18 @@ include("../../../EksCore/GeneralOptions.pri")
 
 
 SOURCES += splugin.cpp \
-    sappdatabase.cpp
+    sappdatabase.cpp \
+    saparteditor.cpp
 
 HEADERS += splugin.h \
     saglobal.h \
-    sappdatabase.h
+    sappdatabase.h \
+    saparteditor.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift ../../
 
 
 LIBS += -lshift -lEksCore -lalter
+
+
 
