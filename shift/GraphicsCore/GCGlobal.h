@@ -10,12 +10,12 @@
 # define GRAPHICSCORE_EXPORT X_DECL_IMPORT
 #endif
 
-S_DEFINE_INTERFACE_TYPE(ManipulatableInterface, 200)
 
 #define GCProfileScope 1090
 #define GCProfileFunction XProfileFunction(GCProfileScope)
 #define GCProfileFunctionScopedBlock(mess) XProfileScopedBlock(GCProfileScope, mess)
 
 S_DEFINE_INTERFACE_TYPE(GCShaderBindableInterface, 50)
+S_DEFINE_INTERFACE_TYPE(ManipulatableInterface, 51)
 
 #endif // GCGLOBAL_H

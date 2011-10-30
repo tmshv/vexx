@@ -8,6 +8,7 @@
 #include "QDir"
 #include "Serialisation/sjsonio.h"
 #include "styperegistry.h"
+#include "saparteditorinterface.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -45,6 +46,8 @@ void SPlugin::load()
     }
 
   SProcessManager::initiate(threadCount);
+
+  SProperty::staticTypeInformation()->addStaticInterface(new SDefaultPartEditorInterface);
 
   _db = new SAppDatabase();
 

@@ -10,4 +10,6 @@
 # define SHIFTALTER_EXPORT X_DECL_IMPORT
 #endif
 
+S_DEFINE_INTERFACE_TYPE(SPartEditorInterface, 300)
+
 #endif // SAGLOBAL_H

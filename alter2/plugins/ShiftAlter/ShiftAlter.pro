@@ -13,21 +13,29 @@ include("../../../EksCore/GeneralOptions.pri")
 SOURCES += splugin.cpp \
     sappdatabase.cpp \
     saparteditor.cpp \
-    saparteditorform.cpp
+    saparteditorinterface.cpp
 
 HEADERS += splugin.h \
     saglobal.h \
     sappdatabase.h \
     saparteditor.h \
-    saparteditorform.h
+    saparteditorinterface.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift ../../
 
 
 LIBS += -lshift -lEksCore -lalter
 
-FORMS += \
-    saparteditorform.ui
+FORMS +=
+
+RESOURCES += \
+    Resources.qrc
+
+
+
+
+
+
 
 
 
