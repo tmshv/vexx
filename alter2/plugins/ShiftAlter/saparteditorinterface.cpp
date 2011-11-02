@@ -54,6 +54,11 @@ void SDefaultPartEditorInterface::properties(SEntity *p, QStringList &l) const
     }
   }
 
+void *SDefaultPartEditorInterface::findProperty(SEntity *c, const QString &n) const
+  {
+  return c->findChild(n);
+  }
+
 void SDefaultPartEditorInterface::addProperty(SEntity *c) const
   {
   c->addProperty<SProperty>();
@@ -66,5 +71,28 @@ void SDefaultPartEditorInterface::removeProperty(SEntity *c, const QString &n) c
   if(p)
     {
     c->removeProperty(p);
+    }
+  }
+
+xsize SDefaultPartEditorInterface::numberOfTypeSubParameters(SEntity *, void *) const
+  {
+  return NumberOfSubTypeParameters;
+  }
+
+void SDefaultPartEditorInterface::typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const
+  {
+  if(i == SubName)
+    {
+    name = "Name";
+    widget = new QLineEdit;
+    }
+  else if(i == SubType)
+    {
+    name = "Type";
+    widget = new QComboBox;
+    }
+  else
+    {
+    xAssertFail();
     }
   }

@@ -26,6 +26,7 @@ public:
 private slots:
   void addProperty();
   void removeProperty();
+  void selectProperty();
 
 private:
   SPartEditor(const QString &type, SEntity *prop);
@@ -35,8 +36,11 @@ private:
   QLayout *buildTypeParameters();
   QLayout *buildProperties();
   void rebuildPropertyList(QListWidget *);
+  void rebuildPropertyProperties(QWidget *widget, void *property);
 
   QListWidget *_list;
+  QWidget *_propertyProperties;
+  QWidget *_propertyPropertiesInternal;
 
   XPropertyMember(const SPartEditorInterface *, partInterface);
   };
