@@ -43,14 +43,14 @@ public:
     return ent;
     }
 
-  template <typename T>T *addProperty(const QString& name)
+  template <typename T>T *addProperty(const QString& name="")
     {
     SProperty *p = addProperty(T::staticTypeInformation(), name);
     xAssert(p);
     return p->uncheckedCastTo<T>();
     }
 
-  SProperty *addProperty(const SPropertyInformation *info, const QString& name)
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name="")
     {
     SProperty *p = SPropertyContainer::addProperty(info);
     xAssert(p);

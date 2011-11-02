@@ -1,5 +1,5 @@
 #include "saparteditorinterface.h"
-#include "spropertycontainer.h"
+#include "sentity.h"
 #include "QLineEdit"
 #include "QComboBox"
 
@@ -7,12 +7,12 @@ SDefaultPartEditorInterface::SDefaultPartEditorInterface() : SPartEditorInterfac
   {
   }
 
-xsize SDefaultPartEditorInterface::numberOfTypeParameters(SProperty *prop) const
+xsize SDefaultPartEditorInterface::numberOfTypeParameters(SEntity *prop) const
   {
   return NumberOfTypeParameters;
   }
 
-void SDefaultPartEditorInterface::typeParameter(SProperty *, xsize index, QString& name, QWidget *&widget) const
+void SDefaultPartEditorInterface::typeParameter(SEntity *, xsize index, QString& name, QWidget *&widget) const
   {
   if(index == Name)
     {
@@ -40,7 +40,7 @@ void SDefaultPartEditorInterface::propertiesSectionTitle(QString &n) const
   n = "Properties";
   }
 
-void SDefaultPartEditorInterface::properties(SPropertyContainer *p, QStringList &l) const
+void SDefaultPartEditorInterface::properties(SEntity *p, QStringList &l) const
   {
   SProperty *c = p->firstChild();
   while(c)
@@ -51,5 +51,20 @@ void SDefaultPartEditorInterface::properties(SPropertyContainer *p, QStringList 
       }
 
     c = c->nextSibling();
+    }
+  }
+
+void SDefaultPartEditorInterface::addProperty(SEntity *c) const
+  {
+  c->addProperty<SProperty>();
+  }
+
+void SDefaultPartEditorInterface::removeProperty(SEntity *c, const QString &n) const
+  {
+  SProperty *p = c->findChild(n);
+  xAssert(p);
+  if(p)
+    {
+    c->removeProperty(p);
     }
   }

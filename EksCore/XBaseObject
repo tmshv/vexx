@@ -1,9 +1,9 @@
 #ifndef XBASEOBJECT_H
 #define XBASEOBJECT_H
 
-#include "XGlobal"
 #include "XList"
 #include "XSet"
+#include "XGlobal"
 
 // Casting macros
 #define X_CASTABLE( myName, superName, myID, rootName ) \

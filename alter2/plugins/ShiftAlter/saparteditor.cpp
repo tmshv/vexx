@@ -7,7 +7,7 @@
 #include "QPushButton"
 #include "saparteditorinterface.h"
 
-SPartEditor::SPartEditor(const QString &type, SPropertyContainer *prop) : _property(prop), _list(0)
+SPartEditor::SPartEditor(const QString &type, SEntity *prop) : _property(prop), _list(0)
   {
   _partInterface = findInterface(type);
 
@@ -104,7 +104,7 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
   if(info)
     {
-    SPropertyContainer *p = parent->addChild(info, name)->castTo<SPropertyContainer>();
+    SEntity *p = parent->addChild(info, name)->castTo<SEntity>();
 
     return new SPartEditor(type, p);
     }
@@ -114,8 +114,18 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
 void SPartEditor::addProperty()
   {
+  partInterface()->addProperty(property());
+  rebuildPropertyList(_list);
   }
 
 void SPartEditor::removeProperty()
   {
+  QList<QListWidgetItem *> selection = _list->selectedItems();
+
+  foreach(const QListWidgetItem *i, selection)
+    {
+    QString n = i->text();
+    partInterface()->removeProperty(property(), n);
+    }
+  rebuildPropertyList(_list);
   }

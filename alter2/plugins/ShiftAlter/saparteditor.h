@@ -17,7 +17,7 @@ class SHIFTALTER_EXPORT SPartEditor : public QWidget
 
 XProperties:
   XReadProperty(const SPartEditorInterface *, partInterface, partInterface);
-  XROProperty(SPropertyContainer *, property);
+  XROProperty(SEntity *, property);
 
 public:
   static SPartEditor *editNewPart(const QString &type, const QString &name, SEntity *parent);
@@ -28,7 +28,7 @@ private slots:
   void removeProperty();
 
 private:
-  SPartEditor(const QString &type, SPropertyContainer *prop);
+  SPartEditor(const QString &type, SEntity *prop);
 
   const SPartEditorInterface *findInterface(const QString& t);
 

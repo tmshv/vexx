@@ -381,7 +381,7 @@ void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)
       {
       if(oldProp == prop->_nextSibling)
         {
-        xAssert(propIndex >= _containedProperties);
+        xAssert((propIndex+1) >= _containedProperties);
 
         oldProp->_parent = this;
         oldProp->_entity = 0;

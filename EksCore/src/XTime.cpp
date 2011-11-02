@@ -1,3 +1,4 @@
+#define builtIn
 #include "XTime"
 #include "QDebug"
 #include "XAssert"
