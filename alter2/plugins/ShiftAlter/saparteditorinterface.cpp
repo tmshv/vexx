@@ -3,7 +3,8 @@
 #include "QLineEdit"
 #include "QComboBox"
 
-PropertyNameEditor::PropertyNameEditor(SProperty *e) : _property(e)
+PropertyNameEditor::PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbacker *feedback, CallbackFn callback)
+    : _property(e), _feedback(feedback), _callback(callback)
   {
   setText(e->name());
   xAssert(e->isDynamic());
@@ -35,10 +36,31 @@ void PropertyNameEditor::onTreeChange(const SChange *c)
 void PropertyNameEditor::editName()
   {
   property()->setName(text());
+  if(feedback() && callback())
+    {
+    (feedback()->*callback())();
+    }
   }
 
 SDefaultPartEditorInterface::SDefaultPartEditorInterface() : SPartEditorInterface(true)
   {
+  }
+
+QStringList SDefaultPartEditorInterface::possibleTypes() const
+  {
+  const SPropertyInformation *info = SEntity::staticTypeInformation();
+
+  QStringList list;
+  foreach(const SPropertyInformation *i, STypeRegistry::types())
+    {
+    if(i->inheritsFromType(info))
+      {
+      list << i->typeName();
+      }
+    }
+
+  qSort(list);
+  return list;
   }
 
 xsize SDefaultPartEditorInterface::numberOfTypeParameters(SEntity *) const
@@ -56,7 +78,12 @@ void SDefaultPartEditorInterface::typeParameter(SEntity *e, xsize index, QString
   else if(index == Type)
     {
     name = "Type";
-    widget = new QComboBox;
+    QComboBox *combo = new QComboBox;
+
+    QStringList types = possibleTypes();
+    combo->addItems(types);
+
+    widget = combo;
     }
   else
     {
@@ -93,6 +120,18 @@ void *SDefaultPartEditorInterface::findProperty(SEntity *c, const QString &n) co
   return c->findChild(n);
   }
 
+QStringList SDefaultPartEditorInterface::possiblePropertyTypes() const
+  {
+  QStringList list;
+  foreach(const SPropertyInformation *i, STypeRegistry::types())
+    {
+    list << i->typeName();
+    }
+
+  qSort(list);
+  return list;
+  }
+
 void SDefaultPartEditorInterface::addProperty(SEntity *c) const
   {
   c->addProperty<SProperty>();
@@ -113,17 +152,22 @@ xsize SDefaultPartEditorInterface::numberOfTypeSubParameters(SEntity *, void *) 
   return NumberOfSubTypeParameters;
   }
 
-void SDefaultPartEditorInterface::typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const
+void SDefaultPartEditorInterface::typeSubParameter(SPartEditorInterfaceFeedbacker *f, SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const
   {
   if(i == SubName)
     {
     name = "Name";
-    widget = new PropertyNameEditor((SProperty*)prop);
+    widget = new PropertyNameEditor((SProperty*)prop, f, &SPartEditorInterfaceFeedbacker::propertyNameChanged);
     }
   else if(i == SubType)
     {
     name = "Type";
-    widget = new QComboBox;
+    QComboBox *combo = new QComboBox;
+
+    QStringList types = possiblePropertyTypes();
+    combo->addItems(types);
+
+    widget = combo;
     }
   else
     {

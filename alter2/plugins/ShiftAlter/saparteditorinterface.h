@@ -6,6 +6,12 @@
 #include "QLineEdit"
 #include "sentity.h"
 
+class SPartEditorInterfaceFeedbacker
+  {
+public:
+  virtual void propertyNameChanged() = 0;
+  };
+
 class SPartEditorInterface : public SStaticInterfaceBase
   {
   S_STATIC_INTERFACE_TYPE(SPartEditorInterface, SPartEditorInterface)
@@ -27,7 +33,7 @@ public:
   virtual void removeProperty(SEntity *, const QString &) const = 0;
 
   virtual xsize numberOfTypeSubParameters(SEntity *, void *property) const = 0;
-  virtual void typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const = 0;
+  virtual void typeSubParameter(SPartEditorInterfaceFeedbacker *, SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const = 0;
 
   virtual QWidget *buildCustomEditor(SEntity *) const = 0;
   virtual QWidget *buildCustomPreview(const SEntity *) const = 0;
@@ -38,11 +44,16 @@ class PropertyNameEditor : public QLineEdit, public STreeObserver
   {
   Q_OBJECT
 
+public:
+  typedef void (SPartEditorInterfaceFeedbacker::*CallbackFn)();
+
 XProperties:
   XProperty(SProperty *, property, setProperty)
+  XProperty(CallbackFn, callback, setCallback)
+  XProperty(SPartEditorInterfaceFeedbacker *, feedback, setFeedback)
 
 public:
-  PropertyNameEditor(SProperty *e);
+  PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbacker *f=0, CallbackFn callback=0);
   ~PropertyNameEditor();
 
   virtual void onTreeChange(const SChange *);
@@ -72,18 +83,20 @@ public:
 
   virtual xsize numberOfTypeParameters(SEntity *prop) const;
   virtual void typeParameter(SEntity *prop, xsize index, QString& name, QWidget *&widget) const;
+  virtual QStringList possibleTypes() const;
 
   virtual bool hasPropertiesSection() const;
   virtual void propertiesSectionTitle(QString &n) const;
 
   virtual void properties(SEntity *, QStringList &) const;
   virtual void *findProperty(SEntity *, const QString &) const;
+  virtual QStringList possiblePropertyTypes() const;
 
   virtual void addProperty(SEntity *) const;
   virtual void removeProperty(SEntity *, const QString &) const;
 
   virtual xsize numberOfTypeSubParameters(SEntity *, void *property) const;
-  virtual void typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const;
+  virtual void typeSubParameter(SPartEditorInterfaceFeedbacker *, SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const;
 
   virtual QWidget *buildCustomEditor(SEntity *) const { return 0; }
   virtual QWidget *buildCustomPreview(const SEntity *) const { return 0; }

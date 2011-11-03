@@ -2,16 +2,16 @@
 #define SAPARTEDITOR_H
 
 #include "saglobal.h"
+#include "saparteditorinterface.h"
 #include "XProperty"
 #include "QWidget"
 
 class SProperty;
 class SPropertyContainer;
-class SPartEditorInterface;
 
 class QListWidget;
 
-class SHIFTALTER_EXPORT SPartEditor : public QWidget
+class SHIFTALTER_EXPORT SPartEditor : public QWidget, public SPartEditorInterfaceFeedbacker
   {
   Q_OBJECT
 
@@ -38,6 +38,8 @@ private:
   QLayout *buildProperties();
   void rebuildPropertyList(QListWidget *);
   void rebuildPropertyProperties(QWidget *widget, void *property);
+
+  void propertyNameChanged();
 
   QListWidget *_list;
   QWidget *_propertyProperties;

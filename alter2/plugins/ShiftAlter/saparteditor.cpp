@@ -122,16 +122,25 @@ void SPartEditor::rebuildPropertyList(QListWidget *list)
     }
   }
 
+void SPartEditor::propertyNameChanged()
+  {
+  rebuildPropertyList(_list);
+  }
+
 void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
   {
+
   // delete old internal
   if(_propertyPropertiesInternal)
     {
+    // delete old layout
+    delete widget->layout();
+    widget->setLayout(0);
+
     _propertyPropertiesInternal->deleteLater();
+    _propertyPropertiesInternal = 0;
     }
 
-  // delete old layout
-  delete widget->layout();
 
   if(prop)
     {
@@ -155,7 +164,7 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
       name.clear();
       w = 0;
 
-      partInterface()->typeSubParameter(property(), prop, i, name, w);
+      partInterface()->typeSubParameter(this, property(), prop, i, name, w);
       xAssert(!name.isEmpty());
       xAssert(w);
 
