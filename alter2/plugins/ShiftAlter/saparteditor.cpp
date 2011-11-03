@@ -3,6 +3,7 @@
 #include "sentity.h"
 #include "QFormLayout"
 #include "QLabel"
+#include "QGroupBox"
 #include "QListWidget"
 #include "QPushButton"
 #include "saparteditorinterface.h"
@@ -12,7 +13,27 @@ SPartEditor::SPartEditor(const QString &type, SEntity *prop) : _property(prop),
   {
   _partInterface = findInterface(type);
 
-  QVBoxLayout *layout(new QVBoxLayout(this));
+  QHBoxLayout *mainLayout(new QHBoxLayout(this));
+
+  QLayout *entitySection = buildEntitySection();
+  mainLayout->addLayout(entitySection);
+
+  QWidget *customEditor = partInterface()->buildCustomEditor(property());
+  if(customEditor)
+    {
+    mainLayout->addWidget(customEditor);
+    }
+
+  QWidget *customPreview = partInterface()->buildCustomPreview(property());
+  if(customPreview)
+    {
+    mainLayout->addWidget(customPreview);
+    }
+  }
+
+QLayout *SPartEditor::buildEntitySection()
+  {
+  QVBoxLayout *layout(new QVBoxLayout);
 
   QLayout *l = buildTypeParameters();
   layout->addLayout(l);
@@ -22,6 +43,7 @@ SPartEditor::SPartEditor(const QString &type, SEntity *prop) : _property(prop),
     QLayout *l2 = buildProperties();
     layout->addLayout(l2);
     }
+  return layout;
   }
 
 const SPartEditorInterface *SPartEditor::findInterface(const QString& t)
@@ -62,7 +84,7 @@ QLayout *SPartEditor::buildProperties()
 
   QString t;
   partInterface()->propertiesSectionTitle(t);
-  QLabel *label = new QLabel("<b>" + t + "</b>");
+  QLabel *label = new QLabel("<b>" + t + "<\b>");
 
   QPushButton *add(new QPushButton("Add"));
   connect(add, SIGNAL(clicked()), this, SLOT(addProperty()));
@@ -76,10 +98,7 @@ QLayout *SPartEditor::buildProperties()
   headerLayout->addWidget(add);
   headerLayout->addWidget(remove);
 
-  layout->addWidget(label);
-
   _list = new QListWidget;
-  _list->setSelectionMode(QAbstractItemView::MultiSelection);
   layout->addWidget(_list);
   rebuildPropertyList(_list);
 
@@ -114,26 +133,34 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
   // delete old layout
   delete widget->layout();
 
-  // setup new internal
-  QVBoxLayout *internalLayout(new QVBoxLayout(widget));
-  internalLayout->setContentsMargins(0, 0, 0, 0);
-  _propertyPropertiesInternal = new QWidget;
-  internalLayout->addWidget(_propertyPropertiesInternal);
-
-  QFormLayout *layout(new QFormLayout(widget));
-
-  QString name;
-  QWidget *w;
-  for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(property(), prop); i<s; ++i)
+  if(prop)
     {
-    name.clear();
-    w = 0;
+    // setup new internal
+    QVBoxLayout *internalLayout(new QVBoxLayout(widget));
+    internalLayout->setContentsMargins(0, 0, 0, 0);
 
-    partInterface()->typeSubParameter(property(), prop, i, name, w);
-    xAssert(!name.isEmpty());
-    xAssert(w);
+    QGroupBox *groupBox = new QGroupBox;
+    groupBox->setTitle("Property Properties");
 
-    layout->addRow(name, w);
+    _propertyPropertiesInternal = groupBox;
+    internalLayout->addWidget(_propertyPropertiesInternal);
+
+    QFormLayout *layout(new QFormLayout(_propertyPropertiesInternal));
+    //layout->setContentsMargins(0, 0, 0, 0);
+
+    QString name;
+    QWidget *w;
+    for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(property(), prop); i<s; ++i)
+      {
+      name.clear();
+      w = 0;
+
+      partInterface()->typeSubParameter(property(), prop, i, name, w);
+      xAssert(!name.isEmpty());
+      xAssert(w);
+
+      layout->addRow(name, w);
+      }
     }
   }
 

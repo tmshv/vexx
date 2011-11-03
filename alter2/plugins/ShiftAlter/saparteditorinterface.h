@@ -3,6 +3,8 @@
 
 #include "saglobal.h"
 #include "sinterface.h"
+#include "QLineEdit"
+#include "sentity.h"
 
 class SPartEditorInterface : public SStaticInterfaceBase
   {
@@ -26,6 +28,27 @@ public:
 
   virtual xsize numberOfTypeSubParameters(SEntity *, void *property) const = 0;
   virtual void typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const = 0;
+
+  virtual QWidget *buildCustomEditor(SEntity *) const = 0;
+  virtual QWidget *buildCustomPreview(const SEntity *) const = 0;
+  };
+
+
+class PropertyNameEditor : public QLineEdit, public STreeObserver
+  {
+  Q_OBJECT
+
+XProperties:
+  XProperty(SProperty *, property, setProperty)
+
+public:
+  PropertyNameEditor(SProperty *e);
+  ~PropertyNameEditor();
+
+  virtual void onTreeChange(const SChange *);
+
+public slots:
+  void editName();
   };
 
 class SDefaultPartEditorInterface : public SPartEditorInterface
@@ -61,6 +84,9 @@ public:
 
   virtual xsize numberOfTypeSubParameters(SEntity *, void *property) const;
   virtual void typeSubParameter(SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const;
+
+  virtual QWidget *buildCustomEditor(SEntity *) const { return 0; }
+  virtual QWidget *buildCustomPreview(const SEntity *) const { return 0; }
   };
 
 #endif // SAPARTEDITORINTERFACE_H

@@ -33,6 +33,7 @@ private:
 
   const SPartEditorInterface *findInterface(const QString& t);
 
+  QLayout *buildEntitySection();
   QLayout *buildTypeParameters();
   QLayout *buildProperties();
   void rebuildPropertyList(QListWidget *);
