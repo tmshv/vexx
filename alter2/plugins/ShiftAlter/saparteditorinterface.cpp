@@ -88,7 +88,6 @@ void PropertyTypeEditor::editType(const QString &t)
       {
       QString n = property()->name();
       property()->setName("");
-      newProp->setName(n);
 
       QVector<SProperty*> outputs;
 
@@ -150,6 +149,7 @@ void PropertyTypeEditor::editType(const QString &t)
         arrayParent->remove(property());
         }
 
+      newProp->setName(n);
       setProperty(newProp);
       }
     }

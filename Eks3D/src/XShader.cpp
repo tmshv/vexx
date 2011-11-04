@@ -44,7 +44,11 @@ XShaderVariable::XShaderVariable( QString n, XShader *s, XAbstractShaderVariable
 
 XShaderVariable::~XShaderVariable( )
   {
-  _shader->internal()->destroyVariable(_internal);
+  XAbstractShader *sInt = _shader->internal();
+  if(sInt && _internal)
+    {
+    sInt->destroyVariable(_internal);
+    }
   }
 
 void XShaderVariable::setValue( int value )

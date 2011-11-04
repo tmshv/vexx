@@ -83,7 +83,6 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
   {
   SDataModelProfileFunction
   const SProperty *prop = _root;
-  int size = 0;
   if(parent.isValid())
     {
     prop = (SProperty *)parent.internalPointer();
@@ -105,15 +104,10 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
   const SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
-    SProperty *child = container->firstChild();
-    while(child)
-      {
-      size++;
-      child = child->nextSibling();
-      }
+    return container->size();
     }
 
-  return size;
+  return 0;
   }
 
 QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &parent ) const
@@ -201,7 +195,8 @@ int SDatabaseModel::columnCount( const QModelIndex &parent ) const
       while(child)
         {
         // this could maybe be improved, but we dont want to show the values for complex widgets...
-        if(child->castTo<SPropertyContainer>())
+        SPropertyVariantInterface *interface = child->interface<SPropertyVariantInterface>();
+        if(interface)
           {
           columns = 2;
           break;

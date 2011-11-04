@@ -52,7 +52,7 @@ public:
 
   bool isValid() const
     {
-    return data() != 0 && data()->parent() != 0;
+    return data() != 0;
     }
 
   operator SEntity*()
