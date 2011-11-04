@@ -1,7 +1,7 @@
 #include "saparteditorinterface.h"
 #include "sentity.h"
-#include "QLineEdit"
-#include "QComboBox"
+#include "sdatabase.h"
+#include "QDebug"
 
 PropertyNameEditor::PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbacker *feedback, CallbackFn callback)
     : _property(e), _feedback(feedback), _callback(callback)
@@ -42,6 +42,129 @@ void PropertyNameEditor::editName()
     }
   }
 
+
+PropertyTypeEditor::PropertyTypeEditor(SProperty *e, const QStringList &items, SPartEditorInterfaceFeedbacker *f, CallbackFn callback)
+   : _property(e), _feedback(f), _callback(callback)
+  {
+  addItems(items);
+
+  int index = findText(e->typeInformation()->typeName());
+  setCurrentIndex(index);
+
+
+  xAssert(e->isDynamic());
+  connect(this, SIGNAL(activated(QString)), this, SLOT(editType(QString)));
+  }
+
+PropertyTypeEditor::~PropertyTypeEditor()
+  {
+  }
+
+void PropertyTypeEditor::editType(const QString &t)
+  {
+  xAssert(property());
+  SBlock b(property()->database());
+
+  const SPropertyInformation *info = STypeRegistry::findType(t);
+  SProperty *parent = property()->parent();
+  if(parent && info)
+    {
+    SProperty *newProp = 0;
+    if(parent->inheritsFromType<SEntity>())
+      {
+      SEntity *entParent = parent->uncheckedCastTo<SEntity>();
+
+      newProp = entParent->addProperty(info);
+      }
+    else if(parent->inheritsFromType<SPropertyArray>())
+      {
+      SPropertyArray *arrayParent = parent->uncheckedCastTo<SPropertyArray>();
+
+      newProp = arrayParent->add(info);
+      }
+
+    xAssert(newProp);
+    if(newProp)
+      {
+      QString n = property()->name();
+      property()->setName("");
+      newProp->setName(n);
+
+      QVector<SProperty*> outputs;
+
+      SEntity *newCont = newProp->castTo<SEntity>();
+      SEntity *oldCont = property()->castTo<SEntity>();
+      if(newCont && oldCont)
+        {
+        for(SProperty *child=oldCont->firstChild(); child; child=child->nextSibling())
+          {
+          if(child->isDynamic())
+            {
+            oldCont->moveProperty(newCont, child);
+            }
+          else
+            {
+            SProperty *prop = newCont->findChild(child->name());
+            if(prop)
+              {
+              child->assign(prop);
+
+              const SProperty *inp = child->input();
+              if(inp)
+                {
+                inp->disconnect(child);
+                inp->connect(prop);
+                }
+
+              outputs.clear();
+              for(SProperty *out=child->output(); out; out=out->nextOutput())
+                {
+                outputs << out;
+                }
+
+              prop->connect(outputs);
+
+              child->disconnect();
+              }
+            }
+          }
+        }
+      else if(!newProp->inheritsFromType<SPropertyContainer>() && !property()->inheritsFromType<SPropertyContainer>())
+        {
+        // transfer the value
+        property()->assign(newProp);
+        }
+
+
+      // remove the old property
+      if(parent->inheritsFromType<SEntity>())
+        {
+        SEntity *entParent = parent->uncheckedCastTo<SEntity>();
+
+        entParent->removeProperty(property());
+        }
+      else if(parent->inheritsFromType<SPropertyArray>())
+        {
+        SPropertyArray *arrayParent = parent->uncheckedCastTo<SPropertyArray>();
+
+        arrayParent->remove(property());
+        }
+
+      setProperty(newProp);
+      }
+    }
+  else
+    {
+    xAssertFail();
+    }
+
+  if(feedback() && callback())
+    {
+    (feedback()->*callback())();
+    }
+  }
+
+
 SDefaultPartEditorInterface::SDefaultPartEditorInterface() : SPartEditorInterface(true)
   {
   }
@@ -78,12 +201,9 @@ void SDefaultPartEditorInterface::typeParameter(SEntity *e, xsize index, QString
   else if(index == Type)
     {
     name = "Type";
-    QComboBox *combo = new QComboBox;
 
     QStringList types = possibleTypes();
-    combo->addItems(types);
-
-    widget = combo;
+    widget = new PropertyTypeEditor(e, types);
     }
   else
     {
@@ -162,12 +282,9 @@ void SDefaultPartEditorInterface::typeSubParameter(SPartEditorInterfaceFeedbacke
   else if(i == SubType)
     {
     name = "Type";
-    QComboBox *combo = new QComboBox;
 
     QStringList types = possiblePropertyTypes();
-    combo->addItems(types);
-
-    widget = combo;
+    widget = new PropertyTypeEditor((SProperty*)prop, types, f, &SPartEditorInterfaceFeedbacker::propertySubParametersChanged);
     }
   else
     {

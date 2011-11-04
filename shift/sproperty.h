@@ -159,6 +159,7 @@ public:
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
+  void connect(const QVector<SProperty*> &) const;
   void disconnect(SProperty *) const;
   void disconnect() const;
 

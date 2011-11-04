@@ -40,6 +40,7 @@ private:
   void rebuildPropertyProperties(QWidget *widget, void *property);
 
   void propertyNameChanged();
+  void propertySubParametersChanged();
 
   QListWidget *_list;
   QWidget *_propertyProperties;

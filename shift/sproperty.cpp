@@ -343,6 +343,18 @@ void SProperty::connect(SProperty *prop) const
     }
   }
 
+void SProperty::connect(const QVector<SProperty*> &l) const
+  {
+  if(l.size())
+    {
+    SBlock b(l.front()->database());
+    foreach(SProperty *p, l)
+      {
+      connect(p);
+      }
+    }
+  }
+
 void SProperty::disconnect(SProperty *prop) const
   {
   SProfileFunction

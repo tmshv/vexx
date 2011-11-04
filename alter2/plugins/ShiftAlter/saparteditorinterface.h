@@ -4,12 +4,14 @@
 #include "saglobal.h"
 #include "sinterface.h"
 #include "QLineEdit"
+#include "QComboBox"
 #include "sentity.h"
 
 class SPartEditorInterfaceFeedbacker
   {
 public:
   virtual void propertyNameChanged() = 0;
+  virtual void propertySubParametersChanged() = 0;
   };
 
 class SPartEditorInterface : public SStaticInterfaceBase
@@ -39,7 +41,6 @@ public:
   virtual QWidget *buildCustomPreview(const SEntity *) const = 0;
   };
 
-
 class PropertyNameEditor : public QLineEdit, public STreeObserver
   {
   Q_OBJECT
@@ -60,6 +61,26 @@ public:
 
 public slots:
   void editName();
+  };
+
+class PropertyTypeEditor : public QComboBox
+  {
+  Q_OBJECT
+
+public:
+  typedef void (SPartEditorInterfaceFeedbacker::*CallbackFn)();
+
+XProperties:
+  XProperty(SProperty *, property, setProperty)
+  XProperty(CallbackFn, callback, setCallback)
+  XProperty(SPartEditorInterfaceFeedbacker *, feedback, setFeedback)
+
+public:
+  PropertyTypeEditor(SProperty *e, const QStringList &items, SPartEditorInterfaceFeedbacker *f=0, CallbackFn callback=0);
+  ~PropertyTypeEditor();
+
+public slots:
+  void editType(const QString &);
   };
 
 class SDefaultPartEditorInterface : public SPartEditorInterface

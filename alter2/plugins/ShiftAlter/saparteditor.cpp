@@ -127,6 +127,11 @@ void SPartEditor::propertyNameChanged()
   rebuildPropertyList(_list);
   }
 
+void SPartEditor::propertySubParametersChanged()
+  {
+  selectProperty();
+  }
+
 void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
   {
 

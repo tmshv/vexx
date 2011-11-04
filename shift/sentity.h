@@ -63,6 +63,11 @@ public:
     SPropertyContainer::removeProperty(prop);
     }
 
+  void moveProperty(SEntity *newParent, SProperty *prop)
+    {
+    SPropertyContainer::moveProperty(newParent, prop);
+    }
+
   // accessing child properties by index
   using SPropertyContainer::at;
 
