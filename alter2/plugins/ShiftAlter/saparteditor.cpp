@@ -9,7 +9,8 @@
 #include "saparteditorinterface.h"
 
 SPartEditor::SPartEditor(const QString &type, SEntity *prop) : _property(prop),
-    _list(0), _propertyProperties(0), _propertyPropertiesInternal(0)
+    _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
+    _typeParameters(0), _typeParametersInternal(0)
   {
   _partInterface = findInterface(type);
 
@@ -35,8 +36,9 @@ QLayout *SPartEditor::buildEntitySection()
   {
   QVBoxLayout *layout(new QVBoxLayout);
 
-  QLayout *l = buildTypeParameters();
-  layout->addLayout(l);
+  _typeParameters = new QWidget;
+  layout->addWidget(_typeParameters);
+  rebuildTypeParameters(_typeParameters, _property);
 
   if(partInterface()->hasPropertiesSection())
     {
@@ -60,6 +62,7 @@ const SPartEditorInterface *SPartEditor::findInterface(const QString& t)
 QLayout *SPartEditor::buildTypeParameters()
   {
   QFormLayout *layout(new QFormLayout());
+  layout->setContentsMargins(0, 0, 0, 0);
 
   QString name;
   QWidget *w;
@@ -68,7 +71,7 @@ QLayout *SPartEditor::buildTypeParameters()
     name.clear();
     w = 0;
 
-    partInterface()->typeParameter(property(), i, name, w);
+    partInterface()->typeParameter(this, property(), i, name, w);
     xAssert(!name.isEmpty());
     xAssert(w);
 
@@ -127,14 +130,50 @@ void SPartEditor::propertyNameChanged()
   rebuildPropertyList(_list);
   }
 
-void SPartEditor::propertySubParametersChanged()
+void SPartEditor::propertySubParametersChanged(SProperty *)
   {
   selectProperty();
   }
 
+void SPartEditor::refreshAll(SProperty *newEnt)
+  {
+  _property = newEnt->castTo<SEntity>();
+  xAssert(_property);
+
+  rebuildTypeParameters(_typeParameters, _property);
+  rebuildPropertyList(_list);
+  selectProperty();
+  }
+
+void SPartEditor::rebuildTypeParameters(QWidget *widget, SEntity *ent)
+  {
+  // delete old internal
+  if(_typeParametersInternal)
+    {
+    // delete old layout
+    delete widget->layout();
+    widget->setLayout(0);
+
+    _typeParametersInternal->deleteLater();
+    _typeParametersInternal = 0;
+    }
+
+  if(ent)
+    {
+    // setup new internal
+    QVBoxLayout *internalLayout(new QVBoxLayout(widget));
+    internalLayout->setContentsMargins(0, 0, 0, 0);
+
+    _typeParametersInternal = new QWidget;
+    internalLayout->addWidget(_typeParametersInternal);
+
+    QLayout *l = buildTypeParameters();
+    _typeParametersInternal->setLayout(l);
+    }
+  }
+
 void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
   {
-
   // delete old internal
   if(_propertyPropertiesInternal)
     {
@@ -209,6 +248,7 @@ void SPartEditor::removeProperty()
     partInterface()->removeProperty(property(), n);
     }
   rebuildPropertyList(_list);
+  selectProperty();
   }
 
 void SPartEditor::selectProperty()

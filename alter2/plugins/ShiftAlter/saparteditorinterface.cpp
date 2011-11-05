@@ -13,14 +13,15 @@ PropertyNameEditor::PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbac
   if(property()->entity())
     {
     property()->entity()->addTreeObserver(this);
+    _observedEntity = property()->entity();
     }
   }
 
 PropertyNameEditor::~PropertyNameEditor()
   {
-  if(property()->entity())
+  if(_observedEntity.isValid())
     {
-    property()->entity()->removeTreeObserver(this);
+    _observedEntity->removeTreeObserver(this);
     }
   }
 
@@ -95,11 +96,13 @@ void PropertyTypeEditor::editType(const QString &t)
       SEntity *oldCont = property()->castTo<SEntity>();
       if(newCont && oldCont)
         {
-        for(SProperty *child=oldCont->firstChild(); child; child=child->nextSibling())
+        for(SProperty *child=oldCont->firstChild(); child; /* nothing */)
           {
           if(child->isDynamic())
             {
+            SProperty *next = child->nextSibling();
             oldCont->moveProperty(newCont, child);
+            child = next;
             }
           else
             {
@@ -125,6 +128,8 @@ void PropertyTypeEditor::editType(const QString &t)
 
               child->disconnect();
               }
+
+            child=child->nextSibling();
             }
           }
         }
@@ -151,16 +156,16 @@ void PropertyTypeEditor::editType(const QString &t)
 
       newProp->setName(n);
       setProperty(newProp);
+
+      if(feedback() && callback())
+        {
+        (feedback()->*callback())(newProp);
+        }
       }
     }
   else
     {
     xAssertFail();
-    }
-
-  if(feedback() && callback())
-    {
-    (feedback()->*callback())();
     }
   }
 
@@ -191,7 +196,7 @@ xsize SDefaultPartEditorInterface::numberOfTypeParameters(SEntity *) const
   return NumberOfTypeParameters;
   }
 
-void SDefaultPartEditorInterface::typeParameter(SEntity *e, xsize index, QString& name, QWidget *&widget) const
+void SDefaultPartEditorInterface::typeParameter(SPartEditorInterfaceFeedbacker *f, SEntity *e, xsize index, QString& name, QWidget *&widget) const
   {
   if(index == Name)
     {
@@ -203,7 +208,7 @@ void SDefaultPartEditorInterface::typeParameter(SEntity *e, xsize index, QString
     name = "Type";
 
     QStringList types = possibleTypes();
-    widget = new PropertyTypeEditor(e, types);
+    widget = new PropertyTypeEditor(e, types, f, &SPartEditorInterfaceFeedbacker::refreshAll);
     }
   else
     {

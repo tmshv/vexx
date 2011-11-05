@@ -6,12 +6,14 @@
 #include "QLineEdit"
 #include "QComboBox"
 #include "sentity.h"
+#include "sentityweakpointer.h"
 
 class SPartEditorInterfaceFeedbacker
   {
 public:
   virtual void propertyNameChanged() = 0;
-  virtual void propertySubParametersChanged() = 0;
+  virtual void propertySubParametersChanged(SProperty *) = 0;
+  virtual void refreshAll(SProperty *) = 0;
   };
 
 class SPartEditorInterface : public SStaticInterfaceBase
@@ -23,7 +25,7 @@ public:
   virtual ~SPartEditorInterface() { }
 
   virtual xsize numberOfTypeParameters(SEntity *prop) const = 0;
-  virtual void typeParameter(SEntity *prop, xsize index, QString& name, QWidget *&widget) const = 0;
+  virtual void typeParameter(SPartEditorInterfaceFeedbacker *, SEntity *prop, xsize index, QString& name, QWidget *&widget) const = 0;
 
   virtual bool hasPropertiesSection() const = 0;
   virtual void propertiesSectionTitle(QString &) const = 0;
@@ -55,12 +57,15 @@ XProperties:
 
 public:
   PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbacker *f=0, CallbackFn callback=0);
-  ~PropertyNameEditor();
+  virtual ~PropertyNameEditor();
 
   virtual void onTreeChange(const SChange *);
 
 public slots:
   void editName();
+
+private:
+  SEntityWeakPointer _observedEntity;
   };
 
 class PropertyTypeEditor : public QComboBox
@@ -68,7 +73,7 @@ class PropertyTypeEditor : public QComboBox
   Q_OBJECT
 
 public:
-  typedef void (SPartEditorInterfaceFeedbacker::*CallbackFn)();
+  typedef void (SPartEditorInterfaceFeedbacker::*CallbackFn)(SProperty *);
 
 XProperties:
   XProperty(SProperty *, property, setProperty)
@@ -103,7 +108,7 @@ public:
     };
 
   virtual xsize numberOfTypeParameters(SEntity *prop) const;
-  virtual void typeParameter(SEntity *prop, xsize index, QString& name, QWidget *&widget) const;
+  virtual void typeParameter(SPartEditorInterfaceFeedbacker *, SEntity *prop, xsize index, QString& name, QWidget *&widget) const;
   virtual QStringList possibleTypes() const;
 
   virtual bool hasPropertiesSection() const;

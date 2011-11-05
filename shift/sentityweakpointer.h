@@ -6,7 +6,7 @@
 #include "sdatabase.h"
 
 #define S_ENTITY_WEAK_POINTER_CHECK \
-if(data() == 0 || (data()->parent() == 0 && !data()->inheritsFromType<SDatabase>())) { xAssertFail(); return 0; }
+if(data() == 0) { xAssertFail(); return 0; }
 
 class SEntityWeakPointer : private XWeakSharedPointer<SEntity>
   {

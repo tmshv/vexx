@@ -36,15 +36,21 @@ private:
   QLayout *buildEntitySection();
   QLayout *buildTypeParameters();
   QLayout *buildProperties();
+
+
+  void rebuildTypeParameters(QWidget *widget, SEntity *ent);
   void rebuildPropertyList(QListWidget *);
   void rebuildPropertyProperties(QWidget *widget, void *property);
 
   void propertyNameChanged();
-  void propertySubParametersChanged();
+  void propertySubParametersChanged(SProperty *);
+  void refreshAll(SProperty *);
 
   QListWidget *_list;
   QWidget *_propertyProperties;
   QWidget *_propertyPropertiesInternal;
+  QWidget *_typeParameters;
+  QWidget *_typeParametersInternal;
 
   XPropertyMember(const SPartEditorInterface *, partInterface);
   };
