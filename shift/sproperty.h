@@ -25,12 +25,10 @@ class SDatabase;
 
 
 #define S_ADD_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
-  public: enum { Version = version };
+  public: enum { Version = version, IsAbstract = false };
 
 #define S_ADD_ABSTRACT_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
-  public: enum { Version = version };
+  public: enum { Version = version, IsAbstract = true };
 
 #define S_PROPERTY_ROOT(myName, version) \
   public: \
@@ -48,8 +46,6 @@ class SDatabase;
 
 
 #define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  void myName::createProperty(void *, const SPropertyInformation *, SPropertyInstanceInformation **) \
-  { xAssertFailMessage("Creating abstract type") } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \

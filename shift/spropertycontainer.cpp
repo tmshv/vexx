@@ -288,7 +288,7 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   return false;
   }
 
-void SPropertyContainer::postChildSet(SPropertyContainer *c, SProperty *p)
+void SPropertyContainer::postChildSet(SPropertyContainer *, SProperty *p)
   {
   p->_flags.clearFlag(Dirty);
 

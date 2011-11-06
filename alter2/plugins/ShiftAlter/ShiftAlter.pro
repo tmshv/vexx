@@ -25,10 +25,10 @@ HEADERS += splugin.h \
     sashaderparteditorinterface.h \
     saviewport.h
 
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore
 
 QT += opengl
-LIBS += -lshift -lEksCore -lEks3D -lalter -lShiftGraphicsCore
+LIBS += -lshift -lEksCore -lEksGui -lEks3D -lalter -lShiftGraphicsCore
 
 FORMS +=
 

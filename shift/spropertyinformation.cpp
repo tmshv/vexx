@@ -120,7 +120,7 @@ SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   return g_maxChildKey++;
   }
 
-void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info)
+void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation *info)
   {
   xAssert(!_affects);
   xAssert(info);

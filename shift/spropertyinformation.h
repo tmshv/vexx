@@ -51,7 +51,7 @@ public:
   SPropertyInstanceInformation();
   virtual ~SPropertyInstanceInformation();
 
-  void setAffects(SPropertyInstanceInformation *info);
+  void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
@@ -241,9 +241,6 @@ private:
     return def;
     }
 
-  template <typename T> static void createProperty(void *ptr,
-                       const SPropertyInformation *,
-                       SPropertyInstanceInformation **instanceInfo);
   void reference() const;
   void dereference() const;
 
@@ -254,29 +251,46 @@ private:
 
 #include "sproperty.h"
 
+namespace
+{
+template<typename T, bool Abstract = T::IsAbstract> struct CreatePropertyHelper;
 
-template <typename T> static void SPropertyInformation::createProperty(void *ptr,
-                     const SPropertyInformation *,
-                     SPropertyInstanceInformation **instanceInfo)
+template<typename T> struct CreatePropertyHelper<T, true>
   {
-  T *prop = new(ptr) T();
-
-  if(instanceInfo)
+  static void run(void *,
+                  const SPropertyInformation *,
+                  SPropertyInstanceInformation **)
     {
-    xuint8 *alignedPtr = (xuint8*)(prop+1);
-    alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
-    xAssertIsAligned(alignedPtr);
-    *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
-    new(*instanceInfo) T::InstanceInformation();
-    (*instanceInfo)->setDynamic(true);
+    xAssertFail();
     }
-  }
+  };
+
+template<typename T> struct CreatePropertyHelper<T, false>
+  {
+  static void run(void *ptr,
+                  const SPropertyInformation *,
+                  SPropertyInstanceInformation **instanceInfo)
+    {
+    T *prop = new(ptr) T();
+
+    if(instanceInfo)
+      {
+      xuint8 *alignedPtr = (xuint8*)(prop+1);
+      alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
+      xAssertIsAligned(alignedPtr);
+      *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
+      new(*instanceInfo) T::InstanceInformation();
+      (*instanceInfo)->setDynamic(true);
+      }
+    }
+  };
+}
 
 template <typename PropType> SPropertyInformation *SPropertyInformation::create(const QString &typeName, void postCreate(PropType *))
   {
   SPropertyInformation *info = PropType::ParentType::createTypeInformation();
 
-  info->setCreate(SPropertyInformation::createProperty<PropType>);
+  info->setCreate(CreatePropertyHelper<PropType>::run);
   info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
@@ -299,7 +313,7 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
   {
   SPropertyInformation *info = new SPropertyInformation();
 
-  info->setCreate(SPropertyInformation::createProperty<PropType>);
+  info->setCreate(CreatePropertyHelper<PropType>::run);
   info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);

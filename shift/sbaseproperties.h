@@ -228,12 +228,12 @@ private:
   };
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault, typeID) \
-class EXPORT_MODE name : public SPODProperty<type, name> { public: \
-  enum { Type = typeID }; \
-  S_PROPERTY(name, SProperty, 0); \
+class EXPORT_MODE name : public SPODProperty<type, name> { \
 public: class InstanceInformation : public SPODProperty<type, name>::InstanceInformation \
     { public: \
     InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
+  enum { Type = typeID }; \
+  S_PROPERTY(name, SProperty, 0); \
   name(); \
   name &operator=(const type &in) { \
     assign(in); \

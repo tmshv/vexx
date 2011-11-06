@@ -60,6 +60,26 @@ public:
 
   SProperty *firstChild() const { preGet(); return _child; }
 
+  template <typename T> const T *findChild(const QString &name) const
+    {
+    const SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<T>();
+      }
+    return 0;
+    }
+
+  template <typename T> T *findChild(const QString &name)
+    {
+    SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<T>();
+      }
+    return 0;
+    }
+
   const SProperty *findChild(const QString &name) const;
   SProperty *findChild(const QString &name);
 
