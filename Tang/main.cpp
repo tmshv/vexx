@@ -54,5 +54,8 @@ int main( int argc, char **argv )
   SPartEditor* editor = SPartEditor::editNewPart("SEntity", "", &db->db().document);
   editor->show();
 
+  SPartEditor* editor2 = SPartEditor::editNewPart("GCShader", "", &db->db().document);
+  editor2->show();
+
   return app.execute();
   }

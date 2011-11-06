@@ -4,7 +4,7 @@
 #include "sentityweakpointer.h"
 #include "UISurface.h"
 #include "XObject"
-#include "X3DCanvas.h"
+#include "saviewport.h"
 #include "XCamera.h"
 #include "XScene.h"
 #include "XCameraCanvasController.h"
@@ -21,7 +21,7 @@ class EnvironmentEntity;
 
 class Object;
 
-class Viewport : public X3DCanvas, public UISurface, STreeObserver
+class Viewport : public SViewport, public UISurface
   {
   Q_OBJECT
 
@@ -31,40 +31,6 @@ public:
 
 public slots:
   void setObject(Object *id);
-
-protected:
-  void initializeGL();
-  void resizeGL( int w, int h );
-  void paintGL();
-
-  virtual void onTreeChange(const SChange *);
-
-  XGLRenderer _renderer;
-  QTimer *_timer;
-
-  SAppDatabase *db()
-    {
-    SEntity *ent = _db->entity();
-    if(ent)
-      {
-      return ent->castTo<SAppDatabase>();
-      }
-    return 0;
-    }
-
-  const SAppDatabase *db() const
-    {
-    const SEntity *ent = _db->entity();
-    if(ent)
-      {
-      return ent->castTo<SAppDatabase>();
-      }
-    return 0;
-    }
-
-  SEntityWeakPointer _db;
-  QList<GCScreenRenderTarget*> _screenRenderers;
-  SEntityWeakPointer _viewport;
   };
 
 #endif // VIEWPORT_H

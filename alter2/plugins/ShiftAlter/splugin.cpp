@@ -1,6 +1,7 @@
 #include "splugin.h"
 #include "sglobal.h"
 #include "GraphicsCore/GCGlobal.h"
+#include "GraphicsCore/3D/GCShader.h"
 #include "sprocessmanager.h"
 #include "QThread"
 #include "QDesktopServices"
@@ -9,6 +10,7 @@
 #include "Serialisation/sjsonio.h"
 #include "styperegistry.h"
 #include "saparteditorinterface.h"
+#include "sashaderparteditorinterface.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -48,6 +50,7 @@ void SPlugin::load()
   SProcessManager::initiate(threadCount);
 
   SProperty::staticTypeInformation()->addStaticInterface(new SDefaultPartEditorInterface);
+  GCShader::staticTypeInformation()->addStaticInterface(new SShaderPartEditorInterface);
 
   _db = new SAppDatabase();
 

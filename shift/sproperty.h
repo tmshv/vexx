@@ -40,16 +40,6 @@ class SDatabase;
   S_REGISTER_TYPE_FUNCTION()
 
 #define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
-  TEMPL void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
   TEMPL const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -67,16 +57,6 @@ class SDatabase;
   return info;}
 
 #define S_IMPLEMENT_PROPERTY(myName) \
-  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -84,16 +64,6 @@ class SDatabase;
   return info;}
 
 #define S_IMPLEMENT_INLINE_PROPERTY(myName) \
-  inline void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
   inline const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
