@@ -44,7 +44,7 @@ void SViewport::onTreeChange(const SChange *c)
     return;
     }
 
-  if(t->after())
+  if(t->after() && t->after() == &_scene->children)
     {
     if(!_screenRenderers.contains(prop))
       {
