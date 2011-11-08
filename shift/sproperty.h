@@ -160,7 +160,7 @@ public:
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
 
   void postSet();
-  void setDependantsDirty(bool force=false);
+  void setDependantsDirty();
   void preGet() const
     {
     if(_flags.hasFlag(Dirty))
@@ -316,8 +316,7 @@ public:
   X_ALIGNED_OPERATOR_NEW
 
 private:
-  void setDirty(bool force=false);
-  friend void setDependantsDirty(SProperty* prop, bool force=false);
+  void setDirty();
   void internalSetName(const QString &name);
 
   void connectInternal(SProperty *) const;

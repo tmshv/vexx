@@ -11,6 +11,7 @@
 #include "QVBoxLayout"
 #include "QTextEdit"
 #include "QLabel"
+#include "QFile"
 #include "spropertydefaultui.h"
 
 class ShaderPreviewViewport : public SViewport
@@ -18,6 +19,8 @@ class ShaderPreviewViewport : public SViewport
 public:
   ShaderPreviewViewport(SEntity *ent) : SViewport(ent)
     {
+    GCShader *shader = ent->uncheckedCastTo<GCShader>();
+
     SEntity *sc = scene();
 
     GCViewport* vp = sc->addChild<GCViewport>("Viewport");
@@ -42,26 +45,14 @@ public:
     GCShadingGroup *group = sc->addChild<GCShadingGroup>("Groups");
     msc->shadingGroups.addPointer(group);
 
-    GCStandardSurface *shader = sc->addChild<GCStandardSurface>("Shader");
     group->shader.setPointed(shader);
-
-    XTransform tr = XTransform::Identity();
-    tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
 
     GCGeometryTransform *transform = sc->addChild<GCGeometryTransform>("Transform");
     group->geometry.addPointer(transform);
-    transform->transform = tr;
 
-
-    tr.translation() = XVector3D(-1.0f, 0.0f, 0.0f);
-
-    GCGeometryTransform *transform2 = sc->addChild<GCGeometryTransform>("Transform");
-    group->geometry.addPointer(transform2);
-    transform2->transform = tr;
 
     GCCuboid *cube = sc->addChild<GCCuboid>("Cube");
     transform->geometry.setPointed(&cube->geometry);
-    transform2->geometry.setPointed(&cube->geometry);
 
     op->source.setPointed(msc);
     }
@@ -114,6 +105,14 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
     }
 
   GCShaderComponent *frag = ent->addProperty<GCFragmentShaderComponent>();
+    {
+    QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
+    if(shaderResource.open(QIODevice::ReadOnly))
+      {
+      frag->source = shaderResource.readAll();
+      }
+    }
+
   shader->components.addPointer(frag);
   QWidget *vertex(new SPropertyDefaultUI::LongString(&frag->source, false, 0));
   layout->addWidget(vertex);
@@ -121,6 +120,14 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   layout->addWidget(new QLabel("<b>Fragment</b>"));
 
   GCShaderComponent *vert = ent->addProperty<GCVertexShaderComponent>();
+    {
+    QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
+    if(shaderResource.open(QIODevice::ReadOnly))
+      {
+      vert->source = shaderResource.readAll();
+      }
+    }
+
   shader->components.addPointer(vert);
   QWidget *fragment(new SPropertyDefaultUI::LongString(&vert->source, false, 0));
   layout->addWidget(fragment);

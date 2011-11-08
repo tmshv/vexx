@@ -16,11 +16,11 @@ SPropertyInformation *SProperty::createTypeInformation()
   return SPropertyInformation::createNoParent<SProperty>("SProperty");
   }
 
-void SProperty::setDependantsDirty(bool force)
+void SProperty::setDependantsDirty()
   {
   for(SProperty *o=output(); o; o = o->nextOutput())
     {
-    o->setDirty(force);
+    o->setDirty();
     }
 
   const SPropertyInstanceInformation *child = baseInstanceInformation();
@@ -36,7 +36,7 @@ void SProperty::setDependantsDirty(bool force)
       SProperty *affectsProp = propInst->locateProperty(par);
 
       xAssert(affectsProp);
-      affectsProp->setDirty(force);
+      affectsProp->setDirty();
       i++;
       }
     }
@@ -49,7 +49,7 @@ void SProperty::setDependantsDirty(bool force)
       SProperty *child = c->_child;
       while(child)
         {
-        child->setDirty(force);
+        child->setDirty();
         child = child->_nextSibling;
         }
       }
@@ -67,7 +67,7 @@ void SProperty::setDependantsDirty(bool force)
       // so we dirty the outputs of the parent, which do need to be updated.
       for(SProperty *o=parent->output(); o; o = o->nextOutput())
         {
-        o->setDirty(force);
+        o->setDirty();
         }
       }
     }
@@ -393,7 +393,7 @@ bool SProperty::ConnectionChange::apply(int mode)
         setParentHasInputConnection(_driven);
         setParentHasOutputConnection(_driver);
         }
-      _driver->setDependantsDirty(true);
+      _driver->setDependantsDirty();
       }
     else if(_mode == Disconnect)
       {
@@ -418,7 +418,7 @@ bool SProperty::ConnectionChange::apply(int mode)
         setParentHasInputConnection(_driven);
         setParentHasOutputConnection(_driver);
         }
-      _driver->setDependantsDirty(true);
+      _driver->setDependantsDirty();
       }
     }
 
@@ -699,16 +699,16 @@ void SProperty::postSet()
   info->postChildSet()(c, this);
   _flags.clearFlag(Dirty);
 
-  setDependantsDirty(this);
+  setDependantsDirty();
   }
 
-void SProperty::setDirty(bool force)
+void SProperty::setDirty()
   {
-  if((!_flags.hasAnyFlags(Dirty|PreGetting)) || force)
+  if((!_flags.hasAnyFlags(Dirty|PreGetting)))
     {
     _flags.setFlag(Dirty);
 
-    setDependantsDirty(force);
+    setDependantsDirty();
 
     if(entity())
       {
