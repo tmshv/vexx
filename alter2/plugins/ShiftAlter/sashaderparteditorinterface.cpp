@@ -96,28 +96,14 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   QVBoxLayout *layout(new QVBoxLayout(main));
   layout->setContentsMargins(0, 0, 0, 0);
 
-  layout->addWidget(new QLabel("<b>Vertex</b>"));
-
   SEntity *ent = e->children.findChild<SEntity>("ShaderContents");
   if(!ent)
     {
     ent = e->addChild<SEntity>("ShaderContents");
     }
 
-  GCShaderComponent *frag = ent->addProperty<GCFragmentShaderComponent>();
-    {
-    QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
-    if(shaderResource.open(QIODevice::ReadOnly))
-      {
-      frag->source = shaderResource.readAll();
-      }
-    }
 
-  shader->components.addPointer(frag);
-  QWidget *vertex(new SPropertyDefaultUI::LongString(&frag->source, false, 0));
-  layout->addWidget(vertex);
-
-  layout->addWidget(new QLabel("<b>Fragment</b>"));
+  layout->addWidget(new QLabel("<b>Vertex</b>"));
 
   GCShaderComponent *vert = ent->addProperty<GCVertexShaderComponent>();
     {
@@ -127,9 +113,26 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
       vert->source = shaderResource.readAll();
       }
     }
-
   shader->components.addPointer(vert);
-  QWidget *fragment(new SPropertyDefaultUI::LongString(&vert->source, false, 0));
+
+
+  QWidget *vertex(new SPropertyDefaultUI::LongString(&vert->source, false, 0));
+  layout->addWidget(vertex);
+
+  layout->addWidget(new QLabel("<b>Fragment</b>"));
+
+  GCShaderComponent *frag = ent->addProperty<GCFragmentShaderComponent>();
+    {
+    QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
+    if(shaderResource.open(QIODevice::ReadOnly))
+      {
+      frag->source = shaderResource.readAll();
+      }
+    }
+  shader->components.addPointer(frag);
+
+
+  QWidget *fragment(new SPropertyDefaultUI::LongString(&frag->source, false, 0));
   layout->addWidget(fragment);
 
   return main;

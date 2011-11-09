@@ -62,13 +62,8 @@ void SProperty::setDependantsDirty()
     while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
       {
       parent = parent->parent();
-      // so we hit here when a child has been updated,
-      // having a parent dirty when a child is up to date is a bit weird (possibly just wrong)
-      // so we dirty the outputs of the parent, which do need to be updated.
-      for(SProperty *o=parent->output(); o; o = o->nextOutput())
-        {
-        o->setDirty();
-        }
+
+      parent->setDirty();
       }
     }
   }
@@ -697,18 +692,16 @@ void SProperty::postSet()
   SPropertyContainer *c = parent();
   const SPropertyInformation *info = c->typeInformation();
   info->postChildSet()(c, this);
-  _flags.clearFlag(Dirty);
 
-  setDependantsDirty();
+  _flags.clearFlag(Dirty);
   }
 
 void SProperty::setDirty()
   {
   if((!_flags.hasAnyFlags(Dirty|PreGetting)))
-    {
+  {
     _flags.setFlag(Dirty);
-
-    setDependantsDirty();
+    postSet();
 
     if(entity())
       {

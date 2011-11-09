@@ -290,8 +290,6 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
 
 void SPropertyContainer::postChildSet(SPropertyContainer *, SProperty *p)
   {
-  p->_flags.clearFlag(Dirty);
-
   p->setDependantsDirty();
   }
 
