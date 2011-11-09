@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include\QtWebKit;C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include\QtNetwork;C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include\QtOpenGL;C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include\QtGui;C:\Users\Jorj\CodeVexxLocal\shift;C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include;C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\include\QtCore;C:\Users\Jorj\CodeVexxLocal\Eks3D\include;C:\Users\Jorj\CodeVexxLocal\shift\GraphicsCore;C:\Users\Jorj\CodeVexxLocal\EksCore;C:\Users\Jorj\CodeVexxLocal\alter2\plugins\UI;C:\Users\Jorj\CodeVexxLocal\alter2\plugins\ShiftAlter;C:\Users\Jorj\CodeVexxLocal\alter2\plugins\script;C:\Users\Jorj\CodeVexxLocal\alter2"
+				AdditionalIncludeDirectories="&quot;$(QT_MSVC_INCLUDE)&quot;;&quot;$(QT_MSVC_INCLUDE)\QtWebKit&quot;;&quot;$(QT_MSVC_INCLUDE)\QtNetwork&quot;;&quot;$(QT_MSVC_INCLUDE)\QtOpenGL&quot;;&quot;$(QT_MSVC_INCLUDE)\QtGui&quot;;&quot;$(QT_MSVC_INCLUDE)\QtCore&quot;;..\..\shift;..\..\Eks3D\include;..\..\shift\GraphicsCore;..\..\EksCore;..\..\alter2\plugins\UI;..\..\alter2\plugins\ShiftAlter;..\..\alter2\plugins\script;..\..\alter2"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="QtGuid4.lib QtCored4.lib QtOpenGLd4.lib QtXmld4.lib QtNetworkd4.lib QtWebkitd4.lib QtScriptd4.lib EksCore.lib Eks3D.lib shift.lib alter.lib script.lib ShiftAlter.lib ShiftGraphicsCore.lib UI.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\QtSDK\Desktop\Qt\4.7.4\msvc2008\lib;C:\Users\Jorj\CodeVexxLocal\bin"
+				AdditionalLibraryDirectories="&quot;$(QT_MSVC_LIB)&quot;;..\..\bin"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
