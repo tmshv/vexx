@@ -163,12 +163,18 @@ public:
   void setDependantsDirty();
   void preGet() const
     {
+    if(_flags.hasFlag(ParentHasInput))
+      {
+      updateParent();
+      }
+
     if(_flags.hasFlag(Dirty))
       {
       update();
       }
-    }
+  }
   void update() const;
+  void updateParent() const;
 
   bool isDynamic() const;
   xsize index() const;

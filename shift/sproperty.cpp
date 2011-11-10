@@ -698,15 +698,26 @@ void SProperty::postSet()
 
 void SProperty::setDirty()
   {
+    SProfileFunction
   if((!_flags.hasAnyFlags(Dirty|PreGetting)))
   {
     _flags.setFlag(Dirty);
-    postSet();
+    SPropertyContainer *c = parent();
+    const SPropertyInformation *info = c->typeInformation();
+    info->postChildSet()(c, this);
 
     if(entity())
       {
       entity()->informDirtyObservers(this);
       }
+    }
+  }
+
+void SProperty::updateParent() const
+  {
+  if(parent())
+    {
+    parent()->preGet();
     }
   }
 
@@ -718,11 +729,6 @@ void SProperty::update() const
 
   SProperty *prop = const_cast<SProperty*>(this);
   prop->_flags.setFlag(PreGetting);
-
-  if(_flags.hasFlag(ParentHasInput))
-    {
-    parent()->preGet();
-    }
 
   // this is a const function, but because we delay computation we may need to assign here
   prop->_flags.clearFlag(Dirty);
