@@ -63,7 +63,7 @@ void SProperty::setDependantsDirty()
       {
       parent = parent->parent();
 
-      parent->setDirty();
+      parent->setDependantsDirty();
       }
     }
   }
