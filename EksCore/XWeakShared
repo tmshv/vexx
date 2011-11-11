@@ -2,6 +2,8 @@
 #define XWEAKSHARED_H
 
 #include "XGlobal"
+#include "XMacroHelpers"
+#include "XAssert"
 
 class XWeakSharedPointerData;
 

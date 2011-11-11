@@ -1,4 +1,5 @@
 #include "XMetaType"
+#include "XAssert"
 #include "QString"
 #include "QMap"
 #include "QHash"

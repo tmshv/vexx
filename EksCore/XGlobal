@@ -20,6 +20,7 @@
 #include "QtGlobal"
 #include "cstdlib"
 #include "cmath"
+#include "Eigen/Core"
 
 #define X_DECL_EXPORT Q_DECL_EXPORT
 #define X_DECL_IMPORT Q_DECL_IMPORT
@@ -30,69 +31,21 @@
 # define EKSCORE_EXPORT X_DECL_IMPORT
 #endif
 
-EKSCORE_EXPORT void xDoAssert(const char *assertion, const char *file, int line);
-inline void xNoOp() { }
-
-#ifndef QT_NO_DEBUG
-# define X_DEBUG
-# define xAssert(cond) ((!(cond)) ? xDoAssert(#cond, __FILE__, __LINE__) : xNoOp())
-#else
-# define xAssert(cond)
-#endif
-
-#define X_ASSERTS_ENABLED 1
-
-#include "Eigen/Core"
-
 #define X_ALIGNED_OPERATOR_NEW EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #define X_ALIGN_BYTE_COUNT 16
 #define X_ROUND_TO_ALIGNMENT(type, exp) X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, X_ALIGN_BYTE_COUNT)
 #define X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, align) ((type)((xuint8*)exp + ((ptrdiff_t)align - (((ptrdiff_t)exp)&((ptrdiff_t)align-1)))))
-#define xAssertIsAligned(ptr) xAssertIsSpecificAligned(ptr, X_ALIGN_BYTE_COUNT);
-#define xAssertIsSpecificAligned(ptr, alignment) alignment > 0 ? xAssert(((xsize)(ptr)&(alignment-1)) == 0) : xNoOp();
+#define xAssertIsAligned(ptr) xAssertIsSpecificAligned(ptr, X_ALIGN_BYTE_COUNT)
+#define xAssertIsSpecificAligned(ptr, alignment) xAssert((alignment > 0) || (((xsize)(ptr)&(alignment-1)) == 0))
+
+#ifndef QT_NO_DEBUG
+# define X_DEBUG
+#endif
 
 #ifdef X_DEBUG
 # define X_PROFILING_ENABLED
-# define xVerify(x) xAssert(x)
-#else
-# define xVerify(x) x
+# define X_ASSERTS_ENABLED 1
 #endif
-
-
-#define xAssertFail() xAssert(0);
-#define xAssertFailMessage(msg) xAssert(0 && msg);
-
-#define X_DISABLE_COPY(x) Q_DISABLE_COPY(x)
-
-#ifdef Q_OS_DARWIN
-# define xCurrentFunction __PRETTY_FUNCTION__
-#else
-# if defined Q_OS_LINUX && __GNUC__
-#  if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
-#   define xCurrentFunction	__PRETTY_FUNCTION__
-#  else
-#   if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#    define xCurrentFunction	__func__
-#   else
-#    define xCurrentFunction	"_No Function Info Available_"
-#   endif
-#  endif
-# else
-#  ifdef Q_CC_MINGW
-#   define xCurrentFunction __PRETTY_FUNCTION__
-#  else
-#   define xCurrentFunction __FUNCTION__
-#  endif
-# endif
-#endif
-
-#define xTypeof( x ) typeof( x )
-
-#define xMax qMax
-#define xMin qMin
-
-#define X_DEGTORAD(ang) ((ang/360.0f)*2.0f*M_PI)
-#define X_RADTODEG(ang) ((ang/2.0f*M_PI)*360.0f)
 
 typedef signed char xint8;         /* 8 bit signed */
 typedef unsigned char xuint8;      /* 8 bit unsigned */
@@ -102,8 +55,6 @@ typedef int xint32;                /* 32 bit signed */
 typedef unsigned int xuint32;      /* 32 bit unsigned */
 typedef size_t xsize;
 typedef ptrdiff_t xptrdiff;
-
-#define XUINT32_MAX (xuint32)-1
 
 #if defined(Q_OS_WIN) && !defined(Q_CC_GNU) && !defined(Q_CC_MWERKS)
 #  define X_INT64_C(c) c ## i64    /* signed 64 bit constant */
@@ -117,72 +68,10 @@ typedef long long xint64;           /* 64 bit signed */
 typedef unsigned long long xuint64; /* 64 bit unsigned */
 #endif
 
+inline void xNoop() { }
+
 #define X_SIZE_SENTINEL (xsize)-1
 #define X_UINT64_SENTINEL (xuint64)-1
 #define X_UINT32_SENTINEL (xuint32)-1
-
-typedef float xReal;
-#define EKS_XREAL_IS_DOUBLE 0
-
-#define X_UNUSED(x)
-
-inline void xNoop()
-  {
-  }
-
-template <typename T>T xMix( xReal t, const T &a, const T &b )
-  {
-  return ( (1-t) * a  ) + ( t * b );
-  }
-
-inline int xRand()
-  {
-  return qrand();
-  }
-
-inline int xRand( int min, int max )
-  {
-  return min + ( xRand() % (max-min+1) );
-  }
-
-inline xReal xRandF( )
-  {
-  return xRand() / (double)RAND_MAX;
-  }
-
-inline xReal xRandF( xReal min, xReal max )
-  {
-  return min + ( xRandF() * (max-min) );
-  }
-
-inline xReal xClamp( xReal in, xReal min, xReal max )
-  {
-  if( in < min )
-    {
-    return min;
-    }
-  else if( in > max )
-    {
-    return max;
-    }
-  return in;
-  }
-
-inline unsigned int xFactorial( unsigned int in )
-  {
-  // multiply 1 * 2 * 3 * ... * in
-  unsigned int ret = 1;
-  for( unsigned int x=2; x<=in; x++ )
-    {
-    ret *= x;
-    }
-  return ret;
-  }
-
-inline unsigned int xBinomialCoefficient( unsigned int n, unsigned int k )
-  {
-  // Find the coefficient of n and k...
-  return xFactorial( n ) / ( ( xFactorial( n - k ) * xFactorial( k ) ) );
-  }
 
 #endif // XGLOBAL_H

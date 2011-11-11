@@ -1,5 +1,7 @@
 #include "XTime"
 #include "QDebug"
+#include "XAssert"
+
 #ifdef Q_OS_WIN
 # include <windows.h>
 #else
