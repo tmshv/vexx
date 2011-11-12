@@ -2,6 +2,7 @@
 #define XEVENTLOGGER_H
 
 #include "XGlobal"
+#include "XAssert"
 #include "XTime"
 #include "QMetaType"
 

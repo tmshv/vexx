@@ -1,4 +1,5 @@
 #include "XAllocatorBase"
+#include "XAssert"
 
 X_IMPLEMENT_MEMORY_LOGGER(xTotalGlobalAllocatorSize);
 

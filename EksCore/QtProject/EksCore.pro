@@ -22,9 +22,10 @@ SOURCES += ../src/XObject.cpp \
     ../src/XProfiler.cpp \
     ../src/XAllocatorBase.cpp \
     ../src/XUnorderedMap.cpp \
-    ../src/XGlobal.cpp \
     ../src/XEventLogger.cpp \
-    ../src/XBucketAllocator.cpp
+    ../src/XBucketAllocator.cpp \
+    ../src/XAssert.cpp \
+    ../src/XCodeLocation.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -133,7 +134,22 @@ HEADERS += ../XObject \
     ../XAllocatorBase \
     ../XBucketAllocator \
     ../XUnorderedMap \
-    ../XEventLogger
+    ../XEventLogger \
+    ../XAssert \
+    ../XMacroHelpers \
+    ../XMathHelpers \
+    ../XCodeLocation
+
+
+
+
+
+
+
+
+
+
+
 
 
 

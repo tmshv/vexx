@@ -2,6 +2,7 @@
 #define XLIGHTMANAGER_H
 
 #include "XObject"
+#include "XMacroHelpers"
 
 class XLightRig;
 

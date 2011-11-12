@@ -2,6 +2,7 @@
 #define XVECTORXD_H
 
 #include "XGlobal"
+#include "XMathHelpers"
 #include "Eigen/Core"
 #include "QMetaType"
 #include "XMetaType"

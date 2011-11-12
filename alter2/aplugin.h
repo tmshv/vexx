@@ -1,6 +1,7 @@
 #ifndef APLUGIN_H
 #define APLUGIN_H
 
+#include "XAssert"
 #include "aabstractplugin.h"
 #include "acore.h"
 

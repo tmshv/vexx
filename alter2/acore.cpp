@@ -1,4 +1,5 @@
 #include "acore.h"
+#include "XAssert"
 #include "QApplication"
 #include "QStringList"
 #include "aabstractplugin.h"

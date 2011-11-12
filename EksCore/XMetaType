@@ -2,6 +2,7 @@
 #define XMETATYPE_
 
 #include "XGlobal"
+#include "XMacroHelpers"
 
 #define X_DECLARE_METATYPE(type) \
 template <> \

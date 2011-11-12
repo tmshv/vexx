@@ -2,6 +2,8 @@
 #define XRANDOMACCESSBLOCKALLOCATOR_H
 
 #include "XGlobal"
+#include "XMacroHelpers"
+#include "XAssert"
 #include "XProperty"
 #include "QHash"
 #include "XUnorderedMap"
