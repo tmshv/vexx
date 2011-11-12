@@ -30,7 +30,7 @@ SEntityUI::SEntityUI(xuint32 options)
 
 xuint64 SEntityUI::widgetType(const SProperty *p) const
   {
-  const SPropertyInformation *actualType(p->staticTypeInformation());
+  const SPropertyInformation *actualType(p->typeInformation());
   if(_uiTypes.contains(actualType))
     {
     return _uiTypes[actualType];

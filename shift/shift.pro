@@ -20,8 +20,8 @@ SOURCES += \
     sdatabase.cpp \
     schange.cpp \
     sobserver.cpp \
-    sentityui.cpp \
-    spropertydefaultui.cpp \
+    UI/sentityui.cpp \
+    UI/spropertydefaultui.cpp \
     sreferenceentity.cpp \
     spropertycontainer.cpp \
     spropertyarray.cpp \
@@ -47,8 +47,8 @@ HEADERS += \
     sdatabase.h \
     schange.h \
     sobserver.h \
-    sentityui.h \
-    spropertydefaultui.h \
+    UI/sentityui.h \
+    UI/spropertydefaultui.h \
     sreferenceentity.h \
     spropertycontainer.h \
     spropertyarray.h \

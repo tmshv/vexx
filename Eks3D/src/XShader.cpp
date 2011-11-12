@@ -383,6 +383,7 @@ void XShader::clear()
     {
     delete var;
     }
+  _variables.clear();
 
   delete _internal;
   _internal = 0;

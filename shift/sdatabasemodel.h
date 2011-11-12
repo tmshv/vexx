@@ -5,7 +5,7 @@
 #include "QAbstractItemModel"
 #include "QItemDelegate"
 #include "sobserver.h"
-#include "sentityui.h"
+#include "UI/sentityui.h"
 #include "sentityweakpointer.h"
 #include "XFlags"
 

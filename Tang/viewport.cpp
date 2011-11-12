@@ -8,7 +8,7 @@
 #include "QVBoxLayout"
 #include "XGLRenderer.h"
 #include "XScene.h"
-#include "sentityui.h"
+#include "UI/sentityui.h"
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"

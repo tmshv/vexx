@@ -12,7 +12,8 @@
 #include "QTextEdit"
 #include "QLabel"
 #include "QFile"
-#include "spropertydefaultui.h"
+#include "UI/spropertydefaultui.h"
+#include "UI/sentityui.h"
 
 class ShaderPreviewViewport : public SViewport
   {
@@ -86,6 +87,27 @@ QStringList SShaderPartEditorInterface::possiblePropertyTypes() const
 
   qSort(l);
   return l;
+  }
+
+xsize SShaderPartEditorInterface::numberOfTypeSubParameters(SEntity *, void *) const
+  {
+  return NumberOfSubTypeParameters;
+  }
+
+void SShaderPartEditorInterface::typeSubParameter(SPartEditorInterfaceFeedbacker *f, SEntity *e, void *prop, xsize i, QString &name, QWidget *&widget) const
+  {
+  if(i == SubValue)
+    {
+    name = "Value";
+
+    SEntityUI ui;
+
+    widget = ui.createControlWidget((SProperty*)prop);
+
+    return;
+    }
+
+  SDefaultPartEditorInterface::typeSubParameter(f, e, prop, i, name, widget);
   }
 
 QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const

@@ -6,7 +6,6 @@
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
-#include "sentityui.h"
 #include "QTimer"
 #include "XScene.h"
 
