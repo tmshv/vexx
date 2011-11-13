@@ -52,43 +52,43 @@ void computeCube(const SPropertyInstanceInformation *, SPropertyContainer *cont)
   // pos
     {
     xuint32 posX[] = { 0, 3, 7, 4 };
-    vertex->setPolygon(0, posX);
+    vertex->setPolygon(0, posX, 4);
 
     xuint32 negX[] = { 1, 2, 6, 5 };
-    vertex->setPolygon(1, negX);
+    vertex->setPolygon(1, negX, 4);
 
     xuint32 posY[] = { 0, 1, 5, 4 };
-    vertex->setPolygon(2, posY);
+    vertex->setPolygon(2, posY, 4);
 
     xuint32 negY[] = { 2, 3, 7, 6 };
-    vertex->setPolygon(3, negY);
+    vertex->setPolygon(3, negY, 4);
 
     xuint32 posZ[] = { 0, 1, 2, 3 };
-    vertex->setPolygon(4, posZ);
+    vertex->setPolygon(4, posZ, 4);
 
     xuint32 negZ[] = { 4, 5, 6, 7 };
-    vertex->setPolygon(5, negZ);
+    vertex->setPolygon(5, negZ, 4);
     }
 
   // norm
     {
     xuint32 posX[] = { 0, 0, 0, 0 };
-    normals->setPolygon(0, posX);
+    normals->setPolygon(0, posX, 4);
 
     xuint32 negX[] = { 1, 1, 1, 1 };
-    normals->setPolygon(1, negX);
+    normals->setPolygon(1, negX, 4);
 
     xuint32 posY[] = { 2, 2, 2, 2 };
-    normals->setPolygon(2, posY);
+    normals->setPolygon(2, posY, 4);
 
     xuint32 negY[] = { 3, 3, 3, 3 };
-    normals->setPolygon(3, negY);
+    normals->setPolygon(3, negY, 4);
 
     xuint32 posZ[] = { 4, 4, 4, 4 };
-    normals->setPolygon(4, posZ);
+    normals->setPolygon(4, posZ, 4);
 
     xuint32 negZ[] = { 5, 5, 5, 5 };
-    normals->setPolygon(5, negZ);
+    normals->setPolygon(5, negZ, 4);
     }
   }
 

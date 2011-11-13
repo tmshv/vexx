@@ -53,8 +53,8 @@ public:
 
   void clear();
 
-  void setPolygon(xuint32 index, const XVector<xuint32> &indices) { setPolygon(index, &indices.front()); }
-  void setPolygon(xuint32 index, const xuint32 *indices);
+  void setPolygon(xuint32 index, const XVector<xuint32> &indices) { setPolygon(index, &indices.front(), indices.size()); }
+  void setPolygon(xuint32 index, const xuint32 *indices, xsize size); // size used for checking, not to set
 
   SUIntArrayProperty polygons;
   };

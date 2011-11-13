@@ -97,7 +97,7 @@ void GCGeometryAttribute::removePolygons(xuint32 index, xuint32 count)
   xAssertFail();
   }
 
-void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
+void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices, xsize size)
   {
   SUIntArrayProperty::EigenArray data = polygons.data();
 
@@ -110,6 +110,7 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
     if(index == currentIndex)
       {
       xuint32* rawData = data.data();
+      xAssert(data(offset) == size, data(offset), size);
       rawData += offset + 1;
 
       memcpy(rawData, indices, sizeof(xuint32) * data(offset));

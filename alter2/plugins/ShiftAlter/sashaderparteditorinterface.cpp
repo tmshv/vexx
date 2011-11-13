@@ -7,6 +7,7 @@
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
+#include "3D/Renderable/GCSphere.h"
 #include "saviewport.h"
 #include "QVBoxLayout"
 #include "QTextEdit"
@@ -53,8 +54,8 @@ public:
     group->geometry.addPointer(transform);
 
 
-    GCCuboid *cube = sc->addChild<GCCuboid>("Cube");
-    transform->geometry.setPointed(&cube->geometry);
+    GCSphere *shape = sc->addChild<GCSphere>("Sphere");
+    transform->geometry.setPointed(&shape->geometry);
 
     op->source.setPointed(msc);
     }
