@@ -117,7 +117,12 @@ void GCShader::postChildSet(SPropertyContainer *c, SProperty *p)
 
   GCShader *shader = c->uncheckedCastTo<GCShader>();
 
-  if(p == &shader->components || p == &shader->runtimeShader)
+  if(p == &shader->runtimeShader)
+    {
+    return;
+    }
+
+  if(shader->components.isDirty())
     {
     shader->_rebuildShader = true;
     }

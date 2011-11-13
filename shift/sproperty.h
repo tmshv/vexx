@@ -129,6 +129,7 @@ public:
   void disconnect(SProperty *) const;
   void disconnect() const;
 
+  bool isDirty() const { return _flags.hasFlag(Dirty); }
   bool isComputed() const;
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }

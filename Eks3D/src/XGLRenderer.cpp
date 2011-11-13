@@ -105,10 +105,9 @@ class XGLShader : public XAbstractShader
 public:
     XGLShader( XGLRenderer * );
 
-    void setType( int );
 private:
-    virtual bool addComponent(ComponentType c, const QString &source);
-    virtual bool build();
+    virtual bool addComponent(ComponentType c, const QString &source, QStringList &log);
+    virtual bool build(QStringList &log);
     virtual bool isValid();
 
     virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * );
@@ -410,23 +409,31 @@ void XGLRenderer::setShader( const XShader *shader )
     {
     shader->prepareInternal( this );
     _currentShader = static_cast<XGLShader*>(shader->internal());
-    _currentShader->shader.bind() GLE;
 
-    int x=0;
-    foreach( XShaderVariable *var, shader->variables() )
+    if(_currentShader->shader.isLinked())
       {
-      XGLShaderVariable *glVar( static_cast<XGLShaderVariable*>(var->internal()) );
-      if( glVar->_texture )
+      _currentShader->shader.bind() GLE;
+
+      int x=0;
+      foreach( XShaderVariable *var, shader->variables() )
         {
-        const XTexture *tex( glVar->_texture );
-        tex->prepareInternal( this );
-        const XGLTexture *glTex( static_cast<const XGLTexture*>(tex->internal()) );
-        xAssert( glTex );
-        glActiveTexture( GL_TEXTURE0 + x ) GLE;
-        glBindTexture( GL_TEXTURE_2D, glTex->_id ) GLE;
-        _currentShader->shader.setUniformValue( glVar->_location, x );
+        XGLShaderVariable *glVar( static_cast<XGLShaderVariable*>(var->internal()) );
+        if( glVar->_texture )
+          {
+          const XTexture *tex( glVar->_texture );
+          tex->prepareInternal( this );
+          const XGLTexture *glTex( static_cast<const XGLTexture*>(tex->internal()) );
+          xAssert( glTex );
+          glActiveTexture( GL_TEXTURE0 + x ) GLE;
+          glBindTexture( GL_TEXTURE_2D, glTex->_id ) GLE;
+          _currentShader->shader.setUniformValue( glVar->_location, x );
+          }
+        x++;
         }
-      x++;
+      }
+    else
+      {
+      _currentShader = 0;
       }
     }
   else if( shader == 0 && _currentShader != 0 )
@@ -696,11 +703,7 @@ XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), sha
   {
   }
 
-void XGLShader::setType( int type )
-  {
-  }
-
-bool XGLShader::addComponent(ComponentType c, const QString &source)
+bool XGLShader::addComponent(ComponentType c, const QString &source, QStringList &log)
   {
   QGLShader::ShaderTypeBit t = QGLShader::Fragment;
   if(c == Vertex)
@@ -711,13 +714,40 @@ bool XGLShader::addComponent(ComponentType c, const QString &source)
     {
     t = QGLShader::Geometry;
     }
-  bool result = shader.addShaderFromSourceCode( t, source ) GLE;
+
+  QGLShader *component = new QGLShader(t, &shader) GLE;
+
+  bool result = component->compileSourceCode(source) GLE;
+
+  if(result)
+    {
+    shader.addShader(component) GLE;
+    }
+
+  QString logEntry = component->log();
+  if(!logEntry.isEmpty())
+    {
+    log << logEntry;
+    }
+
+  if(!result)
+    {
+    delete component;
+    }
+
   return result;
   }
 
-bool XGLShader::build()
+bool XGLShader::build(QStringList &log)
   {
   bool result = shader.link() GLE;
+
+  QString logEntry = shader.log();
+  if(!logEntry.isEmpty())
+    {
+    log << logEntry;
+    }
+
   return result;
   }
 

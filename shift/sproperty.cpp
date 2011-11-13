@@ -41,7 +41,8 @@ void SProperty::setDependantsDirty()
       }
     }
 
-  if(input() || isComputed() || _flags.hasFlag(SProperty::ParentHasInput))
+  // ?  || isComputed()
+  if(input() || _flags.hasFlag(SProperty::ParentHasInput))
     {
     SPropertyContainer *c = castTo<SPropertyContainer>();
     if(c)
@@ -59,6 +60,18 @@ void SProperty::setDependantsDirty()
   if(_flags.hasFlag(SProperty::ParentHasOutput))
     {
     SProperty *parent = this;
+
+    if(_flags.hasFlag(Dirty))
+      {
+      while(parent->_flags.hasFlag(SProperty::ParentHasOutput)
+            && !parent->_flags.hasFlag(PreGetting))
+        {
+        parent = parent->parent();
+
+        parent->setDirty();
+        }
+      }
+
     while(parent->_flags.hasFlag(SProperty::ParentHasOutput))
       {
       parent = parent->parent();

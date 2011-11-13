@@ -17,8 +17,9 @@
 
 class ShaderPreviewViewport : public SViewport
   {
+  XProperty(QTextEdit *, log, setLog);
 public:
-  ShaderPreviewViewport(SEntity *ent) : SViewport(ent)
+  ShaderPreviewViewport(SEntity *ent) : SViewport(ent), _log(0)
     {
     GCShader *shader = ent->uncheckedCastTo<GCShader>();
 
@@ -56,6 +57,33 @@ public:
     transform->geometry.setPointed(&cube->geometry);
 
     op->source.setPointed(msc);
+    }
+
+  virtual void paintGL()
+    {
+    SViewport::paintGL();
+
+    if(log())
+      {
+      GCShader *shader = scene()->uncheckedCastTo<GCShader>();
+      QStringList newLog = shader->runtimeShader().log();
+      if(newLog.size())
+        {
+        QString oldText = log()->toPlainText();
+
+        QString newText;
+        foreach(const QString &t, newLog)
+          {
+          newText.append(t);
+          newText.append("\n");
+          }
+
+        if(oldText != newText)
+          {
+          log()->setPlainText(newText);
+          }
+        }
+      }
     }
   };
 
@@ -162,5 +190,17 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
 QWidget *SShaderPartEditorInterface::buildCustomPreview(SEntity *e) const
   {
-  return new ShaderPreviewViewport(e);
+  QWidget *base = new QWidget;
+  QVBoxLayout *layout(new QVBoxLayout(base));
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  ShaderPreviewViewport *w(new ShaderPreviewViewport(e));
+  layout->addWidget(w);
+
+  QTextEdit *text(new QTextEdit);
+  layout->addWidget(text);
+
+  w->setLog(text);
+
+  return base;
   }
