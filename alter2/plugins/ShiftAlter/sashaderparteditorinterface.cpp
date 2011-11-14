@@ -22,7 +22,8 @@ class ShaderPreviewViewport : public SViewport
   XROProperty(const GCShader *, shader);
 
 public:
-  ShaderPreviewViewport(const SEntity *s, SEntity *holder) : SViewport(holder), _log(0), _shader(s->children.firstChild<GCShader>())
+  ShaderPreviewViewport(const SEntity *s, SPropertyArray *holder) : SViewport(holder->add<SEntity>()), _log(0),
+      _shader(s->uncheckedCastTo<GCShader>())
     {
     const GCShader *sha = shader();
     xAssert(sha);
@@ -144,7 +145,7 @@ void SShaderPartEditorInterface::typeSubParameter(SPartEditorInterfaceFeedbacker
 
 QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   {
-  GCShader *shader = e->children.firstChild<GCShader>();
+  GCShader *shader = e->uncheckedCastTo<GCShader>();
   xAssert(shader);
 
   QWidget *main(new QWidget);
@@ -193,7 +194,7 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   return main;
   }
 
-QWidget *SShaderPartEditorInterface::buildCustomPreview(const SEntity *e, SEntity *p) const
+QWidget *SShaderPartEditorInterface::buildCustomPreview(const SEntity *e, SPropertyArray *p) const
   {
   QWidget *base = new QWidget;
   QVBoxLayout *layout(new QVBoxLayout(base));

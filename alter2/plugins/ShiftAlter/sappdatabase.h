@@ -10,7 +10,7 @@ class SAppDatabase : public SDatabase
   S_ENTITY(SAppDatabase, SDatabase, 0);
 
 public:
-  SEntity document;
+  SEntity documents;
   SEntity settings;
 
   SAppDatabase();

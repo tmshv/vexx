@@ -15,7 +15,8 @@ SOURCES += splugin.cpp \
     saparteditor.cpp \
     saparteditorinterface.cpp \
     sashaderparteditorinterface.cpp \
-    saviewport.cpp
+    saviewport.cpp \
+    sadocument.cpp
 
 HEADERS += splugin.h \
     saglobal.h \
@@ -23,7 +24,8 @@ HEADERS += splugin.h \
     saparteditor.h \
     saparteditorinterface.h \
     sashaderparteditorinterface.h \
-    saviewport.h
+    saviewport.h \
+    sadocument.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore
 
@@ -34,6 +36,8 @@ FORMS +=
 
 RESOURCES += \
     Resources.qrc
+
+
 
 
 

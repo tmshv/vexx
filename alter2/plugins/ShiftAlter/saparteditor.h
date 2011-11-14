@@ -3,6 +3,7 @@
 
 #include "saglobal.h"
 #include "saparteditorinterface.h"
+#include "sadocument.h"
 #include "sentityweakpointer.h"
 #include "XProperty"
 #include "QWidget"
@@ -12,13 +13,11 @@ class SPropertyContainer;
 
 class QListWidget;
 
-class PartEditorHolder : public SEntity
+class SPartDocument : public SDocument
   {
-  S_PROPERTY(PartEditorHolder, SEntity, 0)
+  S_ENTITY(SPartDocument, SDocument, 0)
 public:
-  PartEditorHolder();
-
-  SEntity previewEntities;
+  SPartDocument();
   };
 
 class SHIFTALTER_EXPORT SPartEditor : public QWidget, public SPartEditorInterfaceFeedbacker
@@ -27,7 +26,8 @@ class SHIFTALTER_EXPORT SPartEditor : public QWidget, public SPartEditorInterfac
 
 XProperties:
   XReadProperty(const SPartEditorInterface *, partInterface, partInterface);
-  XROProperty(SEntityWeakPointer, holder);
+  XROProperty(SEntityTypedWeakPointer<SPartDocument>, document);
+  XROProperty(SEntityWeakPointer, part);
 
 public:
   static SPartEditor *editNewPart(const QString &type, const QString &name, SEntity *parent);
@@ -40,7 +40,7 @@ private slots:
   void save();
 
 private:
-  SPartEditor(const QString &type, PartEditorHolder *holder, SEntity *prop);
+  SPartEditor(const QString &type, SPartDocument *holder, SEntity *prop);
 
   const SPartEditorInterface *findInterface(const QString& t);
 

@@ -37,7 +37,7 @@ int main( int argc, char **argv )
   initiateGraphicsCore(&db->db());
 
 
-  SEntity *objectParent = &db->db().document;
+  SEntity *objectParent = &db->db().documents;
 
   WebView *webData = new WebView(objectParent);
   script->registerScriptGlobal(webData);
@@ -51,10 +51,10 @@ int main( int argc, char **argv )
 
   ui->show();
 
-  SPartEditor* editor = SPartEditor::editNewPart("SEntity", "", &db->db().document);
+  SPartEditor* editor = SPartEditor::editNewPart("SEntity", "", &db->db().documents);
   editor->show();
 
-  SPartEditor* editor2 = SPartEditor::editNewPart("GCShader", "", &db->db().document);
+  SPartEditor* editor2 = SPartEditor::editNewPart("GCShader", "", &db->db().documents);
   editor2->show();
 
   return app.execute();

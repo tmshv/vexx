@@ -11,22 +11,20 @@
 #include "saparteditorinterface.h"
 #include "Serialisation/sjsonio.h"
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(PartEditorHolder)
+S_IMPLEMENT_PROPERTY(SPartDocument)
 
-SPropertyInformation *PartEditorHolder::createTypeInformation()
+SPropertyInformation *SPartDocument::createTypeInformation()
   {
-  SPropertyInformation *info = SPropertyInformation::create<PartEditorHolder>("PartEditorHolder");
-
-  info->add(&PartEditorHolder::previewEntities, "previewEntities");
-
+  SPropertyInformation *info = SPropertyInformation::create<SPartDocument>("SPartDocument");
   return info;
   }
 
-PartEditorHolder::PartEditorHolder()
+SPartDocument::SPartDocument()
   {
   }
 
-SPartEditor::SPartEditor(const QString &type, PartEditorHolder *h, SEntity *prop) : _holder(h),
+
+SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) : _document(h), _part(prop),
     _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {
@@ -47,15 +45,15 @@ SPartEditor::SPartEditor(const QString &type, PartEditorHolder *h, SEntity *prop
   QLayout *entitySection = buildEntitySection();
   mainLayout->addLayout(entitySection);
 
-  QWidget *customEditor = partInterface()->buildCustomEditor(holder());
+  QWidget *customEditor = partInterface()->buildCustomEditor(part());
   if(customEditor)
     {
     mainLayout->addWidget(customEditor);
     }
 
-  SEntity *previewContainer = &holder()->castTo<PartEditorHolder>()->previewEntities;
+  SPropertyArray *previewContainer = &document()->transientData;
 
-  QWidget *customPreview = partInterface()->buildCustomPreview(holder(), previewContainer);
+  QWidget *customPreview = partInterface()->buildCustomPreview(part(), previewContainer);
   if(customPreview)
     {
     mainLayout->addWidget(customPreview);
@@ -68,7 +66,7 @@ QLayout *SPartEditor::buildEntitySection()
 
   _typeParameters = new QWidget;
   layout->addWidget(_typeParameters);
-  rebuildTypeParameters(_typeParameters, holder());
+  rebuildTypeParameters(_typeParameters, part());
 
   if(partInterface()->hasPropertiesSection())
     {
@@ -96,12 +94,12 @@ QLayout *SPartEditor::buildTypeParameters()
 
   QString name;
   QWidget *w;
-  for(xsize i=0, s=partInterface()->numberOfTypeParameters(holder()); i<s; ++i)
+  for(xsize i=0, s=partInterface()->numberOfTypeParameters(part()); i<s; ++i)
     {
     name.clear();
     w = 0;
 
-    partInterface()->typeParameter(this, holder(), i, name, w);
+    partInterface()->typeParameter(this, part(), i, name, w);
     xAssert(!name.isEmpty());
     xAssert(w);
 
@@ -148,7 +146,7 @@ void SPartEditor::rebuildPropertyList(QListWidget *list)
   list->clear();
 
   QStringList l;
-  partInterface()->properties(holder(), l);
+  partInterface()->properties(part(), l);
   foreach(const QString &n, l)
     {
     list->addItem(n);
@@ -167,10 +165,10 @@ void SPartEditor::propertySubParametersChanged(SProperty *)
 
 void SPartEditor::refreshAll(SProperty *newEnt)
   {
-  _holder = newEnt->castTo<SEntity>();
-  xAssert(holder());
+  _part = newEnt->castTo<SEntity>();
+  xAssert(part());
 
-  rebuildTypeParameters(_typeParameters, holder());
+  rebuildTypeParameters(_typeParameters, part());
   rebuildPropertyList(_list);
   selectProperty();
   }
@@ -233,12 +231,12 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
 
     QString name;
     QWidget *w;
-    for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(holder(), prop); i<s; ++i)
+    for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(part(), prop); i<s; ++i)
       {
       name.clear();
       w = 0;
 
-      partInterface()->typeSubParameter(this, holder(), prop, i, name, w);
+      partInterface()->typeSubParameter(this, part(), prop, i, name, w);
       xAssert(!name.isEmpty());
       xAssert(w);
 
@@ -254,7 +252,7 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
   if(info)
     {
-    PartEditorHolder *holder = parent->addChild<PartEditorHolder>(name);
+    SPartDocument *holder = parent->addChild<SPartDocument>(name);
     xAssert(holder);
 
     SEntity *p = holder->addChild(info, name)->castTo<SEntity>();
@@ -268,7 +266,7 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
 void SPartEditor::addProperty()
   {
-  partInterface()->addProperty(holder());
+  partInterface()->addProperty(part());
   rebuildPropertyList(_list);
   }
 
@@ -279,7 +277,7 @@ void SPartEditor::removeProperty()
   foreach(const QListWidgetItem *i, selection)
     {
     QString n = i->text();
-    partInterface()->removeProperty(holder(), n);
+    partInterface()->removeProperty(part(), n);
     }
   rebuildPropertyList(_list);
   selectProperty();
@@ -294,7 +292,7 @@ void SPartEditor::selectProperty()
     xAssert(selection.size() == 1);
     QString name = selection[0]->text();
 
-    void *data = partInterface()->findProperty(holder(), name);
+    void *data = partInterface()->findProperty(part(), name);
 
     rebuildPropertyProperties(_propertyProperties, data);
     }
@@ -314,7 +312,7 @@ void SPartEditor::save()
     SJSONSaver saver;
     saver.setAutoWhitespace(true);
 
-    saver.writeToDevice(&file, &holder()->children, false);
+    saver.writeToDevice(&file, &document()->children, false);
     }
   else
     {
