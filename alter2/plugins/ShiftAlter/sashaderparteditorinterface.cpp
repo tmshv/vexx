@@ -19,10 +19,13 @@
 class ShaderPreviewViewport : public SViewport
   {
   XProperty(QTextEdit *, log, setLog);
+  XROProperty(const GCShader *, shader);
+
 public:
-  ShaderPreviewViewport(SEntity *ent) : SViewport(ent), _log(0)
+  ShaderPreviewViewport(const SEntity *s, SEntity *holder) : SViewport(holder), _log(0), _shader(s->children.firstChild<GCShader>())
     {
-    GCShader *shader = ent->uncheckedCastTo<GCShader>();
+    const GCShader *sha = shader();
+    xAssert(sha);
 
     SEntity *sc = scene();
 
@@ -48,7 +51,7 @@ public:
     GCShadingGroup *group = sc->addChild<GCShadingGroup>("Groups");
     msc->shadingGroups.addPointer(group);
 
-    group->shader.setPointed(shader);
+    group->shader.setPointed(sha);
 
     GCGeometryTransform *transform = sc->addChild<GCGeometryTransform>("Transform");
     group->geometry.addPointer(transform);
@@ -66,8 +69,8 @@ public:
 
     if(log())
       {
-      GCShader *shader = scene()->uncheckedCastTo<GCShader>();
-      QStringList newLog = shader->runtimeShader().log();
+      const GCShader *s = shader()->uncheckedCastTo<GCShader>();
+      QStringList newLog = s->runtimeShader().log();
       if(newLog.size())
         {
         QString oldText = log()->toPlainText();
@@ -141,7 +144,8 @@ void SShaderPartEditorInterface::typeSubParameter(SPartEditorInterfaceFeedbacker
 
 QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   {
-  GCShader *shader = e->uncheckedCastTo<GCShader>();
+  GCShader *shader = e->children.firstChild<GCShader>();
+  xAssert(shader);
 
   QWidget *main(new QWidget);
   QVBoxLayout *layout(new QVBoxLayout(main));
@@ -189,13 +193,13 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   return main;
   }
 
-QWidget *SShaderPartEditorInterface::buildCustomPreview(SEntity *e) const
+QWidget *SShaderPartEditorInterface::buildCustomPreview(const SEntity *e, SEntity *p) const
   {
   QWidget *base = new QWidget;
   QVBoxLayout *layout(new QVBoxLayout(base));
   layout->setContentsMargins(0, 0, 0, 0);
 
-  ShaderPreviewViewport *w(new ShaderPreviewViewport(e));
+  ShaderPreviewViewport *w(new ShaderPreviewViewport(e, p));
   layout->addWidget(w);
 
   QTextEdit *text(new QTextEdit);

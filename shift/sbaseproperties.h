@@ -147,9 +147,15 @@ public:
     {
     const DERIVED *ptr = p->uncheckedCastTo<DERIVED>();
 
-    bool def = ptr->value() == ptr->instanceInformation()->defaultValue();
+    if(SProperty::shouldSavePropertyValue(p))
+      {
+      if(ptr->value() == ptr->instanceInformation()->defaultValue())
+        {
+        return true;
+        }
+      }
 
-    return !def && SProperty::shouldSavePropertyValue(p);
+    return false;
     }
 
 private:

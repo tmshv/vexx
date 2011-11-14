@@ -21,7 +21,7 @@ public:
   virtual void typeSubParameter(SPartEditorInterfaceFeedbacker *, SEntity *, void *prop, xsize i, QString &name, QWidget *&widget) const;
 
   virtual QWidget *buildCustomEditor(SEntity *) const;
-  virtual QWidget *buildCustomPreview(SEntity *) const;
+  virtual QWidget *buildCustomPreview(const SEntity *, SEntity *) const;
   };
 
 #endif // SASHADERPARTEDITORINTERFACE_H

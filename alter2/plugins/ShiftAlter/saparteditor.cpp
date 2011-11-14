@@ -5,27 +5,57 @@
 #include "QLabel"
 #include "QGroupBox"
 #include "QListWidget"
+#include "QMenuBar"
 #include "QPushButton"
+#include "QFileDialog"
 #include "saparteditorinterface.h"
+#include "Serialisation/sjsonio.h"
 
-SPartEditor::SPartEditor(const QString &type, SEntity *prop) : _property(prop),
+S_IMPLEMENT_ABSTRACT_PROPERTY(PartEditorHolder)
+
+SPropertyInformation *PartEditorHolder::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<PartEditorHolder>("PartEditorHolder");
+
+  info->add(&PartEditorHolder::previewEntities, "previewEntities");
+
+  return info;
+  }
+
+PartEditorHolder::PartEditorHolder()
+  {
+  }
+
+SPartEditor::SPartEditor(const QString &type, PartEditorHolder *h, SEntity *prop) : _holder(h),
     _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {
+  QVBoxLayout *menuLayout(new QVBoxLayout(this));
+  menuLayout->setContentsMargins(0, 0, 0, 0);
+  QMenuBar *menu(new QMenuBar);
+  menuLayout->addWidget(menu);
+
+  QMenu *file(menu->addMenu("File"));
+  file->addAction("Save", this, SLOT(save()));
+
+  QWidget *main(new QWidget);
+  menuLayout->addWidget(main);
   _partInterface = findInterface(type);
 
-  QHBoxLayout *mainLayout(new QHBoxLayout(this));
+  QHBoxLayout *mainLayout(new QHBoxLayout(main));
 
   QLayout *entitySection = buildEntitySection();
   mainLayout->addLayout(entitySection);
 
-  QWidget *customEditor = partInterface()->buildCustomEditor(property());
+  QWidget *customEditor = partInterface()->buildCustomEditor(holder());
   if(customEditor)
     {
     mainLayout->addWidget(customEditor);
     }
 
-  QWidget *customPreview = partInterface()->buildCustomPreview(property());
+  SEntity *previewContainer = &holder()->castTo<PartEditorHolder>()->previewEntities;
+
+  QWidget *customPreview = partInterface()->buildCustomPreview(holder(), previewContainer);
   if(customPreview)
     {
     mainLayout->addWidget(customPreview);
@@ -38,7 +68,7 @@ QLayout *SPartEditor::buildEntitySection()
 
   _typeParameters = new QWidget;
   layout->addWidget(_typeParameters);
-  rebuildTypeParameters(_typeParameters, _property);
+  rebuildTypeParameters(_typeParameters, holder());
 
   if(partInterface()->hasPropertiesSection())
     {
@@ -66,12 +96,12 @@ QLayout *SPartEditor::buildTypeParameters()
 
   QString name;
   QWidget *w;
-  for(xsize i=0, s=partInterface()->numberOfTypeParameters(property()); i<s; ++i)
+  for(xsize i=0, s=partInterface()->numberOfTypeParameters(holder()); i<s; ++i)
     {
     name.clear();
     w = 0;
 
-    partInterface()->typeParameter(this, property(), i, name, w);
+    partInterface()->typeParameter(this, holder(), i, name, w);
     xAssert(!name.isEmpty());
     xAssert(w);
 
@@ -118,7 +148,7 @@ void SPartEditor::rebuildPropertyList(QListWidget *list)
   list->clear();
 
   QStringList l;
-  partInterface()->properties(property(), l);
+  partInterface()->properties(holder(), l);
   foreach(const QString &n, l)
     {
     list->addItem(n);
@@ -137,10 +167,10 @@ void SPartEditor::propertySubParametersChanged(SProperty *)
 
 void SPartEditor::refreshAll(SProperty *newEnt)
   {
-  _property = newEnt->castTo<SEntity>();
-  xAssert(_property);
+  _holder = newEnt->castTo<SEntity>();
+  xAssert(holder());
 
-  rebuildTypeParameters(_typeParameters, _property);
+  rebuildTypeParameters(_typeParameters, holder());
   rebuildPropertyList(_list);
   selectProperty();
   }
@@ -203,12 +233,12 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
 
     QString name;
     QWidget *w;
-    for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(property(), prop); i<s; ++i)
+    for(xsize i=0, s=partInterface()->numberOfTypeSubParameters(holder(), prop); i<s; ++i)
       {
       name.clear();
       w = 0;
 
-      partInterface()->typeSubParameter(this, property(), prop, i, name, w);
+      partInterface()->typeSubParameter(this, holder(), prop, i, name, w);
       xAssert(!name.isEmpty());
       xAssert(w);
 
@@ -224,9 +254,13 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
   if(info)
     {
-    SEntity *p = parent->addChild(info, name)->castTo<SEntity>();
+    PartEditorHolder *holder = parent->addChild<PartEditorHolder>(name);
+    xAssert(holder);
 
-    return new SPartEditor(type, p);
+    SEntity *p = holder->addChild(info, name)->castTo<SEntity>();
+    xAssert(p);
+
+    return new SPartEditor(type, holder, p);
     }
 
   return 0;
@@ -234,7 +268,7 @@ SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, 
 
 void SPartEditor::addProperty()
   {
-  partInterface()->addProperty(property());
+  partInterface()->addProperty(holder());
   rebuildPropertyList(_list);
   }
 
@@ -245,7 +279,7 @@ void SPartEditor::removeProperty()
   foreach(const QListWidgetItem *i, selection)
     {
     QString n = i->text();
-    partInterface()->removeProperty(property(), n);
+    partInterface()->removeProperty(holder(), n);
     }
   rebuildPropertyList(_list);
   selectProperty();
@@ -260,12 +294,30 @@ void SPartEditor::selectProperty()
     xAssert(selection.size() == 1);
     QString name = selection[0]->text();
 
-    void *data = partInterface()->findProperty(property(), name);
+    void *data = partInterface()->findProperty(holder(), name);
 
     rebuildPropertyProperties(_propertyProperties, data);
     }
   else
     {
     rebuildPropertyProperties(_propertyProperties, 0);
+    }
+  }
+
+void SPartEditor::save()
+  {
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Json Data (*.json)"));
+
+  QFile file(fileName);
+  if(file.open(QIODevice::WriteOnly))
+    {
+    SJSONSaver saver;
+    saver.setAutoWhitespace(true);
+
+    saver.writeToDevice(&file, &holder()->children, false);
+    }
+  else
+    {
+    qWarning() << "Failed to open file for writing '" << fileName << "'";
     }
   }

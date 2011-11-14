@@ -40,7 +40,7 @@ public:
   virtual void typeSubParameter(SPartEditorInterfaceFeedbacker *, SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const = 0;
 
   virtual QWidget *buildCustomEditor(SEntity *) const = 0;
-  virtual QWidget *buildCustomPreview(SEntity *) const = 0;
+  virtual QWidget *buildCustomPreview(const SEntity *, SEntity *) const = 0;
   };
 
 class PropertyNameEditor : public QLineEdit, public STreeObserver
@@ -125,7 +125,7 @@ public:
   virtual void typeSubParameter(SPartEditorInterfaceFeedbacker *, SEntity *, void *prop, xsize i, QString& name, QWidget *&widget) const;
 
   virtual QWidget *buildCustomEditor(SEntity *) const { return 0; }
-  virtual QWidget *buildCustomPreview(SEntity *) const { return 0; }
+  virtual QWidget *buildCustomPreview(const SEntity *, SEntity *) const { return 0; }
   };
 
 #endif // SAPARTEDITORINTERFACE_H
