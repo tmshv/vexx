@@ -74,6 +74,17 @@ public:
           _triangles == g._triangles;
       }
 
+    bool operator!=(const XGeometry &g) const
+      {
+      return _attr1 != g._attr1 ||
+          _attr2 != g._attr2 ||
+          _attr3 != g._attr3 ||
+          _attr4 != g._attr4 ||
+          _points != g._points ||
+          _lines != g._lines ||
+          _triangles != g._triangles;
+      }
+
 private:
     mutable XAbstractGeometry *_internal;
     mutable XSet <QString> _changedA1;

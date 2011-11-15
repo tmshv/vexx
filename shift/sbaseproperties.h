@@ -149,7 +149,7 @@ public:
 
     if(SProperty::shouldSavePropertyValue(p))
       {
-      if(ptr->value() == ptr->instanceInformation()->defaultValue())
+      if(ptr->value() != ptr->instanceInformation()->defaultValue())
         {
         return true;
         }
@@ -289,79 +289,6 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray(), 113);
 
 #define EnumProperty IntProperty
-
-template <typename Derived> QTextStream & operator <<(QTextStream &str, const Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width = data.cols();
-  xsize height = data.rows();
-  str << width << " " << height << " ";
-  for (xsize i = 0; i < height; ++i)
-    {
-    for(xsize j = 0; j < width; ++j)
-      {
-      str << data(i, j);
-      if((i < height-1) && (j < width-1)) // while not last element
-        {
-        str << " "; // separate each element with space
-        }
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QDataStream & operator <<(QDataStream &str, const Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width = data.cols();
-  xsize height = data.rows();
-  str << (quint64) width << (quint64) height;
-  for (xsize i = 0; i < height; ++i)
-    {
-    for(xsize j = 0; j < width; ++j)
-      {
-      str << data(i, j);
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QTextStream & operator >>(QTextStream &str, Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width;
-  xsize height;
-
-  str >> width >> height; // first element in str is size of str
-  data.resize(width, height);
-
-  for(xsize i = 0; i < height; ++i )
-    {
-    for(xsize j = 0; j < width; j++)
-      {
-      typename Derived::Scalar tVal;
-      str >> tVal;
-      data(i, j) = tVal;
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QDataStream & operator >>(QDataStream &str, Eigen::PlainObjectBase <Derived> &data)
-  {
-  quint64 width;
-  quint64 height;
-
-  str >> width >> height; // first element in str is size of str
-  data.resize(width, height);
-  for(xsize i = 0; i < height; ++i )
-    {
-    for(xsize j = 0; j < width; j++)
-      {
-      typename Derived::Scalar tVal;
-      str >> tVal;
-      data(i, j) = tVal;
-      }
-    }
-  return str;
-  }
 
 // specific pod interface for bool because it is actually a uint8.
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \

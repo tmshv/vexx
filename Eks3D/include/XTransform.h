@@ -30,6 +30,13 @@ template <typename A, int B, int C, int D, typename E, int F, int G, int H>
   return a.matrix() == b.matrix();
   }
 
+
+template <typename A, int B, int C, int D, typename E, int F, int G, int H>
+    bool operator !=(const Eigen::Transform <A, B, C, D> &a, const Eigen::Transform <E, F, G, H> &b)
+  {
+  return a.matrix() != b.matrix();
+  }
+
 typedef XList <XTransform> XTransformList;
 
 #endif // XTRANSFORM_H
