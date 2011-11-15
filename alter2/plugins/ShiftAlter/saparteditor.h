@@ -20,13 +20,12 @@ public:
   SPartDocument();
   };
 
-class SHIFTALTER_EXPORT SPartEditor : public QWidget, public SPartEditorInterfaceFeedbacker
+class SHIFTALTER_EXPORT SPartEditor : public SDocumentEditor, public SPartEditorInterfaceFeedbacker
   {
   Q_OBJECT
 
 XProperties:
   XReadProperty(const SPartEditorInterface *, partInterface, partInterface);
-  XROProperty(SEntityTypedWeakPointer<SPartDocument>, document);
   XROProperty(SEntityWeakPointer, part);
 
 public:
@@ -37,7 +36,6 @@ private slots:
   void addProperty();
   void removeProperty();
   void selectProperty();
-  void save();
 
 private:
   SPartEditor(const QString &type, SPartDocument *holder, SEntity *prop);

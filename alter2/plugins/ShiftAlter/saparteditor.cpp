@@ -7,10 +7,7 @@
 #include "QListWidget"
 #include "QMenuBar"
 #include "QPushButton"
-#include "QFileDialog"
 #include "saparteditorinterface.h"
-#include "Serialisation/sjsonio.h"
-
 S_IMPLEMENT_PROPERTY(SPartDocument)
 
 SPropertyInformation *SPartDocument::createTypeInformation()
@@ -24,7 +21,7 @@ SPartDocument::SPartDocument()
   }
 
 
-SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) : _document(h), _part(prop),
+SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) : SDocumentEditor(h), _part(prop),
     _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {
@@ -34,7 +31,7 @@ SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) :
   menuLayout->addWidget(menu);
 
   QMenu *file(menu->addMenu("File"));
-  file->addAction("Save", this, SLOT(save()));
+  buildFileMenu(file);
 
   QWidget *main(new QWidget);
   menuLayout->addWidget(main);
@@ -299,23 +296,5 @@ void SPartEditor::selectProperty()
   else
     {
     rebuildPropertyProperties(_propertyProperties, 0);
-    }
-  }
-
-void SPartEditor::save()
-  {
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Json Data (*.json)"));
-
-  QFile file(fileName);
-  if(file.open(QIODevice::WriteOnly))
-    {
-    SJSONSaver saver;
-    saver.setAutoWhitespace(true);
-
-    saver.writeToDevice(&file, &document()->children, false);
-    }
-  else
-    {
-    qWarning() << "Failed to open file for writing '" << fileName << "'";
     }
   }
