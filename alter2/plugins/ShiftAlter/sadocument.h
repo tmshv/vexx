@@ -11,7 +11,7 @@ class QMenu;
 
 class SHIFTALTER_EXPORT SDocument : public SEntity
   {
-  S_ENTITY(SDocument, SEntity, 0)
+  S_ABSTRACT_ENTITY(SDocument, SEntity, 0)
 
 public:
   SDocument();
@@ -21,18 +21,20 @@ public:
 
   SProperty fileChangedStub;
 
+  virtual QWidget *createEditor() = 0;
+
   bool hasChanged();
 
   void save(QWidget *parent);
   void saveAs(QWidget *parent, const QString &filename="");
 
 private:
-  static void incrementRevision(const SPropertyInformation *info, SPropertyContainer *c);
+  static void incrementRevision(const SPropertyInstanceInformation *info, SPropertyContainer *c);
   UnsignedIntProperty revision;
   xuint32 _checkpoint;
   };
 
-class SDocumentEditor : public QWidget
+class SHIFTALTER_EXPORT SDocumentEditor : public QWidget
   {
   Q_OBJECT
 

@@ -8,11 +8,15 @@
 #include "QMenuBar"
 #include "QPushButton"
 #include "saparteditorinterface.h"
+
 S_IMPLEMENT_PROPERTY(SPartDocument)
 
 SPropertyInformation *SPartDocument::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SPartDocument>("SPartDocument");
+
+  info->add(&SPartDocument::type, "type");
+
   return info;
   }
 
@@ -20,11 +24,41 @@ SPartDocument::SPartDocument()
   {
   }
 
+QWidget *SPartDocument::createEditor()
+  {
+  return new SPartEditor(this);
+  }
 
-SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) : SDocumentEditor(h), _part(prop),
-    _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
+/*
+
+SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, SEntity *parent)
+  {
+  const SPropertyInformation *info = STypeRegistry::findType(type);
+  xAssert(info);
+
+  if(info)
+    {
+    SPartDocument *holder = parent->addChild<SPartDocument>(name);
+    xAssert(holder);
+
+    SEntity *p = holder->addChild(info, name)->castTo<SEntity>();
+    xAssert(p);
+
+    return new SPartEditor(type, holder, p);
+    }
+
+  return 0;
+  }*/
+
+SPartEditor::SPartEditor(SPartDocument *holder) : SDocumentEditor(holder),
+    _main(0), _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {
+  _part = holder->children.firstChild<SEntity>();
+  xAssert(_part);
+
+  _partInterface = findInterface(partDocument()->type());
+
   QVBoxLayout *menuLayout(new QVBoxLayout(this));
   menuLayout->setContentsMargins(0, 0, 0, 0);
   QMenuBar *menu(new QMenuBar);
@@ -33,28 +67,16 @@ SPartEditor::SPartEditor(const QString &type, SPartDocument *h, SEntity *prop) :
   QMenu *file(menu->addMenu("File"));
   buildFileMenu(file);
 
-  QWidget *main(new QWidget);
-  menuLayout->addWidget(main);
-  _partInterface = findInterface(type);
+  rebuildUI();
+  }
 
-  QHBoxLayout *mainLayout(new QHBoxLayout(main));
-
-  QLayout *entitySection = buildEntitySection();
-  mainLayout->addLayout(entitySection);
-
-  QWidget *customEditor = partInterface()->buildCustomEditor(part());
-  if(customEditor)
+SPartDocument *SPartEditor::partDocument()
+  {
+  if(document().isValid())
     {
-    mainLayout->addWidget(customEditor);
+    return document()->uncheckedCastTo<SPartDocument>();
     }
-
-  SPropertyArray *previewContainer = &document()->transientData;
-
-  QWidget *customPreview = partInterface()->buildCustomPreview(part(), previewContainer);
-  if(customPreview)
-    {
-    mainLayout->addWidget(customPreview);
-    }
+  return 0;
   }
 
 QLayout *SPartEditor::buildEntitySection()
@@ -170,6 +192,37 @@ void SPartEditor::refreshAll(SProperty *newEnt)
   selectProperty();
   }
 
+
+void SPartEditor::rebuildUI()
+  {
+  if(_main)
+    {
+    _main->deleteLater();
+    }
+
+  _main = new QWidget();
+  layout()->addWidget(_main);
+
+  QHBoxLayout *mainLayout(new QHBoxLayout(_main));
+
+  QLayout *entitySection = buildEntitySection();
+  mainLayout->addLayout(entitySection);
+
+  QWidget *customEditor = partInterface()->buildCustomEditor(part());
+  if(customEditor)
+    {
+    mainLayout->addWidget(customEditor);
+    }
+
+  SPropertyArray *previewContainer = &document()->transientData;
+
+  QWidget *customPreview = partInterface()->buildCustomPreview(part(), previewContainer);
+  if(customPreview)
+    {
+    mainLayout->addWidget(customPreview);
+    }
+  }
+
 void SPartEditor::rebuildTypeParameters(QWidget *widget, SEntity *ent)
   {
   // delete old internal
@@ -240,25 +293,6 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
       layout->addRow(name, w);
       }
     }
-  }
-
-SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, SEntity *parent)
-  {
-  const SPropertyInformation *info = STypeRegistry::findType(type);
-  xAssert(info);
-
-  if(info)
-    {
-    SPartDocument *holder = parent->addChild<SPartDocument>(name);
-    xAssert(holder);
-
-    SEntity *p = holder->addChild(info, name)->castTo<SEntity>();
-    xAssert(p);
-
-    return new SPartEditor(type, holder, p);
-    }
-
-  return 0;
   }
 
 void SPartEditor::addProperty()

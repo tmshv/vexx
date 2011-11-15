@@ -3,14 +3,14 @@
 #include "Serialisation/sjsonio.h"
 #include "QMenu"
 
-void SDocument::incrementRevision(const SPropertyInformation *info, SPropertyContainer *c)
+void SDocument::incrementRevision(const SPropertyInstanceInformation *info, SPropertyContainer *c)
   {
   SDocument *doc = c->uncheckedCastTo<SDocument>();
 
   doc->revision = doc->revision() + 1;
   }
 
-S_IMPLEMENT_PROPERTY(SDocument)
+S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument)
 
 SPropertyInformation *SDocument::createTypeInformation()
   {
@@ -23,7 +23,7 @@ SPropertyInformation *SDocument::createTypeInformation()
   UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
   rev->setCompute(incrementRevision);
 
-  SProperty::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub);
+  SProperty::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
   fCS->setAffects(rev);
 
   return info;

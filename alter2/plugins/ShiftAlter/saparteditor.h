@@ -13,11 +13,16 @@ class SPropertyContainer;
 
 class QListWidget;
 
-class SPartDocument : public SDocument
+class SHIFTALTER_EXPORT SPartDocument : public SDocument
   {
   S_ENTITY(SPartDocument, SDocument, 0)
+
 public:
   SPartDocument();
+
+  StringProperty type;
+
+  virtual QWidget *createEditor();
   };
 
 class SHIFTALTER_EXPORT SPartEditor : public SDocumentEditor, public SPartEditorInterfaceFeedbacker
@@ -29,8 +34,7 @@ XProperties:
   XROProperty(SEntityWeakPointer, part);
 
 public:
-  static SPartEditor *editNewPart(const QString &type, const QString &name, SEntity *parent);
-  //static SPartEditor *editPart(const QString &type, SProperty *parent);
+  SPartEditor(SPartDocument *holder);
 
 private slots:
   void addProperty();
@@ -38,15 +42,15 @@ private slots:
   void selectProperty();
 
 private:
-  SPartEditor(const QString &type, SPartDocument *holder, SEntity *prop);
-
   const SPartEditorInterface *findInterface(const QString& t);
 
   QLayout *buildEntitySection();
   QLayout *buildTypeParameters();
   QLayout *buildProperties();
 
+  SPartDocument *partDocument();
 
+  void rebuildUI();
   void rebuildTypeParameters(QWidget *widget, SEntity *ent);
   void rebuildPropertyList(QListWidget *);
   void rebuildPropertyProperties(QWidget *widget, void *property);
@@ -56,6 +60,7 @@ private:
   void refreshAll(SProperty *);
 
   QListWidget *_list;
+  QWidget *_main;
   QWidget *_propertyProperties;
   QWidget *_propertyPropertiesInternal;
   QWidget *_typeParameters;

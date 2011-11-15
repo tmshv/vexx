@@ -51,11 +51,13 @@ int main( int argc, char **argv )
 
   ui->show();
 
-  SPartEditor* editor = SPartEditor::editNewPart("SEntity", "", &db->db().documents);
-  editor->show();
+  SPartDocument *part = db->db().addDocument<SPartDocument>();
+  part->type = "GCShader";
+  part->createEditor()->show();
 
-  SPartEditor* editor2 = SPartEditor::editNewPart("GCShader", "", &db->db().documents);
-  editor2->show();
+  SPartDocument *part2 = db->db().addDocument<SPartDocument>();
+  part2->type = "SEntity";
+  part2->createEditor()->show();
 
   return app.execute();
   }
