@@ -19,8 +19,17 @@ public:
   StringProperty filename;
   SPropertyArray transientData;
 
+  SProperty fileChangedStub;
+
+  bool hasChanged();
+
   void save(QWidget *parent);
   void saveAs(QWidget *parent, const QString &filename="");
+
+private:
+  static void incrementRevision(const SPropertyInformation *info, SPropertyContainer *c);
+  UnsignedIntProperty revision;
+  xuint32 _checkpoint;
   };
 
 class SDocumentEditor : public QWidget
