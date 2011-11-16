@@ -16,6 +16,10 @@ SEntity::SEntity()
   {
   }
 
+SEntity::~SEntity()
+  {
+  }
+
 void SEntity::reparent(SEntity *ent)
   {
   xAssert(parent() && parentEntity());

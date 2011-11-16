@@ -3,7 +3,7 @@
 #include "Serialisation/sjsonio.h"
 #include "QMenu"
 
-void SDocument::incrementRevision(const SPropertyInstanceInformation *info, SPropertyContainer *c)
+void SDocument::incrementRevision(const SPropertyInstanceInformation *, SPropertyContainer *c)
   {
   SDocument *doc = c->uncheckedCastTo<SDocument>();
 
@@ -33,39 +33,39 @@ SDocument::SDocument()
   {
   }
 
-void SDocument::saveAs(QWidget *parent, const QString &inFile)
-  {
-  QString fileStr = inFile;
-  if(fileStr.isEmpty())
-    {
-    fileStr = QFileDialog::getSaveFileName(parent, QObject::tr("Save File"), "", QObject::tr("Json Data (*.json)"));
-    }
-
-  filename = fileStr;
-  if(!filename().isEmpty())
-    {
-    save(parent);
-    }
-  else
-    {
-    qWarning() << "Failed to save file empty file path passed.";
-    }
-  }
-
 bool SDocument::hasChanged()
   {
   return _checkpoint == revision();
   }
 
-void SDocument::save(QWidget *parent)
+void SDocument::newFile()
   {
-  if(filename().isEmpty())
+  filename = "";
+  _checkpoint = 0;
+  }
+
+void SDocument::loadFile(const QString &f)
+  {
+  QFile file(f);
+  if(file.open(QIODevice::ReadOnly))
     {
-    saveAs(parent);
+    SJSONLoader loader;
+
+    loader.readFromDevice(&file, &children);
+    }
+  else
+    {
+    qWarning() << "Failed to open file for reading '" << filename() << "'";
     return;
     }
 
-  QFile file(filename());
+  filename = f;
+  _checkpoint = revision();
+  }
+
+void SDocument::saveFile(const QString &f)
+  {
+  QFile file(f);
   if(file.open(QIODevice::WriteOnly))
     {
     SJSONSaver saver;
@@ -76,8 +76,10 @@ void SDocument::save(QWidget *parent)
   else
     {
     qWarning() << "Failed to open file for writing '" << filename() << "'";
+    return;
     }
 
+  filename = f;
   _checkpoint = revision();
   }
 
@@ -88,18 +90,69 @@ SDocumentEditor::SDocumentEditor(SDocument *doc) : _document(doc)
 
 void SDocumentEditor::buildFileMenu(QMenu *menu)
   {
-  menu->addAction("Save", this, SLOT(save()));
-  menu->addAction("Save As", this, SLOT(saveAs()));
+  menu->addAction("New", this, SLOT(newFile()));
+  menu->addAction("Open", this, SLOT(loadFile()));
+  QAction *save = menu->addAction("Save", this, SLOT(saveFile()));
+  menu->addAction("Save As", this, SLOT(saveAsFile()));
 
+  save->setObjectName("Save");
 
+  connect(menu, SIGNAL(aboutToShow()), this, SLOT(enableMenu()));
   }
 
-void SDocumentEditor::saveAs()
+void SDocumentEditor::reloadUI()
   {
-  document()->saveAs(this);
   }
 
-void SDocumentEditor::save()
+void SDocumentEditor::enableMenu()
   {
-  document()->save(this);
+  QObject *s = sender();
+  if(!s)
+    {
+    return;
+    }
+
+  QMenu *m = qobject_cast<QMenu*>(s);
+  if(!m)
+    {
+    return;
+    }
+
+  bool canSave = document()->hasChanged();
+
+
+  QAction *save = m->findChild<QAction*>("Save");
+  if(save)
+    {
+    save->setEnabled(canSave);
+    }
   }
+
+void SDocumentEditor::newFile()
+  {
+  document()->newFile();
+
+  reloadUI();
+  }
+
+void SDocumentEditor::loadFile()
+  {
+  QString fileStr = QFileDialog::getOpenFileName(this, QObject::tr("Open File"), "", QObject::tr("Json Data (*.json)"));
+
+  document()->loadFile(fileStr);
+
+  reloadUI();
+  }
+
+void SDocumentEditor::saveFile()
+  {
+  document()->saveFile(document()->filename());
+  }
+
+void SDocumentEditor::saveAsFile()
+  {
+  QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Save File"), "", QObject::tr("Json Data (*.json)"));
+
+  document()->saveFile(fileStr);
+  }
+

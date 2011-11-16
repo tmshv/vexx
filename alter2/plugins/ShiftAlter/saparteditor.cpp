@@ -24,40 +24,31 @@ SPartDocument::SPartDocument()
   {
   }
 
+void SPartDocument::newFile()
+  {
+  SDocument::newFile();
+
+  const SPropertyInformation *info = STypeRegistry::findType(type());
+  xAssert(info);
+
+  if(info)
+    {
+    addChild(info, "");
+    }
+  }
+
 QWidget *SPartDocument::createEditor()
   {
   return new SPartEditor(this);
   }
 
-/*
-
-SPartEditor *SPartEditor::editNewPart(const QString &type, const QString &name, SEntity *parent)
-  {
-  const SPropertyInformation *info = STypeRegistry::findType(type);
-  xAssert(info);
-
-  if(info)
-    {
-    SPartDocument *holder = parent->addChild<SPartDocument>(name);
-    xAssert(holder);
-
-    SEntity *p = holder->addChild(info, name)->castTo<SEntity>();
-    xAssert(p);
-
-    return new SPartEditor(type, holder, p);
-    }
-
-  return 0;
-  }*/
-
 SPartEditor::SPartEditor(SPartDocument *holder) : SDocumentEditor(holder),
     _main(0), _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {
-  _part = holder->children.firstChild<SEntity>();
-  xAssert(_part);
-
+  xAssert(!partDocument()->type().isEmpty());
   _partInterface = findInterface(partDocument()->type());
+  xAssert(_partInterface)
 
   QVBoxLayout *menuLayout(new QVBoxLayout(this));
   menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -67,7 +58,7 @@ SPartEditor::SPartEditor(SPartDocument *holder) : SDocumentEditor(holder),
   QMenu *file(menu->addMenu("File"));
   buildFileMenu(file);
 
-  rebuildUI();
+  reloadUI();
   }
 
 SPartDocument *SPartEditor::partDocument()
@@ -104,6 +95,11 @@ const SPartEditorInterface *SPartEditor::findInterface(const QString& t)
   xAssert(factory);
 
   return static_cast<const SPartEditorInterface*>(factory);
+  }
+
+SEntity *SPartEditor::part()
+  {
+  return _part;
   }
 
 QLayout *SPartEditor::buildTypeParameters()
@@ -193,12 +189,15 @@ void SPartEditor::refreshAll(SProperty *newEnt)
   }
 
 
-void SPartEditor::rebuildUI()
+void SPartEditor::reloadUI()
   {
   if(_main)
     {
     _main->deleteLater();
     }
+
+  _part = document()->children.firstChild<SEntity>();
+  xAssert(_part);
 
   _main = new QWidget();
   layout()->addWidget(_main);

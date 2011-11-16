@@ -40,7 +40,7 @@ const char *glErrorString( int err )
     }
 
 #if 1
-# define GLE ; { int _GL = glGetError(); if( _GL ) { qDebug() << __FILE__ << __LINE__ <<  glErrorString( _GL ); } }
+# define GLE ; { int _GL = glGetError(); xAssertMessage(!_GL, "GL Error", _GL, glErrorString( _GL )); }
 # define GLE_QUIET ; glGetError()
 #else
 # define GLE ; { int _GL = glGetError(); if( _GL ) { qCritical() << __FILE__ << __LINE__<< glErrorString( _GL ); } }
@@ -122,6 +122,8 @@ private:
 // SHADER VARIABLE
 //----------------------------------------------------------------------------------------------------------------------
 
+#define GL_SHADER_VARIABLE_PARENT static_cast<XGLShader*>(abstractShader())
+
 class XGLShaderVariable : public XAbstractShaderVariable
     {
 public:
@@ -163,6 +165,16 @@ public:
     void setValueArray( const XVector<QMatrix4x4> &values );
 
     virtual void rebind();
+
+    inline void bindShader()
+      {
+      XRenderer *r = GL_SHADER_VARIABLE_PARENT->renderer();
+      if(static_cast<XGLRenderer*>(r)->_currentShader != GL_SHADER_VARIABLE_PARENT)
+        {
+        static_cast<XGLRenderer*>(r)->_currentShader = GL_SHADER_VARIABLE_PARENT;
+        GL_SHADER_VARIABLE_PARENT->shader.bind();
+        }
+      }
 
 private:
     void clear();
@@ -771,7 +783,6 @@ void XGLShader::destroyVariable( XAbstractShaderVariable *var )
 // SHADER VARIABLE
 //----------------------------------------------------------------------------------------------------------------------
 
-#define GL_SHADER_VARIABLE_PARENT static_cast<XGLShader*>(abstractShader())
 
 XGLShaderVariable::XGLShaderVariable( XAbstractShader *s, QString name )
     : XAbstractShaderVariable( s ), _name( name ), _texture( 0 )
@@ -787,99 +798,112 @@ XGLShaderVariable::~XGLShaderVariable( )
 void XGLShaderVariable::setValue( int value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( xReal value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( unsigned int value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XColour &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector2D &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector3D &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const XVector4D &value )
   {
   clear();
-  XRenderer *r = GL_SHADER_VARIABLE_PARENT->renderer();
-  static_cast<XGLRenderer*>(r)->_currentShader = 0;
-  GL_SHADER_VARIABLE_PARENT->shader.bind();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, toQt(value) ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix2x2 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix2x3 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix2x4 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix3x2 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix3x3 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix3x4 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix4x2 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix4x3 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 
 void XGLShaderVariable::setValue( const QMatrix4x4 &value )
   {
   clear();
+  bindShader();
   GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, value ) GLE;
   }
 

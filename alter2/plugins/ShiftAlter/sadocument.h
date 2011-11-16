@@ -25,8 +25,9 @@ public:
 
   bool hasChanged();
 
-  void save(QWidget *parent);
-  void saveAs(QWidget *parent, const QString &filename="");
+  virtual void newFile();
+  virtual void loadFile(const QString &filename);
+  virtual void saveFile(const QString &filename="");
 
 private:
   static void incrementRevision(const SPropertyInstanceInformation *info, SPropertyContainer *c);
@@ -46,9 +47,15 @@ public:
 
   void buildFileMenu(QMenu *menu);
 
+  virtual void reloadUI();
+
 private slots:
-  void save();
-  void saveAs();
+  void newFile();
+  void loadFile();
+  void saveFile();
+  void saveAsFile();
+
+  void enableMenu();
   };
 
 #endif // SDOCUMENT_H

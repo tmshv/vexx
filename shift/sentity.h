@@ -22,6 +22,7 @@ class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
 
 public:
   SEntity();
+  virtual ~SEntity();
 
   SPropertyArray children;
 

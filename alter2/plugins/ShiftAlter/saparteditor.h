@@ -22,6 +22,7 @@ public:
 
   StringProperty type;
 
+  virtual void newFile();
   virtual QWidget *createEditor();
   };
 
@@ -31,7 +32,6 @@ class SHIFTALTER_EXPORT SPartEditor : public SDocumentEditor, public SPartEditor
 
 XProperties:
   XReadProperty(const SPartEditorInterface *, partInterface, partInterface);
-  XROProperty(SEntityWeakPointer, part);
 
 public:
   SPartEditor(SPartDocument *holder);
@@ -44,13 +44,15 @@ private slots:
 private:
   const SPartEditorInterface *findInterface(const QString& t);
 
+  SEntity *part();
+
   QLayout *buildEntitySection();
   QLayout *buildTypeParameters();
   QLayout *buildProperties();
 
   SPartDocument *partDocument();
 
-  void rebuildUI();
+  void reloadUI();
   void rebuildTypeParameters(QWidget *widget, SEntity *ent);
   void rebuildPropertyList(QListWidget *);
   void rebuildPropertyProperties(QWidget *widget, void *property);
@@ -65,6 +67,8 @@ private:
   QWidget *_propertyPropertiesInternal;
   QWidget *_typeParameters;
   QWidget *_typeParametersInternal;
+
+  SEntityWeakPointer _part;
 
   XPropertyMember(const SPartEditorInterface *, partInterface);
   };
