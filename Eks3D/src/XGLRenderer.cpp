@@ -104,6 +104,7 @@ class XGLShader : public XAbstractShader
     {
 public:
     XGLShader( XGLRenderer * );
+    ~XGLShader();
 
 private:
     virtual bool addComponent(ComponentType c, const QString &source, QStringList &log);
@@ -713,6 +714,16 @@ const XAbstractTexture *XGLFramebuffer::depth() const
 
 XGLShader::XGLShader( XGLRenderer *renderer ) : XAbstractShader( renderer ), shader( renderer->context() )
   {
+  }
+
+XGLShader::~XGLShader()
+  {
+  XGLRenderer *r = static_cast<XGLRenderer*>(renderer());
+  if(r && r->_currentShader == this)
+    {
+    r->_currentShader = 0;
+    shader.release();
+    }
   }
 
 bool XGLShader::addComponent(ComponentType c, const QString &source, QStringList &log)
