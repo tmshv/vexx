@@ -88,6 +88,10 @@ public:
           log()->setPlainText(newText);
           }
         }
+      else
+        {
+        log()->setPlainText("");
+        }
       }
     }
   };
@@ -161,15 +165,20 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
   layout->addWidget(new QLabel("<b>Vertex</b>"));
 
-  GCShaderComponent *vert = ent->addProperty<GCVertexShaderComponent>();
+  GCShaderComponent *vert = ent->firstChild<GCVertexShaderComponent>();
+  if(!vert)
     {
-    QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
-    if(shaderResource.open(QIODevice::ReadOnly))
+    vert = ent->addProperty<GCVertexShaderComponent>();
       {
-      vert->source = shaderResource.readAll();
+        QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
+        if(shaderResource.open(QIODevice::ReadOnly))
+        {
+          vert->source = shaderResource.readAll();
+        }
       }
+    shader->components.addPointer(vert);
     }
-  shader->components.addPointer(vert);
+
 
 
   QWidget *vertex(new SPropertyDefaultUI::LongString(&vert->source, false, 0));
@@ -177,15 +186,19 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
   layout->addWidget(new QLabel("<b>Fragment</b>"));
 
-  GCShaderComponent *frag = ent->addProperty<GCFragmentShaderComponent>();
+  GCShaderComponent *frag = ent->firstChild<GCFragmentShaderComponent>();
+  if(!frag)
     {
-    QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
-    if(shaderResource.open(QIODevice::ReadOnly))
+    frag = ent->addProperty<GCFragmentShaderComponent>();
       {
-      frag->source = shaderResource.readAll();
+        QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
+        if(shaderResource.open(QIODevice::ReadOnly))
+        {
+          frag->source = shaderResource.readAll();
+        }
       }
+    shader->components.addPointer(frag);
     }
-  shader->components.addPointer(frag);
 
 
   QWidget *fragment(new SPropertyDefaultUI::LongString(&frag->source, false, 0));

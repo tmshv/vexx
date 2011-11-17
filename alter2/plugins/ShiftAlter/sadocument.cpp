@@ -40,8 +40,14 @@ bool SDocument::hasChanged()
 
 void SDocument::newFile()
   {
+  SBlock b(database());
   filename = "";
+
+  children.clear();
+  transientData.clear();
+
   _checkpoint = 0;
+  revision = 0;
   }
 
 void SDocument::loadFile(const QString &f)
@@ -50,6 +56,11 @@ void SDocument::loadFile(const QString &f)
   if(file.open(QIODevice::ReadOnly))
     {
     SJSONLoader loader;
+
+    SBlock b(database());
+
+    children.clear();
+    transientData.clear();
 
     loader.readFromDevice(&file, &children);
     }
