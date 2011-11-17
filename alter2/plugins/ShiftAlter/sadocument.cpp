@@ -33,20 +33,26 @@ SDocument::SDocument()
   {
   }
 
+void SDocument::setCheckpoint()
+  {
+  _checkpoint = revision();
+  }
+
 bool SDocument::hasChanged()
   {
-  return _checkpoint == revision();
+  xAssert(revision() >= _checkpoint);
+  return _checkpoint != revision();
   }
 
 void SDocument::newFile()
   {
   SBlock b(database());
-  filename = "";
 
   fileChangedStub.clear();
   children.clear();
   transientData.clear();
 
+  filename = "";
   _checkpoint = 0;
   revision = 0;
   }
@@ -54,46 +60,43 @@ void SDocument::newFile()
 void SDocument::loadFile(const QString &f)
   {
   QFile file(f);
-  if(file.open(QIODevice::ReadOnly))
-    {
-    SJSONLoader loader;
-
-    SBlock b(database());
-
-    fileChangedStub.clear();
-    children.clear();
-    transientData.clear();
-
-    loader.readFromDevice(&file, &children);
-    }
-  else
+  if(!file.open(QIODevice::ReadOnly))
     {
     qWarning() << "Failed to open file for reading '" << filename() << "'";
     return;
     }
 
+  SJSONLoader loader;
+
+  SBlock b(database());
+
+  fileChangedStub.clear();
+  children.clear();
+  transientData.clear();
+
+  loader.readFromDevice(&file, &children);
+
   filename = f;
-  _checkpoint = revision();
+  _checkpoint = 0;
+  revision = 0;
   }
 
 void SDocument::saveFile(const QString &f)
   {
   QFile file(f);
-  if(file.open(QIODevice::WriteOnly))
-    {
-    SJSONSaver saver;
-    saver.setAutoWhitespace(true);
-
-    saver.writeToDevice(&file, &children, false);
-    }
-  else
+  if(!file.open(QIODevice::WriteOnly))
     {
     qWarning() << "Failed to open file for writing '" << filename() << "'";
     return;
     }
 
+   SJSONSaver saver;
+   saver.setAutoWhitespace(true);
+
+   saver.writeToDevice(&file, &children, false);
+
   filename = f;
-  _checkpoint = revision();
+  setCheckpoint();
   }
 
 

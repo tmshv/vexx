@@ -23,6 +23,7 @@ public:
   StringProperty type;
 
   virtual void newFile();
+  virtual void loadFile(const QString &filename);
   virtual QWidget *createEditor();
   };
 

@@ -38,6 +38,18 @@ void SPartDocument::newFile()
     }
   }
 
+void SPartDocument::loadFile(const QString &filename)
+  {
+  SDocument::loadFile(filename);
+
+  SProperty *prop = firstChild();
+  xAssert(prop);
+  if(prop)
+    {
+    fileChangedStub.addPointer(prop);
+    }
+  }
+
 QWidget *SPartDocument::createEditor()
   {
   return new SPartEditor(this);

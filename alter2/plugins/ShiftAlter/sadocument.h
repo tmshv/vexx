@@ -24,6 +24,7 @@ public:
 
   virtual QWidget *createEditor() = 0;
 
+  void setCheckpoint();
   bool hasChanged();
 
   virtual void newFile();
