@@ -6,6 +6,7 @@
 #include "QWidget"
 #include "sentityweakpointer.h"
 #include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 
 class QMenu;
 
@@ -19,7 +20,7 @@ public:
   StringProperty filename;
   SPropertyArray transientData;
 
-  SProperty fileChangedStub;
+  PointerArray fileChangedStub;
 
   virtual QWidget *createEditor() = 0;
 

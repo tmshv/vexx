@@ -78,6 +78,8 @@ public:
 
     return c;
     }
+
+  using SPropertyContainer::clear;
   };
 
 S_IMPLEMENT_TEMPLATED_PROPERTY(template <typename T>, STypedPropertyArray<T>)

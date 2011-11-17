@@ -227,7 +227,12 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
       }
     else
       {
-      return prop->name();
+      QString name = prop->name();
+      if(name == "")
+        {
+        name = QString("_UNNAMED_%1").arg(prop->index());
+        }
+      return name;
       }
     }
   return QVariant();

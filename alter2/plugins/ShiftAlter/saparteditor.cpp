@@ -33,7 +33,8 @@ void SPartDocument::newFile()
 
   if(info)
     {
-    addChild(info, "");
+    SProperty *prop = addChild(info, "");
+    fileChangedStub.addPointer(prop);
     }
   }
 

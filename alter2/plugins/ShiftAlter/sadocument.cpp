@@ -23,7 +23,7 @@ SPropertyInformation *SDocument::createTypeInformation()
   UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
   rev->setCompute(incrementRevision);
 
-  SProperty::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
+  PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
   fCS->setAffects(rev);
 
   return info;
@@ -43,6 +43,7 @@ void SDocument::newFile()
   SBlock b(database());
   filename = "";
 
+  fileChangedStub.clear();
   children.clear();
   transientData.clear();
 
@@ -59,6 +60,7 @@ void SDocument::loadFile(const QString &f)
 
     SBlock b(database());
 
+    fileChangedStub.clear();
     children.clear();
     transientData.clear();
 
