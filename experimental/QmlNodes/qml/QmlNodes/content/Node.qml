@@ -3,11 +3,11 @@ import QtQuick 1.0
 Item {
   property string title: "Node"
 
-  function move(dx, dy) {
+  function move(dx, dy)
+    {
     node.x += dx
     node.y += dy
-    print("Move " + dx + " " + dy)
-  }
+    }
   Rectangle {
     id: node
     x: 100
@@ -54,11 +54,9 @@ Item {
           onReleased: dragging = false
           onMousePositionChanged: {
             var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
-            print("#" + gc.x + " " + gc.y)
             parent.parent.parent.parent.move(gc.x - lastX, gc.y - lastY)
             lastX = gc.x
             lastY = gc.y
-            print(lastX + " " + lastY)
           }
         }
       }

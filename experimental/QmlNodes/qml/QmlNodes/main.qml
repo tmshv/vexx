@@ -14,53 +14,14 @@ Rectangle
     ListElement
       {
       name: "Bill Smith"
-      properties: ListModel
-        {
-        ListElement
-          {
-          name: "Bill Smith"
-          properties: "555 3264"
-          }
-        ListElement
-          {
-          name: "John Brown"
-          number: "555 8426"
-          }
-        }
       }
     ListElement
       {
       name: "Bill Smith"
-      properties: ListModel
-        {
-        ListElement
-          {
-          name: "Bill Smith"
-          properties: "555 3264"
-          }
-        ListElement
-          {
-          name: "John Brown"
-          number: "555 8426"
-          }
-        }
       }
     ListElement
       {
       name: "Bill Smith"
-      properties: ListModel
-        {
-        ListElement
-          {
-          name: "Bill Smith"
-          properties: "555 3264"
-          }
-        ListElement
-          {
-          name: "John Brown"
-          number: "555 8426"
-          }
-        }
       }
     }
 
