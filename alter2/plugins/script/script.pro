@@ -7,7 +7,7 @@ TEMPLATE = lib
 
 include("../../../EksCore/GeneralOptions.pri")
 
-QT += script scripttools
+QT += script scripttools declarative
 INCLUDEPATH += ../../ \
     $$ROOT/EksCore \
     $$ROOT/shift \
@@ -47,7 +47,10 @@ RESOURCES += \
 
 OTHER_FILES += \
     JSPartExporter.js \
-    CoreStartup.js
+    CoreStartup.js \
+    StartupUI.js \
+    NodeCanvas.qml \
+    NodeCanvasContents/Node.qml
 
 
 

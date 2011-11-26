@@ -13,11 +13,14 @@
 #include "QDebug"
 #include "QMainWindow"
 #include "scio.h"
+#include "QDeclarativeView"
+#include "QDeclarativeContext"
+#include "sdatabasemodel.h"
 
 
 ALTER_PLUGIN(ScPlugin);
 
-ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0)
+ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0), _model(0)
   {
   setObjectName("script");
   }
@@ -27,7 +30,9 @@ ScPlugin::~ScPlugin()
   delete _io;
   delete _engine;
   delete _types;
+  delete _model;
 
+  _model = 0;
   _engine = 0;
   _surface = 0;
   }
@@ -65,6 +70,8 @@ void ScPlugin::pluginAdded(const QString &type)
       APlugin<UIPlugin> ui(this, "ui");
       xAssert(ui.isValid());
       ui->addSurface(_surface);
+      
+      includePath(":/Sc/StartupUI.js");
       }
     }
   }
@@ -73,7 +80,12 @@ void ScPlugin::pluginRemoved(const QString &type)
   {
   engine()->globalObject().setProperty(type, QScriptValue());
 
-  if(type == "ui")
+  if(type == "db")
+    {
+    delete _model;
+    _model = 0;
+    }
+  else if(type == "ui")
     {
     delete _surface;
     _surface = 0;
@@ -127,6 +139,10 @@ void ScPlugin::load()
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");
 #endif
 
+
+  xAssert(!_model);
+  _model = new SDatabaseModel(&db->db(), &db->db(), SDatabaseModel::NoOptions);
+  
   include("CoreStartup.js");
   }
 
@@ -286,6 +302,34 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
     qDebug() << "Script Returned: " << ret.toString() << endl;
     }
   return QScriptValue();
+  }
+
+void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url)
+  {
+  APlugin<UIPlugin> ui(this, "ui");
+  if(ui.isValid())
+    {
+    class DeclarativeSurface : public UISurface, QDeclarativeView
+      {
+    public:
+      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, QAbstractItemModel *model) : UISurface(name, this, type)
+        {
+        setSource(s);
+        setResizeMode(QDeclarativeView::SizeRootObjectToView);
+
+        if(model)
+          {
+          QDeclarativeContext *ctx = rootContext();
+          ctx->setContextProperty("db", model);
+          }
+        }
+      };
+
+    UISurface::SurfaceType t = (type == "Properties") ? UISurface::PropertiesPage : UISurface::Dock;
+
+    DeclarativeSurface *s = new DeclarativeSurface(name, url, t, _model);
+    ui->addSurface(s);
+    }
   }
 
 bool ScPlugin::execute(const QString &code)

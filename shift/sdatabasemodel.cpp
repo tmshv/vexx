@@ -69,6 +69,10 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
     {
     _root->addTreeObserver(this);
     }
+
+  QHash<int, QByteArray> roles;
+  roles[Qt::DisplayRole] = "name";
+  setRoleNames(roles);
   }
 
 SDatabaseModel::~SDatabaseModel()

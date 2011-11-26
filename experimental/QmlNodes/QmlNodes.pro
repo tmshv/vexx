@@ -1,31 +1,49 @@
-# Add more folders to ship with the application, here
-folder_01.source = qml/QmlNodes
-folder_01.target = qml
-DEPLOYMENTFOLDERS = folder_01
+# -------------------------------------------------
+# Project created by QtCreator 2010-04-23T12:10:30
+# -------------------------------------------------
 
-# Additional import path used to resolve QML modules in Creator's code model
-QML_IMPORT_PATH =
+TARGET = QmlNodes
+TEMPLATE = app
 
-symbian:TARGET.UID3 = 0xE89DED64
+include("../../EksCore/GeneralOptions.pri")
 
-# Smart Installer package's UID
-# This UID is from the protected range and therefore the package will
-# fail to install if self-signed. By default qmake uses the unprotected
-# range value if unprotected UID is defined for the application and
-# 0x2002CCCF value if protected UID is given to the application
-#symbian:DEPLOYMENT.installer_header = 0x2002CCCF
+QT += opengl \
+    xml \
+    network \
+    webkit
 
-# Allow network access on Symbian
-symbian:TARGET.CAPABILITY += NetworkServices
+SOURCES += main.cpp \
+    qmlapplicationviewer/qmlapplicationviewer.cpp
 
-# If your application uses the Qt Mobility libraries, uncomment the following
-# lines and add the respective components to the MOBILITY variable.
-# CONFIG += mobility
-# MOBILITY +=
+LIBS += -lEksCore \
+    -lEks3D \
+    -lshift \
+    -lalter \
+    -lscript \
+    -lShiftAlter \
+    -lShiftGraphicsCore \
+    -lUI
 
-# The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+INCLUDEPATH += ../include \
+    $$ROOT/EksCore \
+    $$ROOT/Eks3D/include \
+    $$ROOT/Shift \
+    $$ROOT/Shift/GraphicsCore \
+    $$ROOT/Alter2 \
+    $$ROOT/EksCore \
+    $$ROOT/Alter2/Plugins/UI \
+    $$ROOT/Alter2/Plugins/Script \
+    $$ROOT/Alter2/Plugins/ShiftAlter
 
-# Please do not modify the following two lines. Required for deployment.
-include(qmlapplicationviewer/qmlapplicationviewer.pri)
-qtcAddDeployment()
+OTHER_FILES += \
+    qml/QmlNodes/main.qml \
+    qml/QmlNodes/content/Node.qml \
+    qmlapplicationviewer/qmlapplicationviewer.pri
+
+HEADERS += \
+    qmlapplicationviewer/qmlapplicationviewer.h
+
+
+
+
+

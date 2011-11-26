@@ -37,6 +37,7 @@ class SHIFT_EXPORT SDatabaseModel : public QAbstractItemModel, STreeObserver
 public:
   enum OptionsFlags
     {
+    NoOptions = 0,
     EntitiesOnly = 1,
     //DisableUpdates = 2,
     ShowValues = 4
