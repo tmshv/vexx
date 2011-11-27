@@ -105,8 +105,8 @@ void UIPlugin::load()
 
     if(core()->isDebugUIEnabled())
       {
-      //addSurface(new UIDatabaseDebugSurface(&db));
-      //addSurface(new UIGraphDebugSurface(&db));
+      addSurface(new UIDatabaseDebugSurface(&db));
+      addSurface(new UIGraphDebugSurface(&db));
       }
 
 #ifdef X_PROFILING_ENABLED

@@ -283,11 +283,29 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       {
       _root = 0;
       }
+
+
     emit layoutAboutToBeChanged();
 
     if(tC->after() == 0)
       {
       changePersistentIndex(createIndex(tC->index(), 0, (void*)tC->property()), QModelIndex());
+
+      const SPropertyContainer *parent = tC->before();
+      xAssert(parent);
+
+      xsize i = tC->index();
+      emit beginRemoveRows(createIndex(parent->index(), 0, (void *)parent), i, i+1);
+      emit endRemoveRows();
+      }
+    else
+      {
+      const SPropertyContainer *parent = tC->after();
+      xAssert(parent);
+
+      xsize i = tC->index();
+      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+2);
+      emit endInsertRows();
       }
 
     emit layoutChanged();

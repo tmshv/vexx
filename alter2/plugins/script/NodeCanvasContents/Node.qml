@@ -81,7 +81,7 @@ Item {
 
                 ListView {
                     width: parent.width
-                    height: contentItem.childrenRect.height + 1
+                    height: contentItem.childrenRect.height + 100
                     interactive: false
                     model: chilrenVisualModel
                 }
