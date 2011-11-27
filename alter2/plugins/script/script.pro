@@ -50,7 +50,9 @@ OTHER_FILES += \
     CoreStartup.js \
     StartupUI.js \
     NodeCanvas.qml \
-    NodeCanvasContents/Node.qml
+    NodeCanvasContents/Node.qml \
+    NodeCanvasContents/Property.qml
+
 
 
 

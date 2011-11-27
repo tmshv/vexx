@@ -16,6 +16,7 @@
 #include "QDeclarativeView"
 #include "QDeclarativeContext"
 #include "sdatabasemodel.h"
+#include "QGraphicsObject"
 
 
 ALTER_PLUGIN(ScPlugin);
@@ -304,7 +305,7 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
   return QScriptValue();
   }
 
-void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url)
+void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
   {
   APlugin<UIPlugin> ui(this, "ui");
   if(ui.isValid())
@@ -312,22 +313,28 @@ void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QSt
     class DeclarativeSurface : public UISurface, QDeclarativeView
       {
     public:
-      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, QAbstractItemModel *model) : UISurface(name, this, type)
+      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, QAbstractItemModel *model, const QVariantMap &data) : UISurface(name, this, type)
         {
-        setSource(s);
-        setResizeMode(QDeclarativeView::SizeRootObjectToView);
-
         if(model)
           {
           QDeclarativeContext *ctx = rootContext();
           ctx->setContextProperty("db", model);
           }
+
+        setSource(s);
+        setResizeMode(QDeclarativeView::SizeRootObjectToView);
+
+        /*QGraphicsObject *root = rootObject();
+        foreach(const QString &s, data.keys())
+          {
+          root->setProperty(s.toLatin1().constData(), data.value(s));
+          }*/
         }
       };
 
     UISurface::SurfaceType t = (type == "Properties") ? UISurface::PropertiesPage : UISurface::Dock;
 
-    DeclarativeSurface *s = new DeclarativeSurface(name, url, t, _model);
+    DeclarativeSurface *s = new DeclarativeSurface(name, url, t, _model, qmlData);
     ui->addSurface(s);
     }
   }

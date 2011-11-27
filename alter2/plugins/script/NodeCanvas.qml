@@ -5,11 +5,15 @@ Rectangle
   {
   id: nodecanvas
   color: "#343434"
-
-  function setRootToChildIndex(childIndex)
+  function childIndex(index)
     {
-    var index = visualModel.modelIndex(childIndex);
-    visualModel.rootIndex = index;
+    return visualModel.modelIndex(index);
+    }
+
+  function setRootToChildIndex(index)
+    {
+    var modelInd = childIndex(index);
+    visualModel.rootIndex = modelInd;
     }
 
   function setRootToParent()
@@ -25,6 +29,8 @@ Rectangle
     delegate: Node
       {
       title: name
+      x: ((Math.random() * nodecanvas.width) - 100)
+      y: ((Math.random() * nodecanvas.height) - 50)
       }
     }
 
