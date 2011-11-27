@@ -24,6 +24,7 @@ Item {
 
       onEntered: parent.color = "blue"
       onExited: parent.color = "red"
+      onDoubleClicked: nodecanvas.setRootToChildIndex(index)
     }
 
     Column {
@@ -51,6 +52,7 @@ Item {
             lastX = gc.x
             lastY = gc.y
           }
+          onDoubleClicked: nodecanvas.setRootToChildIndex(index)
           onReleased: dragging = false
           onMousePositionChanged: {
             var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)

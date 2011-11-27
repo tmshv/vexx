@@ -6,6 +6,18 @@ Rectangle
   id: nodecanvas
   color: "#343434"
 
+  function setRootToChildIndex(childIndex)
+    {
+    var index = visualModel.modelIndex(childIndex);
+    visualModel.rootIndex = index;
+    }
+
+  function setRootToParent()
+    {
+    var index = visualModel.parentModelIndex();
+    visualModel.rootIndex = index;
+    }
+
   VisualDataModel
     {
     id: visualModel
@@ -15,6 +27,11 @@ Rectangle
       title: name
       }
     }
+
+  MouseArea {
+    anchors.fill: parent
+    onDoubleClicked: nodecanvas.setRootToParent()
+  }
 
   ListView
     {
