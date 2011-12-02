@@ -227,7 +227,7 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
         {
         return interface->asVariant(prop);
         }
-      return QVariant();;
+      return QVariant();
       }
     else
       {
