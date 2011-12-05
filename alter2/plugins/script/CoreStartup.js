@@ -41,3 +41,5 @@ db.addType({
   });
 
   */
+
+script.include("JSPartExporter.js")

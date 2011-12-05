@@ -114,6 +114,43 @@ void SDocumentEditor::buildFileMenu(QMenu *menu)
   save->setObjectName("Save");
 
   connect(menu, SIGNAL(aboutToShow()), this, SLOT(enableMenu()));
+
+  menu->addSeparator();
+
+  QMenu *exportMenu = menu->addMenu("Export");
+
+  QMap <QString, const void *> exporters;
+
+  xAssert(_document.isValid());
+  const SPropertyInformation *info = _document->typeInformation();
+  const SExportableInterface *ifc = 0;
+  while(info)
+    {
+    const SExportableInterface *newIfc = static_cast<const SExportableInterface*>(info->interfaceFactory(SExportableInterface::InterfaceTypeId));
+    if(newIfc != ifc)
+      {
+      ifc = newIfc;
+      if(ifc)
+        {
+        foreach(const XConstSharedPointer<SExportableInterface::Exporter> &e, ifc->exporters())
+          {
+          QString name = e->exporterName();
+          xAssert(!exporters.contains(name));
+          exporters.insert(name, e.constPtr());
+          }
+        }
+      }
+
+    info = info->parentTypeInformation();
+    }
+
+  foreach(const QString &n, exporters.keys())
+    {
+    QAction *a = exportMenu->addAction(n, this, SLOT(exportFile()));
+
+    const void *v = exporters[n];
+    a->setData((quint64)v);
+    }
   }
 
 void SDocumentEditor::reloadUI()
@@ -163,6 +200,43 @@ void SDocumentEditor::loadFile()
 void SDocumentEditor::saveFile()
   {
   document()->saveFile(document()->filename());
+  }
+
+void SDocumentEditor::exportFile()
+  {
+  QAction *sen = qobject_cast<QAction*>(sender());
+  xAssert(sen);
+
+  const void *data = (const void *)sen->data().value<quint64>();
+  xAssert(data);
+
+  const SPropertyInformation *info = _document->typeInformation();
+  const SExportableInterface *ifc = 0;
+  while(info)
+    {
+    const SExportableInterface *newIfc = static_cast<const SExportableInterface*>(info->interfaceFactory(SExportableInterface::InterfaceTypeId));
+    if(newIfc != ifc)
+      {
+      ifc = newIfc;
+      if(ifc)
+        {
+        foreach(const XConstSharedPointer<SExportableInterface::Exporter> &e, ifc->exporters())
+          {
+          if(data == e.constPtr())
+            {
+            QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Export File"), "", e->exporterFileType());
+
+
+            e->exportFile(fileStr, _document);
+
+            return;
+            }
+          }
+        }
+      }
+
+    info = info->parentTypeInformation();
+    }
   }
 
 void SDocumentEditor::saveAsFile()

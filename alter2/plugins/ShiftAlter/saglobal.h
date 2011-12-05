@@ -11,5 +11,5 @@
 #endif
 
 S_DEFINE_INTERFACE_TYPE(SPartEditorInterface, 300)
-
+S_DEFINE_INTERFACE_TYPE(SExportableInterface, 301)
 #endif // SAGLOBAL_H

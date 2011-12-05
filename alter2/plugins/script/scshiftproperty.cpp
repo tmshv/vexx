@@ -3,6 +3,7 @@
 #include "scembeddedtypes.h"
 #include "sdatabase.h"
 #include "sbaseproperties.h"
+#include "sadocument.h"
 
 ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
@@ -12,6 +13,9 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
+
+  addMemberFunction("registerExporter", registerExporter);
+
   initiateGlobalValue<ScShiftProperty>("SProperty");
   }
 
@@ -178,5 +182,68 @@ QScriptValue ScShiftProperty::setValue(QScriptContext *ctx, QScriptEngine *)
       }
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::registerExporter(QScriptContext *ctx, QScriptEngine *)
+  {
+  QScriptValue caller = ctx->thisObject();
+  QString str = caller.property("typeName").toString();
+
+  const SPropertyInformation *info = STypeRegistry::findType(str);
+  if(!info)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Cannot find type " + str + " to add exporter.");
+    }
+
+  if(ctx->argumentCount() != 1)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect first argument to SProperty.registerExporter(...), expected object");
+    }
+
+  QScriptValue exp = ctx->argument(0);
+
+  class ScriptExporter : public SExportableInterface::Exporter
+    {
+  public:
+    ScriptExporter(QScriptValue v) : _v(v)
+      {
+      }
+
+    virtual bool exportFile(const QString &file, SProperty *prop) const
+      {
+      QScriptValue exFn(_v.property("exportFile"));
+
+      if(!exFn.isFunction())
+        {
+        return false;
+        }
+
+      QScriptValueList l;
+      l << file;
+      l << ScEmbeddedTypes::packValue(prop);
+
+      QScriptValue r = exFn.call(_v, l);
+
+      return r.toBool();
+      }
+
+    virtual QString exporterName() const
+      {
+      return _v.property("name").toString();
+      }
+
+    virtual QString exporterFileType() const
+      {
+      return _v.property("fileType").toString();
+      }
+
+  private:
+    QScriptValue _v;
+    };
+
+  SExportableInterface::Exporter *exporter = new ScriptExporter(exp);
+  SExportableInterface::addExporter(info, exporter);
+
   return QScriptValue();
   }

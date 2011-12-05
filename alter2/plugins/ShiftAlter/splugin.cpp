@@ -10,6 +10,7 @@
 #include "Serialisation/sjsonio.h"
 #include "styperegistry.h"
 #include "saparteditorinterface.h"
+#include "saparteditor.h"
 #include "sashaderparteditorinterface.h"
 
 ALTER_PLUGIN(SPlugin);
@@ -34,6 +35,8 @@ void SPlugin::load()
   {
   STypeRegistry::initiate();
   STypeRegistry::addType(SAppDatabase::staticTypeInformation());
+  STypeRegistry::addType(SDocument::staticTypeInformation());
+  STypeRegistry::addType(SPartDocument::staticTypeInformation());
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
   XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope

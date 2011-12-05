@@ -16,6 +16,8 @@ public:
   static QScriptValue name(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue value(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue setValue(QScriptContext *ctx, QScriptEngine *);
+
+  static QScriptValue registerExporter(QScriptContext *ctx, QScriptEngine *);
   };
 
 Q_DECLARE_METATYPE(SProperty*)

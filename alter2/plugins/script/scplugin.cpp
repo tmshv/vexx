@@ -52,27 +52,7 @@ void ScPlugin::initDebugger()
 
 void ScPlugin::pluginAdded(const QString &type)
   {
-  if(type == "db")
-    {
-    APlugin<SPlugin> db(this, "db");
-    xAssert(db.isValid());
-
-    _types = new ScEmbeddedTypes(_engine);
-
-    registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
-
-    QScriptValue dbObject = engine()->globalObject().property("db");
-    foreach(const SPropertyInformation *t, STypeRegistry::types())
-      {
-      QScriptValue type = dbObject.property(t->typeName());
-      if(type.isNull())
-        {
-        type = _engine->newObject();
-        type.setProperty("typeName", t->typeName());
-        }
-      }
-    }
-  else
+  if(type != "db")
     {
     QObject *plug = core()->plugin(type);
     xAssert(plug);
@@ -125,7 +105,29 @@ void ScPlugin::load()
 
   registerScriptGlobal(this);
 
-  includePath(":/Sc/CoreUtils.js");
+  APlugin<SPlugin> db(this, "db");
+  xAssert(db.isValid());
+
+  _types = new ScEmbeddedTypes(_engine);
+
+  registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
+
+  QScriptValue dbObject = engine()->globalObject().property("db");
+  foreach(const SPropertyInformation *t, STypeRegistry::types())
+    {
+    QScriptValue type = dbObject.property(t->typeName());
+    if(type.isNull())
+      {
+      type = _engine->newObject();
+      type.setProperty("typeName", t->typeName());
+      }
+    }
+
+#ifdef X_DEBUG
+  core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");
+#endif
+
+  include("CoreStartup.js");
   }
 
 void ScPlugin::enableDebugging(bool enable)
