@@ -10,6 +10,8 @@ public:
   ScShiftProperty(QScriptEngine *engine);
   ~ScShiftProperty();
 
+  static QScriptValue typeInformation(QScriptContext *ctx, QScriptEngine *);
+
   static QScriptValue input(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue outputs(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue firstOutput(QScriptContext *ctx, QScriptEngine *);

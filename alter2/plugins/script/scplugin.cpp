@@ -271,6 +271,23 @@ QScriptEngine *ScPlugin::engine()
   return _engine;
   }
 
+QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args)
+  {
+  QScriptEngine *e = fn.engine();
+  QScriptValue ret = fn.call(th, args);
+
+  if(e->hasUncaughtException())
+    {
+    qWarning() << "Error in script at line " << e->uncaughtExceptionLineNumber() << ": " << endl << ret.toString() << endl;
+    return QScriptValue();
+    }
+  else if(!ret.isUndefined())
+    {
+    qDebug() << "Script Returned: " << ret.toString() << endl;
+    }
+  return QScriptValue();
+  }
+
 bool ScPlugin::execute(const QString &code)
   {
   ScProfileFunction

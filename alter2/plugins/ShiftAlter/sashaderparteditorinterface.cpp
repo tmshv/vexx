@@ -156,19 +156,12 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   QVBoxLayout *layout(new QVBoxLayout(main));
   layout->setContentsMargins(0, 0, 0, 0);
 
-  SEntity *ent = e->children.findChild<SEntity>("ShaderContents");
-  if(!ent)
-    {
-    ent = e->addChild<SEntity>("ShaderContents");
-    }
-
-
   layout->addWidget(new QLabel("<b>Vertex</b>"));
 
-  GCShaderComponent *vert = ent->firstChild<GCVertexShaderComponent>();
+  GCShaderComponent *vert = e->firstChild<GCVertexShaderComponent>();
   if(!vert)
     {
-    vert = ent->addProperty<GCVertexShaderComponent>();
+    vert = e->addProperty<GCVertexShaderComponent>();
       {
         QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
         if(shaderResource.open(QIODevice::ReadOnly))
@@ -186,10 +179,10 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
   layout->addWidget(new QLabel("<b>Fragment</b>"));
 
-  GCShaderComponent *frag = ent->firstChild<GCFragmentShaderComponent>();
+  GCShaderComponent *frag = e->firstChild<GCFragmentShaderComponent>();
   if(!frag)
     {
-    frag = ent->addProperty<GCFragmentShaderComponent>();
+    frag = e->addProperty<GCFragmentShaderComponent>();
       {
         QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
         if(shaderResource.open(QIODevice::ReadOnly))

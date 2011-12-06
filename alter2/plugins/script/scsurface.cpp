@@ -141,7 +141,10 @@ void ScSurface::threadSafeLog(const QString &message)
 
 void ScSurface::appendToLog(const QString &message)
   {
-  _log->insertHtml(message + "<br>");
+  QString htmlMessage = message + "\n";
+  htmlMessage.replace('\n', "<br>\n");
+
+  _log->insertHtml(htmlMessage);
 
   // scroll to bottom
   QScrollBar *sb = _log->verticalScrollBar();

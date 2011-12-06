@@ -208,6 +208,38 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
     l.beginAttribute("dynamic");
     writeValue(l, dyn ? 1 : 0);
     l.endAttribute("dynamic");
+
+    const SPropertyInstanceInformation *instInfo = p->instanceInformation();
+    xsize *affects = instInfo->affects();
+    if(affects)
+      {
+      xAssert(p->parent());
+      QString affectsString;
+
+      const SPropertyInformation *contInfo = p->parent()->typeInformation();
+      while(affects != 0)
+        {
+        const SPropertyInstanceInformation *affectsInst = contInfo->child(*affects);
+
+        xAssert(!affectsInst->dynamic());
+        if(!affectsInst->dynamic())
+          {
+          QString fixedName = affectsInst->name();
+          affectsString.append(fixedName.replace(',', "\\,"));
+
+          if(affects[1] != 0)
+            {
+            affectsString.append(",");
+            }
+          }
+
+        ++affects;
+        }
+
+      l.beginAttribute("affects");
+      writeValue(l, affectsString);
+      l.endAttribute("affects");
+      }
     }
 
   if(p->input())
@@ -233,6 +265,70 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   xuint32 dynamic=false;
   readValue(l, dynamic);
   l.endAttribute("dynamic");
+
+  l.beginAttribute("affects");
+  QString affectsString;
+  readValue(l, affectsString);
+  l.endAttribute("affects");
+  xsize *affects = 0;
+  if(!affectsString.isEmpty())
+    {
+    xsize numAffects = 0;
+    bool escapeNext = false;
+    for(int i=0, s=affectsString.size(); i<s; ++i)
+      {
+      xAssert(!escapeNext || affectsString[i] == ',');
+      if(affectsString[i] == ',' && !escapeNext)
+        {
+        numAffects++;
+        }
+
+      if(affectsString[i] == '\'')
+        {
+        escapeNext = true;
+        }
+      else
+        {
+        escapeNext = false;
+        }
+      }
+
+    affects = new xsize[numAffects];
+    const SPropertyInformation *parentType = parent->typeInformation();
+
+    int num = 0;
+    int lastPos = 0;
+    xsize affectsCount = 0;
+    escapeNext = false;
+    for(int i=0, s=affectsString.size(); i<s; ++i)
+      {
+      xAssert(!escapeNext || affectsString[i] == ',');
+      if(affectsString[i] == ',' && !escapeNext)
+        {
+        QString affectsName = affectsString.mid(lastPos, num);
+
+        const SPropertyInstanceInformation *inst = parentType->childFromName(affectsName);
+        xAssert(inst);
+
+        affects[affectsCount++] = inst->location();
+
+        num = 0;
+        lastPos = i+1;
+        }
+
+      if(affectsString[i] == '\'')
+        {
+        escapeNext = true;
+        }
+      else
+        {
+        escapeNext = false;
+        }
+      num++;
+      }
+
+    xAssert(affectsCount == numAffects);
+    }
 
   l.beginAttribute("version");
   xuint32 version=0;

@@ -4,9 +4,11 @@
 #include "sdatabase.h"
 #include "sbaseproperties.h"
 #include "sadocument.h"
+#include "scplugin.h"
 
 ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
+  addMemberProperty("typeInformation", typeInformation, QScriptValue::PropertyGetter);
   addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("outputs", outputs, QScriptValue::PropertyGetter);
   addMemberProperty("firstOutput", firstOutput, QScriptValue::PropertyGetter);
@@ -80,6 +82,27 @@ QScriptValue ScShiftProperty::outputs(QScriptContext *ctx, QScriptEngine *eng)
       ++index;
       }
     return ret;
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.outputs(...);");
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::typeInformation(QScriptContext *ctx, QScriptEngine *eng)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    const SPropertyInformation *info = (*prop)->typeInformation();
+    QScriptValue value = eng->globalObject().property(info->typeName());
+
+    if(!value.isObject())
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Could not find global object " + info->typeName() + " to SProperty.typeInformation(...);");
+      return QScriptValue();
+      }
+
+    return value;
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.outputs(...);");
   return QScriptValue();
@@ -223,7 +246,7 @@ QScriptValue ScShiftProperty::registerExporter(QScriptContext *ctx, QScriptEngin
       l << file;
       l << ScEmbeddedTypes::packValue(prop);
 
-      QScriptValue r = exFn.call(_v, l);
+      QScriptValue r = ScPlugin::call(exFn, _v, l);
 
       return r.toBool();
       }

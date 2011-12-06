@@ -108,6 +108,30 @@ SPropertyInstanceInformation *SPropertyInformation::childFromIndex(xsize index)
   return _children[index];
   }
 
+const SPropertyInstanceInformation *SPropertyInformation::childFromName(const QString &in) const
+  {
+  foreach(SPropertyInstanceInformation *i, _children)
+    {
+    if(i->name() == in)
+      {
+      return i;
+      }
+    }
+  return 0;
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::childFromName(const QString &in)
+  {
+  foreach(SPropertyInstanceInformation *i, _children)
+    {
+    if(i->name() == in)
+      {
+      return i;
+      }
+    }
+  return 0;
+  }
+
 SPropertyInformation::DataKey g_maxKey = 0;
 SPropertyInformation::DataKey SPropertyInformation::newDataKey()
   {

@@ -1,5 +1,6 @@
 #include "scio.h"
 #include "QIODevice"
+#include "QScriptValue"
 
 ScFile::ScFile(const QString& file) : QFile(file)
   {
@@ -28,6 +29,12 @@ void ScFile::close()
   QFile::close();
   }
 
+void ScFile::write(const QScriptValue &val)
+  {
+  QString str = val.toString();
+
+  QFile::write(str.toUtf8());
+  }
 
 ScIO::ScIO()
   {

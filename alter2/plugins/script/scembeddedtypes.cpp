@@ -63,6 +63,7 @@ void ScEmbeddedTypes::typeAdded(const SPropertyInformation *p)
       if(parent.isObject())
         {
         v.setPrototype(parent);
+        v.setProperty("parentTypeInformation", parent);
         }
       }
 

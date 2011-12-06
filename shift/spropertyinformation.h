@@ -193,6 +193,9 @@ public:
   SPropertyInstanceInformation *child(xsize location);
   const SPropertyInstanceInformation *child(xsize location) const;
 
+  SPropertyInstanceInformation *childFromName(const QString &);
+  const SPropertyInstanceInformation *childFromName(const QString &) const;
+
   // access child instance information
   SPropertyInstanceInformation *childFromIndex(xsize index);
   const SPropertyInstanceInformation *childFromIndex(xsize index) const;
