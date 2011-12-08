@@ -10,7 +10,7 @@ var jsFileExporter = {
             return false;
             }
 
-        var part = entity.children.firstChild();
+        var part = entity.children[0];
 
         var propertyArray = []; /*
             [

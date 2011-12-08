@@ -86,6 +86,9 @@ public:
   xsize size() const;
   xsize containedProperties() const { return _containedProperties; }
 
+  SProperty *at(xsize i);
+  const SProperty *at(xsize i) const;
+
   bool contains(SProperty *) const;
 
   static void assignProperty(const SProperty *, SProperty *);
@@ -103,9 +106,6 @@ protected:
   // move a property from this to newParent
   void moveProperty(SPropertyContainer *newParent, SProperty *property);
   void removeProperty(SProperty *);
-
-  SProperty *at(xsize i);
-  const SProperty *at(xsize i) const;
 
   void clear();
 

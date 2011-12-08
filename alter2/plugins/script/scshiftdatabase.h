@@ -2,12 +2,12 @@
 #define SCSHIFTDATABASE_H
 
 #include "scglobal.h"
-#include "scshiftentity.h"
+#include "scshiftpropertycontainer.h"
 
 class SPropertyInstanceInformation;
 class SPropertyContainer;
 
-class ScShiftDatabase : public ScWrappedClass<SProperty *>
+class ScShiftDatabase : public ScShiftPropertyContainerBase
   {
 public:
   ScShiftDatabase(QScriptEngine *engine);

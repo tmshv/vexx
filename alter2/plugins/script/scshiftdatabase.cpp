@@ -6,7 +6,7 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
+ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftPropertyContainerBase(eng)
   {
   addMemberFunction("addType", addType);
   addMemberFunction("load", load);
@@ -18,7 +18,7 @@ ScShiftDatabase::~ScShiftDatabase()
   {
   }
 
-QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
+QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *)
   {
   enum
     {
