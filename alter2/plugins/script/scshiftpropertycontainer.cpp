@@ -52,11 +52,7 @@ QScriptValue ScShiftPropertyContainerBase::property(const QScriptValue &object, 
   if(id != (uint)-1)
     {
     SProperty *c = prop->at(id);
-
-    if(c)
-      {
-      return ScEmbeddedTypes::packValue(c);
-      }
+    return ScEmbeddedTypes::packValue(c);
     }
   else
     {

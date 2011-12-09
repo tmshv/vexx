@@ -144,6 +144,7 @@ void ScSurface::appendToLog(const QString &message)
   QString htmlMessage = message + "\n";
   htmlMessage.replace('\n', "<br>\n");
 
+  _log->moveCursor(QTextCursor::End);
   _log->insertHtml(htmlMessage);
 
   // scroll to bottom

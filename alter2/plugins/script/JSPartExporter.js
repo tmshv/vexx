@@ -12,7 +12,22 @@ var jsFileExporter = {
 
         var part = entity.children[0];
 
-        var propertyArray = []; /*
+        var propertyArray = [];
+        var subProps = part.children;
+        for(var i=0, s=subProps.length; i<s; ++i)
+          {
+          var subProp = subProps[i];
+          print("#" + subProp);
+          print("#" + subProp.name);
+          /*var obj =
+            {
+            name: subProp.name,
+            type: subProp.typeInformation.typeName
+            };*/
+          propertyArray.push(obj);
+          }
+
+         /*
             [
                 {
                     name: "AttrName",

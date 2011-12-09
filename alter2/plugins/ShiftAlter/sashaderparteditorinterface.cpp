@@ -161,7 +161,7 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   GCShaderComponent *vert = e->firstChild<GCVertexShaderComponent>();
   if(!vert)
     {
-    vert = e->addProperty<GCVertexShaderComponent>();
+    vert = e->addChild<GCVertexShaderComponent>("Vert");
       {
         QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
         if(shaderResource.open(QIODevice::ReadOnly))
@@ -182,7 +182,7 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
   GCShaderComponent *frag = e->firstChild<GCFragmentShaderComponent>();
   if(!frag)
     {
-    frag = e->addProperty<GCFragmentShaderComponent>();
+    frag = e->addChild<GCFragmentShaderComponent>("Frag");
       {
         QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
         if(shaderResource.open(QIODevice::ReadOnly))
