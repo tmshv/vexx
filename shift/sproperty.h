@@ -53,11 +53,7 @@ class SDatabase;
   return info;}
 
 #define S_IMPLEMENT_PROPERTY(myName) \
-  const SPropertyInformation *myName::staticTypeInformation() { \
-  static const SPropertyInformation *info = 0; \
-  if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
-  return info;}
+  const SPropertyInformation *myName::staticTypeInformation() { return SPropertyInformation::findStaticTypeInformation<myName>(#myName); }
 
 #define S_IMPLEMENT_INLINE_PROPERTY(myName) \
   inline const SPropertyInformation *myName::staticTypeInformation() { \

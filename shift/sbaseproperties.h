@@ -13,6 +13,22 @@
 #include "sinterface.h"
 #include "QByteArray"
 
+namespace
+{
+QTextStream &operator<<(QTextStream &s, xuint8 v)
+  {
+  return s << (xuint32)v;
+  }
+
+QTextStream &operator>>(QTextStream &s, xuint8 &v)
+  {
+  xuint32 t;
+  s >> t;
+  v = (xuint8)t;
+  return s;
+  }
+}
+
 template <typename T>
 class SPODInterface
   {
@@ -24,6 +40,7 @@ class SPropertyVariantInterface : public SStaticInterfaceBase
 
 public:
   SPropertyVariantInterface(bool d) : SStaticInterfaceBase(d) { }
+  virtual QString asString(const SProperty *) const = 0;
   virtual QVariant asVariant(const SProperty *) const = 0;
   virtual void setVariant(SProperty *, const QVariant &) const = 0;
   };
@@ -32,6 +49,15 @@ template <typename PROP, typename POD> class PODPropertyVariantInterface : publi
   {
 public:
   PODPropertyVariantInterface() : SPropertyVariantInterface(true) { }
+  virtual QString asString(const SProperty *p) const
+    {
+    QString d;
+      {
+      QTextStream s(&d);
+      s << p->uncheckedCastTo<PROP>()->value();
+      }
+    return d;
+    }
   virtual QVariant asVariant(const SProperty *p) const
     {
     return QVariant::fromValue<POD>(p->uncheckedCastTo<PROP>()->value());
@@ -256,22 +282,6 @@ template <> class SPODInterface <type> { public: typedef name Type; \
     info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); \
     return info; } \
   name::name() { }
-
-namespace
-{
-QTextStream &operator<<(QTextStream &s, xuint8 v)
-  {
-  return s << (xuint32)v;
-  }
-
-QTextStream &operator>>(QTextStream &s, xuint8 &v)
-  {
-  xuint32 t;
-  s >> t;
-  v = (xuint8)t;
-  return s;
-  }
-}
 
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0, 101);

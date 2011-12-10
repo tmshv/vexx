@@ -12,7 +12,10 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("outputs", outputs, QScriptValue::PropertyGetter);
   addMemberProperty("firstOutput", firstOutput, QScriptValue::PropertyGetter);
+  addMemberProperty("affects", affects, QScriptValue::PropertyGetter);
+  addMemberProperty("dynamic", dynamic, QScriptValue::PropertyGetter);
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
+  addMemberProperty("valueString", valueString, QScriptValue::PropertyGetter);
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
 
@@ -120,6 +123,50 @@ QScriptValue ScShiftProperty::firstOutput(QScriptContext *ctx, QScriptEngine *)
   return QScriptValue();
   }
 
+QScriptValue ScShiftProperty::affects(QScriptContext *ctx, QScriptEngine *e)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    const SPropertyInstanceInformation *info = (*prop)->instanceInformation();
+    xsize *affects = info->affects();
+    if(affects && affects[0] != 0)
+      {
+      QScriptValue ret = e->newArray();
+      xsize i = 0;
+      const SPropertyInformation *parentInfo = (*prop)->parent()->typeInformation();
+      while(*affects)
+        {
+        const SPropertyInstanceInformation *affected = parentInfo->child(*affects);
+        QString affectedName = affected->name();
+
+        ret.setProperty(i++, affectedName);
+        affects++;
+        }
+
+      return ret;
+      }
+
+    return QScriptValue();
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.firstOutput(...);");
+  return QScriptValue();
+  }
+
+
+QScriptValue ScShiftProperty::dynamic(QScriptContext *ctx, QScriptEngine *e)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    return (*prop)->isDynamic();
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.firstOutput(...);");
+  return QScriptValue();
+  }
+
 QScriptValue toScriptValue(QScriptEngine *e, const QVariant &v)
   {
   if(v.isNull() || !v.isValid())
@@ -161,6 +208,34 @@ QScriptValue ScShiftProperty::value(QScriptContext *ctx, QScriptEngine *e)
     if(varInt)
       {
       return toScriptValue(e, varInt->asVariant(prop));
+      }
+    else
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Unable to retrieve value from property.");
+      }
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::valueString(QScriptContext *ctx, QScriptEngine *e)
+  {
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  if(propPtr && *propPtr)
+    {
+    SProperty *prop = *propPtr;
+    if(prop->inheritsFromType<SPropertyContainer>())
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Can't pack the value for type " + prop->typeInformation()->typeName() + " in SProperty.value(...);");
+      return QScriptValue();
+      }
+
+    SPropertyVariantInterface *varInt = prop->interface<SPropertyVariantInterface>();
+
+    if(varInt)
+      {
+      return toScriptValue(e, varInt->asString(prop));
       }
     else
       {

@@ -8,8 +8,6 @@ SPropertyInformation *GCShaderComponent::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCShaderComponent>("GCShaderComponent");
 
-  info->add(&GCShaderComponent::source, "source");
-
   return info;
   }
 
@@ -63,7 +61,7 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, SPrope
           {
           xAssertFail();
           }
-        lock.data()->addComponent(t, cmp->source());
+        lock.data()->addComponent(t, cmp->value());
         }
       }
 

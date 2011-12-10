@@ -671,7 +671,7 @@ QString SProperty::path() const
   SProfileFunction
   if(parent() == 0)
     {
-    return SDatabase::pathSeparator() + name();
+    return QString();
     }
   return parent()->path() + SDatabase::pathSeparator() + name();
   }

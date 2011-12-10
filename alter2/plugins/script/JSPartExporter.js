@@ -12,42 +12,41 @@ var jsFileExporter = {
 
         var part = entity.children[0];
 
+        function exportChildren(arr, parent, onlyDynamic, doAffects)
+            {
+            for(var i=0, s=parent.length; i<s; ++i)
+                {
+                var subProp = parent[i];
+                if(onlyDynamic && !subProp.dynamic)
+                    {
+                    continue;
+                    }
+
+                var obj =
+                    {
+                    name: subProp.name,
+                    type: subProp.typeInformation.typeName
+                    };
+
+                var val = subProp.valueString;
+                if(val != "")
+                    {
+                    obj["defaultValue"] = val;
+                    }
+
+                if(doAffects)
+                    {
+                    obj["affects"] = subProp.affects;
+                    }
+
+                arr.push(obj);
+                }
+            }
+
         var propertyArray = [];
         var subProps = part.children;
-        for(var i=0, s=subProps.length; i<s; ++i)
-          {
-          var subProp = subProps[i];
-          print("#" + subProp);
-          print("#" + subProp.name);
-          /*var obj =
-            {
-            name: subProp.name,
-            type: subProp.typeInformation.typeName
-            };*/
-          propertyArray.push(obj);
-          }
-
-         /*
-            [
-                {
-                    name: "AttrName",
-                    type: FloatProperty,
-                    affects: [ "Output" ]
-                },
-                {
-                    name: "AttrName2",
-                    type: IntProperty,
-                    affects: [ "Output" ]
-                },
-                {
-                    name: "Output",
-                    type: FloatProperty,
-                    compute: function()
-                    {
-                        this.Output = this.AttrName * this.AttrName2;
-                    }
-                }
-            ]*/
+        exportChildren(propertyArray, subProps, true, false);
+        exportChildren(propertyArray, part, true, true);
 
         var nodeObject =
         {

@@ -34,9 +34,6 @@ int main( int argc, char **argv )
     return EXIT_FAILURE;
     }
 
-  initiateGraphicsCore(&db->db());
-
-
   SEntity *objectParent = &db->db().documents;
 
   WebView *webData = new WebView(objectParent);

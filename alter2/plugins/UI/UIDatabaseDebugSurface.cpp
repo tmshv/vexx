@@ -4,6 +4,8 @@
 #include "sdatabase.h"
 #include "QHeaderView"
 #include "QMenu"
+#include "QClipboard"
+#include "QApplication"
 
 UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
     : UISurface("Database Debug", new QWidget(), UISurface::Dock),
@@ -45,18 +47,23 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
     {
     _clickedItem = (SProperty *)index.internalPointer();
 
+
+    QString path = _clickedItem->path();
+    menu.addAction("Copy Path \"" + path + "\"", this, SLOT(copyPath()));
+    menu.addSeparator();
+    exec = true;
+
     if(_clickedItem->hasInput())
       {
       QAction *inputLabel = menu.addAction("Input");
       inputLabel->setEnabled(false);
-      exec = true;
 
       menu.addAction(_clickedItem->input()->path(), this, SLOT(disconnectInput()));
       }
 
     if(_clickedItem->hasOutputs())
       {
-      if(exec)
+      if(_clickedItem->hasInput())
         {
         menu.addSeparator();
         }
@@ -88,7 +95,15 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
       }
     }
 
-  menu.exec(_treeView->mapToGlobal(point));
+  menu.exec(QCursor::pos());
+  }
+
+void UIDatabaseDebugSurface::copyPath()
+  {
+  QString path = _clickedItem->path();
+
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(path);
   }
 
 void UIDatabaseDebugSurface::disconnectInput()

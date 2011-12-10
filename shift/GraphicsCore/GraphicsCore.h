@@ -5,6 +5,6 @@
 
 class SDatabase;
 
-void GRAPHICSCORE_EXPORT initiateGraphicsCore(SDatabase *);
+void GRAPHICSCORE_EXPORT initiateGraphicsCore();
 
 #endif // GRAPHICSCORE_H

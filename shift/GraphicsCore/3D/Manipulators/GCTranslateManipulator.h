@@ -1,5 +1,5 @@
-#ifndef GCDISTANCEMANIPULATOR_H
-#define GCDISTANCEMANIPULATOR_H
+#ifndef GCTRANSLATEMANIPULATOR_H
+#define GCTRANSLATEANIPULATOR_H
 
 #include "GCManipulator.h"
 #include "sbaseproperties.h"

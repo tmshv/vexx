@@ -12,6 +12,7 @@
 #include "saparteditorinterface.h"
 #include "saparteditor.h"
 #include "sashaderparteditorinterface.h"
+#include "GraphicsCore.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -37,6 +38,8 @@ void SPlugin::load()
   STypeRegistry::addType(SAppDatabase::staticTypeInformation());
   STypeRegistry::addType(SDocument::staticTypeInformation());
   STypeRegistry::addType(SPartDocument::staticTypeInformation());
+  
+  initiateGraphicsCore();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
   XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope

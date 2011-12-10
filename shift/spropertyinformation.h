@@ -223,6 +223,7 @@ public:
   template <typename T> void addAddonInterface() const;
   template <typename T> void addStaticInterface(T *) const;
 
+  template <typename T> static const SPropertyInformation *findStaticTypeInformation(const char *);
 
   X_ALIGNED_OPERATOR_NEW
 
@@ -417,6 +418,29 @@ template <typename T> void SPropertyInformation::addAddonInterface() const
 template <typename T> void SPropertyInformation::addStaticInterface(T *factory) const
   {
   addInterfaceFactory(factory);
+  }
+
+template <typename T> static const SPropertyInformation *SPropertyInformation::findStaticTypeInformation(const char *name)
+  {
+  static const SPropertyInformation *info = 0;
+  if(!info)
+    {
+    info = STypeRegistry::findType(name);
+    xAssert(!info);
+
+    if(!info)
+      {
+      info = T::createTypeInformation();
+
+      xAssert(info);
+      }
+    }
+  else
+    {
+    static bool found = STypeRegistry::findType(name);
+    xAssertMessage(found, "Types should be registered before they are used.", name);
+    }
+  return info;
   }
 
 #endif // SPROPERTYINFORMATION_H

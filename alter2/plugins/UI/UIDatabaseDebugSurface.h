@@ -19,6 +19,7 @@ private slots:
   void contextMenu(QPoint);
   void disconnectInput();
   void disconnectOutput();
+  void copyPath();
 
 private:
   QTreeView *_treeView;

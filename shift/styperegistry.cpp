@@ -23,10 +23,6 @@ void STypeRegistry::initiate()
   addType(SPropertyContainer::staticTypeInformation());
   addType(SPropertyArray::staticTypeInformation());
 
-  addType(SEntity::staticTypeInformation());
-  addType(SDatabase::staticTypeInformation());
-  addType(SReferenceEntity::staticTypeInformation());
-
   addType(BoolProperty::staticTypeInformation());
   addType(IntProperty::staticTypeInformation());
   addType(LongIntProperty::staticTypeInformation());
@@ -47,6 +43,16 @@ void STypeRegistry::initiate()
 
   addType(SFloatArrayProperty::staticTypeInformation());
   addType(SUIntArrayProperty::staticTypeInformation());
+
+  addType(SFloatArrayProperty::staticTypeInformation());
+  addType(SUIntArrayProperty::staticTypeInformation());
+  addType(SVector2ArrayProperty::staticTypeInformation());
+  addType(SVector3ArrayProperty::staticTypeInformation());
+  addType(SVector4ArrayProperty::staticTypeInformation());
+
+  addType(SEntity::staticTypeInformation());
+  addType(SDatabase::staticTypeInformation());
+  addType(SReferenceEntity::staticTypeInformation());
   }
 
 const XSet <const SPropertyInformation *> &STypeRegistry::types()

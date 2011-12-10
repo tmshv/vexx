@@ -7,7 +7,7 @@ void GCStandardSurface::postCreate(GCStandardSurface *surface)
     QFile shaderResource(":/GLResources/shaders/standardSurface.frag");
     if(shaderResource.open(QIODevice::ReadOnly))
       {
-      surface->fragment.source = shaderResource.readAll();
+      surface->fragment.assign(shaderResource.readAll());
       }
     }
 
@@ -15,7 +15,7 @@ void GCStandardSurface::postCreate(GCStandardSurface *surface)
     QFile shaderResource(":/GLResources/shaders/standardSurface.vert");
     if(shaderResource.open(QIODevice::ReadOnly))
       {
-      surface->vertex.source = shaderResource.readAll();
+      surface->vertex.assign(shaderResource.readAll());
       }
     }
 
