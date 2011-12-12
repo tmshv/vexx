@@ -15,23 +15,7 @@ SPropertyInstanceInformation::~SPropertyInstanceInformation()
 SPropertyInformation::SPropertyInformation()
     : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0), _postCreate(0),
     _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
-    _dynamic(false), _instances(0)
-  {
-  }
-
-SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
-  : _create(info.create()),
-    _createInstanceInformation(info.createInstanceInformation()),
-    _save(info.save()),
-    _load(info.load()),
-    _assign(info.assign()),
-    _postCreate(info.postCreate()),
-    _version(info.version()),
-    _parentTypeInformation(info.parentTypeInformation()),
-    _size(info.size()),
-    _instanceInformationSize(info.instanceInformationSize()),
-    _dynamic(info.dynamic()),
-    _instances(0)
+    _dynamic(false), _instances(0), _extendedParent(0)
   {
   }
 
@@ -160,6 +144,11 @@ void SPropertyInstanceInformation::setAffects(xsize *affects)
   _affects = affects;
   }
 
+void SPropertyInstanceInformation::setDefaultInput(const SPropertyInstanceInformation *)
+  {
+  xAssertFail();
+  }
+
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
                  const QString &name,
                  xsize index,
@@ -215,7 +204,6 @@ bool SPropertyInformation::inheritsFromType(const SPropertyInformation *match) c
     }
   return false;
   }
-
 
 void SPropertyInformation::reference() const
   {

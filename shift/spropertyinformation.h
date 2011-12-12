@@ -45,6 +45,8 @@ XProperties:
   XProperty(bool, dynamic, setDynamic);
   XRORefProperty(DataHash, data);
 
+  XROProperty(xsize, defaultInput);
+
 public:
   // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
   // initiate or destroy them, and that the Database should handle this.
@@ -53,6 +55,8 @@ public:
 
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
+
+  void setDefaultInput(const SPropertyInstanceInformation *info);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
   static DataKey newDataKey();
@@ -137,12 +141,13 @@ XProperties:
 
   XROProperty(xsize, instances);
 
+  XProperty(SPropertyInstanceInformation *, extendedParent, setExtendedParent);
+
 public:
   template <typename PropType> static SPropertyInformation *create(const QString &typeName, void postCreate(PropType *) = 0);
   template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName, void postCreate(PropType *) = 0);
 
   SPropertyInformation();
-  SPropertyInformation(const SPropertyInformation &info);
 
   ~SPropertyInformation();
 
@@ -205,6 +210,8 @@ public:
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name, typename U::InstanceInformation *def=0);
 
+  template <typename T> typename T::InstanceInformation *add(const QString &name, typename T::InstanceInformation *def=0);
+
   const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const
     {
     const SInterfaceBaseFactory *fac = 0;
@@ -218,6 +225,16 @@ public:
     return fac;
     }
 
+  template <typename T> SPropertyInformation *extendContainedProperty(SPropertyInstanceInformation *inst)
+    {
+    SPropertyInformation *info = new T::createTypeInformation(inst->childInformation());
+
+    info->setExtendedParent(inst);
+    inst->setChildInformation(info);
+
+    return info;
+    }
+
   template <typename T> void addInterfaceFactory(T *factory) const;
   template <typename PROPTYPE, typename T> void addInheritedInterface() const;
   template <typename T> void addAddonInterface() const;
@@ -228,6 +245,7 @@ public:
   X_ALIGNED_OPERATOR_NEW
 
 private:
+  X_DISABLE_COPY(SPropertyInformation);
   template <typename T>
     static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
       const QString &name,
@@ -350,6 +368,37 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr,
   U *offset = &(u->*ptr);
   xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
   xAssert(location > 0);
+
+  def->initiate(U::staticTypeInformation(), name, _children.size(), location);
+
+  _children << def;
+  return def;
+  }
+
+template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name, typename T::InstanceInformation *def)
+  {
+  if(!def)
+    {
+    def = new typename T::InstanceInformation;
+    }
+
+  xptrdiff thisDiffToAllocated = 0;
+  SPropertyInstanceInformation *allocateOnInfo = extendedParent();
+  while(allocateOnInfo)
+    {
+    thisDiffToAllocated -= allocateOnInfo->location();
+
+    SPropertyInformation *alloateOn = (SPropertyInformation*)allocateOnInfo->childInformation();
+    allocateOnInfo = alloateOn->extendedParent();
+    }
+
+  xsize finalLocation = X_ROUND_TO_ALIGNMENT(xsize, allocateOnInfo->size());
+  xsize finalSize = finalLocation + T::staticInformation()->size();
+
+  allocateOnInfo->setSize(finalSize);
+
+  xAssert(finalLocation > thisDiffToAllocated);
+  xsize location = finalLocation + thisDiffToAllocated;
 
   def->initiate(U::staticTypeInformation(), name, _children.size(), location);
 
