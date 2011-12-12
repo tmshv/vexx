@@ -373,7 +373,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
       }
     }
 
-  SPropertyInformation *newType = new SPropertyInformation(*parent);
+  SPropertyInformation *newType = parent->copy();
 
   newType->setVersion(version);
   newType->typeName() = name;

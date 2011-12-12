@@ -11,6 +11,18 @@ void readValue(SLoader &l, XShader &t)
   xAssertFail();
   }
 
+QTextStream &operator<<(QTextStream &s, const XGeometry &v)
+  {
+  xAssertFail();
+  return s;
+  }
+
+QTextStream &operator>>(QTextStream &s, const XGeometry &v)
+  {
+  xAssertFail();
+  return s;
+  }
+
 IMPLEMENT_POD_PROPERTY(TransformProperty, XTransform);
 IMPLEMENT_POD_PROPERTY(ComplexTransformProperty, XComplexTransform);
 IMPLEMENT_POD_PROPERTY(GCRuntimeShader, XShader)

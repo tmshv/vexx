@@ -31,7 +31,6 @@ public:
 
 XProperties:
   XProperty(const SPropertyInformation *, childInformation, setChildInformation);
-  XProperty(SPropertyInformation *, holdingTypeInformation, setHoldingTypeInformation);
   XRefProperty(QString, name);
   XProperty(xsize, location, setLocation);
   XProperty(ComputeFunction, compute, setCompute);
@@ -118,7 +117,7 @@ public:
 
 XProperties:
   XProperty(CreateFunction, create, setCreate);
-  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
+  XWOProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
   XProperty(SaveQueryFunction, shouldSave, setShouldSave);
@@ -209,7 +208,7 @@ public:
   SPropertyInformation *findAllocatableBase(xsize &offset);
   const SPropertyInformation *findAllocatableBase(xsize &offset) const;
 
-  SPropertyInformation *copy() const;
+  SPropertyInformation *copy();
 
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
@@ -234,7 +233,6 @@ public:
   template <typename T> SPropertyInformation *extendContainedProperty(SPropertyInstanceInformation *inst)
     {
     SPropertyInformation *info = T::createTypeInformation();
-    info->setParentTypeInformation(T::staticTypeInformation());
 
     info->setExtendedParent(inst);
     inst->setChildInformation(info);
@@ -248,11 +246,6 @@ public:
   template <typename T> void addStaticInterface(T *) const;
 
   template <typename T> static const SPropertyInformation *findStaticTypeInformation(const char *);
-
-  X_ALIGNED_OPERATOR_NEW
-
-private:
-  X_DISABLE_COPY(SPropertyInformation);
 
   template <typename T>
     static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
@@ -270,6 +263,11 @@ private:
     def->initiate(type, name, index, location);
     return def;
     }
+
+  X_ALIGNED_OPERATOR_NEW
+
+private:
+  X_DISABLE_COPY(SPropertyInformation);
 
   void reference() const;
   void dereference() const;
@@ -334,7 +332,6 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setPostChildSet(PropType::postChildSet);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
-  info->_copy = PropType::createTypeInformation;
   info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
   info->setSize(sizeof(PropType));
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
@@ -358,7 +355,6 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
   info->setPostCreate(0);
   info->setVersion(PropType::Version);
   info->typeName() = typeName;
-  info->_copy = PropType::createTypeInformation;
   info->setSize(sizeof(PropType));
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
@@ -369,7 +365,6 @@ template <typename T, typename U>
 typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QString &name)
   {
   typename U::InstanceInformation *def = new typename U::InstanceInformation;
-  def->setHoldingTypeInformation(this);
 
   T *u = 0;
   SPropertyContainer *container = static_cast<SPropertyContainer *>(u);
@@ -385,8 +380,7 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
   {
-  typename T::InstanceInformation *def = new typename T::InstanceInformation;
-  def->setHoldingTypeInformation(this);
+  typename U::InstanceInformation *def = new typename U::InstanceInformation;
 
   xsize backwardsOffset = 0;
   SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
