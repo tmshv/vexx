@@ -87,6 +87,7 @@ public:
 
     virtual void initiateProperty(SProperty *propertyToInitiate) const
       {
+      SProperty::InstanceInformation::initiateProperty(propertyToInitiate);
       propertyToInitiate->uncheckedCastTo<DERIVED>()->_value = defaultValue();
       }
     };

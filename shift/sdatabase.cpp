@@ -48,6 +48,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   prop->_info = type;
 
   initiateProperty(prop);
+  postInitiateProperty(prop);
   return prop;
   }
 
@@ -97,8 +98,6 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     thisProp->_instanceInfo = child;
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     initiateProperty(thisProp);
-
-    child->initiateProperty(thisProp);
     }
   }
 
@@ -134,6 +133,26 @@ void SDatabase::initiateProperty(SProperty *prop)
     xAssert(metaData);
 
     initiatePropertyFromMetaData(container, metaData);
+    }
+
+  xAssert(prop->database());
+  }
+
+void SDatabase::postInitiateProperty(SProperty *prop)
+  {
+  SPropertyContainer *container = prop->castTo<SPropertyContainer>();
+  if(container)
+    {
+    const SPropertyInformation *metaData = container->typeInformation();
+    xAssert(metaData);
+
+    for(xsize i=0, s=metaData->childCount(); i<s; ++i)
+      {
+      const SPropertyInstanceInformation *child = metaData->childFromIndex(i);
+
+      SProperty *thisProp = child->locateProperty(container);
+      postInitiateProperty(thisProp);
+      }
     }
 
   const SPropertyInstanceInformation *inst = prop->instanceInformation();

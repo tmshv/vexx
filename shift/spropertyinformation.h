@@ -59,7 +59,7 @@ public:
 
   void setDefaultInput(const SPropertyInstanceInformation *info);
 
-  virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const { }
+  virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const;
   static DataKey newDataKey();
 
   bool isComputed() const { return _compute != 0; }

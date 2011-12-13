@@ -4,7 +4,7 @@
 SPropertyInstanceInformation::SPropertyInstanceInformation()
   : _childInformation(0), _holdingTypeInformation(0), _name(""), _location(0), _compute(0),
     _computeLockedToMainThread(false), _queueCompute(defaultQueue), _affects(0), _index(X_SIZE_SENTINEL),
-    _entityChild(false), _extra(false), _dynamic(false)
+    _entityChild(false), _extra(false), _dynamic(false), _defaultInput(0)
   {
   }
 
@@ -208,11 +208,17 @@ void SPropertyInstanceInformation::setAffects(xsize *affects)
 
 void SPropertyInstanceInformation::setDefaultInput(const SPropertyInstanceInformation *info)
   {
+  // find the offset to the holding type information
   xsize targetOffset = 0;
   const SPropertyInformation *targetBase = info->holdingTypeInformation()->findAllocatableBase(targetOffset);
+  // add the instance location
+  targetOffset += info->location();
 
+  // find the offset to the holding type information
   xsize sourceOffset = 0;
   const SPropertyInformation *sourceBase = holdingTypeInformation()->findAllocatableBase(sourceOffset);
+  // add the instance location
+  sourceOffset += location();
 
   // cannot add a default input between to separate allocatable types.
   xAssert(targetBase == sourceBase);
@@ -224,6 +230,20 @@ void SPropertyInstanceInformation::setDefaultInput(const SPropertyInstanceInform
   xAssert((sourceOffset + _defaultInput) < sourceBase->size());
   xAssert((targetOffset - _defaultInput) < sourceBase->size());
   xAssert(_defaultInput < (xptrdiff)sourceBase->size());
+  }
+
+void SPropertyInstanceInformation::initiateProperty(SProperty *propertyToInitiate) const
+  {
+  if(defaultInput())
+    {
+    xuint8 *data = (xuint8*)propertyToInitiate;
+
+    const xuint8 *inputPropertyData = data + defaultInput();
+
+    const SProperty *inputProperty = (SProperty*)inputPropertyData;
+
+    inputProperty->connect(propertyToInitiate);
+    }
   }
 
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,

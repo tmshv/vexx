@@ -38,10 +38,10 @@ SPropertyInformation *GCStandardSurface::createTypeInformation()
   GCShaderComponentPointerArray::InstanceInformation *componentsInst = info->child(&GCStandardSurface::components);
   SPropertyInformation *componentsInfo = info->extendContainedProperty<GCShaderComponentPointerArray>(componentsInst);
 
-  Pointer::InstanceInformation *fragPtrInst = componentsInfo->add<Pointer>("FragmentPtr");
+  Pointer::InstanceInformation *fragPtrInst = componentsInfo->add<GCShaderComponentPointer>("FragmentPtr");
   fragPtrInst->setDefaultInput(fragInst);
 
-  Pointer::InstanceInformation *vertPtrInst = componentsInfo->add<Pointer>("VertexPtr");
+  Pointer::InstanceInformation *vertPtrInst = componentsInfo->add<GCShaderComponentPointer>("VertexPtr");
   vertPtrInst->setDefaultInput(vertInst);
 
   return info;
