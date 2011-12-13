@@ -136,7 +136,9 @@ void SDatabase::initiateProperty(SProperty *prop)
     initiatePropertyFromMetaData(container, metaData);
     }
 
-  prop->instanceInformation()->initiateProperty(prop);
+  const SPropertyInstanceInformation *inst = prop->instanceInformation();
+  xAssert(inst);
+  inst->initiateProperty(prop);
 
   const SPropertyInformation *info = prop->typeInformation();
   while(info)

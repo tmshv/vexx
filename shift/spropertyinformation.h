@@ -300,14 +300,14 @@ template<typename T> struct CreatePropertyHelper<T, true>
 template<typename T> struct CreatePropertyHelper<T, false>
   {
   static void run(void *ptr,
-                  const SPropertyInformation *,
+                  const SPropertyInformation *type,
                   SPropertyInstanceInformation **instanceInfo)
     {
     T *prop = new(ptr) T();
 
     if(instanceInfo)
       {
-      xuint8 *alignedPtr = (xuint8*)(prop+1);
+      xuint8 *alignedPtr = (xuint8*)(prop) + type->size();
       alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
       xAssertIsAligned(alignedPtr);
       *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
@@ -387,6 +387,7 @@ template <typename T> typename T::InstanceInformation *SPropertyInformation::add
   {
   typename T::InstanceInformation *def = new typename T::InstanceInformation;
   def->setHoldingTypeInformation(this);
+  def->setExtra(true);
 
   xsize backwardsOffset = 0;
   SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
@@ -403,6 +404,10 @@ template <typename T> typename T::InstanceInformation *SPropertyInformation::add
   def->initiate(T::staticTypeInformation(), name, _children.size(), location);
 
   _children << def;
+
+  const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
+  xAssert((backwardsOffset + (xsize)prop) == finalLocation);
+
   return def;
   }
 

@@ -175,7 +175,7 @@ SPropertyInformation *SPropertyInformation::findAllocatableBase(xsize &offset)
     allocateOnInfo = allocateOn->extendedParent();
     }
 
-  return 0;
+  return allocateOn;
   }
 
 SPropertyInformation::DataKey g_maxKey = 0;
@@ -209,10 +209,10 @@ void SPropertyInstanceInformation::setAffects(xsize *affects)
 void SPropertyInstanceInformation::setDefaultInput(const SPropertyInstanceInformation *info)
   {
   xsize targetOffset = 0;
-  const SPropertyInformation *targetBase = info->childInformation()->findAllocatableBase(targetOffset);
+  const SPropertyInformation *targetBase = info->holdingTypeInformation()->findAllocatableBase(targetOffset);
 
   xsize sourceOffset = 0;
-  const SPropertyInformation *sourceBase = childInformation()->findAllocatableBase(sourceOffset);
+  const SPropertyInformation *sourceBase = holdingTypeInformation()->findAllocatableBase(sourceOffset);
 
   // cannot add a default input between to separate allocatable types.
   xAssert(targetBase == sourceBase);
