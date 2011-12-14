@@ -68,6 +68,28 @@ SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *o
   return obj->_copy();
   }
 
+SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, const QString &name)
+  {
+  xsize backwardsOffset = 0;
+  SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
+  xAssert(allocatable);
+
+  xsize finalLocation = X_ROUND_TO_ALIGNMENT(xsize, allocatable->size());
+  xsize finalSize = finalLocation + newChildType->size();
+
+  allocatable->setSize(finalSize);
+
+  xAssert(finalLocation > backwardsOffset);
+  xsize location = finalLocation - backwardsOffset;
+
+  SPropertyInstanceInformation *def = add(newChildType, location, name, true);
+
+  const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
+  xAssert((backwardsOffset + (xsize)prop) == finalLocation);
+
+  return def;
+  }
+
 SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra)
   {
   xAssert(newChildType);

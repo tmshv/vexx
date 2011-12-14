@@ -193,8 +193,9 @@ public:
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name);
   template <typename T> typename T::InstanceInformation *add(const QString &name);
-  template <typename T> typename T::InstanceInformation *add(xsize location, const QString &name, bool extra);
+  template <typename T> typename T::InstanceInformation *add(xsize location, const QString &name);
   SPropertyInstanceInformation *add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra);
+  SPropertyInstanceInformation *add(const SPropertyInformation *newChildType, const QString &name);
 
   const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const
     {
@@ -361,31 +362,18 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
   {
-  xsize backwardsOffset = 0;
-  SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
-  xAssert(allocatable);
+  const SPropertyInformation *newChildType = T::staticTypeInformation();
 
-  xsize finalLocation = X_ROUND_TO_ALIGNMENT(xsize, allocatable->size());
-  xsize finalSize = finalLocation + T::staticTypeInformation()->size();
+  SPropertyInstanceInformation *inst = add(newChildType, name);
 
-  allocatable->setSize(finalSize);
-
-  xAssert(finalLocation > backwardsOffset);
-  xsize location = finalLocation - backwardsOffset;
-
-  typename T::InstanceInformation *def = add<T>(location, name, true);
-
-  const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
-  xAssert((backwardsOffset + (xsize)prop) == finalLocation);
-
-  return def;
+  return static_cast<typename T::InstanceInformation*>(inst);
   }
 
-template <typename T> typename T::InstanceInformation *SPropertyInformation::add(xsize location, const QString &name, bool extra)
+template <typename T> typename T::InstanceInformation *SPropertyInformation::add(xsize location, const QString &name)
   {
   const SPropertyInformation *newChildType = T::staticTypeInformation();
 
-  SPropertyInstanceInformation *inst = add(newChildType, location, name, extra);
+  SPropertyInstanceInformation *inst = add(newChildType, location, name, false);
 
   return static_cast<typename T::InstanceInformation*>(inst);
   }
