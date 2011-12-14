@@ -38,7 +38,7 @@ void SPlugin::load()
   STypeRegistry::addType(SAppDatabase::staticTypeInformation());
   STypeRegistry::addType(SDocument::staticTypeInformation());
   STypeRegistry::addType(SPartDocument::staticTypeInformation());
-  
+
   initiateGraphicsCore();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
@@ -91,4 +91,5 @@ void SPlugin::unload()
   delete _db;
   _db = 0;
   SProcessManager::terminate();
+  STypeRegistry::terminate();
   }

@@ -40,7 +40,6 @@ XProperties:
   XROProperty(xsize *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
-  XProperty(bool, entityChild, setEntityChild);
   XProperty(bool, extra, setExtra);
 
   XProperty(bool, dynamic, setDynamic);
@@ -49,10 +48,8 @@ XProperties:
   XROProperty(xptrdiff, defaultInput);
 
 public:
-  // extra properties indicate that whilst they are contained within the type itself, the constuctor does not
-  // initiate or destroy them, and that the Database should handle this.
-  SPropertyInstanceInformation();
-  virtual ~SPropertyInstanceInformation();
+  static SPropertyInstanceInformation *allocate(xsize size);
+  static void destroy(SPropertyInstanceInformation *);
 
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
@@ -100,13 +97,9 @@ private:
 class SHIFT_EXPORT SPropertyInformation
   {
 public:
-  typedef void (*CreateFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
+  typedef void (*CreatePropertyFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
   typedef void (*PostCreateFunction)(void *data);
   typedef void (*PostSetFunction)(SPropertyContainer *cont, SProperty *data);
-  typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const SPropertyInformation *type,
-                                                                            const QString &name,
-                                                                            xsize index,
-                                                                            SProperty SPropertyContainer::* location);
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
@@ -117,8 +110,7 @@ public:
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
 XProperties:
-  XProperty(CreateFunction, create, setCreate);
-  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
+  XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
   XProperty(SaveQueryFunction, shouldSave, setShouldSave);
@@ -136,7 +128,7 @@ XProperties:
   XRefProperty(XList<SPropertyInstanceInformation*>, children);
   XProperty(xsize, size, setSize);
   XProperty(xsize, instanceInformationSize, setInstanceInformationSize);
-  XProperty(bool, dynamic, seyDynamic);
+  //XProperty(bool, dynamic, seyDynamic);
 
   XRORefProperty(DataHash, data);
 
@@ -145,12 +137,11 @@ XProperties:
   XProperty(SPropertyInstanceInformation *, extendedParent, setExtendedParent);
 
 public:
+  static SPropertyInformation *allocate();
+  static void destroy(SPropertyInformation *);
+
   template <typename PropType> static SPropertyInformation *create(const QString &typeName, void postCreate(PropType *) = 0);
-  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName, void postCreate(PropType *) = 0);
-
-  SPropertyInformation();
-
-  ~SPropertyInformation();
+  static SPropertyInformation *create(const SPropertyInformation *);
 
   static DataKey newDataKey();
 
@@ -209,14 +200,13 @@ public:
   SPropertyInformation *findAllocatableBase(xsize &offset);
   const SPropertyInformation *findAllocatableBase(xsize &offset) const;
 
-  SPropertyInformation *copy() const;
-
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
 
   template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name);
-
   template <typename T> typename T::InstanceInformation *add(const QString &name);
+  template <typename T> typename T::InstanceInformation *add(xsize location, const QString &name, bool extra);
+  SPropertyInstanceInformation *add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra);
 
   const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const
     {
@@ -254,30 +244,21 @@ public:
 private:
   X_DISABLE_COPY(SPropertyInformation);
 
-  template <typename T>
-    static SPropertyInstanceInformation *createInstanceInformation(const SPropertyInformation *type,
-      const QString &name,
-      xsize index,
-      SProperty SPropertyContainer::* ptr)
-    {
-    typename T::InstanceInformation* def = new typename T::InstanceInformation;
+  template <typename T> static SPropertyInformation *initiate(SPropertyInformation *info, const QString &typeName, void postCreate(T *));
+  template <typename T> static SPropertyInstanceInformation *createInstanceInformationHelper(const QString &name, xsize index, xsize ptr);
 
-    SPropertyContainer *u = 0;
-    SProperty *offset = &(u->*ptr);
-    xptrdiff location = reinterpret_cast<xsize>(offset);
-    xAssert(location > 0);
-
-    def->initiate(type, name, index, location);
-    return def;
-    }
+  template <typename PropType> static SPropertyInformation *createNoParent(const QString &typeName, void postCreate(PropType *) = 0);
 
   void reference() const;
   void dereference() const;
 
+  typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const QString &name, xsize index, xsize location);
   SPropertyInformation *(*_copy)();
+  CreateInstanceInformationFunction _createInstanceInformation;
 
   mutable InterfaceHash _interfaceFactories;
 
+  friend class SProperty;
   friend class SDatabase;
 };
 
@@ -318,13 +299,45 @@ template<typename T> struct CreatePropertyHelper<T, false>
   };
 }
 
+template <typename T>
+  static SPropertyInstanceInformation *SPropertyInformation::createInstanceInformationHelper(
+    const QString &name,
+    xsize index,
+    xsize location)
+  {
+  typename T::InstanceInformation* def = (T::InstanceInformation*)SPropertyInstanceInformation::allocate(sizeof(T::InstanceInformation));
+
+  new(def) T::InstanceInformation;
+
+  def->initiate(T::staticTypeInformation(), name, index, location);
+
+  return def;
+  }
+
 template <typename PropType> SPropertyInformation *SPropertyInformation::create(const QString &typeName, void postCreate(PropType *))
   {
   SPropertyInformation *info = PropType::ParentType::createTypeInformation();
 
-  info->setCreate(CreatePropertyHelper<PropType>::run);
+  info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
+  initiate<PropType>(info, typeName, postCreate);
+
+  return info;
+  }
+
+template <typename PropType> SPropertyInformation *SPropertyInformation::createNoParent(const QString &typeName, void postCreate(PropType *))
+  {
+  SPropertyInformation *info = SPropertyInformation::allocate();
+
+  info->setParentTypeInformation(0);
+  initiate<PropType>(info, typeName, postCreate);
+
+  return info;
+  }
+
+template <typename PropType> SPropertyInformation *SPropertyInformation::initiate(SPropertyInformation *info, const QString &typeName, void postCreate(PropType *))
+  {
+  info->setCreateProperty(CreatePropertyHelper<PropType>::run);
   info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
-  info->setCreateInstanceInformation(createInstanceInformation<PropType>);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
   info->setShouldSave(PropType::shouldSaveProperty);
@@ -333,34 +346,18 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
   info->setPostChildSet(PropType::postChildSet);
   info->setVersion(PropType::Version);
-  info->typeName() = typeName;
-  info->_copy = PropType::createTypeInformation;
-  info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
   info->setSize(sizeof(PropType));
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
-  return info;
-  }
-
-template <typename PropType> SPropertyInformation *SPropertyInformation::createNoParent(const QString &typeName, void postCreate(PropType *))
-  {
-  SPropertyInformation *info = new SPropertyInformation();
-
-  info->setCreate(CreatePropertyHelper<PropType>::run);
-  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
-  info->setCreateInstanceInformation(createInstanceInformation<PropType>);
-  info->setSave(PropType::saveProperty);
-  info->setLoad(PropType::loadProperty);
-  info->setShouldSave(PropType::shouldSaveProperty);
-  info->setShouldSaveValue(PropType::shouldSavePropertyValue);
-  info->setAssign(PropType::assignProperty);
-  info->setPostCreate(reinterpret_cast<PostCreateFunction>(postCreate));
-  info->setPostCreate(0);
-  info->setVersion(PropType::Version);
-  info->typeName() = typeName;
+  //_dynamic(false)
+  info->_instances = 0;
+  info->_extendedParent = 0;
+  info->_createInstanceInformation = createInstanceInformationHelper<PropType>;
   info->_copy = PropType::createTypeInformation;
-  info->setSize(sizeof(PropType));
-  info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+  new(&info->_typeName) QString(typeName);
+  new(&info->_children) XList<SPropertyInstanceInformation*>();
+  new(&info->_data) DataHash();
+  new(&info->_interfaceFactories) InterfaceHash();
 
   return info;
   }
@@ -368,27 +365,17 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
 template <typename T, typename U>
 typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QString &name)
   {
-  typename U::InstanceInformation *def = new typename U::InstanceInformation;
-  def->setHoldingTypeInformation(this);
-
   T *u = 0;
   SPropertyContainer *container = static_cast<SPropertyContainer *>(u);
   U *offset = &(u->*ptr);
   xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
   xAssert(location > 0);
 
-  def->initiate(U::staticTypeInformation(), name, _children.size(), location);
-
-  _children << def;
-  return def;
+  return add<U>(location, name, false);
   }
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
   {
-  typename T::InstanceInformation *def = new typename T::InstanceInformation;
-  def->setHoldingTypeInformation(this);
-  def->setExtra(true);
-
   xsize backwardsOffset = 0;
   SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
   xAssert(allocatable);
@@ -401,14 +388,21 @@ template <typename T> typename T::InstanceInformation *SPropertyInformation::add
   xAssert(finalLocation > backwardsOffset);
   xsize location = finalLocation - backwardsOffset;
 
-  def->initiate(T::staticTypeInformation(), name, _children.size(), location);
-
-  _children << def;
+  typename T::InstanceInformation *def = add<T>(location, name, true);
 
   const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
   xAssert((backwardsOffset + (xsize)prop) == finalLocation);
 
   return def;
+  }
+
+template <typename T> typename T::InstanceInformation *SPropertyInformation::add(xsize location, const QString &name, bool extra)
+  {
+  const SPropertyInformation *newChildType = T::staticTypeInformation();
+
+  SPropertyInstanceInformation *inst = add(newChildType, location, name, extra);
+
+  return static_cast<typename T::InstanceInformation*>(inst);
   }
 
 template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory) const

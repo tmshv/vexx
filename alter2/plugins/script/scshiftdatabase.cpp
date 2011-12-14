@@ -263,6 +263,8 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   xsize endOfUsedMemory = parent->dynamicSize();
   QList<SPropertyInstanceInformation*> properties;
 
+  SPropertyInformation *newType = SPropertyInformation::create(parent);
+
   tempObject = typeObject.property("properties");
   if(tempObject.isArray())
     {
@@ -307,7 +309,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
         computeFn = computeNode;
         }
 
-      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory));
+      SPropertyInstanceInformation *info = newType->add(propType, endOfUsedMemory, propName, true);
       info->setCompute(computeFn);
       info->setExtra(true);
 
@@ -373,14 +375,10 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
       }
     }
 
-  SPropertyInformation *newType = parent->copy();
-
   newType->setVersion(version);
   newType->typeName() = name;
   newType->setParentTypeInformation(parent);
   newType->setSize(endOfUsedMemory);
-
-  newType->children() << parent->children() << properties;
 
   tempObject = typeObject.property("prototype");
   if(tempObject.isObject())

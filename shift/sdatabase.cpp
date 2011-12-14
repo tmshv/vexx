@@ -43,7 +43,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
-  type->create()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
+  type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
   prop->_database = this;
   prop->_info = type;
 
@@ -87,7 +87,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
 
     if(child->extra())
       {
-      childInformation->create()(thisProp, child->childInformation(), 0);
+      childInformation->createProperty()(thisProp, child->childInformation(), 0);
       }
 
     xAssert(thisProp->_parent == 0);

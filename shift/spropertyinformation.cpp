@@ -1,27 +1,34 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
+#include "styperegistry.h"
 
-SPropertyInstanceInformation::SPropertyInstanceInformation()
-  : _childInformation(0), _holdingTypeInformation(0), _name(""), _location(0), _compute(0),
-    _computeLockedToMainThread(false), _queueCompute(defaultQueue), _affects(0), _index(X_SIZE_SENTINEL),
-    _entityChild(false), _extra(false), _dynamic(false), _defaultInput(0)
+SPropertyInstanceInformation *SPropertyInstanceInformation::allocate(xsize size)
   {
+  xAssert(STypeRegistry::allocator());
+  void *ptr = STypeRegistry::allocator()->alloc(size);
+
+  xAssert(ptr);
+  return (SPropertyInstanceInformation*)ptr;
   }
 
-SPropertyInstanceInformation::~SPropertyInstanceInformation()
+void SPropertyInstanceInformation::destroy(SPropertyInstanceInformation *d)
   {
+  xAssert(STypeRegistry::allocator());
+  STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation::SPropertyInformation()
-    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0), _postCreate(0),
-    _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
-    _dynamic(false), _instances(0), _extendedParent(0), _copy(0)
+SPropertyInformation *SPropertyInformation::allocate()
   {
+  xAssert(STypeRegistry::allocator());
+  void *ptr = STypeRegistry::allocator()->alloc(sizeof(SPropertyInformation));
+
+  xAssert(ptr);
+  return (SPropertyInformation*)ptr;
   }
 
-SPropertyInformation::~SPropertyInformation()
+void SPropertyInformation::destroy(SPropertyInformation *d)
   {
-  foreach(SInterfaceBaseFactory *f, _interfaceFactories)
+  foreach(SInterfaceBaseFactory *f, d->_interfaceFactories)
     {
     xAssert(f->_referenceCount > 0);
     --f->_referenceCount;
@@ -31,17 +38,35 @@ SPropertyInformation::~SPropertyInformation()
       }
     }
 
-  for(xsize i=0; i<childCount(); ++i)
+  for(xsize i=0; i<d->childCount(); ++i)
     {
-    delete [] child(i)->affects();
-    delete child(i);
+    SPropertyInstanceInformation *inst = d->child(i);
+    delete [] inst->affects();
+    inst->~SPropertyInstanceInformation();
+    SPropertyInstanceInformation::destroy(inst);
     }
+
+  xAssert(STypeRegistry::allocator());
+  STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation *SPropertyInformation::copy() const
+SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj)
   {
-  xAssert(_copy);
-  return _copy();
+  xAssert(obj->_copy);
+  return obj->_copy();
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra)
+  {
+  xAssert(newChildType);
+  SPropertyInstanceInformation *def = newChildType->_createInstanceInformation(name, _children.size(), location);
+
+  def->setHoldingTypeInformation(this);
+  def->setExtra(extra);
+
+  _children << def;
+
+  return def;
   }
 
 SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr)
@@ -255,6 +280,15 @@ void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
   _name = name;
   _location = location;
   _index = index;
+
+  _holdingTypeInformation = 0;
+  _compute = 0;
+  _computeLockedToMainThread = false;
+  _queueCompute = defaultQueue;
+  _affects = 0;
+  _extra = false;
+  _dynamic = false;
+  _defaultInput = 0;
   }
 
 void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)

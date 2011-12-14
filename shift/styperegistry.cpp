@@ -4,14 +4,16 @@
 #include "sreferenceentity.h"
 #include "sbasepointerproperties.h"
 #include "sdatabase.h"
+#include "XAllocatorBase"
 
 struct TypeData
   {
   XSet <const SPropertyInformation *> types;
   XList <STypeRegistry::Observer *> observers;
+  XAllocatorBase *allocator;
   };
 
-static TypeData _types;
+static TypeData _internalTypes;
 
 STypeRegistry::STypeRegistry()
   {
@@ -19,6 +21,8 @@ STypeRegistry::STypeRegistry()
 
 void STypeRegistry::initiate()
   {
+  _internalTypes.allocator = XGlobalAllocator::instance();
+
   addType(SProperty::staticTypeInformation());
   addType(SPropertyContainer::staticTypeInformation());
   addType(SPropertyArray::staticTypeInformation());
@@ -55,15 +59,26 @@ void STypeRegistry::initiate()
   addType(SReferenceEntity::staticTypeInformation());
   }
 
+void STypeRegistry::terminate()
+  {
+  _internalTypes.allocator = 0;
+  }
+
+XAllocatorBase *STypeRegistry::allocator()
+  {
+  xAssert(_internalTypes.allocator);
+  return _internalTypes.allocator;
+  }
+
 const XSet <const SPropertyInformation *> &STypeRegistry::types()
   {
-  return _types.types;
+  return _internalTypes.types;
   }
 
 void STypeRegistry::addType(const SPropertyInformation *t)
   {
   internalAddType(t);
-  foreach(Observer *o, _types.observers)
+  foreach(Observer *o, _internalTypes.observers)
     {
     o->typeAdded(t);
     }
@@ -71,26 +86,26 @@ void STypeRegistry::addType(const SPropertyInformation *t)
 
 void STypeRegistry::addTypeObserver(Observer *o)
   {
-  _types.observers << o;
+  _internalTypes.observers << o;
   }
 
 void STypeRegistry::removeTypeObserver(Observer *o)
   {
-  _types.observers.removeAll(o);
+  _internalTypes.observers.removeAll(o);
   }
 
 void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
-  if(!_types.types.contains(t))
+  if(!_internalTypes.types.contains(t))
     {
-    _types.types.insert(t);
+    _internalTypes.types.insert(t);
     }
   }
 
 const SPropertyInformation *STypeRegistry::findType(const QString &in)
   {
   SProfileFunction
-  foreach(const SPropertyInformation *info, _types.types)
+  foreach(const SPropertyInformation *info, _internalTypes.types)
     {
     if(info->typeName() == in)
       {
