@@ -2,6 +2,18 @@
 #include "spropertycontainer.h"
 #include "styperegistry.h"
 
+SPropertyInstanceInformation::SPropertyInstanceInformation()
+  {
+  _holdingTypeInformation = 0;
+  _compute = 0;
+  _computeLockedToMainThread = false;
+  _queueCompute = defaultQueue;
+  _affects = 0;
+  _extra = false;
+  _dynamic = false;
+  _defaultInput = 0;
+  }
+
 SPropertyInstanceInformation *SPropertyInstanceInformation::allocate(xsize size)
   {
   xAssert(STypeRegistry::allocator());
@@ -23,7 +35,7 @@ SPropertyInformation *SPropertyInformation::allocate()
   void *ptr = STypeRegistry::allocator()->alloc(sizeof(SPropertyInformation));
 
   xAssert(ptr);
-  return (SPropertyInformation*)ptr;
+  return new(ptr) SPropertyInformation;
   }
 
 void SPropertyInformation::destroy(SPropertyInformation *d)
@@ -280,21 +292,28 @@ void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
   _name = name;
   _location = location;
   _index = index;
-
-  _holdingTypeInformation = 0;
-  _compute = 0;
-  _computeLockedToMainThread = false;
-  _queueCompute = defaultQueue;
-  _affects = 0;
-  _extra = false;
-  _dynamic = false;
-  _defaultInput = 0;
   }
 
 void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)
   {
   xAssert(k < g_maxChildKey);
   _data[k].setValue(v);
+  }
+
+SProperty *SPropertyInstanceInformation::locateProperty(SPropertyContainer *parent) const
+  {
+  xuint8* parentOffset = reinterpret_cast<xuint8*>(parent);
+  xuint8* childOffset = parentOffset + location();
+  SProperty *child = reinterpret_cast<SProperty*>(childOffset);
+  return child;
+  }
+
+const SProperty *SPropertyInstanceInformation::locateProperty(const SPropertyContainer *parent) const
+  {
+  const xuint8* parentOffset = reinterpret_cast<const xuint8*>(parent);
+  const xuint8* childOffset = parentOffset + location();
+  const SProperty *child = reinterpret_cast<const SProperty*>(childOffset);
+  return child;
   }
 
 void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformation *info, const SPropertyContainer *cont, SProperty **jobs, xsize &numJobs)

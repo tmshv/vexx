@@ -48,6 +48,7 @@ XProperties:
   XROProperty(xptrdiff, defaultInput);
 
 public:
+  SPropertyInstanceInformation();
   static SPropertyInstanceInformation *allocate(xsize size);
   static void destroy(SPropertyInstanceInformation *);
 
@@ -64,21 +65,8 @@ public:
 
   void setData(DataKey, const QVariant &);
 
-  SProperty *locateProperty(SPropertyContainer *parent) const
-    {
-    xuint8* parentOffset = reinterpret_cast<xuint8*>(parent);
-    xuint8* childOffset = parentOffset + location();
-    SProperty *child = reinterpret_cast<SProperty*>(childOffset);
-    return child;
-    }
-
-  const SProperty *locateProperty(const SPropertyContainer *parent) const
-    {
-    const xuint8* parentOffset = reinterpret_cast<const xuint8*>(parent);
-    const xuint8* childOffset = parentOffset + location();
-    const SProperty *child = reinterpret_cast<const SProperty*>(childOffset);
-    return child;
-    }
+  SProperty *locateProperty(SPropertyContainer *parent) const;
+  const SProperty *locateProperty(const SPropertyContainer *parent) const;
 
   X_ALIGNED_OPERATOR_NEW
 
@@ -128,7 +116,6 @@ XProperties:
   XRefProperty(XList<SPropertyInstanceInformation*>, children);
   XProperty(xsize, size, setSize);
   XProperty(xsize, instanceInformationSize, setInstanceInformationSize);
-  //XProperty(bool, dynamic, seyDynamic);
 
   XRORefProperty(DataHash, data);
 
@@ -137,6 +124,7 @@ XProperties:
   XProperty(SPropertyInstanceInformation *, extendedParent, setExtendedParent);
 
 public:
+  SPropertyInformation() { }
   static SPropertyInformation *allocate();
   static void destroy(SPropertyInformation *);
 
@@ -349,15 +337,12 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->setSize(sizeof(PropType));
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
-  //_dynamic(false)
-  info->_instances = 0;
-  info->_extendedParent = 0;
   info->_createInstanceInformation = createInstanceInformationHelper<PropType>;
   info->_copy = PropType::createTypeInformation;
-  new(&info->_typeName) QString(typeName);
-  new(&info->_children) XList<SPropertyInstanceInformation*>();
-  new(&info->_data) DataHash();
-  new(&info->_interfaceFactories) InterfaceHash();
+  info->_instances = 0;
+  info->_extendedParent = 0;
+
+  info->_typeName = typeName;
 
   return info;
   }

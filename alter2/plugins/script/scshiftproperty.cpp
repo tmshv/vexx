@@ -155,7 +155,7 @@ QScriptValue ScShiftProperty::affects(QScriptContext *ctx, QScriptEngine *e)
   }
 
 
-QScriptValue ScShiftProperty::dynamic(QScriptContext *ctx, QScriptEngine *e)
+QScriptValue ScShiftProperty::dynamic(QScriptContext *ctx, QScriptEngine *)
   {
   ScProfileFunction
   SProperty **prop = getThis(ctx);
