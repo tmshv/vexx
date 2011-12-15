@@ -36,7 +36,7 @@ SPropertyInformation *GCStandardSurface::createTypeInformation()
   GCFragmentShaderComponent::InstanceInformation *fragInst = info->add(&GCStandardSurface::fragment, "fragment");
 
   GCShaderComponentPointerArray::InstanceInformation *componentsInst = info->child(&GCStandardSurface::components);
-  SPropertyInformation *componentsInfo = info->extendContainedProperty<GCShaderComponentPointerArray>(componentsInst);
+  SPropertyInformation *componentsInfo = info->extendContainedProperty(componentsInst);
 
   Pointer::InstanceInformation *fragPtrInst = componentsInfo->add<GCShaderComponentPointer>("FragmentPtr");
   fragPtrInst->setDefaultInput(fragInst);

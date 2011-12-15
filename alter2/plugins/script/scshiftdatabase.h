@@ -19,7 +19,7 @@ private:
   static QScriptValue load(QScriptContext *ctx, QScriptEngine *);
   static void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node);
 
-  static void parseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
+  static bool parseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
   };
 
 Q_DECLARE_METATYPE(ScShiftDatabase*)

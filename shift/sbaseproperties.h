@@ -90,6 +90,13 @@ public:
       SProperty::InstanceInformation::initiateProperty(propertyToInitiate);
       propertyToInitiate->uncheckedCastTo<DERIVED>()->_value = defaultValue();
       }
+
+    virtual void setDefaultValue(const QString &val)
+      {
+      QString cpyVal(val);
+      QTextStream s(&cpyVal);
+      s >> _defaultValue;
+      }
     };
 
   class ComputeLock

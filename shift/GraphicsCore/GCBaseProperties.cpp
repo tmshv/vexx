@@ -1,26 +1,14 @@
 #include "GCBaseProperties.h"
 #include "sdatabase.h"
 
-void writeValue(SSaver &s, const XShader &t)
+void writeValue(SSaver &s, const XShader &)
   {
   xAssertFail();
   }
 
-void readValue(SLoader &l, XShader &t)
+void readValue(SLoader &l, XShader &)
   {
   xAssertFail();
-  }
-
-QTextStream &operator<<(QTextStream &s, const XGeometry &v)
-  {
-  xAssertFail();
-  return s;
-  }
-
-QTextStream &operator>>(QTextStream &s, const XGeometry &v)
-  {
-  xAssertFail();
-  return s;
   }
 
 IMPLEMENT_POD_PROPERTY(TransformProperty, XTransform);

@@ -32,15 +32,18 @@ QTextStream &operator >>(QTextStream &str, QImage &data)
   return str;
   }
 
-void writeValue(SSaver &, const XGeometry &)
+QTextStream &operator<<(QTextStream &s, const XGeometry &)
   {
   xAssertFail();
+  return s;
   }
 
-void readValue(SLoader &, XGeometry &)
+QTextStream &operator>>(QTextStream &s, const XGeometry &)
   {
   xAssertFail();
+  return s;
   }
+
 }
 
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, TransformProperty, XTransform, XTransform::Identity(), 150);

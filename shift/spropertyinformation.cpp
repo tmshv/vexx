@@ -103,6 +103,20 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
   return def;
   }
 
+SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
+  {
+  const SPropertyInformation *oldInst = inst->childInformation();
+  SPropertyInformation *info = SPropertyInformation::create(oldInst);
+
+  info->setParentTypeInformation(oldInst);
+
+  info->setExtendedParent(inst);
+  inst->setChildInformation(info);
+
+  return info;
+  }
+
+
 SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr)
   {
   SPropertyContainer *u = 0;

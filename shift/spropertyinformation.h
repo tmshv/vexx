@@ -55,6 +55,7 @@ public:
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
 
+  virtual void setDefaultValue(const QString &) { xAssertFail(); }
   void setDefaultInput(const SPropertyInstanceInformation *info);
 
   virtual void initiateProperty(SProperty *X_UNUSED(propertyToInitiate)) const;
@@ -210,16 +211,7 @@ public:
     return fac;
     }
 
-  template <typename T> SPropertyInformation *extendContainedProperty(SPropertyInstanceInformation *inst)
-    {
-    SPropertyInformation *info = T::createTypeInformation();
-    info->setParentTypeInformation(T::staticTypeInformation());
-
-    info->setExtendedParent(inst);
-    inst->setChildInformation(info);
-
-    return info;
-    }
+  SPropertyInformation *extendContainedProperty(SPropertyInstanceInformation *inst);
 
   template <typename T> void addInterfaceFactory(T *factory) const;
   template <typename PROPTYPE, typename T> void addInheritedInterface() const;
@@ -357,7 +349,7 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
   xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
   xAssert(location > 0);
 
-  return add<U>(location, name, false);
+  return add<U>(location, name);
   }
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
