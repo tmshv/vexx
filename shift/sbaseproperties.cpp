@@ -13,9 +13,16 @@ IMPLEMENT_POD_PROPERTY(Vector2DProperty, XVector2D);
 IMPLEMENT_POD_PROPERTY(Vector3DProperty, XVector3D);
 IMPLEMENT_POD_PROPERTY(Vector4DProperty, XVector4D);
 IMPLEMENT_POD_PROPERTY(QuaternionProperty, XQuaternion);
-IMPLEMENT_POD_PROPERTY(StringProperty, QString);
+IMPLEMENT_POD_PROPERTY(StringPropertyBase, QString);
 IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
 IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
+
+S_IMPLEMENT_PROPERTY(StringProperty)
+
+SPropertyInformation *StringProperty::createTypeInformation()
+  {
+  return SPropertyInformation::create<StringProperty>("StringProperty");
+  }
 
 void BoolProperty::assignProperty(const SProperty *f, SProperty *t)
   {
@@ -603,11 +610,11 @@ void ColourProperty::assignProperty(const SProperty *f, SProperty *t)
     }
   }
 
-void StringProperty::assignProperty(const SProperty *f, SProperty *t)
+void StringPropertyBase::assignProperty(const SProperty *f, SProperty *t)
   {
-  StringProperty *to = t->uncheckedCastTo<StringProperty>();
+  StringPropertyBase *to = t->uncheckedCastTo<StringPropertyBase>();
 
-  const StringProperty *sProp = f->castTo<StringProperty>();
+  const StringPropertyBase *sProp = f->castTo<StringPropertyBase>();
   if(sProp)
     {
     to->assign(sProp->value());

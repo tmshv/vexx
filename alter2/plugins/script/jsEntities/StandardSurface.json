@@ -1,0 +1,48 @@
+{
+  "__N":"true",
+  "__H":[
+    {
+      "__T":"GCShader",
+      "name":"StandardSurface",
+      "dynamic":"1",
+      "__H":[
+        {
+          "__T":"SPropertyArray",
+          "name":"children",
+          "__H":[
+            {
+              "__T":"GCVertexShaderComponent",
+              "name":"Vert",
+              "dynamic":"1",
+              "__V":"attribute vec3 vertex;\nattribute vec3 normals;\nvarying vec3 normal;\n\nvoid main(void)\n  {\n  normal = normals;\n  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(vertex,1.0);\n  }\n"
+            },
+            {
+              "__T":"GCFragmentShaderComponent",
+              "name":"Frag",
+              "dynamic":"1",
+              "__V":"varying vec3 normal;\n\nvoid main(void)\n  {\n  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n  }\n"
+            }
+          ]
+        },
+        {
+          "__T":"GCShaderComponentPointerArray",
+          "name":"components",
+          "__H":[
+            {
+              "__T":"GCShaderComponentPointer",
+              "name":"1",
+              "dynamic":"1",
+              "input":"..\/..\/children\/Vert"
+            },
+            {
+              "__T":"GCShaderComponentPointer",
+              "name":"2",
+              "dynamic":"1",
+              "input":"..\/..\/children\/Frag"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

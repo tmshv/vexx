@@ -10,6 +10,7 @@
 #include "XShared"
 #include "QVector"
 
+class SPlugin;
 class QMenu;
 
 class SExportableInterface : public SStaticInterfaceBase
@@ -63,6 +64,9 @@ class SHIFTALTER_EXPORT SDocument : public SEntity
   {
   S_ABSTRACT_ENTITY(SDocument, SEntity, 0)
 
+XProperties:
+  XProperty(SPlugin *, plugin, setPlugin);
+
 public:
   SDocument();
 
@@ -94,11 +98,15 @@ XProperties:
   XROProperty(SEntityTypedWeakPointer<SDocument>, document);
 
 public:
-  SDocumentEditor(SDocument *doc);
+  SDocumentEditor(SPlugin *plugin, SDocument *doc);
 
   void buildFileMenu(QMenu *menu);
 
   virtual void reloadUI();
+
+  void setLastUsedDirectory(const QString &dir);
+  void setLastUsedDirectoryFromFile(const QString &file);
+  QString lastUsedDirectory() const;
 
 private slots:
   void newFile();
@@ -108,6 +116,9 @@ private slots:
   void exportFile();
 
   void enableMenu();
+
+private:
+  SPlugin *_plugin;
   };
 
 #endif // SDOCUMENT_H

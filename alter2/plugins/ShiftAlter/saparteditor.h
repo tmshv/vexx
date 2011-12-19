@@ -35,7 +35,7 @@ XProperties:
   XReadProperty(const SPartEditorInterface *, partInterface, partInterface);
 
 public:
-  SPartEditor(SPartDocument *holder);
+  SPartEditor(SPlugin *p, SPartDocument *holder);
 
 private slots:
   void addProperty();

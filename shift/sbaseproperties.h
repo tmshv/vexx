@@ -301,9 +301,35 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector2DProperty, XVector2D, XVector2D(0.0f, 0
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f), 108);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f), 109);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion(), 110);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, QString, "", 111);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringPropertyBase, QString, "", 111);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f), 112);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray(), 113);
+
+class SHIFT_EXPORT StringProperty : public StringPropertyBase
+  {
+public:
+  class InstanceInformation : public StringPropertyBase::InstanceInformation
+    {
+  public:
+    InstanceInformation()
+      {
+      }
+    void setDefaultValue(const QString &val)
+      {
+      setDefault(val);
+      }
+    };
+
+  S_PROPERTY(StringProperty, StringPropertyBase, 0);
+  StringProperty()
+    {
+    }
+  StringProperty &operator=(const QString &in)
+    {
+    assign(in);
+    return *this;
+    }
+  };
 
 #define EnumProperty IntProperty
 

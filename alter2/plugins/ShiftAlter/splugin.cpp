@@ -60,6 +60,7 @@ void SPlugin::load()
   GCShader::staticTypeInformation()->addStaticInterface(new SShaderPartEditorInterface);
 
   _db = new SAppDatabase();
+  _db->setPlugin(this);
 
   QDir dataDir = core()->localDataDirectory();
   QFile file(dataDir.absolutePath() + "/settings.json");

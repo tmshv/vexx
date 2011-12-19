@@ -60,10 +60,10 @@ void SPartDocument::loadFile(const QString &filename)
 
 QWidget *SPartDocument::createEditor()
   {
-  return new SPartEditor(this);
+  return new SPartEditor(plugin(), this);
   }
 
-SPartEditor::SPartEditor(SPartDocument *holder) : SDocumentEditor(holder),
+SPartEditor::SPartEditor(SPlugin *p, SPartDocument *holder) : SDocumentEditor(p, holder),
     _main(0), _list(0), _propertyProperties(0), _propertyPropertiesInternal(0),
     _typeParameters(0), _typeParametersInternal(0)
   {

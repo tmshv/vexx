@@ -44,8 +44,9 @@ Viewport::Viewport(SPlugin &db) : SViewport(&db.db()), UISurface("Viewport", thi
   GCShadingGroup *group = sc->addChild<GCShadingGroup>("Groups");
   msc->shadingGroups.addPointer(group);
 
-  GCStandardSurface *shader = sc->addChild<GCStandardSurface>("Shader");
-  group->shader.setPointed(shader);
+  const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
+  SProperty *shader = sc->addChild(standardSurfaceInfo, "Shader");
+  group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
 
   XTransform tr = XTransform::Identity();
   tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
@@ -72,6 +73,6 @@ Viewport::~Viewport()
   {
   }
 
-void Viewport::setObject(Object *id)
+void Viewport::setObject(Object *)
   {
   }

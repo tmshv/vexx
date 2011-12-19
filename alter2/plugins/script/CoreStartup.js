@@ -114,4 +114,5 @@ SDatabase.cancelBlock = function(fn)
   db.endBlock(true);
   }
 
-script.include("JSPartExporter.js")
+script.include("JSPartExporter.js");
+script.includeFolder("jsEntities");

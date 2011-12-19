@@ -158,7 +158,7 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
   layout->addWidget(new QLabel("<b>Vertex</b>"));
 
-  GCShaderComponent *vert = e->firstChild<GCVertexShaderComponent>();
+  GCShaderComponent *vert = e->children.firstChild<GCVertexShaderComponent>();
   if(!vert)
     {
     vert = e->addChild<GCVertexShaderComponent>("Vert");
@@ -179,7 +179,7 @@ QWidget *SShaderPartEditorInterface::buildCustomEditor(SEntity *e) const
 
   layout->addWidget(new QLabel("<b>Fragment</b>"));
 
-  GCShaderComponent *frag = e->firstChild<GCFragmentShaderComponent>();
+  GCShaderComponent *frag = e->children.firstChild<GCFragmentShaderComponent>();
   if(!frag)
     {
     frag = e->addChild<GCFragmentShaderComponent>("Frag");

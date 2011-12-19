@@ -2,6 +2,7 @@
 #include "QFileDialog"
 #include "Serialisation/sjsonio.h"
 #include "QMenu"
+#include "splugin.h"
 
 void SDocument::incrementRevision(const SPropertyInstanceInformation *, SPropertyContainer *c)
   {
@@ -100,7 +101,7 @@ void SDocument::saveFile(const QString &f)
   }
 
 
-SDocumentEditor::SDocumentEditor(SDocument *doc) : _document(doc)
+SDocumentEditor::SDocumentEditor(SPlugin *p, SDocument *doc) : _document(doc), _plugin(p)
   {
   }
 
@@ -157,6 +158,23 @@ void SDocumentEditor::reloadUI()
   {
   }
 
+void SDocumentEditor::setLastUsedDirectory(const QString &dir)
+  {
+  _plugin->setSetting<QString>("document", "lastUsedDirectory", dir);
+  }
+
+void SDocumentEditor::setLastUsedDirectoryFromFile(const QString &fName)
+  {
+  QFileInfo file(fName);
+  QDir dir = file.absoluteDir();
+  _plugin->setSetting<QString>("document", "lastUsedDirectory", dir.absolutePath());
+  }
+
+QString SDocumentEditor::lastUsedDirectory() const
+  {
+  return _plugin->setting<QString>("document", "lastUsedDirectory");
+  }
+
 void SDocumentEditor::enableMenu()
   {
   QObject *s = sender();
@@ -190,7 +208,9 @@ void SDocumentEditor::newFile()
 
 void SDocumentEditor::loadFile()
   {
-  QString fileStr = QFileDialog::getOpenFileName(this, QObject::tr("Open File"), "", QObject::tr("Json Data (*.json)"));
+  QString fileStr = QFileDialog::getOpenFileName(this, QObject::tr("Open File"), lastUsedDirectory(), QObject::tr("Json Data (*.json)"));
+
+  setLastUsedDirectoryFromFile(fileStr);
 
   document()->loadFile(fileStr);
 
@@ -224,8 +244,9 @@ void SDocumentEditor::exportFile()
           {
           if(data == e.constPtr())
             {
-            QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Export File"), "", e->exporterFileType());
+            QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Export File"), lastUsedDirectory(), e->exporterFileType());
 
+            setLastUsedDirectoryFromFile(fileStr);
 
             e->exportFile(fileStr, _document);
 
@@ -241,7 +262,9 @@ void SDocumentEditor::exportFile()
 
 void SDocumentEditor::saveAsFile()
   {
-  QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Save File"), "", QObject::tr("Json Data (*.json)"));
+  QString fileStr = QFileDialog::getSaveFileName(this, QObject::tr("Save File"), lastUsedDirectory(), QObject::tr("Json Data (*.json)"));
+
+  setLastUsedDirectoryFromFile(fileStr);
 
   document()->saveFile(fileStr);
   }

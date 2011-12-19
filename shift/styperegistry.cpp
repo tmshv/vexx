@@ -38,6 +38,7 @@ void STypeRegistry::initiate()
   addType(Vector3DProperty::staticTypeInformation());
   addType(Vector4DProperty::staticTypeInformation());
   addType(QuaternionProperty::staticTypeInformation());
+  addType(StringPropertyBase::staticTypeInformation());
   addType(StringProperty::staticTypeInformation());
   addType(ColourProperty::staticTypeInformation());
   addType(ByteArrayProperty::staticTypeInformation());

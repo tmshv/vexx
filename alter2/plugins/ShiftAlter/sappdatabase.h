@@ -6,10 +6,14 @@
 #include "sentity.h"
 
 class SDocument;
+class SPlugin;
 
 class SHIFTALTER_EXPORT SAppDatabase : public SDatabase
   {
   S_ENTITY(SAppDatabase, SDatabase, 0);
+
+XProperties:
+  XProperty(SPlugin *, plugin, setPlugin);
 
 public:
   SEntity documents;

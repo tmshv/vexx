@@ -12,7 +12,7 @@ SPropertyInformation *SAppDatabase::createTypeInformation()
   return info;
   }
 
-SAppDatabase::SAppDatabase() : SDatabase()
+SAppDatabase::SAppDatabase() : SDatabase(), _plugin(0)
   {
   initiateInheritedDatabaseType(staticTypeInformation());
   }
@@ -23,6 +23,10 @@ SDocument *SAppDatabase::addDocument(const SPropertyInformation *info)
   if(prop)
     {
     SDocument *doc = prop->castTo<SDocument>();
+
+    xAssert(_plugin);
+    doc->setPlugin(_plugin);
+
     xAssert(doc);
     return doc;
     }
