@@ -205,22 +205,20 @@ private:
       }
 
   private:
-    bool apply(int mode)
+    bool apply()
       {
-      if(mode&Forward)
+      return true;
+      }
+    bool unApply()
+      {
+      xAssertFail();
+      return true;
+      }
+    bool inform()
+      {
+      if(property()->entity())
         {
-        // changes already applied.
-        }
-      else if(mode&Backward)
-        {
-        xAssertFail();
-        }
-      if(mode&Inform)
-        {
-        if(property()->entity())
-          {
-          property()->entity()->informDirtyObservers(property());
-          }
+        property()->entity()->informDirtyObservers(property());
         }
       return true;
       }
@@ -240,24 +238,25 @@ private:
       { }
 
   private:
-    bool apply(int mode)
+    bool apply()
       {
-      if(mode&Forward)
+      property()->uncheckedCastTo<DERIVED>()->_value = after();
+      property()->postSet();
+      return true;
+      }
+
+    bool unApply()
+      {
+      property()->uncheckedCastTo<DERIVED>()->_value = before();
+      property()->postSet();
+      return true;
+      }
+
+    bool inform()
+      {
+      if(property()->entity())
         {
-        property()->uncheckedCastTo<DERIVED>()->_value = after();
-        property()->postSet();
-        }
-      else if(mode&Backward)
-        {
-        property()->uncheckedCastTo<DERIVED>()->_value = before();
-        property()->postSet();
-        }
-      if(mode&Inform)
-        {
-        if(property()->entity())
-          {
-          property()->entity()->informDirtyObservers(property());
-          }
+        property()->entity()->informDirtyObservers(property());
         }
       return true;
       }

@@ -5,6 +5,7 @@
 #include "aabstractplugin.h"
 #include "QFile"
 #include "QDomDocument"
+#include "QDesktopServices"
 #include "QDebug"
 #include "QLibrary"
 #include "QDir"
@@ -253,6 +254,16 @@ void ACore::addDirectory(const QString &in)
 void ACore::removeDirectory(const QString &in)
   {
   _priv->directories.removeAll( in );
+  }
+
+QDir ACore::localDataDirectory() const
+  {
+  QString location = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+  QDir dir(location);
+  dir.mkpath(location);
+
+  return dir;
   }
 
 bool ACore::isDebugUIEnabled() const

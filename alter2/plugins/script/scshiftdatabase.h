@@ -14,12 +14,16 @@ public:
   ~ScShiftDatabase();
 
 private:
+  static QScriptValue beginBlock(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue endBlock(QScriptContext *ctx, QScriptEngine *);
+
   static QScriptValue addType(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue save(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue load(QScriptContext *ctx, QScriptEngine *);
   static void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node);
 
   static bool parseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
+  static bool postParseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
   };
 
 Q_DECLARE_METATYPE(ScShiftDatabase*)

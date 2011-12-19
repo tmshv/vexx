@@ -66,6 +66,8 @@ public:
 
   void setData(DataKey, const QVariant &);
 
+  const SPropertyInstanceInformation *resolvePath(const QString &) const;
+
   SProperty *locateProperty(SPropertyContainer *parent) const;
   const SProperty *locateProperty(const SPropertyContainer *parent) const;
 

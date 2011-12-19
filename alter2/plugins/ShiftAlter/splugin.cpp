@@ -12,6 +12,7 @@
 #include "saparteditorinterface.h"
 #include "saparteditor.h"
 #include "sashaderparteditorinterface.h"
+#include "acore.h"
 #include "GraphicsCore.h"
 
 ALTER_PLUGIN(SPlugin);
@@ -60,9 +61,8 @@ void SPlugin::load()
 
   _db = new SAppDatabase();
 
-  QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-
-  QFile file(dataLocation + "/settings.json");
+  QDir dataDir = core()->localDataDirectory();
+  QFile file(dataDir.absolutePath() + "/settings.json");
   if(file.open(QIODevice::ReadOnly))
     {
     SJSONLoader loader;

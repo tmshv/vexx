@@ -33,49 +33,56 @@ SPropertyContainer::TreeChange::~TreeChange()
     }
   }
 
-bool SPropertyContainer::TreeChange::apply(int mode)
+bool SPropertyContainer::TreeChange::apply()
   {
-  if(mode&Forward)
+  SProfileFunction
+  if(before())
     {
-    if(before())
-      {
-      _owner = true;
-      before()->internalRemoveProperty(property());
-      before()->postSet();
-      }
-    if(after())
-      {
-      _owner = false;
-      after()->internalInsertProperty(false, property(), _index);
-      after()->postSet();
-      }
+    _owner = true;
+    before()->internalRemoveProperty(property());
+    before()->postSet();
     }
-  else if(mode&Backward)
+
+  if(after())
     {
-    if(after())
-      {
-      _owner = true;
-      after()->internalRemoveProperty(property());
-      after()->postSet();
-      }
-    if(before())
-      {
-      _owner = false;
-      before()->internalInsertProperty(false, property(), _index);
-      before()->postSet();
-      }
+    _owner = false;
+    after()->internalInsertProperty(false, property(), _index);
+    after()->postSet();
     }
-  if(mode&Inform)
+  return true;
+  }
+
+bool SPropertyContainer::TreeChange::unApply()
+  {
+  SProfileFunction
+  if(after())
     {
-    if(after())
-      {
-      xAssert(property()->entity());
-      property()->entity()->informTreeObservers(this);
-      }
-    if(before())
-      {
-      before()->entity()->informTreeObservers(this);
-      }
+    _owner = true;
+    after()->internalRemoveProperty(property());
+    after()->postSet();
+    }
+
+  if(before())
+    {
+    _owner = false;
+    before()->internalInsertProperty(false, property(), _index);
+    before()->postSet();
+    }
+  return true;
+  }
+
+bool SPropertyContainer::TreeChange::inform()
+  {
+  SProfileFunction
+  if(after())
+    {
+    xAssert(property()->entity());
+    property()->entity()->informTreeObservers(this);
+    }
+
+  if(before())
+    {
+    before()->entity()->informTreeObservers(this);
     }
   return true;
   }
@@ -100,21 +107,18 @@ xsize SPropertyContainer::size() const
 
 const SProperty *SPropertyContainer::findChild(const QString &name) const
   {
-  preGet();
-  for(SProperty *child=firstChild(); child; child=child->nextSibling())
-    {
-    if(child->name() == name)
-      {
-      return child;
-      }
-    }
-  return 0;
+  return const_cast<SPropertyContainer*>(this)->findChild(name);
   }
 
 SProperty *SPropertyContainer::findChild(const QString &name)
   {
   preGet();
-  for(SProperty *child=firstChild(); child; child=child->nextSibling())
+  return internalFindChild(name);
+  }
+
+SProperty *SPropertyContainer::internalFindChild(const QString &name)
+  {
+  for(SProperty *child=_child; child; child=child->_nextSibling)
     {
     if(child->name() == name)
       {
@@ -299,6 +303,23 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
   xAssert(newProp->_parent == 0);
   xAssert(newProp->_nextSibling == 0);
 
+  const QString &name = newProp->name();
+  bool nameUnique = internalFindChild(name) == false;
+  QString newName;
+  if(!nameUnique || name.isEmpty())
+    {
+    xAssert(newProp->isDynamic());
+    database()->beginBlock();
+
+    xuint32 id = 1;
+    newName = newProp->name() + QString::number(id);
+    while(internalFindChild(newName))
+      {
+      newName = newProp->name() + QString::number(id);
+      ++id;
+      }
+    }
+
   if(_child)
     {
     xsize propIndex = 0;
@@ -359,6 +380,12 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
     newProp->_flags.setFlag(ParentHasOutput);
     }
   xAssert(newProp->_parent);
+
+  if(!newName.isEmpty())
+    {
+    newProp->setName(newName);
+    database()->endBlock();
+    }
   }
 
 void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)

@@ -33,7 +33,15 @@ void SPartDocument::newFile()
 
   if(info)
     {
-    SProperty *prop = addChild(info, "");
+    xuint32 i = 1;
+    QString name = info->typeName();
+    while(STypeRegistry::findType(name))
+      {
+      name = info->typeName() + QString::number(i);
+      i++;
+      }
+
+    SProperty *prop = addChild(info, name);
     fileChangedStub.addPointer(prop);
     }
   }

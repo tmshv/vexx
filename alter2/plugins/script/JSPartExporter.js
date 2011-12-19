@@ -3,62 +3,121 @@ var jsFileExporter = {
     fileType: "Javascript Source (*.js)",
     exportFile: function(filename, entity)
         {
-        var file = io.createFile(filename);
-        if(!file.open("write"))
+        db.cancelBlock(function()
+          {
+          var file = io.createFile(filename);
+          if(!file.open("write"))
             {
             print("Couldn't open file " + filename + " for writing.");
             return false;
             }
 
-        var part = entity.children[0];
+          var part = entity.children[0];
 
-        function exportChildren(arr, parent, onlyDynamic, doAffects)
+          function hasExportableChild(parent)
             {
             for(var i=0, s=parent.length; i<s; ++i)
-                {
-                var subProp = parent[i];
-                if(onlyDynamic && !subProp.dynamic)
-                    {
-                    continue;
-                    }
+              {
+              var subProp = parent[i];
 
-                var obj =
+              if(!subProp.dynamic)
+                {
+                if(hasExportableChild(subProp))
+                  {
+                  return true;
+                  }
+                }
+              else
+                {
+                return true;
+                }
+              }
+            return false;
+            }
+
+          function exportChildren(arr, parent, doAffects, excludeArray)
+            {
+            for(var i=0, s=parent.length; i<s; ++i)
+              {
+              var subProp = parent[i];
+
+              if(excludeArray && excludeArray.indexOf(subProp.name) !== -1)
+                {
+                continue;
+                }
+
+              if(!subProp.dynamic)
+                {
+                if(hasExportableChild(subProp))
+                  {
+                  var obj =
                     {
                     name: subProp.name,
-                    type: subProp.typeInformation.typeName
+                    extend: true,
+                    properties: []
                     };
 
-                var val = subProp.valueString;
-                if(val != "")
+                  exportChildren(obj.properties, subProp, true);
+                  arr.push(obj);
+                  }
+                }
+              else
+                {
+                var obj =
+                  {
+                  name: subProp.name,
+                  type: subProp.typeInformation.typeName
+                  };
+
+                var input = subProp.input;
+                if(input)
+                  {
+                  obj["defaultInput"] = subProp.pathTo(input);
+                  }
+                else
+                  {
+                  var val = subProp.valueString;
+                  if(val !== "")
                     {
                     obj["defaultValue"] = val;
                     }
+                  }
 
                 if(doAffects)
-                    {
-                    obj["affects"] = subProp.affects;
-                    }
+                  {
+                  obj["affects"] = subProp.affects;
+                  }
 
                 arr.push(obj);
                 }
+              }
             }
 
-        var propertyArray = [];
-        var subProps = part.children;
-        exportChildren(propertyArray, subProps, true, false);
-        exportChildren(propertyArray, part, true, true);
 
-        var nodeObject =
-        {
+          var nodeObject =
+            {
             name: part.name,
             parent: part.typeInformation.typeName,
-            properties: propertyArray
-        }
+            properties: []
+            }
 
-        var fileContents = JSON.stringify(nodeObject, null, "  ");
+          var children = part.children;
+          for(var i=0, s=children.length; i<s; ++i)
+            {
+            var subProp = children[0];
 
-        file.write(fileContents);
-        file.close();
+            subProp.parent = part;
+            }
+
+          exportChildren(nodeObject.properties, part, true, [ "children" ]);
+
+          var fileContents = JSON.stringify(nodeObject, null, "  ");
+
+          file.write("db.addType(");
+          file.write(fileContents);
+          file.write(");");
+          file.close();
+          });
 
         return true;
         }

@@ -81,22 +81,25 @@ void SProperty::setDependantsDirty()
     }
   }
 
-bool SProperty::NameChange::apply(int mode)
+bool SProperty::NameChange::apply()
   {
   SProfileFunction
-  if(mode&Forward)
-    {
-    property()->internalSetName(after());
-    }
-  else if(mode&Backward)
-    {
-    property()->internalSetName(before());
-    }
-  if(mode&Inform)
-    {
-    xAssert(property()->entity());
-    property()->entity()->informTreeObservers(this);
-    }
+  property()->internalSetName(after());
+  return true;
+  }
+
+bool SProperty::NameChange::unApply()
+  {
+  SProfileFunction
+  property()->internalSetName(before());
+  return true;
+  }
+
+bool SProperty::NameChange::inform()
+  {
+  SProfileFunction
+  xAssert(property()->entity());
+  property()->entity()->informTreeObservers(this);
   return true;
   }
 
@@ -407,6 +410,16 @@ const QString &SProperty::name() const
   return baseInstanceInformation()->name();
   }
 
+QString SProperty::escapedName() const
+  {
+  SProfileFunction
+  QString n = baseInstanceInformation()->name();
+
+  n.replace(SDatabase::pathSeparator(), '\\' + SDatabase::pathSeparator());
+
+  return n;
+  }
+
 void SProperty::assign(const SProperty *propToAssign)
   {
   const SPropertyInformation *info = typeInformation();
@@ -484,58 +497,60 @@ void SProperty::disconnect() const
     }
   }
 
-bool SProperty::ConnectionChange::apply(int mode)
+bool SProperty::ConnectionChange::apply()
   {
   SProfileFunction
-  if(mode&Forward)
+  if(_mode == Connect)
     {
-    if(_mode == Connect)
+    _driver->connectInternal(_driven);
+    //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
       {
-      _driver->connectInternal(_driven);
-      //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
-        {
-        setParentHasInputConnection(_driven);
-        setParentHasOutputConnection(_driver);
-        }
-      _driver->setDependantsDirty();
+      setParentHasInputConnection(_driven);
+      setParentHasOutputConnection(_driver);
       }
-    else if(_mode == Disconnect)
-      {
-      _driver->disconnectInternal(_driven);
-      clearParentHasInputConnection(_driven);
-      clearParentHasOutputConnection(_driver);
-      }
+    _driver->setDependantsDirty();
     }
-  else if(mode&Backward)
+  else if(_mode == Disconnect)
     {
-    if(_mode == Connect)
-      {
-      _driver->disconnectInternal(_driven);
-      clearParentHasInputConnection(_driven);
-      clearParentHasOutputConnection(_driver);
-      }
-    else if(_mode == Disconnect)
-      {
-      _driver->connectInternal(_driven);
-      //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
-        {
-        setParentHasInputConnection(_driven);
-        setParentHasOutputConnection(_driver);
-        }
-      _driver->setDependantsDirty();
-      }
+    _driver->disconnectInternal(_driven);
+    clearParentHasInputConnection(_driven);
+    clearParentHasOutputConnection(_driver);
     }
+  return true;
+  }
 
-  if(mode&Inform)
+bool SProperty::ConnectionChange::unApply()
+  {
+  SProfileFunction
+  if(_mode == Connect)
     {
-    if(_driver->entity())
+    _driver->disconnectInternal(_driven);
+    clearParentHasInputConnection(_driven);
+    clearParentHasOutputConnection(_driver);
+    }
+  else if(_mode == Disconnect)
+    {
+    _driver->connectInternal(_driven);
+    //if(_driven->typeInformation()->inheritsFromType(_driver->typeInformation()))
       {
-      _driver->entity()->informConnectionObservers(this);
+      setParentHasInputConnection(_driven);
+      setParentHasOutputConnection(_driver);
       }
-    if(_driven->entity())
-      {
-      _driven->entity()->informConnectionObservers(this);
-      }
+    _driver->setDependantsDirty();
+    }
+  return true;
+  }
+
+bool SProperty::ConnectionChange::inform()
+  {
+  SProfileFunction
+  if(_driver->entity())
+    {
+    _driver->entity()->informConnectionObservers(this);
+    }
+  if(_driven->entity())
+    {
+    _driven->entity()->informConnectionObservers(this);
     }
   return true;
   }
@@ -673,16 +688,18 @@ QString SProperty::path() const
     {
     return QString();
     }
-  return parent()->path() + SDatabase::pathSeparator() + name();
+  return parent()->path() + SDatabase::pathSeparator() + escapedName();
   }
 
 QString SProperty::path(const SProperty *from) const
   {
   SProfileFunction
+
   if(from == this)
     {
     return "";
     }
+
   if(isDescendedFrom(from))
     {
     QString ret;
@@ -690,11 +707,11 @@ QString SProperty::path(const SProperty *from) const
     while(p && p != from)
       {
       xAssert(p->name() != "");
-      ret = p->name() + SDatabase::pathSeparator() + ret;
+      ret = p->escapedName() + SDatabase::pathSeparator() + ret;
 
       p = p->parent();
       }
-    return ret + name();
+    return ret + escapedName();
     }
   else if(from->parent())
     {
@@ -722,33 +739,60 @@ SProperty *SProperty::resolvePath(const QString &path)
   {
   SProfileFunction
   preGet();
-  QStringList splitPath(path.split(SDatabase::pathSeparator()));
-  SProperty *cur = this;
-  foreach(const QString &name, splitPath)
-    {
-    if(!cur)
-      {
-      return 0;
-      }
-    if(name == "..")
-      {
-      cur = cur->parent();
-      }
 
-    SPropertyContainer* container = cur->castTo<SPropertyContainer>();
-    if(!container)
+  SProperty *cur = this;
+
+  QString name;
+  bool escape = false;
+  for(xsize i = 0, s = path.size(); i < s; ++i)
+    {
+    QChar c = path[i];
+
+    if(c == QChar('\\'))
       {
-      return 0;
+      escape = true;
       }
-    SProperty *child = container->firstChild();
-    while(child)
+    else
       {
-      if(child->name() == name)
+      if(!escape && c != QChar('/'))
         {
-        cur = child;
-        break;
+        name.append(c);
         }
-      child = child->nextSibling();
+
+      if(!escape && (c == QChar('/') || i == (s-1)))
+        {
+        if(!cur)
+          {
+          return 0;
+          }
+
+        if(name == "..")
+          {
+          cur = cur->parent();
+          }
+        else
+          {
+          SPropertyContainer* container = cur->castTo<SPropertyContainer>();
+          if(!container)
+            {
+            return 0;
+            }
+
+          SProperty *child = container->firstChild();
+          while(child)
+            {
+            if(child->name() == name)
+              {
+              cur = child;
+              break;
+              }
+            child = child->nextSibling();
+            }
+          }
+
+        name.clear();
+        }
+      escape = false;
       }
     }
   return cur;
@@ -756,38 +800,7 @@ SProperty *SProperty::resolvePath(const QString &path)
 
 const SProperty *SProperty::resolvePath(const QString &path) const
   {
-  SProfileFunction
-  preGet();
-  QStringList splitPath(path.split(SDatabase::pathSeparator()));
-  const SProperty *cur = this;
-  foreach(const QString &name, splitPath)
-    {
-    if(!cur)
-      {
-      return 0;
-      }
-    if(name == "..")
-      {
-      cur = cur->parent();
-      }
-
-    const SPropertyContainer* container = cur->castTo<SPropertyContainer>();
-    if(!container)
-      {
-      return 0;
-      }
-    const SProperty *child = container->firstChild();
-    while(child)
-      {
-      if(child->name() == name)
-        {
-        cur = child;
-        break;
-        }
-      child = child->nextSibling();
-      }
-    }
-  return cur;
+  return const_cast<SProperty*>(this)->resolvePath(path);
   }
 
 void SProperty::internalSetName(const QString &name)

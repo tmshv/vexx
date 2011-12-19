@@ -190,21 +190,46 @@ void SDatabase::uninitiateProperty(SProperty *prop)
 void SDatabase::beginBlock()
   {
   _blockLevel++;
+  _blockSize << _done.size();
   }
 
-void SDatabase::endBlock()
+void SDatabase::endBlock(bool cancel)
   {
   xAssert(_blockLevel > 0);
   _blockLevel--;
+
+  xsize previousPoint = _blockSize.last();
+  _blockSize.pop_back();
+  if(cancel)
+    {
+    undoTo(previousPoint);
+    }
+
+  // wrap everything into one inform block
   if(_blockLevel == 0)
     {
     inform();
     }
   }
 
-QString SDatabase::pathSeparator()
+void SDatabase::undoTo(xsize p)
   {
-  return "/";
+  xAssert(p <= (xsize)_done.size());
+  for(xsize i=((xsize)_done.size()-1); i>=p; --i)
+    {
+    SChange *c = _done[i];
+
+    bool result = c->unApply() && c->inform();
+    xAssert(result);
+
+    // todo dont need this here, when undo fully implemented.B
+    _done.pop_back();
+    }
+  }
+
+QChar SDatabase::pathSeparator()
+  {
+  return QChar('/');
   }
 
 SBlock::SBlock(SDatabase *db) : _db(db)

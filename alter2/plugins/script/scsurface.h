@@ -2,6 +2,7 @@
 #define SCSURFACE_H
 
 #include "UISurface.h"
+#include "QFile"
 #include "QObject"
 
 class ScPlugin;
@@ -18,21 +19,22 @@ public:
   ScSurface(ScPlugin *plugin);
   ~ScSurface();
 
-  void threadSafeLog(const QString &);
+  void threadSafeLog(QtMsgType t, const QString &);
 
 public slots:
-  void appendToLog(const QString &);
+  void appendToLog(QtMsgType t, const QString &);
 
 private slots:
   void execute();
   void executeDebugged();
 
 signals:
-  void threadSafeLogSignal(const QString &);
+  void threadSafeLogSignal(QtMsgType t, const QString &);
 
 private:
   QTextEdit *_editor;
   QTextEdit *_log;
+  QFile _logFile;
   friend void logHandler(QtMsgType msgType, const char *message);
   };
 

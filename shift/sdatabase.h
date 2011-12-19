@@ -22,9 +22,9 @@ public:
   ~SDatabase();
 
   void beginBlock();
-  void endBlock();
+  void endBlock(bool cancel = false);
 
-  static QString pathSeparator();
+  static QChar pathSeparator();
 
 #ifdef X_CPPOX_SUPPORT
   template <typename CLS, typename ...CLSARGS> void doChange(CLSARGS&&... params)
@@ -32,7 +32,6 @@ public:
     bool oldStateStorageEnabled = _stateStorageEnabled;
     setStateStorageEnabled(false);
 
-    int mode = SChange::Forward|SChange::Inform;
     if(!oldStateStorageEnabled)
       {
       CLS change(std::forward<CLSARGS>(params)...);
@@ -54,7 +53,7 @@ public:
       void *mem = changeAllocator()->alloc(sizeof(CLS));
       SChange* change = new(mem) CLS(std::forward<CLSARGS>(params)...);
 
-      bool result = change->apply(mode);
+      bool result = change->apply() && change->inform();
 
       if(result)
         {
@@ -71,15 +70,15 @@ public:
 #define DO_CHANGE_IMPL(...) { \
     bool oldStateStorageEnabled = _stateStorageEnabled; \
     setStateStorageEnabled(false); \
-    int mode = SChange::Forward|SChange::Inform; \
     if(!oldStateStorageEnabled) { \
       CLS change(__VA_ARGS__); \
-      ((SChange&)change).apply(mode); \
+      ((SChange&)change).apply(); \
+      ((SChange&)change).inform(); \
     }else { \
       QMutexLocker l(&_doChange); \
       void *mem = changeAllocator()->alloc(sizeof(CLS)); \
       SChange* change = new(mem) CLS(__VA_ARGS__); \
-      bool result = change->apply(mode); \
+      bool result = change->apply() && change->inform(); \
       if(result) { \
         _done << change; \
       } else { \
@@ -116,11 +115,9 @@ private:
     return &_memory;
     }
 
-  template <typename T> static T *createHelper()
-    {
-    return new T();
-    }
   xuint32 _blockLevel;
+
+  void undoTo(xsize p);
 
   void inform();
   SObservers _blockObservers;
@@ -128,6 +125,7 @@ private:
   bool _stateStorageEnabled;
 
   XList <SChange*> _done;
+  QVector <xsize> _blockSize;
   InstanceInformation _instanceInfoData;
 
   void initiateProperty(SProperty *);

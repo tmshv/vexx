@@ -37,7 +37,9 @@ public:
     SProperty *_property;
     xsize _index;
     bool _owner;
-    bool apply(int);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   SPropertyContainer();
@@ -89,6 +91,9 @@ public:
   SProperty *at(xsize i);
   const SProperty *at(xsize i) const;
 
+  // move a property from this to newParent
+  void moveProperty(SPropertyContainer *newParent, SProperty *property);
+
   bool contains(SProperty *) const;
 
   static void assignProperty(const SProperty *, SProperty *);
@@ -103,13 +108,12 @@ protected:
   // you cannot add another contained property once dynamic properties have been added, this bool
   // should really be left alone and not exposed in sub classes
   SProperty *addProperty(const SPropertyInformation *info, xsize index=X_SIZE_SENTINEL);
-  // move a property from this to newParent
-  void moveProperty(SPropertyContainer *newParent, SProperty *property);
   void removeProperty(SProperty *);
 
   void clear();
 
 private:
+  SProperty *internalFindChild(const QString &name);
   friend void setDependantsDirty(SProperty* prop, bool force);
   SProperty *_child;
   xsize _containedProperties;

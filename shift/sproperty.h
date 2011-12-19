@@ -186,6 +186,8 @@ public:
   // set only works for dynamic properties
   void setName(const QString &);
   const QString &name() const;
+  // name valid for entry into paths.
+  QString escapedName() const;
 
   template <typename T>T *uncheckedCastTo()
     {
@@ -270,7 +272,9 @@ public:
     QString _before;
     QString _after;
     SProperty *_property;
-    bool apply(int mode);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   class ConnectionChange : public SChange
@@ -301,7 +305,9 @@ public:
     SProperty *_driver;
     SProperty *_driven;
     Mode _mode;
-    bool apply(int mode);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   static void assignProperty(const SProperty *, SProperty *);

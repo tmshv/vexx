@@ -1,5 +1,6 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
+#include "sdatabase.h"
 #include "styperegistry.h"
 
 SPropertyInstanceInformation::SPropertyInstanceInformation()
@@ -65,7 +66,8 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
 SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj)
   {
   xAssert(obj->_copy);
-  return obj->_copy();
+  SPropertyInformation *copy = obj->_copy();
+  return copy;
   }
 
 SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, const QString &name)
@@ -350,6 +352,74 @@ const SProperty *SPropertyInstanceInformation::locateProperty(const SPropertyCon
   const xuint8* childOffset = parentOffset + location();
   const SProperty *child = reinterpret_cast<const SProperty*>(childOffset);
   return child;
+  }
+
+const SPropertyInstanceInformation *SPropertyInstanceInformation::resolvePath(const QString &path) const
+  {
+  SProfileFunction
+
+  const SPropertyInstanceInformation *cur = this;
+  const SPropertyInformation *curInfo = cur->childInformation();
+
+  QString name;
+  bool escape = false;
+  for(xsize i = 0, s = path.size(); i < s; ++i)
+    {
+    QChar c = path[i];
+
+    if(c == QChar('\\'))
+      {
+      escape = true;
+      }
+    else
+      {
+      if(!escape && c != SDatabase::pathSeparator())
+        {
+        name.append(c);
+        }
+
+      if(!escape && (c == SDatabase::pathSeparator() || i == (s-1)))
+        {
+        if(name == "..")
+          {
+          xAssert(cur);
+          if(!cur)
+            {
+            return 0;
+            }
+
+          curInfo = cur->holdingTypeInformation();
+          if(!curInfo)
+            {
+            return 0;
+            }
+
+          cur = curInfo->extendedParent();
+          }
+        else
+          {
+          xAssert(curInfo);
+          cur = curInfo->childFromName(name);
+          if(!cur)
+            {
+            return 0;
+            }
+
+          curInfo = cur->childInformation();
+          }
+
+        if(!cur && !curInfo)
+          {
+          return 0;
+          }
+        xAssert(curInfo);
+
+        name.clear();
+        }
+      escape = false;
+      }
+    }
+  return cur;
   }
 
 void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformation *info, const SPropertyContainer *cont, SProperty **jobs, xsize &numJobs)

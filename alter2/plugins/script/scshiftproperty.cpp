@@ -10,6 +10,7 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   {
   addMemberProperty("typeInformation", typeInformation, QScriptValue::PropertyGetter);
   addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
+  addMemberProperty("parent", parent, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("outputs", outputs, QScriptValue::PropertyGetter);
   addMemberProperty("firstOutput", firstOutput, QScriptValue::PropertyGetter);
   addMemberProperty("affects", affects, QScriptValue::PropertyGetter);
@@ -18,6 +19,7 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   addMemberProperty("valueString", valueString, QScriptValue::PropertyGetter);
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
+  addMemberFunction("pathTo", pathTo);
 
   addMemberFunction("registerExporter", registerExporter);
 
@@ -26,6 +28,29 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
 
 ScShiftProperty::~ScShiftProperty()
   {
+  }
+
+QScriptValue ScShiftProperty::pathTo(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    if(ctx->argumentCount() < 1)
+      {
+      ctx->throwError(QScriptContext::SyntaxError, "Incorrect argument count to SProperty.pathTo(property);");
+      return QScriptValue();
+      }
+
+    SProperty **toPtr = unpackValue(ctx->argument(0));
+    if(toPtr)
+      {
+      return (*toPtr)->path(*prop);
+      }
+
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.pathTo(property);");
+  return QScriptValue();
   }
 
 QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *)
@@ -48,6 +73,35 @@ QScriptValue ScShiftProperty::input(QScriptContext *ctx, QScriptEngine *)
         }
       }
     return ScEmbeddedTypes::packValue((*prop)->input());
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.input(...);");
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::parent(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    if(ctx->argumentCount() == 1)
+      {
+      SProperty **newParent = unpackValue(ctx->argument(0));
+      if(newParent && *newParent)
+        {
+        SPropertyContainer *cont = (*newParent)->castTo<SPropertyContainer>();
+        if(cont)
+          {
+          (*prop)->parent()->moveProperty(cont, *prop);
+          }
+        }
+      else
+        {
+        ctx->throwError(QScriptContext::SyntaxError, "Incorrect argument to SProperty.input(...); expected property type");
+        return QScriptValue();
+        }
+      }
+    return ScEmbeddedTypes::packValue((*prop)->parent());
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.input(...);");
   return QScriptValue();

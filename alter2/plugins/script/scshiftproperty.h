@@ -12,7 +12,9 @@ public:
 
   static QScriptValue typeInformation(QScriptContext *ctx, QScriptEngine *);
 
+  static QScriptValue pathTo(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue input(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue parent(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue outputs(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue firstOutput(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue affects(QScriptContext *ctx, QScriptEngine *);

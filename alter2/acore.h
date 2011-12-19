@@ -9,6 +9,7 @@
 
 class ACorePrivate;
 class AAbstractPlugin;
+class QDir;
 
 class ALTER_EXPORT ACore : public QObject
     {
@@ -30,6 +31,8 @@ public:
     QStringList directories() const;
     void addDirectory(const QString &);
     void removeDirectory(const QString &);
+
+    QDir localDataDirectory() const;
 
     QObject *plugin(const QString &pluginID);
 
