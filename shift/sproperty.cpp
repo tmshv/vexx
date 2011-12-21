@@ -220,10 +220,11 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
       QString affectsString;
 
       const SPropertyInformation *contInfo = p->parent()->typeInformation();
-      while(affects != 0)
+      while(*affects != 0)
         {
         const SPropertyInstanceInformation *affectsInst = contInfo->child(*affects);
 
+        xAssert(affectsInst);
         xAssert(!affectsInst->dynamic());
         if(!affectsInst->dynamic())
           {
@@ -281,7 +282,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
     for(int i=0, s=affectsString.size(); i<s; ++i)
       {
       xAssert(!escapeNext || affectsString[i] == ',');
-      if(affectsString[i] == ',' && !escapeNext)
+      if((affectsString[i] == ',' || i == (s-1)) && !escapeNext)
         {
         numAffects++;
         }
@@ -306,8 +307,13 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
     for(int i=0, s=affectsString.size(); i<s; ++i)
       {
       xAssert(!escapeNext || affectsString[i] == ',');
-      if(affectsString[i] == ',' && !escapeNext)
+      if((affectsString[i] == ',' || i == (s-1)) && !escapeNext)
         {
+        if(i == (s-1))
+          {
+          num++;
+          }
+
         QString affectsName = affectsString.mid(lastPos, num);
 
         const SPropertyInstanceInformation *inst = parentType->childFromName(affectsName);

@@ -36,10 +36,13 @@ void PropertyNameEditor::onTreeChange(const SChange *c)
 
 void PropertyNameEditor::editName()
   {
-  property()->setName(text());
-  if(feedback() && callback())
+  if(property() && property()->parent())
     {
-    (feedback()->*callback())();
+    property()->setName(text());
+    if(feedback() && callback())
+      {
+      (feedback()->*callback())();
+      }
     }
   }
 
