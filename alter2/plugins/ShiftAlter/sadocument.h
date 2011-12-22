@@ -60,7 +60,7 @@ private:
   mutable QVector <XConstSharedPointer<Exporter> > _exporters;
   };
 
-class SHIFTALTER_EXPORT SDocument : public SEntity
+class SHIFTALTER_EXPORT SDocument : public SEntity, public SHandler
   {
   S_ABSTRACT_ENTITY(SDocument, SEntity, 0)
 

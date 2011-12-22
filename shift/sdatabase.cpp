@@ -14,12 +14,16 @@ SPropertyInformation *SDatabase::createTypeInformation()
   info->add(&SDatabase::majorVersion, "majorVersion")->setDefault(0);
   info->add(&SDatabase::minorVersion, "minorVersion")->setDefault(0);
   info->add(&SDatabase::revision, "revision")->setDefault(0);
+
+  info->addInheritedInterface<SDatabase, SHandler>();
+
   return info;
   }
 
-SDatabase::SDatabase() : _blockLevel(0)
+SDatabase::SDatabase()
   {
-  _database = this;
+  _handler = this;
+  setDatabase(this);
   _info = staticTypeInformation();
   _instanceInfo = &_instanceInfoData;
   }
@@ -29,23 +33,20 @@ SDatabase::~SDatabase()
   clear();
   _child = 0;
 
-  foreach(SChange *ch, _done)
-    {
-    xDestroyAndFree(changeAllocator(), SChange, ch);
-    }
-
   xAssert(_memory.empty());
   }
 
-SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
+SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe)
   {
   SProfileFunction
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
   type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
-  prop->_database = this;
+
   prop->_info = type;
+  prop->_handler = SHandler::findHandler(parentToBe, prop);
+  xAssert(_handler);
 
   initiateProperty(prop);
   postInitiateProperty(prop);
@@ -135,7 +136,7 @@ void SDatabase::initiateProperty(SProperty *prop)
     initiatePropertyFromMetaData(container, metaData);
     }
 
-  xAssert(prop->database());
+  xAssert(prop->handler());
   }
 
 void SDatabase::postInitiateProperty(SProperty *prop)
@@ -170,7 +171,7 @@ void SDatabase::postInitiateProperty(SProperty *prop)
     info = info->parentTypeInformation();
     }
 
-  xAssert(prop->database());
+  xAssert(prop->handler());
   }
 
 void SDatabase::uninitiateProperty(SProperty *prop)
@@ -187,67 +188,7 @@ void SDatabase::uninitiateProperty(SProperty *prop)
     }
   }
 
-void SDatabase::beginBlock()
-  {
-  _blockLevel++;
-  _blockSize << _done.size();
-  }
-
-void SDatabase::endBlock(bool cancel)
-  {
-  xAssert(_blockLevel > 0);
-  _blockLevel--;
-
-  xsize previousPoint = _blockSize.last();
-  _blockSize.pop_back();
-  if(cancel)
-    {
-    undoTo(previousPoint);
-    }
-
-  // wrap everything into one inform block
-  if(_blockLevel == 0)
-    {
-    inform();
-    }
-  }
-
-void SDatabase::undoTo(xsize p)
-  {
-  xAssert(p <= (xsize)_done.size());
-  for(xsize i=((xsize)_done.size()-1); i>=p; --i)
-    {
-    SChange *c = _done[i];
-
-    bool result = c->unApply() && c->inform();
-    xAssert(result);
-
-    // todo dont need this here, when undo fully implemented.B
-    _done.pop_back();
-    }
-  }
-
 QChar SDatabase::pathSeparator()
   {
   return QChar('/');
-  }
-
-SBlock::SBlock(SDatabase *db) : _db(db)
-  {
-  _db->beginBlock();
-  }
-
-SBlock::~SBlock()
-  {
-  _db->endBlock();
-  }
-
-void SDatabase::inform()
-  {
-  SProfileFunction
-  foreach(SObserver *obs, _blockObservers)
-    {
-    obs->actOnChanges();
-    }
-  _blockObservers.clear();
   }

@@ -148,7 +148,7 @@ private:
 
   void applyChange(const EigenArray &arr)
     {
-    SDatabase& db = *database();
+    SHandler& db = *handler();
     db.doChange<ArrayChange>(mData, arr, this);
     }
 

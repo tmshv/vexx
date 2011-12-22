@@ -27,6 +27,8 @@ SPropertyInformation *SDocument::createTypeInformation()
   PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
   fCS->setAffects(rev);
 
+  info->addInheritedInterface<SDocument, SHandler>();
+
   return info;
   }
 
@@ -47,7 +49,7 @@ bool SDocument::hasChanged()
 
 void SDocument::newFile()
   {
-  SBlock b(database());
+  SBlock b(handler());
 
   fileChangedStub.clear();
   children.clear();
@@ -69,7 +71,7 @@ void SDocument::loadFile(const QString &f)
 
   SJSONLoader loader;
 
-  SBlock b(database());
+  SBlock b(handler());
 
   fileChangedStub.clear();
   children.clear();

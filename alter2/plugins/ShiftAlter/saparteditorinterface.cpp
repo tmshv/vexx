@@ -67,7 +67,7 @@ PropertyTypeEditor::~PropertyTypeEditor()
 void PropertyTypeEditor::editType(const QString &t)
   {
   xAssert(property());
-  SBlock b(property()->database());
+  SBlock b(property()->handler());
 
   const SPropertyInformation *info = STypeRegistry::findType(t);
   SProperty *parent = property()->parent();

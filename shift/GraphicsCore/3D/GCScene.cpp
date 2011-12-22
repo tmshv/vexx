@@ -79,7 +79,7 @@ void GCManipulatableScene::clearManipulators()
 
 void GCManipulatableScene::refreshManipulators()
   {
-  SBlock b(database());
+  SBlock b(handler());
 
   clearManipulators();
 

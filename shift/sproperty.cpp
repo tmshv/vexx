@@ -104,7 +104,7 @@ bool SProperty::NameChange::inform()
   }
 
 SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
-    _database(0), _parent(0), _info(0), _instanceInfo(0), _userData(0), _entity(0),
+    _handler(0), _parent(0), _info(0), _instanceInfo(0), _userData(0), _entity(0),
     _flags(Dirty)
   {
   }
@@ -170,7 +170,7 @@ void SProperty::setName(const QString &in)
     realName = fixedName + QString::number(num++);
     }
 
-  database()->doChange<NameChange>(name(), realName, this);
+  handler()->doChange<NameChange>(name(), realName, this);
   }
 
 SProperty *SProperty::nextSibling() const
@@ -347,7 +347,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   SProperty *prop = 0;
   if(dynamic != 0)
     {
-    prop = parent->database()->createDynamicProperty(type);
+    prop = parent->database()->createDynamicProperty(type, parent);
     xAssert(prop);
 
     parent->internalInsertProperty(false, prop, X_SIZE_SENTINEL);
@@ -371,6 +371,16 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
     }
 
   return prop;
+  }
+
+SDatabase *SProperty::database()
+  {
+  return handler()->database();
+  }
+
+const SDatabase *SProperty::database() const
+  {
+  return handler()->database();
   }
 
 bool SProperty::shouldSavePropertyValue(const SProperty *p)
@@ -458,7 +468,7 @@ void SProperty::connect(SProperty *prop) const
   SProfileFunction
   if(prop && prop != this)
     {
-    ((SDatabase*)database())->doChange<ConnectionChange>(ConnectionChange::Connect, (SProperty*)this, prop);
+    ((SDatabase*)handler())->doChange<ConnectionChange>(ConnectionChange::Connect, (SProperty*)this, prop);
     }
   else
     {
@@ -470,7 +480,7 @@ void SProperty::connect(const QVector<SProperty*> &l) const
   {
   if(l.size())
     {
-    SBlock b(l.front()->database());
+    SBlock b(l.front()->handler());
     foreach(SProperty *p, l)
       {
       connect(p);
@@ -481,7 +491,7 @@ void SProperty::connect(const QVector<SProperty*> &l) const
 void SProperty::disconnect(SProperty *prop) const
   {
   SProfileFunction
-  ((SDatabase*)database())->doChange<ConnectionChange>(ConnectionChange::Disconnect, (SProperty*)this, prop);
+  ((SDatabase*)handler())->doChange<ConnectionChange>(ConnectionChange::Disconnect, (SProperty*)this, prop);
   }
 
 bool SProperty::isComputed() const
@@ -852,8 +862,9 @@ void SProperty::updateParent() const
 void SProperty::update() const
   {
   SProfileFunction
-  bool stateStorageEnabled = database()->stateStorageEnabled();
-  const_cast<SDatabase*>(database())->setStateStorageEnabled(false);
+  SDatabase *db = const_cast<SDatabase*>(database());
+  bool stateStorageEnabled = db->stateStorageEnabled();
+  db->setStateStorageEnabled(false);
 
   SProperty *prop = const_cast<SProperty*>(this);
   prop->_flags.setFlag(PreGetting);
@@ -877,7 +888,7 @@ void SProperty::update() const
   prop->_flags.clearFlag(Dirty);
   prop->_flags.clearFlag(PreGetting);
 
-  const_cast<SDatabase*>(database())->setStateStorageEnabled(stateStorageEnabled);
+  db->setStateStorageEnabled(stateStorageEnabled);
 
   xAssert(!_flags.hasFlag(Dirty));
   }

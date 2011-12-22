@@ -53,7 +53,7 @@ public:
       {
       for(xsize x=0; x<s; ++x)
         {
-        addProperty(false, internalCreateHelper(T::Type, database()));
+        addProperty(false, internalCreateHelper(T::Type, handler()));
         }
       }
     else if(dif < 0)

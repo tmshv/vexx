@@ -17,7 +17,7 @@ GCGeometryAttribute::GCGeometryAttribute()
 
 void GCGeometryAttribute::setType(const SPropertyInformation *type)
   {
-  SBlock b(database());
+  SBlock b(handler());
   if(size() > 1)
     {
     removeProperty(firstChild());
@@ -300,7 +300,7 @@ void GCGeometry::appendTo(XGeometry *geo) const
 
 void GCGeometry::clearAttributes()
   {
-  SBlock b(database());
+  SBlock b(handler());
   while(attributes.firstChild())
     {
     attributes.remove(attributes.firstChild());

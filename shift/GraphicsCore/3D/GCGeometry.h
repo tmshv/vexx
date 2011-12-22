@@ -72,7 +72,7 @@ public:
   template <typename T>
   GCGeometryAttribute *addAttribute(const QString &name)
     {
-    SBlock b(database());
+    SBlock b(handler());
     GCGeometryAttribute *t = attributes.add();
     xAssert(t);
 

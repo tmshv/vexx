@@ -150,7 +150,7 @@ SPropertyContainer::~SPropertyContainer()
 
 void SPropertyContainer::clear()
   {
-  xAssert(database());
+  xAssert(handler());
 
   SProperty *prop = _child;
   SProperty *previous = 0;
@@ -183,9 +183,9 @@ SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsi
   {
   xAssert(index >= _containedProperties);
 
-  SProperty *newProp = database()->createDynamicProperty(info);
+  SProperty *newProp = database()->createDynamicProperty(info, this);
 
-  database()->doChange<TreeChange>((SPropertyContainer*)0, this, newProp, index);
+  handler()->doChange<TreeChange>((SPropertyContainer*)0, this, newProp, index);
   return newProp;
   }
 
@@ -193,20 +193,20 @@ void SPropertyContainer::moveProperty(SPropertyContainer *c, SProperty *p)
   {
   xAssert(p->parent() == this);
 
-  database()->doChange<TreeChange>(this, c, p, X_SIZE_SENTINEL);
+  handler()->doChange<TreeChange>(this, c, p, X_SIZE_SENTINEL);
   }
 
 void SPropertyContainer::removeProperty(SProperty *oldProp)
   {
   xAssert(oldProp->parent() == this);
 
-  SDatabase* db = database();
+  SHandler* db = handler();
   xAssert(db);
 
   SBlock b(db);
 
   oldProp->disconnect();
-  database()->doChange<TreeChange>(this, (SPropertyContainer*)0, oldProp, oldProp->index());
+  handler()->doChange<TreeChange>(this, (SPropertyContainer*)0, oldProp, oldProp->index());
   }
 
 void SPropertyContainer::assignProperty(const SProperty *f, SProperty *t)
@@ -309,7 +309,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
   if(!nameUnique || name.isEmpty())
     {
     xAssert(newProp->isDynamic());
-    database()->beginBlock();
+    handler()->beginBlock();
 
     xuint32 id = 1;
     newName = newProp->name() + QString::number(id);
@@ -344,7 +344,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
         // set up state info
         newProp->_parent = this;
         newProp->_entity = 0;
-        newProp->_database = _database;
+        newProp->_handler = SHandler::findHandler(this, newProp);
         break;
         }
       propIndex++;
@@ -365,7 +365,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
     _child = newProp;
     newProp->_parent = this;
     newProp->_entity = 0;
-    newProp->_database = _database;
+    newProp->_handler = SHandler::findHandler(this, newProp);
     }
 
   // is any prop in
@@ -384,7 +384,7 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
   if(!newName.isEmpty())
     {
     newProp->setName(newName);
-    database()->endBlock();
+    handler()->endBlock();
     }
   }
 

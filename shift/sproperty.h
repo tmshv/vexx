@@ -10,6 +10,7 @@ class SEntity;
 class SProperty;
 class SPropertyContainer;
 class SPropertyMetaData;
+class SHandler;
 class SDatabase;
 
 #define S_USER_DATA_TYPE(typeId) public: \
@@ -147,8 +148,10 @@ public:
 
   SProperty *nextSibling() const;
 
-  SDatabase *database() { return _database; }
-  const SDatabase *database() const { return _database; }
+  SHandler *handler() { return _handler; }
+  const SHandler *handler() const { return _handler; }
+  SDatabase *database();
+  const SDatabase *database() const;
 
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
@@ -334,7 +337,7 @@ private:
   SProperty *_input;
   SProperty *_output;
   SProperty *_nextOutput;
-  SDatabase *_database;
+  SHandler *_handler;
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
   const InstanceInformation *_instanceInfo;

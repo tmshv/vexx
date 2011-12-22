@@ -109,7 +109,7 @@ public:
       }
     ~ComputeLock()
       {
-      _ptr->database()->doChange<ComputeChange>(_ptr);
+      _ptr->handler()->doChange<ComputeChange>(_ptr);
       }
 
     T* data()
@@ -133,7 +133,7 @@ public:
       }
     ~Lock()
       {
-      _ptr->database()->doChange<Change>(_oldData, *_data, _ptr);
+      _ptr->handler()->doChange<Change>(_oldData, *_data, _ptr);
       _data = 0;
       }
 
@@ -344,7 +344,7 @@ template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
 
 template <typename T, typename DERIVED> void SPODProperty<T, DERIVED>::assign(const T &in)
   {
-  database()->doChange<Change>(_value, in, this);
+  handler()->doChange<Change>(_value, in, this);
   }
 
 #endif // SBASEPROPERTIES_H

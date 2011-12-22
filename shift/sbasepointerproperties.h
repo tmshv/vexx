@@ -40,7 +40,7 @@ template <typename PTR> class TypedPointerArray : public STypedPropertyArray<PTR
 public:
   PTR* addPointer(typename PTR::Type *prop)
     {
-    SDatabase* db = SProperty::database();
+    SHandler* db = SProperty::handler();
     xAssert(db);
 
     SBlock b(db);
