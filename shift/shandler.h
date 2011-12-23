@@ -17,6 +17,8 @@ public:
   SHandler();
   ~SHandler();
 
+  void clearChanges();
+
   static SHandler *findHandler(SPropertyContainer *parent, SProperty *prop);
 
   void beginBlock();

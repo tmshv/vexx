@@ -112,6 +112,9 @@ protected:
 
   void clear();
 
+  // remove and destroy all children. not for use by "array types", use clear instead.
+  void internalClear();
+
 private:
   SProperty *internalFindChild(const QString &name);
   friend void setDependantsDirty(SProperty* prop, bool force);

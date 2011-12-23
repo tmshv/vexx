@@ -15,7 +15,7 @@ XAssert::XAssert(const XCodeLocation &location, const char *condition, const cha
   }
 
 QHash<XCodeLocation, bool> g_disabledAsserts;
-bool defultFire(const XAssert &a)
+bool defaultFire(const XAssert &a)
   {
   if(g_disabledAsserts.contains(a.location()))
     {
@@ -82,7 +82,7 @@ bool defultFire(const XAssert &a)
 XAssert::FireFunction *g_currentFireFunction = 0;
 XAssert::FireFunction *XAssert::currentFireFunction()
   {
-  return g_currentFireFunction ? g_currentFireFunction : defultFire;
+  return g_currentFireFunction ? g_currentFireFunction : defaultFire;
   }
 
 void XAssert::setCurrentFireFunction(FireFunction *f)

@@ -7,10 +7,16 @@ SHandler::SHandler() : _blockLevel(0), _database(0)
 
 SHandler::~SHandler()
   {
+  clearChanges();
+  }
+
+void SHandler::clearChanges()
+  {
   foreach(SChange *ch, _done)
     {
     xDestroyAndFree(changeAllocator(), SChange, ch);
     }
+  _done.clear();
   }
 
 SHandler *SHandler::findHandler(SPropertyContainer *parent, SProperty *prop)

@@ -841,6 +841,7 @@ void SProperty::setDirty()
   {
     _flags.setFlag(Dirty);
     SPropertyContainer *c = parent();
+    xAssert(c);
     const SPropertyInformation *info = c->typeInformation();
     info->postChildSet()(c, this);
 

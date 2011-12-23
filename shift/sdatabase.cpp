@@ -30,10 +30,18 @@ SDatabase::SDatabase()
 
 SDatabase::~SDatabase()
   {
-  clear();
+  internalClear();
   _child = 0;
 
-  xAssert(_memory.empty());
+  clearChanges();
+
+#if X_ASSERTS_ENABLED
+  if(!_memory.empty())
+    {
+    _memory.debugDump();
+    xAssertFail();
+    }
+#endif
   }
 
 SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe)

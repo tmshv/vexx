@@ -145,10 +145,29 @@ bool SPropertyContainer::contains(SProperty *child) const
 
 SPropertyContainer::~SPropertyContainer()
   {
-  clear();
+  internalClear();
   }
 
 void SPropertyContainer::clear()
+  {
+  SBlock b(handler());
+  xAssert(handler());
+
+  SProperty *prop = _child;
+  while(prop)
+    {
+    xAssert(prop->parent() == this);
+    SProperty *next = prop->_nextSibling;
+    if(prop->index() >= _containedProperties)
+      {
+      removeProperty(prop);
+      }
+    prop = next;
+    }
+  _child = 0;
+  }
+
+void SPropertyContainer::internalClear()
   {
   xAssert(handler());
 
@@ -292,8 +311,9 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   return false;
   }
 
-void SPropertyContainer::postChildSet(SPropertyContainer *, SProperty *p)
+void SPropertyContainer::postChildSet(SPropertyContainer *cont, SProperty *p)
   {
+  xAssert(cont->parent() || cont == cont->database());
   p->setDependantsDirty();
   }
 
