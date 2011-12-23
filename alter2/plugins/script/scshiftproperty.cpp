@@ -21,6 +21,9 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty 
   addMemberFunction("setValue", setValue);
   addMemberFunction("pathTo", pathTo);
 
+  addMemberFunction("beginBlock", beginBlock);
+  addMemberFunction("endBlock", endBlock);
+
   addMemberFunction("registerExporter", registerExporter);
 
   initiateGlobalValue<ScShiftProperty>("SProperty");
@@ -399,3 +402,50 @@ QScriptValue ScShiftProperty::registerExporter(QScriptContext *ctx, QScriptEngin
 
   return QScriptValue();
   }
+
+QScriptValue ScShiftProperty::beginBlock(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  if(!propPtr || !*propPtr)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.beginBlock(...);");
+    return QScriptValue();
+    }
+
+  if(ctx->argumentCount() != 0)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.beginBlock(...);");
+    return QScriptValue();
+    }
+
+  (*propPtr)->handler()->beginBlock();
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::endBlock(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  if(!propPtr || !*propPtr)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.endBlock(...);");
+    return QScriptValue();
+    }
+
+  if(ctx->argumentCount() > 1)
+    {
+    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.endBlock(...);");
+    return QScriptValue();
+    }
+
+  bool cancel = false;
+  if(ctx->argumentCount() == 1)
+    {
+    cancel = ctx->argument(0).toBoolean();
+    }
+
+  (*propPtr)->handler()->endBlock(cancel);
+  return QScriptValue();
+  }
+

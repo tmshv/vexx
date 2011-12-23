@@ -11,8 +11,6 @@ ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftPropertyContainerB
   addMemberFunction("addType", addType);
   addMemberFunction("load", load);
   addMemberFunction("save", save);
-  addMemberFunction("beginBlock", beginBlock);
-  addMemberFunction("endBlock", endBlock);
   initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
   }
 
@@ -401,62 +399,6 @@ bool ScShiftDatabase::postParseChildProperties(QScriptContext *ctx, SPropertyInf
       }
     }
   return true;
-  }
-
-QScriptValue ScShiftDatabase::beginBlock(QScriptContext *ctx, QScriptEngine *)
-  {
-  ScProfileFunction
-  SProperty **propPtr = getThis(ctx);
-  SDatabase *db = 0;
-  if(propPtr)
-    {
-    db = (*propPtr)->uncheckedCastTo<SDatabase>();
-    }
-  if(!db)
-    {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.beginBlock(...);");
-    return QScriptValue();
-    }
-
-  if(ctx->argumentCount() != 0)
-    {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.beginBlock(...);");
-    return QScriptValue();
-    }
-
-  db->beginBlock();
-  return QScriptValue();
-  }
-
-QScriptValue ScShiftDatabase::endBlock(QScriptContext *ctx, QScriptEngine *)
-  {
-  ScProfileFunction
-  SProperty **propPtr = getThis(ctx);
-  SDatabase *db = 0;
-  if(propPtr)
-    {
-    db = (*propPtr)->uncheckedCastTo<SDatabase>();
-    }
-  if(!db)
-    {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.endBlock(...);");
-    return QScriptValue();
-    }
-
-  if(ctx->argumentCount() > 1)
-    {
-    ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.endBlock(...);");
-    return QScriptValue();
-    }
-
-  bool cancel = false;
-  if(ctx->argumentCount() == 1)
-    {
-    cancel = ctx->argument(0).toBoolean();
-    }
-
-  db->endBlock(cancel);
-  return QScriptValue();
   }
 
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)

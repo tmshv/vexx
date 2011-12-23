@@ -99,19 +99,19 @@ db.addType({
 
   */
 
-SDatabase.cancelBlock = function(fn)
+SProperty.cancelBlock = function(fn)
   {
-  db.beginBlock();
+  this.beginBlock();
   try
     {
     fn()
     }
   catch(e)
     {
-    db.endBlock(true);
+    this.endBlock(true);
     throw e;
     }
-  db.endBlock(true);
+  this.endBlock(true);
   }
 
 script.include("JSPartExporter.js");

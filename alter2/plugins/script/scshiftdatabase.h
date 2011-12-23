@@ -14,9 +14,6 @@ public:
   ~ScShiftDatabase();
 
 private:
-  static QScriptValue beginBlock(QScriptContext *ctx, QScriptEngine *);
-  static QScriptValue endBlock(QScriptContext *ctx, QScriptEngine *);
-
   static QScriptValue addType(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue save(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue load(QScriptContext *ctx, QScriptEngine *);
