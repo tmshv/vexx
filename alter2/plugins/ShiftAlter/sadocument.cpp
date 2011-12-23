@@ -109,10 +109,10 @@ SDocumentEditor::SDocumentEditor(SPlugin *p, SDocument *doc) : _document(doc), _
 
 void SDocumentEditor::buildFileMenu(QMenu *menu)
   {
-  menu->addAction("New", this, SLOT(newFile()));
-  menu->addAction("Open", this, SLOT(loadFile()));
-  QAction *save = menu->addAction("Save", this, SLOT(saveFile()));
-  menu->addAction("Save As", this, SLOT(saveAsFile()));
+  menu->addAction("New", this, SLOT(newFile()), QKeySequence::New);
+  menu->addAction("Open", this, SLOT(loadFile()), QKeySequence::Open);
+  QAction *save = menu->addAction("Save", this, SLOT(saveFile()), QKeySequence::Save);
+  menu->addAction("Save As", this, SLOT(saveAsFile()), QKeySequence::SaveAs);
 
   save->setObjectName("Save");
 
