@@ -43,7 +43,7 @@ public:
 private:
   const SPropertyInformation *type() const;
 
-  void beginChildren() const;
+  bool beginChildren() const;
   void endChildren() const;
   void beginNextChild();
   bool childHasValue() const;

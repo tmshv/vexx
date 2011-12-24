@@ -4,14 +4,16 @@
 
 void SLoader::loadChildren(SPropertyContainer *parent)
   {
-  beginChildren();
-  while(hasNextChild())
+  if(beginChildren())
     {
-    beginNextChild();
-    read(parent);
-    endNextChild();
+    while(hasNextChild())
+      {
+      beginNextChild();
+      read(parent);
+      endNextChild();
+      }
+    endChildren();
     }
-  endChildren();
   }
 
 void SLoader::read(SPropertyContainer *read)
@@ -22,14 +24,7 @@ void SLoader::read(SPropertyContainer *read)
   xAssert(info->load());
 
   bool shouldLoad = true;
-  if(info->inheritsFromType(SPropertyContainer::staticTypeInformation()))
-    {
-    shouldLoad = true;
-    }
-  else
-    {
-    shouldLoad = childHasValue();
-    }
+  shouldLoad = childHasValue();
 
   if(shouldLoad)
     {
@@ -45,22 +40,38 @@ void SLoader::read(SPropertyContainer *read)
 
 void SSaver::saveChildren(const SPropertyContainer *c)
   {
-  beginChildren();
+  bool shouldSaveAnyChildren = false;
+
   for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
     {
     const SPropertyInformation *info = child->typeInformation();
 
     if(info->shouldSave()(child))
       {
-      beginNextChild();
-      //if(info->shouldSaveValue())
-        {
-        write(child);
-        }
-      endNextChild();
+      shouldSaveAnyChildren = true;
+      break;
       }
     }
-  endChildren();
+
+  if(shouldSaveAnyChildren)
+    {
+    beginChildren();
+    for(const SProperty *child=c->firstChild(); child; child=child->nextSibling())
+      {
+      const SPropertyInformation *info = child->typeInformation();
+
+      if(info->shouldSave()(child))
+        {
+        beginNextChild();
+        //if(info->shouldSaveValue())
+          {
+          write(child);
+          }
+        endNextChild();
+        }
+      }
+    endChildren();
+    }
   }
 
 void SSaver::write(const SProperty *prop)

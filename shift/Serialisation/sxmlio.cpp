@@ -154,9 +154,11 @@ const SPropertyInformation *SXMLLoader::type() const
   return info;
   }
 
-void SXMLLoader::beginChildren() const
+bool SXMLLoader::beginChildren() const
   {
   _scratch.clear();
+  xAssertFail(); // fix return value
+  return false;
   }
 
 void SXMLLoader::endChildren() const

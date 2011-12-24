@@ -50,7 +50,7 @@ public:
 private:
   const SPropertyInformation *type() const;
 
-  void beginChildren() const;
+  bool beginChildren() const;
   void endChildren() const;
   bool hasNextChild() const;
   void beginNextChild();

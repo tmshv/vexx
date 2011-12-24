@@ -370,11 +370,22 @@ const SPropertyInformation *SJSONLoader::type() const
   }
 
 
-void SJSONLoader::beginChildren() const
+bool SJSONLoader::beginChildren() const
   {
   SProfileFunction
   readNext();
-  xAssert(_current == Children);
+
+  if(_current == Children)
+    {
+    return true;
+    }
+  else if(_current == End)
+    {
+    return false;
+    }
+
+  xAssertFail();
+  return false;
   }
 
 void SJSONLoader::endChildren() const
@@ -429,7 +440,7 @@ void SJSONLoader::beginNextChild()
 
 bool SJSONLoader::childHasValue() const
   {
-  return !_currentValue.isEmpty();
+  return _current == Children || !_currentValue.isEmpty();
   }
 
 void SJSONLoader::endNextChild()

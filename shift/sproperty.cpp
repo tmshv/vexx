@@ -405,6 +405,25 @@ bool SProperty::shouldSaveProperty(const SProperty *p)
     return true;
     }
 
+  if(p->hasInput())
+    {
+    xsize inputLocation = p->instanceInformation()->defaultInput();
+    if(inputLocation != 0)
+      {
+      const xuint8 *inputPropertyData = (xuint8*)p + inputLocation;
+
+      const SProperty *inputProperty = (SProperty*)inputPropertyData;
+      if(inputProperty != p->input())
+        {
+        return true;
+        }
+      }
+    else
+      {
+      return true;
+      }
+    }
+
   const SPropertyInformation *info = p->typeInformation();
   if(info->shouldSaveValue()(p))
     {
