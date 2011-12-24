@@ -845,9 +845,9 @@ void SProperty::postSet()
   {
   SProfileFunction
   SPropertyContainer *c = parent();
-  SPropertyInformation::PostSetFunction fn = c ? c->typeInformation()->postChildSet() : SPropertyContainer::postChildSet;
-
-  fn(c, this);
+  xAssert(c); // setting the db object? that is odd. Or a property in undo somewhere?
+  const SPropertyInformation *info = c->typeInformation();
+  info->postChildSet()(c, this);
 
   _flags.clearFlag(Dirty);
   }

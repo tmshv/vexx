@@ -126,7 +126,7 @@ void UIDatabaseDebugSurface::loadProperty()
   if(f.open(QIODevice::ReadOnly))
     {
     SJSONLoader j;
-    j.readFromDevice(&f, _clickedItem->entity());
+    j.readFromDevice(&f, _clickedItem->castTo<SPropertyContainer>());
     }
   }
 
