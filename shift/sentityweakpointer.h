@@ -5,8 +5,7 @@
 #include "sentity.h"
 #include "sdatabase.h"
 
-#define S_ENTITY_WEAK_POINTER_CHECK \
-if(data() == 0 || (data()->parent() == 0 && !data()->inheritsFromType<SDatabase>())) { xAssertFail(); return 0; }
+#define S_ENTITY_WEAK_POINTER_CHECK xAssert(data());
 
 class SEntityWeakPointer : private XWeakSharedPointer<SEntity>
   {
@@ -52,7 +51,7 @@ public:
 
   bool isValid() const
     {
-    return data() != 0 && data()->parent() != 0;
+    return data() != 0;
     }
 
   operator SEntity*()
@@ -63,6 +62,61 @@ public:
   operator const SEntity*() const
     {
     return data();
+    }
+  };
+
+#define S_ENTITY_TYPED_WEAK_POINTER_CHECK xAssert(SEntityWeakPointer::entity() && SEntityWeakPointer::entity()->castTo<T>(), (xsize)SEntityWeakPointer::entity());
+
+template <typename T> class SEntityTypedWeakPointer : public SEntityWeakPointer
+  {
+public:
+  explicit SEntityTypedWeakPointer(T *ptr=0) : SEntityWeakPointer(ptr)
+    {
+    }
+
+  SEntity *operator=(T *ptr)
+    {
+    SEntityWeakPointer::assign(ptr);
+    return ptr;
+    }
+
+  void assign(T *ptr)
+    {
+    SEntityWeakPointer::assign(ptr);
+    }
+
+  const T *operator->() const
+    {
+    S_ENTITY_TYPED_WEAK_POINTER_CHECK
+    return entity();
+    }
+
+  T *operator->()
+    {
+    S_ENTITY_TYPED_WEAK_POINTER_CHECK
+    return entity();
+    }
+
+  const T *entity() const
+    {
+    S_ENTITY_TYPED_WEAK_POINTER_CHECK
+    return SEntityWeakPointer::entity()->uncheckedCastTo<T>();
+    }
+
+  T *entity()
+    {
+    S_ENTITY_TYPED_WEAK_POINTER_CHECK
+    return SEntityWeakPointer::entity()->uncheckedCastTo<T>();
+    }
+
+  operator T*()
+    {
+    return entity();
+    }
+
+  operator const T*() const
+    {
+    return entity();
     }
   };
 

@@ -37,7 +37,9 @@ public:
     SProperty *_property;
     xsize _index;
     bool _owner;
-    bool apply(int);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   SPropertyContainer();
@@ -60,11 +62,37 @@ public:
 
   SProperty *firstChild() const { preGet(); return _child; }
 
+  template <typename T> const T *findChild(const QString &name) const
+    {
+    const SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<T>();
+      }
+    return 0;
+    }
+
+  template <typename T> T *findChild(const QString &name)
+    {
+    SProperty *prop = findChild(name);
+    if(prop)
+      {
+      return prop->castTo<T>();
+      }
+    return 0;
+    }
+
   const SProperty *findChild(const QString &name) const;
   SProperty *findChild(const QString &name);
 
   xsize size() const;
   xsize containedProperties() const { return _containedProperties; }
+
+  SProperty *at(xsize i);
+  const SProperty *at(xsize i) const;
+
+  // move a property from this to newParent
+  void moveProperty(SPropertyContainer *newParent, SProperty *property);
 
   bool contains(SProperty *) const;
 
@@ -80,16 +108,15 @@ protected:
   // you cannot add another contained property once dynamic properties have been added, this bool
   // should really be left alone and not exposed in sub classes
   SProperty *addProperty(const SPropertyInformation *info, xsize index=X_SIZE_SENTINEL);
-  // move a property from this to newParent
-  void moveProperty(SPropertyContainer *newParent, SProperty *property);
   void removeProperty(SProperty *);
-
-  SProperty *at(xsize i);
-  const SProperty *at(xsize i) const;
 
   void clear();
 
+  // remove and destroy all children. not for use by "array types", use clear instead.
+  void internalClear();
+
 private:
+  SProperty *internalFindChild(const QString &name);
   friend void setDependantsDirty(SProperty* prop, bool force);
   SProperty *_child;
   xsize _containedProperties;

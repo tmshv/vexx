@@ -13,15 +13,10 @@ class SChange
   {
   S_CHANGE_ROOT(1);
 public:
-  enum Mode
-    {
-    Forward=1,
-    Backward=2,
-    Inform
-    };
-
   virtual ~SChange() { }
-  virtual bool apply(int) = 0;
+  virtual bool apply() = 0;
+  virtual bool unApply() = 0;
+  virtual bool inform() = 0;
   };
 
 #endif // SCHANGE_H

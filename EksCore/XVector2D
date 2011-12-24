@@ -23,8 +23,7 @@ class QDataStream;
 
 // static size
 
-template <typename Derived>
-QTextStream &operator>>(QTextStream &str, Eigen::DenseBase<Derived> &vec)
+template <typename Derived> QTextStream &operator>>(QTextStream &str, Eigen::PlainObjectBase<Derived> &vec)
   {
   xint32 rows = Derived::RowsAtCompileTime;
   xint32 cols = Derived::ColsAtCompileTime;
@@ -50,8 +49,7 @@ QTextStream &operator>>(QTextStream &str, Eigen::DenseBase<Derived> &vec)
   return str;
   }
 
-template <typename Derived>
-QTextStream &operator<<(QTextStream &str, const Eigen::DenseBase<Derived> &vec)
+template <typename Derived> QTextStream &operator<<(QTextStream &str, const Eigen::PlainObjectBase<Derived> &vec)
   {
   xint32 rows = Derived::RowsAtCompileTime;
   xint32 cols = Derived::ColsAtCompileTime;
@@ -74,7 +72,9 @@ QTextStream &operator<<(QTextStream &str, const Eigen::DenseBase<Derived> &vec)
       {
       str << vec(i,j);
 
-      if(j < (rows-1) || i < (cols-1))
+      bool iC = i < (rows-1);
+      bool jC = j < (cols-1);
+      if((iC || jC) && !(iC && jC))
         {
         str << " ";
         }
@@ -84,8 +84,7 @@ QTextStream &operator<<(QTextStream &str, const Eigen::DenseBase<Derived> &vec)
   return str;
   }
 
-template <typename Derived>
-QDataStream &operator>>(QDataStream &str, Eigen::DenseBase<Derived> &vec)
+template <typename Derived> QDataStream &operator>>(QDataStream &str, Eigen::PlainObjectBase<Derived> &vec)
   {
   xint32 rows = Derived::RowsAtCompileTime;
   xint32 cols = Derived::ColsAtCompileTime;
@@ -111,8 +110,7 @@ QDataStream &operator>>(QDataStream &str, Eigen::DenseBase<Derived> &vec)
   return str;
   }
 
-template <typename Derived>
-QDataStream &operator<<(QDataStream &str, const Eigen::DenseBase<Derived> &vec)
+template <typename Derived> QDataStream &operator<<(QDataStream &str, const Eigen::PlainObjectBase<Derived> &vec)
   {
   xint32 rows = Derived::RowsAtCompileTime;
   xint32 cols = Derived::ColsAtCompileTime;

@@ -10,30 +10,6 @@
 
 namespace
 {
-template <typename Scalar, int Size, int Type> inline void writeValue(SSaver &s, const Eigen::Transform<Scalar, Size, Type> &t)
-  {
-  if(s.streamMode() == SSaver::Text)
-    {
-    s.textStream() << t.matrix();
-    }
-  else
-    {
-    s.binaryStream() << t.matrix();
-    }
-  }
-
-template <typename Scalar, int Size, int Type> inline void readValue(SLoader &l, Eigen::Transform<Scalar, Size, Type> &t)
-  {
-  if(l.streamMode() == SLoader::Text)
-    {
-    l.textStream() >> t.matrix();
-    }
-  else
-    {
-    l.binaryStream() >> t.matrix();
-    }
-  }
-
 QTextStream &operator <<(QTextStream &str, const QImage &data)
   {
   QByteArray arr;
@@ -56,15 +32,18 @@ QTextStream &operator >>(QTextStream &str, QImage &data)
   return str;
   }
 
-void writeValue(SSaver &, const XGeometry &)
+QTextStream &operator<<(QTextStream &s, const XGeometry &)
   {
   xAssertFail();
+  return s;
   }
 
-void readValue(SLoader &, XGeometry &)
+QTextStream &operator>>(QTextStream &s, const XGeometry &)
   {
   xAssertFail();
+  return s;
   }
+
 }
 
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, TransformProperty, XTransform, XTransform::Identity(), 150);

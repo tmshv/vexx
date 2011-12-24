@@ -23,11 +23,13 @@ template <typename T> class TypedPointer : public Pointer
 public:
   typedef T Type;
 
-  T *pointed() { return input() ? input()->castTo<T>() : 0; }
-  T *operator()() { return pointed(); }
+  // pre gets here to make sure we clear any dirty flags that have flowed in through
+  // dependencies
+  T *pointed() { preGet(); return input() ? input()->castTo<T>() : 0; }
+  T *operator()() { preGet(); return pointed(); }
 
-  const T *pointed() const { return input() ? input()->castTo<T>() : 0; }
-  const T *operator()() const { return pointed(); }
+  const T *pointed() const { preGet(); return input() ? input()->castTo<T>() : 0; }
+  const T *operator()() const { preGet(); return pointed(); }
 
   void setPointed(const T *prop) { Pointer::setPointed(prop); }
   Pointer &operator=(const T *prop) { setPointed(prop); return *this; }
@@ -38,7 +40,7 @@ template <typename PTR> class TypedPointerArray : public STypedPropertyArray<PTR
 public:
   PTR* addPointer(typename PTR::Type *prop)
     {
-    SDatabase* db = SProperty::database();
+    SHandler* db = SProperty::handler();
     xAssert(db);
 
     SBlock b(db);

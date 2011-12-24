@@ -3,16 +3,23 @@
 
 #include "scshiftproperty.h"
 
-class ScShiftPropertyContainer : public ScWrappedClass<SProperty *>
+class ScShiftPropertyContainerBase : public ScWrappedClass<SProperty *>
   {
 public:
-  ScShiftPropertyContainer(QScriptEngine *engine);
-  ~ScShiftPropertyContainer();
+  ScShiftPropertyContainerBase(QScriptEngine *engine);
+  ~ScShiftPropertyContainerBase();
 
   virtual QueryFlags queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id);
   virtual QScriptValue property(const QScriptValue &object, const QScriptString &name, uint id);
   virtual void setProperty(QScriptValue &object, const QScriptString &name, uint id, const QScriptValue &value);
   virtual QScriptValue::PropertyFlags propertyFlags(const QScriptValue &object, const QScriptString &name, uint id);
+  };
+
+class ScShiftPropertyContainer : public ScShiftPropertyContainerBase
+  {
+public:
+  ScShiftPropertyContainer(QScriptEngine *engine);
+  ~ScShiftPropertyContainer();
 
   static QScriptValue size(QScriptContext *ctx, QScriptEngine *);
   };

@@ -11,14 +11,50 @@ include("../../../EksCore/GeneralOptions.pri")
 
 
 SOURCES += splugin.cpp \
-    sappdatabase.cpp
+    sappdatabase.cpp \
+    saparteditor.cpp \
+    saparteditorinterface.cpp \
+    sashaderparteditorinterface.cpp \
+    saviewport.cpp \
+    sadocument.cpp
 
 HEADERS += splugin.h \
     saglobal.h \
-    sappdatabase.h
+    sappdatabase.h \
+    saparteditor.h \
+    saparteditorinterface.h \
+    sashaderparteditorinterface.h \
+    saviewport.h \
+    sadocument.h
 
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift ../../
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore
+
+QT += opengl
+LIBS += -lshift -lEksCore -lEksGui -lEks3D -lalter -lShiftGraphicsCore
+
+FORMS +=
+
+RESOURCES += \
+    Resources.qrc
 
 
-LIBS += -lshift -lEksCore -lalter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

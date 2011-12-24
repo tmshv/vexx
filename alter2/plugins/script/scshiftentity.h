@@ -3,7 +3,7 @@
 
 #include "scshiftpropertycontainer.h"
 
-class ScShiftEntity : public ScWrappedClass<SProperty *>
+class ScShiftEntity : public ScShiftPropertyContainerBase
   {
 public:
   ScShiftEntity(QScriptEngine *engine);

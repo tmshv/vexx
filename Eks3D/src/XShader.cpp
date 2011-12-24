@@ -7,6 +7,7 @@
 #include "QVector2D"
 #include "QVector3D"
 #include "QVector4D"
+#include "QStringList"
 #include "QFile"
 
 template <typename T> XVector <T> toVector( const QVariantList &variantList )
@@ -44,7 +45,11 @@ XShaderVariable::XShaderVariable( QString n, XShader *s, XAbstractShaderVariable
 
 XShaderVariable::~XShaderVariable( )
   {
-  _shader->internal()->destroyVariable(_internal);
+  XAbstractShader *sInt = _shader->internal();
+  if(sInt && _internal)
+    {
+    sInt->destroyVariable(_internal);
+    }
   }
 
 void XShaderVariable::setValue( int value )
@@ -379,6 +384,7 @@ void XShader::clear()
     {
     delete var;
     }
+  _variables.clear();
 
   delete _internal;
   _internal = 0;
@@ -433,14 +439,28 @@ void XShader::prepareInternal( XRenderer *renderer ) const
     _internal = renderer->getShader( );
     xAssert( _internal );
 
+    XShader *logAccess((XShader*)this);
+    logAccess->_log.clear();
     foreach(const Component &c, _components)
       {
-      bool result = _internal->addComponent(c.type, c.source);
-      xAssert(result);
+      bool result = _internal->addComponent(c.type, c.source, logAccess->_log);
+
+      if(!result)
+        {
+        logAccess->_log << "Shader component failed to compile";
+        }
       }
-    bool result = _internal->build();
-    xAssert(result);
-    xAssert(_internal->isValid());
+    bool result = _internal->build(logAccess->_log);
+
+    if(!result)
+      {
+      logAccess->_log << "Shader failed to build";
+      }
+
+    if(!_internal->isValid())
+      {
+      logAccess->_log << "Shader was not valid for use after building.";
+      }
 
     foreach( XShaderVariable *var, _variables )
       {

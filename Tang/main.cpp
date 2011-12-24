@@ -6,6 +6,7 @@
 #include "Viewport.h"
 #include "webview.h"
 #include "GraphicsCore.h"
+#include "saparteditor.h"
 
 int main( int argc, char **argv )
   {
@@ -33,10 +34,7 @@ int main( int argc, char **argv )
     return EXIT_FAILURE;
     }
 
-  initiateGraphicsCore(&db->db());
-
-
-  SEntity *objectParent = &db->db().document;
+  SEntity *objectParent = &db->db().documents;
 
   WebView *webData = new WebView(objectParent);
   script->registerScriptGlobal(webData);
@@ -49,6 +47,16 @@ int main( int argc, char **argv )
   ui->addSurface(webData);
 
   ui->show();
+
+  SPartDocument *part = db->db().addDocument<SPartDocument>();
+  part->type = "GCShader";
+  part->newFile();
+  part->createEditor()->show();
+
+  /*SPartDocument *part2 = db->db().addDocument<SPartDocument>();
+  part2->type = "SEntity";
+  part2->newFile();
+  part2->createEditor()->show();*/
 
   return app.execute();
   }

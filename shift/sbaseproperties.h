@@ -13,6 +13,22 @@
 #include "sinterface.h"
 #include "QByteArray"
 
+namespace
+{
+QTextStream &operator<<(QTextStream &s, xuint8 v)
+  {
+  return s << (xuint32)v;
+  }
+
+QTextStream &operator>>(QTextStream &s, xuint8 &v)
+  {
+  xuint32 t;
+  s >> t;
+  v = (xuint8)t;
+  return s;
+  }
+}
+
 template <typename T>
 class SPODInterface
   {
@@ -24,6 +40,7 @@ class SPropertyVariantInterface : public SStaticInterfaceBase
 
 public:
   SPropertyVariantInterface(bool d) : SStaticInterfaceBase(d) { }
+  virtual QString asString(const SProperty *) const = 0;
   virtual QVariant asVariant(const SProperty *) const = 0;
   virtual void setVariant(SProperty *, const QVariant &) const = 0;
   };
@@ -32,6 +49,15 @@ template <typename PROP, typename POD> class PODPropertyVariantInterface : publi
   {
 public:
   PODPropertyVariantInterface() : SPropertyVariantInterface(true) { }
+  virtual QString asString(const SProperty *p) const
+    {
+    QString d;
+      {
+      QTextStream s(&d);
+      s << p->uncheckedCastTo<PROP>()->value();
+      }
+    return d;
+    }
   virtual QVariant asVariant(const SProperty *p) const
     {
     return QVariant::fromValue<POD>(p->uncheckedCastTo<PROP>()->value());
@@ -61,7 +87,15 @@ public:
 
     virtual void initiateProperty(SProperty *propertyToInitiate) const
       {
+      SProperty::InstanceInformation::initiateProperty(propertyToInitiate);
       propertyToInitiate->uncheckedCastTo<DERIVED>()->_value = defaultValue();
+      }
+
+    virtual void setDefaultValue(const QString &val)
+      {
+      QString cpyVal(val);
+      QTextStream s(&cpyVal);
+      s >> _defaultValue;
       }
     };
 
@@ -75,7 +109,7 @@ public:
       }
     ~ComputeLock()
       {
-      _ptr->database()->doChange<ComputeChange>(_ptr);
+      _ptr->handler()->doChange<ComputeChange>(_ptr);
       }
 
     T* data()
@@ -99,7 +133,7 @@ public:
       }
     ~Lock()
       {
-      _ptr->database()->doChange<Change>(_oldData, *_data, _ptr);
+      _ptr->handler()->doChange<Change>(_oldData, *_data, _ptr);
       _data = 0;
       }
 
@@ -147,9 +181,15 @@ public:
     {
     const DERIVED *ptr = p->uncheckedCastTo<DERIVED>();
 
-    bool def = ptr->value() == ptr->instanceInformation()->defaultValue();
+    if(SProperty::shouldSavePropertyValue(p))
+      {
+      if(ptr->value() != ptr->instanceInformation()->defaultValue())
+        {
+        return true;
+        }
+      }
 
-    return !def && SProperty::shouldSavePropertyValue(p);
+    return false;
     }
 
 private:
@@ -165,22 +205,20 @@ private:
       }
 
   private:
-    bool apply(int mode)
+    bool apply()
       {
-      if(mode&Forward)
+      return true;
+      }
+    bool unApply()
+      {
+      xAssertFail();
+      return true;
+      }
+    bool inform()
+      {
+      if(property()->entity())
         {
-        // changes already applied.
-        }
-      else if(mode&Backward)
-        {
-        xAssertFail();
-        }
-      if(mode&Inform)
-        {
-        if(property()->entity())
-          {
-          property()->entity()->informDirtyObservers(property());
-          }
+        property()->entity()->informDirtyObservers(property());
         }
       return true;
       }
@@ -200,24 +238,25 @@ private:
       { }
 
   private:
-    bool apply(int mode)
+    bool apply()
       {
-      if(mode&Forward)
+      property()->uncheckedCastTo<DERIVED>()->_value = after();
+      property()->postSet();
+      return true;
+      }
+
+    bool unApply()
+      {
+      property()->uncheckedCastTo<DERIVED>()->_value = before();
+      property()->postSet();
+      return true;
+      }
+
+    bool inform()
+      {
+      if(property()->entity())
         {
-        property()->uncheckedCastTo<DERIVED>()->_value = after();
-        property()->postSet();
-        }
-      else if(mode&Backward)
-        {
-        property()->uncheckedCastTo<DERIVED>()->_value = before();
-        property()->postSet();
-        }
-      if(mode&Inform)
-        {
-        if(property()->entity())
-          {
-          property()->entity()->informDirtyObservers(property());
-          }
+        property()->entity()->informDirtyObservers(property());
         }
       return true;
       }
@@ -228,12 +267,12 @@ private:
   };
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault, typeID) \
-class EXPORT_MODE name : public SPODProperty<type, name> { public: \
-  enum { Type = typeID }; \
-  S_PROPERTY(name, SProperty, 0); \
+class EXPORT_MODE name : public SPODProperty<type, name> { \
 public: class InstanceInformation : public SPODProperty<type, name>::InstanceInformation \
     { public: \
     InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
+  enum { Type = typeID }; \
+  S_PROPERTY(name, SProperty, 0); \
   name(); \
   name &operator=(const type &in) { \
     assign(in); \
@@ -251,22 +290,6 @@ template <> class SPODInterface <type> { public: typedef name Type; \
     return info; } \
   name::name() { }
 
-namespace
-{
-QTextStream &operator<<(QTextStream &s, xuint8 v)
-  {
-  return s << (xuint32)v;
-  }
-
-QTextStream &operator>>(QTextStream &s, xuint8 &v)
-  {
-  xuint32 t;
-  s >> t;
-  v = (xuint8)t;
-  return s;
-  }
-}
-
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, IntProperty, xint32, 0, 101);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, LongIntProperty, xint64, 0, 102);
@@ -278,84 +301,37 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector2DProperty, XVector2D, XVector2D(0.0f, 0
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector3DProperty, XVector3D, XVector3D(0.0f, 0.0f, 0.0f), 108);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, Vector4DProperty, XVector4D, XVector4D(0.0f, 0.0f, 0.0f, 0.0f), 109);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, QuaternionProperty, XQuaternion, XQuaternion(), 110);
-DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringProperty, QString, "", 111);
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringPropertyBase, QString, "", 111);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f), 112);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray(), 113);
 
+class SHIFT_EXPORT StringProperty : public StringPropertyBase
+  {
+public:
+  class InstanceInformation : public StringPropertyBase::InstanceInformation
+    {
+  public:
+    InstanceInformation()
+      {
+      }
+    void setDefaultValue(const QString &val)
+      {
+      setDefault(val);
+      }
+    };
+
+  S_PROPERTY(StringProperty, StringPropertyBase, 0);
+  StringProperty()
+    {
+    }
+  StringProperty &operator=(const QString &in)
+    {
+    assign(in);
+    return *this;
+    }
+  };
+
 #define EnumProperty IntProperty
-
-template <typename Derived> QTextStream & operator <<(QTextStream &str, const Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width = data.cols();
-  xsize height = data.rows();
-  str << width << " " << height << " ";
-  for (xsize i = 0; i < height; ++i)
-    {
-    for(xsize j = 0; j < width; ++j)
-      {
-      str << data(i, j);
-      if((i < height-1) && (j < width-1)) // while not last element
-        {
-        str << " "; // separate each element with space
-        }
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QDataStream & operator <<(QDataStream &str, const Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width = data.cols();
-  xsize height = data.rows();
-  str << (quint64) width << (quint64) height;
-  for (xsize i = 0; i < height; ++i)
-    {
-    for(xsize j = 0; j < width; ++j)
-      {
-      str << data(i, j);
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QTextStream & operator >>(QTextStream &str, Eigen::PlainObjectBase <Derived> &data)
-  {
-  xsize width;
-  xsize height;
-
-  str >> width >> height; // first element in str is size of str
-  data.resize(width, height);
-
-  for(xsize i = 0; i < height; ++i )
-    {
-    for(xsize j = 0; j < width; j++)
-      {
-      typename Derived::Scalar tVal;
-      str >> tVal;
-      data(i, j) = tVal;
-      }
-    }
-  return str;
-  }
-
-template <typename Derived> QDataStream & operator >>(QDataStream &str, Eigen::PlainObjectBase <Derived> &data)
-  {
-  quint64 width;
-  quint64 height;
-
-  str >> width >> height; // first element in str is size of str
-  data.resize(width, height);
-  for(xsize i = 0; i < height; ++i )
-    {
-    for(xsize j = 0; j < width; j++)
-      {
-      typename Derived::Scalar tVal;
-      str >> tVal;
-      data(i, j) = tVal;
-      }
-    }
-  return str;
-  }
 
 // specific pod interface for bool because it is actually a uint8.
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
@@ -368,7 +344,7 @@ template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
 
 template <typename T, typename DERIVED> void SPODProperty<T, DERIVED>::assign(const T &in)
   {
-  database()->doChange<Change>(_value, in, this);
+  handler()->doChange<Change>(_value, in, this);
   }
 
 #endif // SBASEPROPERTIES_H

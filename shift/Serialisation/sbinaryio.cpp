@@ -169,7 +169,7 @@ const SPropertyInformation *SXMLLoader::type() const
   {
   xAssert(_root);
 
-  const SPropertyInformation *info = _root->database()->findType(_typeName);
+  const SPropertyInformation *info = _root->handler()->findType(_typeName);
   xAssert(info);
   return info;
   }

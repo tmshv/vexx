@@ -126,30 +126,29 @@ private:
   private:
     EigenArray _before;
     EigenArray _after;
-    bool apply(int mode)
+    bool apply()
       {
-      if(mode&Forward)
-        {
-        ((U*)property())->mData = after();
-        property()->postSet();
-        }
-      else if(mode&Backward)
-        {
-        ((U*)property())->mData = before();
-        property()->postSet();
-        }
-      if(mode&Inform)
-        {
-        xAssert(property()->entity());
-        property()->entity()->informDirtyObservers(property());
-        }
+      ((U*)property())->mData = after();
+      property()->postSet();
+      return true;
+      }
+    bool unApply()
+      {
+      ((U*)property())->mData = before();
+      property()->postSet();
+      return true;
+      }
+    bool inform()
+      {
+      xAssert(property()->entity());
+      property()->entity()->informDirtyObservers(property());
       return true;
       }
     };
 
   void applyChange(const EigenArray &arr)
     {
-    SDatabase& db = *database();
+    SHandler& db = *handler();
     db.doChange<ArrayChange>(mData, arr, this);
     }
 

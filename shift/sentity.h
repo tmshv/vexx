@@ -22,6 +22,7 @@ class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
 
 public:
   SEntity();
+  virtual ~SEntity();
 
   SPropertyArray children;
 
@@ -43,14 +44,14 @@ public:
     return ent;
     }
 
-  template <typename T>T *addProperty(const QString& name)
+  template <typename T>T *addProperty(const QString& name="")
     {
     SProperty *p = addProperty(T::staticTypeInformation(), name);
     xAssert(p);
     return p->uncheckedCastTo<T>();
     }
 
-  SProperty *addProperty(const SPropertyInformation *info, const QString& name)
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name="")
     {
     SProperty *p = SPropertyContainer::addProperty(info);
     xAssert(p);
@@ -61,6 +62,11 @@ public:
   void removeProperty(SProperty *prop)
     {
     SPropertyContainer::removeProperty(prop);
+    }
+
+  void moveProperty(SEntity *newParent, SProperty *prop)
+    {
+    SPropertyContainer::moveProperty(newParent, prop);
     }
 
   // accessing child properties by index

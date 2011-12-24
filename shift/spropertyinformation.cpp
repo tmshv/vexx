@@ -1,43 +1,47 @@
 #include "spropertyinformation.h"
 #include "spropertycontainer.h"
+#include "sdatabase.h"
+#include "styperegistry.h"
 
 SPropertyInstanceInformation::SPropertyInstanceInformation()
-  : _childInformation(0), _name(""), _location(0), _compute(0), _computeLockedToMainThread(false),
-    _queueCompute(defaultQueue), _affects(0), _index(X_SIZE_SENTINEL), _entityChild(false),
-    _extra(false), _dynamic(false)
   {
+  _holdingTypeInformation = 0;
+  _compute = 0;
+  _computeLockedToMainThread = false;
+  _queueCompute = defaultQueue;
+  _affects = 0;
+  _extra = false;
+  _dynamic = false;
+  _defaultInput = 0;
   }
 
-SPropertyInstanceInformation::~SPropertyInstanceInformation()
+SPropertyInstanceInformation *SPropertyInstanceInformation::allocate(xsize size)
   {
+  xAssert(STypeRegistry::allocator());
+  void *ptr = STypeRegistry::allocator()->alloc(size);
+
+  xAssert(ptr);
+  return (SPropertyInstanceInformation*)ptr;
   }
 
-SPropertyInformation::SPropertyInformation()
-    : _create(0), _createInstanceInformation(0), _save(0), _load(0), _assign(0), _postCreate(0),
-    _version(0), _parentTypeInformation(0), _size(0), _instanceInformationSize(0),
-    _dynamic(false), _instances(0)
+void SPropertyInstanceInformation::destroy(SPropertyInstanceInformation *d)
   {
+  xAssert(STypeRegistry::allocator());
+  STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation::SPropertyInformation(const SPropertyInformation& info)
-  : _create(info.create()),
-    _createInstanceInformation(info.createInstanceInformation()),
-    _save(info.save()),
-    _load(info.load()),
-    _assign(info.assign()),
-    _postCreate(info.postCreate()),
-    _version(info.version()),
-    _parentTypeInformation(info.parentTypeInformation()),
-    _size(info.size()),
-    _instanceInformationSize(info.instanceInformationSize()),
-    _dynamic(info.dynamic()),
-    _instances(0)
+SPropertyInformation *SPropertyInformation::allocate()
   {
+  xAssert(STypeRegistry::allocator());
+  void *ptr = STypeRegistry::allocator()->alloc(sizeof(SPropertyInformation));
+
+  xAssert(ptr);
+  return new(ptr) SPropertyInformation;
   }
 
-SPropertyInformation::~SPropertyInformation()
+void SPropertyInformation::destroy(SPropertyInformation *d)
   {
-  foreach(SInterfaceBaseFactory *f, _interfaceFactories)
+  foreach(SInterfaceBaseFactory *f, d->_interfaceFactories)
     {
     xAssert(f->_referenceCount > 0);
     --f->_referenceCount;
@@ -47,12 +51,73 @@ SPropertyInformation::~SPropertyInformation()
       }
     }
 
-  for(xsize i=0; i<childCount(); ++i)
+  for(xsize i=0; i<d->childCount(); ++i)
     {
-    delete [] child(i)->affects();
-    delete child(i);
+    SPropertyInstanceInformation *inst = d->child(i);
+    delete [] inst->affects();
+    inst->~SPropertyInstanceInformation();
+    SPropertyInstanceInformation::destroy(inst);
     }
+
+  xAssert(STypeRegistry::allocator());
+  STypeRegistry::allocator()->free(d);
   }
+
+SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj)
+  {
+  xAssert(obj->_copy);
+  SPropertyInformation *copy = obj->_copy();
+  return copy;
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, const QString &name)
+  {
+  xsize backwardsOffset = 0;
+  SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
+  xAssert(allocatable);
+
+  xsize finalLocation = X_ROUND_TO_ALIGNMENT(xsize, allocatable->size());
+  xsize finalSize = finalLocation + newChildType->size();
+
+  allocatable->setSize(finalSize);
+
+  xAssert(finalLocation > backwardsOffset);
+  xsize location = finalLocation - backwardsOffset;
+
+  SPropertyInstanceInformation *def = add(newChildType, location, name, true);
+
+  const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
+  xAssert((backwardsOffset + (xsize)prop) == finalLocation);
+
+  return def;
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra)
+  {
+  xAssert(newChildType);
+  SPropertyInstanceInformation *def = newChildType->_createInstanceInformation(name, _children.size(), location);
+
+  def->setHoldingTypeInformation(this);
+  def->setExtra(extra);
+
+  _children << def;
+
+  return def;
+  }
+
+SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
+  {
+  const SPropertyInformation *oldInst = inst->childInformation();
+  SPropertyInformation *info = SPropertyInformation::create(oldInst);
+
+  info->setParentTypeInformation(oldInst);
+
+  info->setExtendedParent(inst);
+  inst->setChildInformation(info);
+
+  return info;
+  }
+
 
 SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr)
   {
@@ -108,6 +173,86 @@ SPropertyInstanceInformation *SPropertyInformation::childFromIndex(xsize index)
   return _children[index];
   }
 
+const SPropertyInstanceInformation *SPropertyInformation::childFromName(const QString &in) const
+  {
+  foreach(SPropertyInstanceInformation *i, _children)
+    {
+    if(i->name() == in)
+      {
+      return i;
+      }
+    }
+  return 0;
+  }
+
+SPropertyInstanceInformation *SPropertyInformation::childFromName(const QString &in)
+  {
+  foreach(SPropertyInstanceInformation *i, _children)
+    {
+    if(i->name() == in)
+      {
+      return i;
+      }
+    }
+  return 0;
+  }
+
+const SPropertyInformation *SPropertyInformation::findAllocatableBase(xsize &offset) const
+  {
+  offset = 0;
+
+  const SPropertyInstanceInformation *allocateOnInfo = extendedParent();
+  if(!allocateOnInfo)
+    {
+    return this;
+    }
+
+  const SPropertyInformation *allocateOn = this;
+  while(allocateOnInfo)
+    {
+    offset += allocateOnInfo->location();
+
+    const SPropertyInformation *holdingInfo = allocateOnInfo->holdingTypeInformation();
+    if(!holdingInfo)
+      {
+      return allocateOn;
+      }
+
+    allocateOn = holdingInfo;
+    allocateOnInfo = allocateOn->extendedParent();
+    }
+
+  return 0;
+  }
+
+SPropertyInformation *SPropertyInformation::findAllocatableBase(xsize &offset)
+  {
+  offset = 0;
+
+  const SPropertyInstanceInformation *allocateOnInfo = extendedParent();
+  if(!allocateOnInfo)
+    {
+    return this;
+    }
+
+  SPropertyInformation *allocateOn = this;
+  while(allocateOnInfo)
+    {
+    offset += allocateOnInfo->location();
+
+    SPropertyInformation *holdingInfo = allocateOnInfo->holdingTypeInformation();
+    if(!holdingInfo)
+      {
+      return allocateOn;
+      }
+
+    allocateOn = holdingInfo;
+    allocateOnInfo = allocateOn->extendedParent();
+    }
+
+  return allocateOn;
+  }
+
 SPropertyInformation::DataKey g_maxKey = 0;
 SPropertyInformation::DataKey SPropertyInformation::newDataKey()
   {
@@ -120,7 +265,7 @@ SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   return g_maxChildKey++;
   }
 
-void SPropertyInstanceInformation::setAffects(SPropertyInstanceInformation *info)
+void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation *info)
   {
   xAssert(!_affects);
   xAssert(info);
@@ -134,6 +279,46 @@ void SPropertyInstanceInformation::setAffects(xsize *affects)
   {
   xAssert(!_affects);
   _affects = affects;
+  }
+
+void SPropertyInstanceInformation::setDefaultInput(const SPropertyInstanceInformation *info)
+  {
+  // find the offset to the holding type information
+  xsize targetOffset = 0;
+  const SPropertyInformation *targetBase = info->holdingTypeInformation()->findAllocatableBase(targetOffset);
+  // add the instance location
+  targetOffset += info->location();
+
+  // find the offset to the holding type information
+  xsize sourceOffset = 0;
+  const SPropertyInformation *sourceBase = holdingTypeInformation()->findAllocatableBase(sourceOffset);
+  // add the instance location
+  sourceOffset += location();
+
+  // cannot add a default input between to separate allocatable types.
+  xAssert(targetBase == sourceBase);
+
+  _defaultInput = (xptrdiff)targetOffset - (xptrdiff)sourceOffset;
+
+  xAssert(sourceOffset < sourceBase->size());
+  xAssert(targetOffset < sourceBase->size());
+  xAssert((sourceOffset + _defaultInput) < sourceBase->size());
+  xAssert((targetOffset - _defaultInput) < sourceBase->size());
+  xAssert(_defaultInput < (xptrdiff)sourceBase->size());
+  }
+
+void SPropertyInstanceInformation::initiateProperty(SProperty *propertyToInitiate) const
+  {
+  if(defaultInput())
+    {
+    xuint8 *data = (xuint8*)propertyToInitiate;
+
+    const xuint8 *inputPropertyData = data + defaultInput();
+
+    const SProperty *inputProperty = (SProperty*)inputPropertyData;
+
+    inputProperty->connect(propertyToInitiate);
+    }
   }
 
 void SPropertyInstanceInformation::initiate(const SPropertyInformation *info,
@@ -151,6 +336,90 @@ void SPropertyInstanceInformation::setData(DataKey k, const QVariant &v)
   {
   xAssert(k < g_maxChildKey);
   _data[k].setValue(v);
+  }
+
+SProperty *SPropertyInstanceInformation::locateProperty(SPropertyContainer *parent) const
+  {
+  xuint8* parentOffset = reinterpret_cast<xuint8*>(parent);
+  xuint8* childOffset = parentOffset + location();
+  SProperty *child = reinterpret_cast<SProperty*>(childOffset);
+  return child;
+  }
+
+const SProperty *SPropertyInstanceInformation::locateProperty(const SPropertyContainer *parent) const
+  {
+  const xuint8* parentOffset = reinterpret_cast<const xuint8*>(parent);
+  const xuint8* childOffset = parentOffset + location();
+  const SProperty *child = reinterpret_cast<const SProperty*>(childOffset);
+  return child;
+  }
+
+const SPropertyInstanceInformation *SPropertyInstanceInformation::resolvePath(const QString &path) const
+  {
+  SProfileFunction
+
+  const SPropertyInstanceInformation *cur = this;
+  const SPropertyInformation *curInfo = cur->childInformation();
+
+  QString name;
+  bool escape = false;
+  for(xsize i = 0, s = path.size(); i < s; ++i)
+    {
+    QChar c = path[i];
+
+    if(c == QChar('\\'))
+      {
+      escape = true;
+      }
+    else
+      {
+      if(!escape && c != SDatabase::pathSeparator())
+        {
+        name.append(c);
+        }
+
+      if(!escape && (c == SDatabase::pathSeparator() || i == (s-1)))
+        {
+        if(name == "..")
+          {
+          xAssert(cur);
+          if(!cur)
+            {
+            return 0;
+            }
+
+          curInfo = cur->holdingTypeInformation();
+          if(!curInfo)
+            {
+            return 0;
+            }
+
+          cur = curInfo->extendedParent();
+          }
+        else
+          {
+          xAssert(curInfo);
+          cur = curInfo->childFromName(name);
+          if(!cur)
+            {
+            return 0;
+            }
+
+          curInfo = cur->childInformation();
+          }
+
+        if(!cur && !curInfo)
+          {
+          return 0;
+          }
+        xAssert(curInfo);
+
+        name.clear();
+        }
+      escape = false;
+      }
+    }
+  return cur;
   }
 
 void SPropertyInstanceInformation::defaultQueue(const SPropertyInstanceInformation *info, const SPropertyContainer *cont, SProperty **jobs, xsize &numJobs)
@@ -191,7 +460,6 @@ bool SPropertyInformation::inheritsFromType(const SPropertyInformation *match) c
     }
   return false;
   }
-
 
 void SPropertyInformation::reference() const
   {

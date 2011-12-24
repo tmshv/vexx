@@ -63,6 +63,7 @@ void ScEmbeddedTypes::typeAdded(const SPropertyInformation *p)
       if(parent.isObject())
         {
         v.setPrototype(parent);
+        v.setProperty("parentTypeInformation", parent);
         }
       }
 
@@ -96,7 +97,7 @@ QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
   QScriptValue v = _types->engine()->newObject(classType, _types->engine()->newVariant(qVariantFromValue(prop)));
 
   QScriptValue proto = _types->engine()->globalObject().property(prop->typeInformation()->typeName());
-  v.setPrototype(proto.isObject());
+  xAssert(proto.isObject());
   v.setPrototype(proto);
   return v;
   }

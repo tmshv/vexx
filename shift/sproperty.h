@@ -10,6 +10,7 @@ class SEntity;
 class SProperty;
 class SPropertyContainer;
 class SPropertyMetaData;
+class SHandler;
 class SDatabase;
 
 #define S_USER_DATA_TYPE(typeId) public: \
@@ -25,12 +26,10 @@ class SDatabase;
 
 
 #define S_ADD_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
-  public: enum { Version = version };
+  public: enum { Version = version, IsAbstract = false };
 
 #define S_ADD_ABSTRACT_STATIC_INFO(name, version) \
-  static void createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo); \
-  public: enum { Version = version };
+  public: enum { Version = version, IsAbstract = true };
 
 #define S_PROPERTY_ROOT(myName, version) \
   public: \
@@ -40,16 +39,6 @@ class SDatabase;
   S_REGISTER_TYPE_FUNCTION()
 
 #define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
-  TEMPL void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
   TEMPL const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -58,8 +47,6 @@ class SDatabase;
 
 
 #define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  void myName::createProperty(void *, const SPropertyInformation *, SPropertyInstanceInformation **) \
-  { xAssertFailMessage("Creating abstract type") } \
   const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -67,33 +54,9 @@ class SDatabase;
   return info;}
 
 #define S_IMPLEMENT_PROPERTY(myName) \
-  void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
-  const SPropertyInformation *myName::staticTypeInformation() { \
-  static const SPropertyInformation *info = 0; \
-  if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
-  return info;}
+  const SPropertyInformation *myName::staticTypeInformation() { return SPropertyInformation::findStaticTypeInformation<myName>(#myName); }
 
 #define S_IMPLEMENT_INLINE_PROPERTY(myName) \
-  inline void myName::createProperty(void *ptr, const SPropertyInformation *, SPropertyInstanceInformation **instanceInfo) \
-  { myName *prop = new(ptr) myName(); \
-  if(instanceInfo) { \
-  xuint8 *alignedPtr = (xuint8*)(prop+1); \
-  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr); \
-  xAssertIsAligned(alignedPtr); \
-  *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr + 1); \
-  new(*instanceInfo) InstanceInformation(); \
-  (*instanceInfo)->setDynamic(true); \
-  } } \
   inline const SPropertyInformation *myName::staticTypeInformation() { \
   static const SPropertyInformation *info = 0; \
   if(!info) { info = STypeRegistry::findType(#myName); \
@@ -159,9 +122,11 @@ public:
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
+  void connect(const QVector<SProperty*> &) const;
   void disconnect(SProperty *) const;
   void disconnect() const;
 
+  bool isDirty() const { return _flags.hasFlag(Dirty); }
   bool isComputed() const;
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }
@@ -183,8 +148,10 @@ public:
 
   SProperty *nextSibling() const;
 
-  SDatabase *database() { return _database; }
-  const SDatabase *database() const { return _database; }
+  SHandler *handler() { return _handler; }
+  const SHandler *handler() const { return _handler; }
+  SDatabase *database();
+  const SDatabase *database() const;
 
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
@@ -193,15 +160,21 @@ public:
   const SPropertyInstanceInformation *baseInstanceInformation() const { xAssert(_instanceInfo); return _instanceInfo; }
 
   void postSet();
-  void setDependantsDirty(bool force=false);
+  void setDependantsDirty();
   void preGet() const
     {
+    if(_flags.hasFlag(ParentHasInput))
+      {
+      updateParent();
+      }
+
     if(_flags.hasFlag(Dirty))
       {
       update();
       }
-    }
+  }
   void update() const;
+  void updateParent() const;
 
   bool isDynamic() const;
   xsize index() const;
@@ -216,6 +189,8 @@ public:
   // set only works for dynamic properties
   void setName(const QString &);
   const QString &name() const;
+  // name valid for entry into paths.
+  QString escapedName() const;
 
   template <typename T>T *uncheckedCastTo()
     {
@@ -300,7 +275,9 @@ public:
     QString _before;
     QString _after;
     SProperty *_property;
-    bool apply(int mode);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   class ConnectionChange : public SChange
@@ -331,7 +308,9 @@ public:
     SProperty *_driver;
     SProperty *_driven;
     Mode _mode;
-    bool apply(int mode);
+    bool apply();
+    bool unApply();
+    bool inform();
     };
 
   static void assignProperty(const SProperty *, SProperty *);
@@ -349,8 +328,7 @@ public:
   X_ALIGNED_OPERATOR_NEW
 
 private:
-  void setDirty(bool force=false);
-  friend void setDependantsDirty(SProperty* prop, bool force=false);
+  void setDirty();
   void internalSetName(const QString &name);
 
   void connectInternal(SProperty *) const;
@@ -359,7 +337,7 @@ private:
   SProperty *_input;
   SProperty *_output;
   SProperty *_nextOutput;
-  SDatabase *_database;
+  SHandler *_handler;
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
   const InstanceInformation *_instanceInfo;

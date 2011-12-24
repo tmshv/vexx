@@ -8,8 +8,6 @@ SPropertyInformation *GCShaderComponent::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCShaderComponent>("GCShaderComponent");
 
-  info->add(&GCShaderComponent::source, "source");
-
   return info;
   }
 
@@ -63,14 +61,15 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, SPrope
           {
           xAssertFail();
           }
-        lock.data()->addComponent(t, cmp->source());
+        lock.data()->addComponent(t, cmp->value());
         }
       }
+
+    shader->_setVariables = true;
     }
 
-  if(shader->_setVariables || shader->_rebuildShader)
+  if(shader->_setVariables)
     {
-    xAssert(shader->_setVariables);
     for(const SProperty* p = shader->components.nextSibling(); p; p = p->nextSibling())
       {
       const GCShaderBindableData *binder = p->interface<GCShaderBindableData>();
@@ -116,7 +115,12 @@ void GCShader::postChildSet(SPropertyContainer *c, SProperty *p)
 
   GCShader *shader = c->uncheckedCastTo<GCShader>();
 
-  if(p == &shader->components)
+  if(p == &shader->runtimeShader)
+    {
+    return;
+    }
+
+  if(shader->components.isDirty())
     {
     shader->_rebuildShader = true;
     }

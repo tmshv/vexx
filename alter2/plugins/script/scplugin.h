@@ -40,6 +40,8 @@ public:
 
   QScriptEngine *engine();
 
+  static QScriptValue call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args);
+
   void registerScriptGlobal(QObject *);
   void registerScriptGlobal(const QString &, QObject *);
   void registerScriptGlobal(const QString &, QScriptClass *cl);

@@ -19,6 +19,9 @@ public:
   static void removeTypeObserver(Observer *o);
 
   static void initiate();
+  static void terminate();
+
+  static XAllocatorBase *allocator();
 
   static const XSet <const SPropertyInformation *> &types();
   static void addType(const SPropertyInformation *);

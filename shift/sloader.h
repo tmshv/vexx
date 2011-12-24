@@ -32,7 +32,7 @@ public:
 
   void loadChildren(SPropertyContainer *parent);
 
-  virtual void beginChildren() const = 0;
+  virtual bool beginChildren() const = 0;
   virtual void endChildren() const = 0;
   virtual bool hasNextChild() const = 0;
 

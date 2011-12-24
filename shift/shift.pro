@@ -20,8 +20,8 @@ SOURCES += \
     sdatabase.cpp \
     schange.cpp \
     sobserver.cpp \
-    sentityui.cpp \
-    spropertydefaultui.cpp \
+    UI/sentityui.cpp \
+    UI/spropertydefaultui.cpp \
     sreferenceentity.cpp \
     spropertycontainer.cpp \
     spropertyarray.cpp \
@@ -38,7 +38,8 @@ SOURCES += \
     Serialisation/sxmlio.cpp \
     Serialisation/sbinaryio.cpp \
     Serialisation/sjsonio.cpp \
-    sloader.cpp
+    sloader.cpp \
+    shandler.cpp
 
 HEADERS += \
     sglobal.h \
@@ -47,8 +48,8 @@ HEADERS += \
     sdatabase.h \
     schange.h \
     sobserver.h \
-    sentityui.h \
-    spropertydefaultui.h \
+    UI/sentityui.h \
+    UI/spropertydefaultui.h \
     sreferenceentity.h \
     spropertycontainer.h \
     spropertyarray.h \
@@ -66,7 +67,8 @@ HEADERS += \
     Serialisation/JsonParser/JSON_parser.h \
     Serialisation/sxmlio.h \
     Serialisation/sbinaryio.h \
-    Serialisation/sjsonio.h
+    Serialisation/sjsonio.h \
+    shandler.h
 
 
 

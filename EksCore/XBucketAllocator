@@ -18,11 +18,11 @@
 
 X_DECLARE_MEMORY_LOGGER(EKSCORE_EXPORT, xTotalBucketAllocatorSize);
 
-class XFixedSizeBucketAllocator
+class EKSCORE_EXPORT XFixedSizeBucketAllocator
   {
 public:
 
-  class Bucket
+  class EKSCORE_EXPORT Bucket
     {
   XProperties:
     XProperty(Bucket *, next, setNext);
@@ -138,6 +138,8 @@ public:
         }
       return true;
       }
+
+    void debugDump() const;
 
   private:
     xuint8 findFirstSpareBit(xuint8 mask)
@@ -275,6 +277,18 @@ public:
     return true;
     }
 
+  xsize bucketCount() const
+    {
+    xsize i = 0;
+    Bucket *b = _first;
+    while(b)
+      {
+      ++i;
+      b = b->next();
+      }
+    return i;
+    }
+
   bool contains(void *ptr) const
     {
     Bucket *b = _first;
@@ -294,6 +308,8 @@ public:
     return _size;
     }
 
+  void debugDump() const;
+
 private:
   X_DISABLE_COPY(XFixedSizeBucketAllocator);
   Bucket *_freePtr;
@@ -304,7 +320,7 @@ private:
   XAllocatorBase *_allocator;
   };
 
-class XBucketAllocator : public XAllocatorBase
+class EKSCORE_EXPORT XBucketAllocator : public XAllocatorBase
   {
 public:
   XBucketAllocator(xsize d=128, xsize e=1024, XAllocatorBase *alloc=XGlobalAllocator::instance())
@@ -328,7 +344,7 @@ public:
     {
     size = X_ROUND_TO_SPECIFIC_ALIGNMENT(xsize, size, alignment);
     X_MEMORY_LOGGER_ALLOC(xTotalBucketAllocatorSize, size);
-
+      
     XFixedSizeBucketAllocator *b = _internal.value(size, 0);
     if(!b)
       {
@@ -372,6 +388,8 @@ public:
       }
     return true;
     }
+
+  void debugDump() const;
 
 private:
   X_DISABLE_COPY(XBucketAllocator);

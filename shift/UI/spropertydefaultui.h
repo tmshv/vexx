@@ -54,7 +54,7 @@ private:
   bool _dirty;
   };
 
-class Bool : public QCheckBox, private SUIBase<BoolProperty>
+class SHIFT_EXPORT Bool : public QCheckBox, private SUIBase<BoolProperty>
   {
   Q_OBJECT
 public:
@@ -69,7 +69,7 @@ public:
   void syncGUI() { setChecked( propertyValue()->value() ); }
   };
 
-class Int32 : public QSpinBox, private SUIBase<IntProperty>
+class SHIFT_EXPORT Int32 : public QSpinBox, private SUIBase<IntProperty>
  {
  Q_OBJECT
 public:
@@ -88,7 +88,7 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class UInt32 : public QSpinBox, private SUIBase<UnsignedIntProperty>
+class SHIFT_EXPORT UInt32 : public QSpinBox, private SUIBase<UnsignedIntProperty>
  {
  Q_OBJECT
 public:
@@ -107,7 +107,7 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class Int64 : public QSpinBox, private SUIBase<LongIntProperty>
+class SHIFT_EXPORT Int64 : public QSpinBox, private SUIBase<LongIntProperty>
  {
  Q_OBJECT
 public:
@@ -126,7 +126,7 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class UInt64 : public QSpinBox, private SUIBase<LongUnsignedIntProperty>
+class SHIFT_EXPORT UInt64 : public QSpinBox, private SUIBase<LongUnsignedIntProperty>
  {
  Q_OBJECT
 public:
@@ -145,7 +145,7 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class Float : public XFloatWidget, private SUIBase<FloatProperty>
+class SHIFT_EXPORT Float : public XFloatWidget, private SUIBase<FloatProperty>
   {
   Q_OBJECT
 public:
@@ -160,7 +160,7 @@ public:
   void syncGUI() { setValue(propertyValue()->value()); }
   };
 
-class Double : public XFloatWidget, private SUIBase<DoubleProperty>
+class SHIFT_EXPORT Double : public XFloatWidget, private SUIBase<DoubleProperty>
   {
   Q_OBJECT
 public:
@@ -175,7 +175,7 @@ public:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class String : public QLineEdit, private SUIBase<StringProperty>
+class SHIFT_EXPORT String : public QLineEdit, private SUIBase<StringProperty>
   {
   Q_OBJECT
 public:
@@ -190,7 +190,7 @@ public:
   void syncGUI() { setText(propertyValue()->value()); }
   };
 
-class LongString : public QTextEdit, private SUIBase<StringProperty>
+class SHIFT_EXPORT LongString : public QTextEdit, private SUIBase<StringProperty>
   {
   Q_OBJECT
 public:
@@ -206,7 +206,7 @@ public:
   void syncGUI() { setText( propertyValue()->value() ); }
   };
 
-class Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty>
+class SHIFT_EXPORT Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty>
   {
   Q_OBJECT
 public:
@@ -224,7 +224,7 @@ private:
   };
 
 
-class Vector3D : public XVector3DWidget, private SUIBase<Vector3DProperty>
+class SHIFT_EXPORT Vector3D : public XVector3DWidget, private SUIBase<Vector3DProperty>
   {
   Q_OBJECT
 public:
@@ -242,7 +242,7 @@ private:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class Colour : public XColourWidget, private SUIBase<ColourProperty>
+class SHIFT_EXPORT Colour : public XColourWidget, private SUIBase<ColourProperty>
   {
   Q_OBJECT
 public:

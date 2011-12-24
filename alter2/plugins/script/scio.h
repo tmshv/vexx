@@ -4,6 +4,8 @@
 #include "QObject"
 #include "QFile"
 
+class QScriptValue;
+
 class ScFile : public QFile
   {
   Q_OBJECT
@@ -12,6 +14,7 @@ public:
   ScFile(const QString& file="");
   Q_INVOKABLE bool open(const QString &strMode);
   Q_INVOKABLE void close();
+  Q_INVOKABLE void write(const QScriptValue &val);
   };
 
 

@@ -24,7 +24,7 @@ public:
 
   SProperty *operator[](xsize i) { return at(i); }
   using SPropertyContainer::at;
-  void clear();
+  using SPropertyContainer::clear;
 
   void remove(SProperty *);
   };
@@ -53,7 +53,7 @@ public:
       {
       for(xsize x=0; x<s; ++x)
         {
-        addProperty(false, internalCreateHelper(T::Type, database()));
+        addProperty(false, internalCreateHelper(T::Type, handler()));
         }
       }
     else if(dif < 0)
@@ -78,6 +78,8 @@ public:
 
     return c;
     }
+
+  using SPropertyContainer::clear;
   };
 
 S_IMPLEMENT_TEMPLATED_PROPERTY(template <typename T>, STypedPropertyArray<T>)

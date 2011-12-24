@@ -46,6 +46,10 @@ RESOURCES += \
     ScResources.qrc
 
 OTHER_FILES += \
-    CoreUtils.js
+    JSPartExporter.js \
+    CoreStartup.js
+
+
+
 
 

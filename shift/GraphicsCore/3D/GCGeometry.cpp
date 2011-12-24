@@ -17,7 +17,7 @@ GCGeometryAttribute::GCGeometryAttribute()
 
 void GCGeometryAttribute::setType(const SPropertyInformation *type)
   {
-  SBlock b(database());
+  SBlock b(handler());
   if(size() > 1)
     {
     removeProperty(firstChild());
@@ -97,7 +97,7 @@ void GCGeometryAttribute::removePolygons(xuint32 index, xuint32 count)
   xAssertFail();
   }
 
-void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
+void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices, xsize size)
   {
   SUIntArrayProperty::EigenArray data = polygons.data();
 
@@ -110,6 +110,7 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices)
     if(index == currentIndex)
       {
       xuint32* rawData = data.data();
+      xAssert(data(offset) == size, data(offset), size);
       rawData += offset + 1;
 
       memcpy(rawData, indices, sizeof(xuint32) * data(offset));
@@ -299,7 +300,7 @@ void GCGeometry::appendTo(XGeometry *geo) const
 
 void GCGeometry::clearAttributes()
   {
-  SBlock b(database());
+  SBlock b(handler());
   while(attributes.firstChild())
     {
     attributes.remove(attributes.firstChild());

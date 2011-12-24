@@ -4,6 +4,10 @@
 #include "sdatabase.h"
 #include "QHeaderView"
 #include "QMenu"
+#include "QClipboard"
+#include "QApplication"
+#include "QFileDialog"
+#include "Serialisation/sjsonio.h"
 
 UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
     : UISurface("Database Debug", new QWidget(), UISurface::Dock),
@@ -45,18 +49,30 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
     {
     _clickedItem = (SProperty *)index.internalPointer();
 
+
+    QString path = _clickedItem->path();
+    menu.addAction("Copy Path \"" + path + "\"", this, SLOT(copyPath()));
+    menu.addAction("Save As JSON", this, SLOT(saveProperty()));
+
+    if(_clickedItem->castTo<SPropertyContainer>())
+      {
+      menu.addAction("Load JSON Under This", this, SLOT(loadProperty()));
+      }
+
+    menu.addSeparator();
+    exec = true;
+
     if(_clickedItem->hasInput())
       {
       QAction *inputLabel = menu.addAction("Input");
       inputLabel->setEnabled(false);
-      exec = true;
 
       menu.addAction(_clickedItem->input()->path(), this, SLOT(disconnectInput()));
       }
 
     if(_clickedItem->hasOutputs())
       {
-      if(exec)
+      if(_clickedItem->hasInput())
         {
         menu.addSeparator();
         }
@@ -88,7 +104,38 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
       }
     }
 
-  menu.exec(_treeView->mapToGlobal(point));
+  menu.exec(QCursor::pos());
+  }
+
+void UIDatabaseDebugSurface::saveProperty()
+  {
+  QString fname = QFileDialog::getSaveFileName(widget(), "Save Property as JSON");
+  QFile f(fname);
+  if(f.open(QIODevice::WriteOnly))
+    {
+    SJSONSaver j;
+    j.setAutoWhitespace(true);
+    j.writeToDevice(&f, _clickedItem->entity(), true);
+    }
+  }
+
+void UIDatabaseDebugSurface::loadProperty()
+  {
+  QString fname = QFileDialog::getOpenFileName(widget(), "Open JSON Under Property");
+  QFile f(fname);
+  if(f.open(QIODevice::ReadOnly))
+    {
+    SJSONLoader j;
+    j.readFromDevice(&f, _clickedItem->castTo<SPropertyContainer>());
+    }
+  }
+
+void UIDatabaseDebugSurface::copyPath()
+  {
+  QString path = _clickedItem->path();
+
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(path);
   }
 
 void UIDatabaseDebugSurface::disconnectInput()

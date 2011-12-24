@@ -2,12 +2,12 @@
 #define SCSHIFTDATABASE_H
 
 #include "scglobal.h"
-#include "scshiftentity.h"
+#include "scshiftpropertycontainer.h"
 
 class SPropertyInstanceInformation;
 class SPropertyContainer;
 
-class ScShiftDatabase : public ScWrappedClass<SProperty *>
+class ScShiftDatabase : public ScShiftPropertyContainerBase
   {
 public:
   ScShiftDatabase(QScriptEngine *engine);
@@ -18,6 +18,9 @@ private:
   static QScriptValue save(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue load(QScriptContext *ctx, QScriptEngine *);
   static void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node);
+
+  static bool parseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
+  static bool postParseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray);
   };
 
 Q_DECLARE_METATYPE(ScShiftDatabase*)

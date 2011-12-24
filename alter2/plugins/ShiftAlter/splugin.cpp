@@ -1,6 +1,7 @@
 #include "splugin.h"
 #include "sglobal.h"
 #include "GraphicsCore/GCGlobal.h"
+#include "GraphicsCore/3D/GCShader.h"
 #include "sprocessmanager.h"
 #include "QThread"
 #include "QDesktopServices"
@@ -8,6 +9,11 @@
 #include "QDir"
 #include "Serialisation/sjsonio.h"
 #include "styperegistry.h"
+#include "saparteditorinterface.h"
+#include "saparteditor.h"
+#include "sashaderparteditorinterface.h"
+#include "acore.h"
+#include "GraphicsCore.h"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -31,6 +37,10 @@ void SPlugin::load()
   {
   STypeRegistry::initiate();
   STypeRegistry::addType(SAppDatabase::staticTypeInformation());
+  STypeRegistry::addType(SDocument::staticTypeInformation());
+  STypeRegistry::addType(SPartDocument::staticTypeInformation());
+
+  initiateGraphicsCore();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
   XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope
@@ -46,11 +56,14 @@ void SPlugin::load()
 
   SProcessManager::initiate(threadCount);
 
+  SProperty::staticTypeInformation()->addStaticInterface(new SDefaultPartEditorInterface);
+  GCShader::staticTypeInformation()->addStaticInterface(new SShaderPartEditorInterface);
+
   _db = new SAppDatabase();
+  _db->setPlugin(this);
 
-  QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-
-  QFile file(dataLocation + "/settings.json");
+  QDir dataDir = core()->localDataDirectory();
+  QFile file(dataDir.absolutePath() + "/settings.json");
   if(file.open(QIODevice::ReadOnly))
     {
     SJSONLoader loader;
@@ -79,4 +92,5 @@ void SPlugin::unload()
   delete _db;
   _db = 0;
   SProcessManager::terminate();
+  STypeRegistry::terminate();
   }

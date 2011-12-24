@@ -60,10 +60,13 @@ public:
           xAssert(next->_next);
           next = next->_next;
           }
-        next->_next = next->_next->_next;
+        xAssert(next->_next);
+        xAssert(next->_next == this);
+        next->_next = _next;
         }
       }
     _data = 0;
+    _next = 0;
     }
 
 protected:
@@ -85,6 +88,7 @@ protected:
           next = next->_next;
           }
         next->_next = this;
+        xAssert(_next == 0);
         }
       }
     }

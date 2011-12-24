@@ -16,13 +16,11 @@ public:
   virtual void bindData(XShader *, const SProperty *) const = 0;
   };
 
-class GRAPHICSCORE_EXPORT GCShaderComponent : public SEntity
+class GRAPHICSCORE_EXPORT GCShaderComponent : public StringProperty
   {
-  S_ENTITY(GCShaderComponent, SEntity, 0)
+  S_ENTITY(GCShaderComponent, StringProperty, 0)
 public:
   GCShaderComponent();
-
-  StringProperty source;
   };
 
 class GRAPHICSCORE_EXPORT GCFragmentShaderComponent : public GCShaderComponent

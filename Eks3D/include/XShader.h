@@ -130,8 +130,8 @@ public:
     Vertex,
     Geometry
     };
-  virtual bool addComponent(ComponentType c, const QString& source) = 0;
-  virtual bool build() = 0;
+  virtual bool addComponent(ComponentType c, const QString& source, QStringList &log) = 0;
+  virtual bool build(QStringList &log) = 0;
   virtual bool isValid() = 0;
 
   virtual XAbstractShaderVariable *createVariable( QString, XAbstractShader * ) = 0;
@@ -155,6 +155,7 @@ class EKS3D_EXPORT XShader
   {
 XProperties:
   XROProperty( XRenderer *, renderer );
+  XRORefProperty( QStringList, log );
 
 public:
   XShader();
@@ -187,6 +188,12 @@ private:
   };
 
 inline bool operator==(const XShader&, const XShader&)
+  {
+  xAssertFail();
+  return false;
+  }
+
+inline bool operator!=(const XShader&, const XShader&)
   {
   xAssertFail();
   return false;

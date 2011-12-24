@@ -1,3 +1,4 @@
+#define builtIn
 #include "XProfiler"
 #include "QThread"
 #include "QMutexLocker"

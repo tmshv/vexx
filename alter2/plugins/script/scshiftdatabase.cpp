@@ -6,7 +6,7 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
+ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftPropertyContainerBase(eng)
   {
   addMemberFunction("addType", addType);
   addMemberFunction("load", load);
@@ -18,7 +18,7 @@ ScShiftDatabase::~ScShiftDatabase()
   {
   }
 
-QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *e)
+QScriptValue ScShiftDatabase::load(QScriptContext *ctx, QScriptEngine *)
   {
   enum
     {
@@ -200,6 +200,207 @@ QScriptValue ScShiftDatabase::save(QScriptContext *ctx, QScriptEngine *)
   return false;
   }
 
+bool ScShiftDatabase::parseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray)
+  {
+  if(propertiesArray.isArray())
+    {
+    // First pass, add basic instance information
+    xuint32 i = 0;
+    for(QScriptValue propertyObject = propertiesArray.property(0);
+        propertyObject.isObject();
+        propertyObject = propertiesArray.property(++i))
+      {
+      // Name
+      QScriptValue nameObject = propertyObject.property("name");
+      if(!nameObject.isString())
+        {
+        ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'name' entry");
+        return false;
+        }
+      QString propName = nameObject.toString();
+
+      // Extending a current child?
+      QScriptValue extendingObject = propertyObject.property("extend");
+      if(!extendingObject.isBoolean() || !extendingObject.toBoolean())
+        {
+        // Type
+        QScriptValue typeObject = propertyObject.property("type");
+        const SPropertyInformation *propType = 0;
+        if(typeObject.isString())
+          {
+          propType = STypeRegistry::findType(typeObject.toString());
+          }
+        else if(typeObject.isObject())
+          {
+          QScriptValue typeName = typeObject.property("typeName");
+          if(typeName.isString())
+            {
+            propType = STypeRegistry::findType(typeName.toString());
+            }
+          }
+
+        if(!propType)
+          {
+          ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'type' entry");
+          return false;
+          }
+
+        // Compute function
+        SPropertyInstanceInformation::ComputeFunction computeFn = 0;
+        QScriptValue computeObject = propertyObject.property("compute");
+        if(computeObject.isFunction())
+          {
+          computeFn = computeNode;
+          }
+
+        // Default value
+        QScriptValue valueObject = propertyObject.property("defaultValue");
+        QString valueStr;
+        if(valueObject.isString())
+          {
+          valueStr = valueObject.toString();
+          }
+
+        // add the described child
+        SPropertyInstanceInformation *info = newType->add(propType, propName);
+
+        if(!valueStr.isEmpty())
+          {
+          info->setDefaultValue(valueStr);
+          }
+
+        info->setCompute(computeFn);
+        info->setExtra(true);
+
+        if(computeFn)
+          {
+          info->setData(g_computeKey, qVariantFromValue(typeObject));
+          }
+        }
+      else
+        {
+        SPropertyInstanceInformation *inst = newType->childFromName(propName);
+        if(!inst)
+          {
+          ctx->throwError(QScriptContext::SyntaxError, "Attempting to extend non-defined child '" + propName + "'.");
+          return false;
+          }
+
+        SPropertyInformation *extended = newType->extendContainedProperty(inst);
+        // Extending known type:
+        QScriptValue properties = propertyObject.property("properties");
+        if(!parseChildProperties(ctx, extended, properties))
+          {
+            return false;
+          }
+        }
+      }
+    }
+  return true;
+  }
+
+bool ScShiftDatabase::postParseChildProperties(QScriptContext *ctx, SPropertyInformation *newType, QScriptValue propertiesArray)
+  {
+  if(propertiesArray.isArray())
+    {
+    // Second pass, affects information, default inputs
+    xuint32 i = 0;
+    for(QScriptValue propertyObject = propertiesArray.property(0);
+        propertyObject.isObject();
+        propertyObject = propertiesArray.property(++i))
+      {
+      // Name
+      QScriptValue nameObject = propertyObject.property("name");
+      if(!nameObject.isString())
+        {
+        ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'name' entry");
+        return false;
+        }
+      QString propName = nameObject.toString();
+      
+      SPropertyInstanceInformation *info =  newType->childFromName(propName);
+      xAssert(info);
+
+      // Extending a current child?
+      QScriptValue extendingObject = propertyObject.property("extend");
+      if(!extendingObject.isBoolean() || !extendingObject.toBoolean())
+        {
+        // Affects
+        QScriptValue affectsObject = propertyObject.property("affects");
+        if(affectsObject.isArray())
+          {
+          xsize *affects = 0;
+          bool affectsIsValid = true;
+          xuint32 length = affectsObject.property("length").toUInt32();
+          affects = new xsize [length+1];
+          affects[length] = 0;
+          for(xuint32 affectIdx=0; affectIdx<length; ++affectIdx)
+            {
+            affects[affectIdx] = 0;
+            QString name = affectsObject.property(affectIdx).toString();
+
+            SPropertyInstanceInformation *inst = newType->childFromName(name);
+            if(inst)
+              {
+              affects[affectIdx] = inst->location();
+              }
+
+            if(!affects[affectIdx])
+              {
+              affectsIsValid = false;
+              ctx->throwError(QScriptContext::SyntaxError, "Defined sibling property name expected for affectedBy members.");
+              return false;
+              }
+            }
+
+          if(!affectsIsValid)
+            {
+            delete [] affects;
+            affects = 0;
+            }
+
+          info->setAffects(affects);
+          }
+
+        // Default input
+        QScriptValue inputObject = propertyObject.property("defaultInput");
+        if(inputObject.isString())
+          {
+          QString inputPath = inputObject.toString();
+
+          const SPropertyInstanceInformation *input = info->resolvePath(inputPath);
+          if(!input)
+            {
+            ctx->throwError(QScriptContext::SyntaxError, "Unable to find default input '" + inputPath + "'");
+            return false;
+            }
+
+          info->setDefaultInput(input);
+          }
+        }
+      else
+        {
+        SPropertyInstanceInformation *inst = newType->childFromName(propName);
+        if(!inst)
+          {
+          ctx->throwError(QScriptContext::SyntaxError, "Attempting to extend non-defined child '" + propName + "'.");
+          return false;
+          }
+
+        SPropertyInformation *child = const_cast<SPropertyInformation*>(inst->childInformation());
+
+        // Extending known type:
+        QScriptValue properties = propertyObject.property("properties");
+        if(!postParseChildProperties(ctx, child, properties))
+          {
+            return false;
+          }
+        }
+      }
+    }
+  return true;
+  }
+
 QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine)
   {
   ScProfileFunction
@@ -212,6 +413,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   if(!db)
     {
     ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SDatabase.addType(...);");
+    return QScriptValue();
     }
 
   if(ctx->argumentCount() != 1)
@@ -227,25 +429,23 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     return QScriptValue();
     }
 
-  QScriptValue tempObject;
-
-  tempObject = typeObject.property("name");
-  QString name = tempObject.toString();
+  QScriptValue nameObject = typeObject.property("name");
+  QString name = nameObject.toString();
   if(name == "" || STypeRegistry::findType(name) != 0)
     {
     ctx->throwError(QScriptContext::SyntaxError, "Unique, non zero-lengthed string expected as 'name' property");
     return QScriptValue();
     }
 
-  tempObject = typeObject.property("parent");
+  QScriptValue parentObject = typeObject.property("parent");
   const SPropertyInformation *parent = 0;
-  if(tempObject.isString())
+  if(parentObject.isString())
     {
-    parent = STypeRegistry::findType(tempObject.toString());
+    parent = STypeRegistry::findType(parentObject.toString());
     }
-  else if(tempObject.isObject())
+  else if(parentObject.isObject())
     {
-    QScriptValue typeName = tempObject.property("typeName");
+    QScriptValue typeName = parentObject.property("typeName");
     if(typeName.isString())
       {
       parent = STypeRegistry::findType(typeName.toString());
@@ -257,142 +457,31 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
     return QScriptValue();
     }
 
-  tempObject = typeObject.property("version");
-  xuint32 version = tempObject.toUInt32();
+  QScriptValue versionObject = typeObject.property("version");
+  xuint32 version = versionObject.toUInt32();
 
-  xsize endOfUsedMemory = parent->dynamicSize();
-  QList<SPropertyInstanceInformation*> properties;
-
-  tempObject = typeObject.property("properties");
-  if(tempObject.isArray())
-    {
-    xuint32 i = 0;
-    QScriptValue val = tempObject.property(i);
-    QScriptValue tempArrayObject;
-    while(val.isObject())
-      {
-      tempArrayObject = val.property("name");
-      if(!tempArrayObject.isString())
-        {
-        ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'name' entry");
-        break;
-        }
-      QString propName = tempArrayObject.toString();
-
-      tempArrayObject = val.property("type");
-      const SPropertyInformation *propType = 0;
-      if(tempArrayObject.isString())
-        {
-        propType = STypeRegistry::findType(tempArrayObject.toString());
-        }
-      else if(tempArrayObject.isObject())
-        {
-        QScriptValue typeName = tempArrayObject.property("typeName");
-        if(typeName.isString())
-          {
-          propType = STypeRegistry::findType(typeName.toString());
-          }
-        }
-
-      if(!propType)
-        {
-        ctx->throwError(QScriptContext::SyntaxError, "String expected as 'properties' array 'type' entry");
-        break;
-        }
-
-      SPropertyInstanceInformation::ComputeFunction computeFn = 0;
-      tempArrayObject = val.property("compute");
-      if(tempArrayObject.isFunction())
-        {
-        computeFn = computeNode;
-        }
-
-      SPropertyInstanceInformation *info = propType->createInstanceInformation()(propType, propName, i, *reinterpret_cast<SProperty SPropertyContainer::**>(&endOfUsedMemory));
-      info->setCompute(computeFn);
-      info->setExtra(true);
-
-      endOfUsedMemory += propType->size();
-      properties << info;
-
-      if(computeFn)
-        {
-        info->setData(g_computeKey, qVariantFromValue(tempArrayObject));
-        }
-
-      val = tempObject.property(++i);
-      }
-
-    i = 0;
-    val = tempObject.property(i);
-    while(val.isObject())
-      {
-      xsize *affects = 0;
-      tempArrayObject = val.property("affects");
-      bool affectsIsValid = false;
-      if(tempArrayObject.isArray())
-        {
-        affectsIsValid = true;
-        xuint32 length = tempArrayObject.property("length").toUInt32();
-        affects = new xsize [length+1];
-        affects[length] = 0;
-        for(xuint32 i=0; i<length; ++i)
-          {
-          affects[i] = 0;
-          QString name = tempArrayObject.property(i).toString();
-
-          for(int propIdx=0, s=properties.size(); propIdx<s; ++propIdx)
-            {
-            if(name == properties[propIdx]->name())
-              {
-              affects[i] = properties[propIdx]->location();
-              break;
-              }
-            }
-
-          if(!affects[i])
-            {
-            affectsIsValid = false;
-            ctx->throwError(QScriptContext::SyntaxError, "Defined sibling property name expected for affectedBy members.");
-            break;
-            }
-          }
-        }
-
-      if(!affectsIsValid)
-        {
-        delete [] affects;
-        affects = 0;
-        }
-
-
-      SPropertyInstanceInformation *info = properties[i];
-      info->setAffects(affects);
-
-
-      val = tempObject.property(++i);
-      }
-    }
-
-  SPropertyInformation *newType = new SPropertyInformation(*parent);
-
+  SPropertyInformation *newType = SPropertyInformation::create(parent);
   newType->setVersion(version);
   newType->typeName() = name;
   newType->setParentTypeInformation(parent);
-  newType->setSize(endOfUsedMemory);
 
-  newType->children() << parent->children() << properties;
+  QScriptValue propertiesObject = typeObject.property("properties");
+  if(!parseChildProperties(ctx, newType, propertiesObject) || !postParseChildProperties(ctx, newType, propertiesObject))
+    {
+      return QScriptValue();
+    }
 
-  tempObject = typeObject.property("prototype");
-  if(tempObject.isObject())
+  QScriptValue prototype = typeObject.property("prototype");
+  if(prototype.isObject())
     {
     QScriptValue g = engine->globalObject();
     QScriptValue parentObj = g.property(parent->typeName());
     xAssert(parentObj.isObject());
     if(parentObj.isObject())
       {
-      tempObject.setPrototype(parentObj);
-      tempObject.setProperty("typeName", name);
-      g.setProperty(name, tempObject);
+      prototype.setPrototype(parentObj);
+      prototype.setProperty("typeName", name);
+      g.setProperty(name, prototype);
       }
     }
 

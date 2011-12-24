@@ -1,3 +1,4 @@
+#define builtIn
 #include "XMessageRouter"
 #include "XMessageHandler"
 #include "QDebug"

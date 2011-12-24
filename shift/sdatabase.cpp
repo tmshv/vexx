@@ -14,40 +14,50 @@ SPropertyInformation *SDatabase::createTypeInformation()
   info->add(&SDatabase::majorVersion, "majorVersion")->setDefault(0);
   info->add(&SDatabase::minorVersion, "minorVersion")->setDefault(0);
   info->add(&SDatabase::revision, "revision")->setDefault(0);
+
+  info->addInheritedInterface<SDatabase, SHandler>();
+
   return info;
   }
 
-SDatabase::SDatabase() : _blockLevel(0)
+SDatabase::SDatabase()
   {
-  _database = this;
+  _handler = this;
+  setDatabase(this);
   _info = staticTypeInformation();
   _instanceInfo = &_instanceInfoData;
   }
 
 SDatabase::~SDatabase()
   {
-  clear();
+  internalClear();
   _child = 0;
 
-  foreach(SChange *ch, _done)
-    {
-    xDestroyAndFree(changeAllocator(), SChange, ch);
-    }
+  clearChanges();
 
-  xAssert(_memory.empty());
+#if X_ASSERTS_ENABLED
+  if(!_memory.empty())
+    {
+    _memory.debugDump();
+    xAssertFail();
+    }
+#endif
   }
 
-SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type)
+SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe)
   {
   SProfileFunction
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
-  type->create()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
-  prop->_database = this;
+  type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
+
   prop->_info = type;
+  prop->_handler = SHandler::findHandler(parentToBe, prop);
+  xAssert(_handler);
 
   initiateProperty(prop);
+  postInitiateProperty(prop);
   return prop;
   }
 
@@ -86,7 +96,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
 
     if(child->extra())
       {
-      childInformation->create()(thisProp, child->childInformation(), 0);
+      childInformation->createProperty()(thisProp, child->childInformation(), 0);
       }
 
     xAssert(thisProp->_parent == 0);
@@ -97,8 +107,6 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     thisProp->_instanceInfo = child;
     container->internalInsertProperty(true, thisProp, X_SIZE_SENTINEL);
     initiateProperty(thisProp);
-
-    child->initiateProperty(thisProp);
     }
   }
 
@@ -136,6 +144,30 @@ void SDatabase::initiateProperty(SProperty *prop)
     initiatePropertyFromMetaData(container, metaData);
     }
 
+  xAssert(prop->handler());
+  }
+
+void SDatabase::postInitiateProperty(SProperty *prop)
+  {
+  SPropertyContainer *container = prop->castTo<SPropertyContainer>();
+  if(container)
+    {
+    const SPropertyInformation *metaData = container->typeInformation();
+    xAssert(metaData);
+
+    for(xsize i=0, s=metaData->childCount(); i<s; ++i)
+      {
+      const SPropertyInstanceInformation *child = metaData->childFromIndex(i);
+
+      SProperty *thisProp = child->locateProperty(container);
+      postInitiateProperty(thisProp);
+      }
+    }
+
+  const SPropertyInstanceInformation *inst = prop->instanceInformation();
+  xAssert(inst);
+  inst->initiateProperty(prop);
+
   const SPropertyInformation *info = prop->typeInformation();
   while(info)
     {
@@ -147,7 +179,7 @@ void SDatabase::initiateProperty(SProperty *prop)
     info = info->parentTypeInformation();
     }
 
-  xAssert(prop->database());
+  xAssert(prop->handler());
   }
 
 void SDatabase::uninitiateProperty(SProperty *prop)
@@ -164,42 +196,7 @@ void SDatabase::uninitiateProperty(SProperty *prop)
     }
   }
 
-void SDatabase::beginBlock()
+QChar SDatabase::pathSeparator()
   {
-  _blockLevel++;
-  }
-
-void SDatabase::endBlock()
-  {
-  xAssert(_blockLevel > 0);
-  _blockLevel--;
-  if(_blockLevel == 0)
-    {
-    inform();
-    }
-  }
-
-QString SDatabase::pathSeparator()
-  {
-  return "/";
-  }
-
-SBlock::SBlock(SDatabase *db) : _db(db)
-  {
-  _db->beginBlock();
-  }
-
-SBlock::~SBlock()
-  {
-  _db->endBlock();
-  }
-
-void SDatabase::inform()
-  {
-  SProfileFunction
-  foreach(SObserver *obs, _blockObservers)
-    {
-    obs->actOnChanges();
-    }
-  _blockObservers.clear();
+  return QChar('/');
   }

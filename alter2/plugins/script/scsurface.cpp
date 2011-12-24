@@ -3,10 +3,13 @@
 #include "QTextEdit"
 #include "QToolBar"
 #include "QAction"
+#include "QDir"
 #include "QSplitter"
+
 #include "scplugin.h"
 #include "scsurface.h"
 #include "QScrollBar"
+#include "acore.h"
 #include <iostream>
 
 ScSurface *g_surface = 0;
@@ -35,21 +38,7 @@ void logHandler(QtMsgType msgType, const char *message)
       xAssertFail();
       }
 
-    QString htmlMessage = message;
-    htmlMessage.replace('\n', "<br>\n");
-
-    if(msgType == QtDebugMsg)
-      {
-      g_surface->threadSafeLog(htmlMessage);
-      }
-    else if(msgType == QtWarningMsg)
-      {
-      g_surface->threadSafeLog(QString("<font color=\"#FFA824\">%1</font>").arg(htmlMessage));
-      }
-    else
-      {
-      g_surface->threadSafeLog(QString("<b><font color=\"red\">%1</font></b>").arg(htmlMessage));
-      }
+    g_surface->threadSafeLog(msgType, message);
 
     if(msgType > QtWarningMsg)
       {
@@ -84,7 +73,7 @@ ScSurface::ScSurface(ScPlugin *plugin) : UISurface("Script", new QWidget(), UISu
 
   _log = new QTextEdit(widget());
   g_oldHandler = qInstallMsgHandler(logHandler);
-  connect(this, SIGNAL(threadSafeLogSignal(QString)), this, SLOT(appendToLog(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(threadSafeLogSignal(QtMsgType, QString)), this, SLOT(appendToLog(QtMsgType, QString)));
   splitter->addWidget(_log);
   _log->setReadOnly(true);
 
@@ -113,6 +102,11 @@ ScSurface::ScSurface(ScPlugin *plugin) : UISurface("Script", new QWidget(), UISu
 
   _editor = new QTextEdit(editor);
   layout->addWidget(_editor);
+
+  QDir localData = plugin->core()->localDataDirectory();
+  _logFile.setFileName(localData.absolutePath() + "/log.txt");
+  bool open = _logFile.open(QIODevice::WriteOnly);
+  xAssert(open);
   }
 
 ScSurface::~ScSurface()
@@ -134,16 +128,34 @@ void ScSurface::executeDebugged()
   _plugin->enableDebugging(debugged);
   }
 
-void ScSurface::threadSafeLog(const QString &message)
+void ScSurface::threadSafeLog(QtMsgType t, const QString &message)
   {
-  emit threadSafeLogSignal(message);
+  emit threadSafeLogSignal(t, message);
   }
 
-void ScSurface::appendToLog(const QString &message)
+void ScSurface::appendToLog(QtMsgType t, const QString &message)
   {
-  _log->insertHtml(message + "<br>");
+  QString finalMessage = message + "\n";
+
+  QString htmlMessage = finalMessage;
+  htmlMessage.replace('\n', "<br>\n");
+
+  if(t == QtWarningMsg)
+    {
+    htmlMessage = QString("<font color=\"#FFA824\">%1</font>").arg(htmlMessage);
+    }
+  else if(t > QtWarningMsg)
+    {
+    htmlMessage = QString("<b><font color=\"red\">%1</font></b>").arg(htmlMessage);
+    }
+
+  _log->moveCursor(QTextCursor::End);
+  _log->insertHtml(htmlMessage);
 
   // scroll to bottom
   QScrollBar *sb = _log->verticalScrollBar();
   sb->setValue(sb->maximum());
+
+  _logFile.write(finalMessage.toUtf8());
+  _logFile.flush();
   }

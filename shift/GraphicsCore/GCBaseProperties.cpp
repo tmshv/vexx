@@ -1,12 +1,12 @@
 #include "GCBaseProperties.h"
 #include "sdatabase.h"
 
-void writeValue(SSaver &s, const XShader &t)
+void writeValue(SSaver &, const XShader &)
   {
   xAssertFail();
   }
 
-void readValue(SLoader &l, XShader &t)
+void readValue(SLoader &, XShader &)
   {
   xAssertFail();
   }

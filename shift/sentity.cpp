@@ -16,6 +16,10 @@ SEntity::SEntity()
   {
   }
 
+SEntity::~SEntity()
+  {
+  }
+
 void SEntity::reparent(SEntity *ent)
   {
   xAssert(parent() && parentEntity());
@@ -162,7 +166,7 @@ void SEntity::informDirtyObservers(SProperty *prop)
       {
       SDirtyObserver *observer = ((SDirtyObserver*)obs.observer);
       observer->onPropertyDirtied(prop);
-      database()->currentBlockObserverList() << observer;
+      handler()->currentBlockObserverList() << observer;
       }
     }
   }
@@ -176,7 +180,7 @@ void SEntity::informTreeObservers(const SChange *event)
       {
       STreeObserver *observer = ((STreeObserver*)obs.observer);
       observer->onTreeChange(event);
-      database()->currentBlockObserverList() << observer;
+      handler()->currentBlockObserverList() << observer;
       }
     }
 
@@ -196,7 +200,7 @@ void SEntity::informConnectionObservers(const SChange *event)
       {
       SConnectionObserver *observer = ((SConnectionObserver*)obs.observer);
       observer->onConnectionChange(event);
-      database()->currentBlockObserverList() << observer;
+      handler()->currentBlockObserverList() << observer;
       }
     }
   }

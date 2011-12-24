@@ -2,34 +2,15 @@
 #include "spropertycontainer.h"
 #include "scembeddedtypes.h"
 
-ScShiftPropertyContainer::ScShiftPropertyContainer(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
-  {
-  addMemberProperty("length", size, QScriptValue::PropertyGetter);
-  addMemberProperty("size", size, QScriptValue::PropertyGetter);
-  initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
-  }
-
-ScShiftPropertyContainer::~ScShiftPropertyContainer()
+ScShiftPropertyContainerBase::ScShiftPropertyContainerBase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
   }
 
-QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *)
+ScShiftPropertyContainerBase::~ScShiftPropertyContainerBase()
   {
-  ScProfileFunction
-  SProperty **propPtr = getThis(ctx);
-  if(propPtr)
-    {
-    SPropertyContainer *prop = (*propPtr)->uncheckedCastTo<SPropertyContainer>();
-    if(prop)
-      {
-      return QScriptValue((quint32)prop->size());
-      }
-    }
-  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
-  return QScriptValue();
   }
 
-QScriptClass::QueryFlags ScShiftPropertyContainer::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id)
+QScriptClass::QueryFlags ScShiftPropertyContainerBase::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id)
   {
   ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
@@ -58,7 +39,7 @@ QScriptClass::QueryFlags ScShiftPropertyContainer::queryProperty(const QScriptVa
   return 0;
   }
 
-QScriptValue ScShiftPropertyContainer::property(const QScriptValue &object, const QScriptString &name, uint id)
+QScriptValue ScShiftPropertyContainerBase::property(const QScriptValue &object, const QScriptString &name, uint id)
   {
   ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
@@ -70,17 +51,8 @@ QScriptValue ScShiftPropertyContainer::property(const QScriptValue &object, cons
 
   if(id != (uint)-1)
     {
-    SProperty *c = prop->firstChild();
-    while(c && id)
-      {
-      --id;
-      c = c->nextSibling();
-      }
-
-    if(c)
-      {
-      return ScEmbeddedTypes::packValue(c);
-      }
+    SProperty *c = prop->at(id);
+    return ScEmbeddedTypes::packValue(c);
     }
   else
     {
@@ -89,12 +61,40 @@ QScriptValue ScShiftPropertyContainer::property(const QScriptValue &object, cons
   return QScriptValue();
   }
 
-void ScShiftPropertyContainer::setProperty(QScriptValue &, const QScriptString &, uint, const QScriptValue &)
+void ScShiftPropertyContainerBase::setProperty(QScriptValue &, const QScriptString &, uint, const QScriptValue &)
   {
   // dont do anything, but dont let users overwrite our properties.
   }
 
-QScriptValue::PropertyFlags ScShiftPropertyContainer::propertyFlags(const QScriptValue &, const QScriptString &, uint)
+QScriptValue::PropertyFlags ScShiftPropertyContainerBase::propertyFlags(const QScriptValue &, const QScriptString &, uint)
   {
   return QScriptValue::Undeletable;
+  }
+
+
+ScShiftPropertyContainer::ScShiftPropertyContainer(QScriptEngine *eng) : ScShiftPropertyContainerBase(eng)
+  {
+  addMemberProperty("length", size, QScriptValue::PropertyGetter);
+  addMemberProperty("size", size, QScriptValue::PropertyGetter);
+  initiateGlobalValue<ScShiftPropertyContainer>("SPropertyContainer", "SProperty");
+  }
+
+ScShiftPropertyContainer::~ScShiftPropertyContainer()
+  {
+  }
+
+QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **propPtr = getThis(ctx);
+  if(propPtr)
+    {
+    SPropertyContainer *prop = (*propPtr)->uncheckedCastTo<SPropertyContainer>();
+    if(prop)
+      {
+      return QScriptValue((quint32)prop->size());
+      }
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
+  return QScriptValue();
   }
