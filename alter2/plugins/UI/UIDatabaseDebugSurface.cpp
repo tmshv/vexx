@@ -6,6 +6,8 @@
 #include "QMenu"
 #include "QClipboard"
 #include "QApplication"
+#include "QFileDialog"
+#include "Serialisation/sjsonio.h"
 
 UIDatabaseDebugSurface::UIDatabaseDebugSurface(SDatabase *db)
     : UISurface("Database Debug", new QWidget(), UISurface::Dock),
@@ -50,6 +52,8 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
 
     QString path = _clickedItem->path();
     menu.addAction("Copy Path \"" + path + "\"", this, SLOT(copyPath()));
+    menu.addAction("Save As JSON", this, SLOT(saveProperty()));
+
     menu.addSeparator();
     exec = true;
 
@@ -96,6 +100,17 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
     }
 
   menu.exec(QCursor::pos());
+  }
+
+void UIDatabaseDebugSurface::saveProperty()
+  {
+  QString fname = QFileDialog::getSaveFileName(widget(), "Save Property as JSON");
+  QFile f(fname);
+  f.open(QIODevice::WriteOnly);
+
+  SJSONSaver j;
+  j.setAutoWhitespace(true);
+  j.writeToDevice(&f, _clickedItem->entity(), true);
   }
 
 void UIDatabaseDebugSurface::copyPath()

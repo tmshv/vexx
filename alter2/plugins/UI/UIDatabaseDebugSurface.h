@@ -20,6 +20,7 @@ private slots:
   void disconnectInput();
   void disconnectOutput();
   void copyPath();
+  void saveProperty();
 
 private:
   QTreeView *_treeView;
