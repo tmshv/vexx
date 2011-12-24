@@ -54,6 +54,11 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
     menu.addAction("Copy Path \"" + path + "\"", this, SLOT(copyPath()));
     menu.addAction("Save As JSON", this, SLOT(saveProperty()));
 
+    if(_clickedItem->castTo<SPropertyContainer>())
+      {
+      menu.addAction("Load JSON Under This", this, SLOT(loadProperty()));
+      }
+
     menu.addSeparator();
     exec = true;
 
@@ -106,11 +111,23 @@ void UIDatabaseDebugSurface::saveProperty()
   {
   QString fname = QFileDialog::getSaveFileName(widget(), "Save Property as JSON");
   QFile f(fname);
-  f.open(QIODevice::WriteOnly);
+  if(f.open(QIODevice::WriteOnly))
+    {
+    SJSONSaver j;
+    j.setAutoWhitespace(true);
+    j.writeToDevice(&f, _clickedItem->entity(), true);
+    }
+  }
 
-  SJSONSaver j;
-  j.setAutoWhitespace(true);
-  j.writeToDevice(&f, _clickedItem->entity(), true);
+void UIDatabaseDebugSurface::loadProperty()
+  {
+  QString fname = QFileDialog::getOpenFileName(widget(), "Open JSON Under Property");
+  QFile f(fname);
+  if(f.open(QIODevice::ReadOnly))
+    {
+    SJSONLoader j;
+    j.readFromDevice(&f, _clickedItem->entity());
+    }
   }
 
 void UIDatabaseDebugSurface::copyPath()

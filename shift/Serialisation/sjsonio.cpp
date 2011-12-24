@@ -1,6 +1,7 @@
 #include "sjsonio.h"
 #include "sentity.h"
 #include "styperegistry.h"
+#include "shandler.h"
 #include "QDebug"
 #include "Serialisation/JsonParser/JSON_parser.h"
 
@@ -322,6 +323,7 @@ void SJSONLoader::readAllAttributes()
 
 void SJSONLoader::readFromDevice(QIODevice *device, SPropertyContainer *parent)
   {
+  SBlock b(parent->handler());
   SProfileFunction
   _root = parent;
 
@@ -373,7 +375,10 @@ const SPropertyInformation *SJSONLoader::type() const
 bool SJSONLoader::beginChildren() const
   {
   SProfileFunction
-  readNext();
+  if(_current == AttributesEnd)
+    {
+    readNext();
+    }
 
   if(_current == Children)
     {
@@ -440,7 +445,22 @@ void SJSONLoader::beginNextChild()
 
 bool SJSONLoader::childHasValue() const
   {
-  return _current == Children || !_currentValue.isEmpty();
+  if(!_currentValue.isEmpty())
+    {
+    return true;
+    }
+
+  if(_current == AttributesEnd)
+    {
+    readNext();
+    }
+
+  if(_current == Children)
+    {
+    return true;
+    }
+
+  return false;
   }
 
 void SJSONLoader::endNextChild()

@@ -347,10 +347,8 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   SProperty *prop = 0;
   if(dynamic != 0)
     {
-    prop = parent->database()->createDynamicProperty(type, parent);
+    prop = parent->addProperty(type, X_SIZE_SENTINEL);
     xAssert(prop);
-
-    parent->internalInsertProperty(false, prop, X_SIZE_SENTINEL);
     prop->setName(name);
     }
   else
@@ -847,8 +845,9 @@ void SProperty::postSet()
   {
   SProfileFunction
   SPropertyContainer *c = parent();
-  const SPropertyInformation *info = c->typeInformation();
-  info->postChildSet()(c, this);
+  SPropertyInformation::PostSetFunction fn = c ? c->typeInformation()->postChildSet() : SPropertyContainer::postChildSet;
+
+  fn(c, this);
 
   _flags.clearFlag(Dirty);
   }
