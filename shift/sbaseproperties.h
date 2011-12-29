@@ -11,6 +11,7 @@
 #include "schange.h"
 #include "sobserver.h"
 #include "sinterface.h"
+#include "sinterfaces.h"
 #include "QByteArray"
 
 namespace
@@ -32,17 +33,6 @@ QTextStream &operator>>(QTextStream &s, xuint8 &v)
 template <typename T>
 class SPODInterface
   {
-  };
-
-class SPropertyVariantInterface : public SStaticInterfaceBase
-  {
-  S_STATIC_INTERFACE_TYPE(SPropertyVariantInterface, PropertyVariantInterface);
-
-public:
-  SPropertyVariantInterface(bool d) : SStaticInterfaceBase(d) { }
-  virtual QString asString(const SProperty *) const = 0;
-  virtual QVariant asVariant(const SProperty *) const = 0;
-  virtual void setVariant(SProperty *, const QVariant &) const = 0;
   };
 
 template <typename PROP, typename POD> class PODPropertyVariantInterface : public SPropertyVariantInterface

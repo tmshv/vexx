@@ -39,5 +39,6 @@ S_DEFINE_USER_DATA_TYPE(InterfaceUserDataType, 0)
 S_DEFINE_INTERFACE_TYPE(Invalid, 0)
 S_DEFINE_INTERFACE_TYPE(PropertyVariantInterface, 1)
 S_DEFINE_INTERFACE_TYPE(SHandlerInterface, 2)
+S_DEFINE_INTERFACE_TYPE(PropertyPositionInterface, 3)
 
 #endif // SHIFT_GLOBAL_H

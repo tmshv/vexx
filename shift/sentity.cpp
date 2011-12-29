@@ -2,6 +2,7 @@
 #include "QStringList"
 #include "styperegistry.h"
 #include "sdatabase.h"
+#include "sinterfaces.h"
 
 S_IMPLEMENT_PROPERTY(SEntity)
 
@@ -9,6 +10,9 @@ SPropertyInformation *SEntity::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
   info->add(&SEntity::children, "children");
+
+  info->addStaticInterface(new SBasicPositionInterface);
+
   return info;
   }
 
