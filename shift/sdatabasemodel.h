@@ -34,6 +34,7 @@ private:
 
 class SHIFT_EXPORT SDatabaseModel : public QAbstractItemModel, STreeObserver
   {
+  Q_OBJECT
 public:
   enum OptionsFlags
     {
@@ -44,6 +45,12 @@ public:
     };
   typedef XFlags<OptionsFlags> Options;
 
+  enum
+    {
+    EntityPositionRole = Qt::UserRole,
+    PropertyColourRole
+    };
+
   SDatabaseModel(SDatabase *db, SEntity *ent, Options options);
   ~SDatabaseModel();
 
@@ -53,6 +60,7 @@ public:
   virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
   bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+  Q_INVOKABLE bool setData(const QModelIndex & index, const QString &role, const QVariant & value);
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
   virtual void onTreeChange(const SChange *);

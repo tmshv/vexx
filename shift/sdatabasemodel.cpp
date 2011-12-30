@@ -13,15 +13,19 @@ SDatabaseDelegate::SDatabaseDelegate(QObject *parent) : QItemDelegate(parent), _
 
 QWidget *SDatabaseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
   {
-  _currentIndex = index;
   if(index.isValid())
     {
     SProperty *prop = (SProperty *)index.internalPointer();
     _currentWidget = _ui.createControlWidget(prop, parent);
     if(_currentWidget)
       {
+      _currentIndex = index;
       connect(_currentWidget, SIGNAL(destroyed(QObject *)), this, SLOT(currentItemDestroyed()));
       emit ((SDatabaseDelegate*)this)->sizeHintChanged(_currentIndex);
+      }
+    else
+      {
+      _currentIndex = QModelIndex();
       }
     return _currentWidget;
     }
@@ -72,6 +76,8 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
 
   QHash<int, QByteArray> roles;
   roles[Qt::DisplayRole] = "name";
+  roles[EntityPositionRole] = "entityPosition";
+  roles[PropertyColourRole] = "propertyColour";
   setRoleNames(roles);
   }
 
@@ -218,33 +224,100 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   {
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
-  if(prop && role == Qt::DisplayRole)
+  if(prop)
     {
-    if(_options.hasFlag(ShowValues) && index.column() == 1)
+    if(role == Qt::DisplayRole)
       {
-      SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
+      if(_options.hasFlag(ShowValues) && index.column() == 1)
+        {
+        SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
+        if(interface)
+          {
+          return interface->asVariant(prop);
+          }
+        return QVariant();
+        }
+      else
+        {
+        QString name = prop->name();
+        xAssert(!name.isEmpty());
+        return name;
+        }
+      }
+    else if(role == EntityPositionRole)
+      {
+      SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
       if(interface)
         {
-        return interface->asVariant(prop);
+        return toQt(interface->position(prop));
         }
-      return QVariant();
+      return QVector3D();
       }
-    else
+    else if(role == PropertyColourRole)
       {
-      QString name = prop->name();
-      if(name == "")
+      SPropertyColourInterface *interface = prop->interface<SPropertyColourInterface>();
+      if(interface)
         {
-        name = QString("_UNNAMED_%1").arg(prop->index());
+        return interface->colour(prop).toLDRColour();
         }
-      return name;
+      return QColor();
       }
     }
   return QVariant();
   }
 
-bool SDatabaseModel::setData(const QModelIndex &, const QVariant &, int)
+bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int role)
   {
-  return true;
+  SDataModelProfileFunction
+  SProperty *prop = (SProperty *)index.internalPointer();
+  if(prop)
+    {
+    if(role == Qt::DisplayRole)
+      {
+      if(_options.hasFlag(ShowValues) && index.column() == 1)
+        {
+        SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
+        if(interface)
+          {
+          interface->setVariant(prop, val);
+          return true;
+          }
+        }
+      else
+        {
+        prop->setName(val.toString());
+        return true;
+        }
+      }
+    else if(role == EntityPositionRole)
+      {
+      SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+      if(interface)
+        {;
+        QVector3D vec = val.value<QVector3D>();
+        interface->setPosition(prop, XVector3D(vec.x(), vec.y(), vec.z()));
+        return true;
+        }
+      }
+    }
+  return false;
+  }
+
+bool SDatabaseModel::setData(const QModelIndex &index, const QString &role, const QVariant &value)
+  {
+  QHash<int, QByteArray> roles = roleNames();
+
+  foreach(int i, roles.keys())
+    {
+    QByteArray name = roles.value(i);
+
+    if(role == name)
+      {
+      return setData(index, value, i);
+      }
+    }
+
+  return false;
   }
 
 QVariant SDatabaseModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -267,7 +340,7 @@ Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
-  if(prop && index.column() == 1)
+  if(prop && index.column() < 2)
     {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
     }
@@ -304,7 +377,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       xAssert(parent);
 
       xsize i = tC->index();
-      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+2);
+      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+1);
       emit endInsertRows();
       }
 
@@ -314,7 +387,9 @@ void SDatabaseModel::onTreeChange(const SChange *c)
   const SProperty::NameChange *nameChange = c->castTo<SProperty::NameChange>();
   if(nameChange)
     {
-    emit dataChanged(index(0,0), index(_root->children.size(),0));
+    const SProperty *prop = nameChange->property();
+    QModelIndex ind = createIndex(prop->index(), 0, (void *)prop);
+    emit dataChanged(ind, ind);
     }
   }
 

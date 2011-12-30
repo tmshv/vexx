@@ -1,5 +1,6 @@
 #include "sinterfaces.h"
 #include "sbaseproperties.h"
+#include "QColor"
 
 #define PositionName "__position"
 
@@ -30,4 +31,25 @@ void SBasicPositionInterface::setPosition(SProperty *p, const XVector3D &val) co
   xAssert(prop);
 
   prop->assign(val);
+  }
+
+SBasicColourInterface::SBasicColourInterface() : SPropertyColourInterface(true)
+  {
+  }
+
+XColour SBasicColourInterface::colour(const SProperty *t) const
+  {
+  xuint32 h = qHash(t->typeInformation()->typeName());
+
+  float lightness = (float)(h & 0xFF) / 0xFF;
+  float saturation = (float)((h >> 8) & 0xFF) / 0xFF;
+  float hue = (float)((h >> 16) & 0xFFF) / 0xFFF; // skip last nibble
+
+  int hueI = hue * 360.0f; // 0.0 -> 360.0
+  int satI = ((saturation / 2.0f) + 0.5f) * 255.0f; // 0.5 -> 1.0
+  int ligI = ((lightness / 2.0f) + 0.25f) * 255.0f; // 0.25 -> 0.75
+
+  QColor col = QColor::fromHsl(hueI, satI, ligI);
+
+  return XColour(col);
   }

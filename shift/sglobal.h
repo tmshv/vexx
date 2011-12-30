@@ -40,5 +40,6 @@ S_DEFINE_INTERFACE_TYPE(Invalid, 0)
 S_DEFINE_INTERFACE_TYPE(PropertyVariantInterface, 1)
 S_DEFINE_INTERFACE_TYPE(SHandlerInterface, 2)
 S_DEFINE_INTERFACE_TYPE(PropertyPositionInterface, 3)
+S_DEFINE_INTERFACE_TYPE(PropertyColourInterface, 4)
 
 #endif // SHIFT_GLOBAL_H

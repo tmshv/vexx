@@ -7,6 +7,7 @@ SPropertyInstanceInformation::SPropertyInstanceInformation()
   {
   _holdingTypeInformation = 0;
   _compute = 0;
+  _location = 0;
   _computeLockedToMainThread = false;
   _queueCompute = defaultQueue;
   _affects = 0;

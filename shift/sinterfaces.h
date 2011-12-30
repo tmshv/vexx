@@ -3,6 +3,7 @@
 
 #include "XVector3D"
 #include "sinterface.h"
+#include "XColour"
 
 class SPropertyVariantInterface : public SStaticInterfaceBase
   {
@@ -33,5 +34,22 @@ public:
   virtual XVector3D position(const SProperty *) const;
   virtual void setPosition(SProperty *, const XVector3D &) const;
   };
+
+class SPropertyColourInterface : public SStaticInterfaceBase
+  {
+  S_STATIC_INTERFACE_TYPE(SPropertyColourInterface, PropertyColourInterface);
+
+public:
+  SPropertyColourInterface(bool a) : SStaticInterfaceBase(a) { }
+  virtual XColour colour(const SProperty *) const = 0;
+  };
+
+class SBasicColourInterface : public SPropertyColourInterface
+  {
+public:
+  SBasicColourInterface();
+  virtual XColour colour(const SProperty *) const;
+  };
+
 
 #endif // SINTERFACES_H

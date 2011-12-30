@@ -58,6 +58,10 @@ void STypeRegistry::initiate()
   addType(SEntity::staticTypeInformation());
   addType(SDatabase::staticTypeInformation());
   addType(SReferenceEntity::staticTypeInformation());
+
+
+  SEntity::staticTypeInformation()->addStaticInterface(new SBasicPositionInterface);
+  SProperty::staticTypeInformation()->addStaticInterface(new SBasicColourInterface);
   }
 
 void STypeRegistry::terminate()

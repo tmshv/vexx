@@ -313,7 +313,7 @@ void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QSt
     class DeclarativeSurface : public UISurface, QDeclarativeView
       {
     public:
-      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, QAbstractItemModel *model, const QVariantMap &data) : UISurface(name, this, type)
+      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, SDatabaseModel *model, const QVariantMap &data) : UISurface(name, this, type)
         {
         if(model)
           {

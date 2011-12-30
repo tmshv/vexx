@@ -11,8 +11,6 @@ SPropertyInformation *SEntity::createTypeInformation()
   SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
   info->add(&SEntity::children, "children");
 
-  info->addStaticInterface(new SBasicPositionInterface);
-
   return info;
   }
 
@@ -39,6 +37,24 @@ bool SEntity::acceptsChild(const SEntity *) const
 bool SEntity::acceptsParent(const SEntity *) const
   {
   return true;
+  }
+
+SProperty *SEntity::addChild(const SPropertyInformation *info, const QString& name)
+  {
+  SBlock b(handler());
+  SProperty *ent = children.add(info);
+  xAssert(ent);
+  ent->setName(name);
+  return ent;
+  }
+
+SProperty *SEntity::addProperty(const SPropertyInformation *info, const QString& name)
+  {
+  SBlock b(handler());
+  SProperty *p = SPropertyContainer::addProperty(info);
+  xAssert(p);
+  p->setName(name);
+  return p;
   }
 
 SEntity *SEntity::parentEntity() const

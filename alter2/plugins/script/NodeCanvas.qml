@@ -1,4 +1,4 @@
-import QtQuick 1.0
+import QtQuick 1.1
 import "NodeCanvasContents"
 
 Rectangle
@@ -22,6 +22,12 @@ Rectangle
     visualModel.rootIndex = index;
     }
 
+  function setNodePosition(nodeIndex, pos)
+    {
+    var modelInd = childIndex(nodeIndex);
+    db.setData(modelInd, "entityPosition", pos);
+    }
+
   VisualDataModel
     {
     id: visualModel
@@ -29,23 +35,21 @@ Rectangle
     delegate: Node
       {
       title: name
-      x: ((Math.random() * nodecanvas.width) - 100)
-      y: ((Math.random() * nodecanvas.height) - 50)
+      x: entityPosition.x
+      y: entityPosition.y
+      colour: propertyColour
       }
     }
 
-  MouseArea {
+  MouseArea
+    {
     anchors.fill: parent
     onDoubleClicked: nodecanvas.setRootToParent()
-  }
+    }
 
-  ListView
+  Repeater
     {
-    width: 180; height: 200
-    anchors.fill: parent
-    interactive: false
-
+    id: nodes
     model: visualModel
     }
   }
-

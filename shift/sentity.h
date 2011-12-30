@@ -30,19 +30,12 @@ public:
 
   template <typename T>T *addChild(const QString& name)
     {
-    T *ent = children.add<T>();
-    xAssert(ent);
-    ent->setName(name);
-    return ent;
+    SProperty *p = addChild(T::staticTypeInformation(), name);
+    xAssert(p);
+    return p->uncheckedCastTo<T>();
     }
 
-  SProperty *addChild(const SPropertyInformation *info, const QString& name)
-    {
-    SProperty *ent = children.add(info);
-    xAssert(ent);
-    ent->setName(name);
-    return ent;
-    }
+  SProperty *addChild(const SPropertyInformation *info, const QString& name="");
 
   template <typename T>T *addProperty(const QString& name="")
     {
@@ -50,14 +43,7 @@ public:
     xAssert(p);
     return p->uncheckedCastTo<T>();
     }
-
-  SProperty *addProperty(const SPropertyInformation *info, const QString& name="")
-    {
-    SProperty *p = SPropertyContainer::addProperty(info);
-    xAssert(p);
-    p->setName(name);
-    return p;
-    }
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name="");
 
   void removeProperty(SProperty *prop)
     {
