@@ -51,7 +51,10 @@ OTHER_FILES += \
     StartupUI.js \
     NodeCanvas.qml \
     NodeCanvasContents/Node.qml \
-    NodeCanvasContents/Property.qml
+    NodeCanvasContents/Property.qml \
+    NodeCanvasContents/Input.qml \
+    QMLItemLookup.js \
+    NodeCanvasContents/PropertyList.qml
 
 
 

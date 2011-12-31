@@ -138,7 +138,7 @@ public:
 
   template <typename T> bool inheritsFromType() const
     {
-    return inheritsFromType(T::Type);
+    return inheritsFromType(T::staticTypeInformation());
     }
 
   bool inheritsFromType(const SPropertyInformation *type) const;
@@ -190,6 +190,8 @@ public:
 
   SPropertyInformation *findAllocatableBase(xsize &offset);
   const SPropertyInformation *findAllocatableBase(xsize &offset) const;
+
+  void setData(DataKey, const QVariant &);
 
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
@@ -244,6 +246,8 @@ private:
   friend class SProperty;
   friend class SDatabase;
 };
+
+Q_DECLARE_METATYPE(const SPropertyInformation*);
 
 #include "sproperty.h"
 

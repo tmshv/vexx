@@ -47,16 +47,22 @@ public:
 
   enum
     {
-    EntityPositionRole = Qt::UserRole,
-    PropertyColourRole
+    PropertyPositionRole = Qt::UserRole,
+    PropertyColourRole,
+    PropertyInputRole
     };
 
   SDatabaseModel(SDatabase *db, SEntity *ent, Options options);
   ~SDatabaseModel();
 
-  virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+  Q_INVOKABLE bool isEqual(const QModelIndex &a, const QModelIndex &b) const;
+  Q_INVOKABLE bool isValid(const QModelIndex &i) const;
+  Q_INVOKABLE int rowIndex(const QModelIndex &i) const;
+  Q_INVOKABLE int columnIndex(const QModelIndex &i) const;
+
+  Q_INVOKABLE virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QModelIndex index( int row, int column, const QModelIndex &parent = QModelIndex() ) const;
-  virtual QModelIndex parent( const QModelIndex &child ) const;
+  Q_INVOKABLE virtual QModelIndex parent( const QModelIndex &child ) const;
   virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
   bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);

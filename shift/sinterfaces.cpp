@@ -1,5 +1,6 @@
 #include "sinterfaces.h"
 #include "sbaseproperties.h"
+#include "sbasepointerproperties.h"
 #include "QColor"
 
 #define PositionName "__position"
@@ -39,7 +40,18 @@ SBasicColourInterface::SBasicColourInterface() : SPropertyColourInterface(true)
 
 XColour SBasicColourInterface::colour(const SProperty *t) const
   {
-  xuint32 h = qHash(t->typeInformation()->typeName());
+  return colour(t->typeInformation());
+  }
+
+XColour SBasicColourInterface::colour(const SPropertyInformation *t) const
+  {
+  if(t->inheritsFromType<Pointer>())
+    {
+    const SPropertyInformation *pointedTo = Pointer::pointedToType(t);
+    return colour(pointedTo);
+    }
+
+  xuint32 h = qHash(t->typeName());
 
   float lightness = (float)(h & 0xFF) / 0xFF;
   float saturation = (float)((h >> 8) & 0xFF) / 0xFF;

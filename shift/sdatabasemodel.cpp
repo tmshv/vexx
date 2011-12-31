@@ -4,6 +4,8 @@
 #include "QPushButton"
 #include "QStyleOptionViewItem"
 
+Q_DECLARE_METATYPE(QModelIndex)
+
 #define SDataModelProfileFunction XProfileFunction(ShiftDataModelProfileScope)
 #define SDataModelProfileScopedBlock(mess) XProfileScopedBlock(ShiftDataModelProfileScope, mess)
 
@@ -76,8 +78,9 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
 
   QHash<int, QByteArray> roles;
   roles[Qt::DisplayRole] = "name";
-  roles[EntityPositionRole] = "entityPosition";
+  roles[PropertyPositionRole] = "propertyPosition";
   roles[PropertyColourRole] = "propertyColour";
+  roles[PropertyInputRole] = "propertyInput";
   setRoleNames(roles);
   }
 
@@ -87,6 +90,26 @@ SDatabaseModel::~SDatabaseModel()
     {
     _root->removeTreeObserver(this);
     }
+  }
+
+bool SDatabaseModel::isEqual(const QModelIndex &a, const QModelIndex &b) const
+  {
+  return a.internalPointer() == b.internalPointer();
+  }
+
+bool SDatabaseModel::isValid(const QModelIndex &a) const
+  {
+  return a.isValid();
+  }
+
+int SDatabaseModel::rowIndex(const QModelIndex &i) const
+  {
+  return i.row();
+  }
+
+int SDatabaseModel::columnIndex(const QModelIndex &i) const
+  {
+  return i.column();
   }
 
 int SDatabaseModel::rowCount( const QModelIndex &parent ) const
@@ -244,7 +267,7 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
         return name;
         }
       }
-    else if(role == EntityPositionRole)
+    else if(role == PropertyPositionRole)
       {
       SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
       if(interface)
@@ -261,6 +284,14 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
         return interface->colour(prop).toLDRColour();
         }
       return QColor();
+      }
+    else if(role == PropertyInputRole)
+      {
+      SProperty *inp = prop->input();
+      if(inp)
+        {
+        return QVariant::fromValue(createIndex(inp->index(), 0, inp));
+        }
       }
     }
   return QVariant();
@@ -289,7 +320,7 @@ bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int 
         return true;
         }
       }
-    else if(role == EntityPositionRole)
+    else if(role == PropertyPositionRole)
       {
       SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
       if(interface)
@@ -368,7 +399,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       xAssert(parent);
 
       xsize i = tC->index();
-      emit beginRemoveRows(createIndex(parent->index(), 0, (void *)parent), i, i+1);
+      emit beginRemoveRows(createIndex(parent->index(), 0, (void *)parent), i, i);
       emit endRemoveRows();
       }
     else

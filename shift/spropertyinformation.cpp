@@ -260,6 +260,12 @@ SPropertyInformation::DataKey SPropertyInformation::newDataKey()
   return g_maxKey++;
   }
 
+void SPropertyInformation::setData(DataKey k, const QVariant &v)
+  {
+  xAssert(k < g_maxKey);
+  _data[k].setValue(v);
+  }
+
 SPropertyInstanceInformation::DataKey g_maxChildKey = 0;
 SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   {

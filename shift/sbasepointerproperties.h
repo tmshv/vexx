@@ -16,6 +16,11 @@ public:
 
   void setPointed(const SProperty *prop);
   Pointer &operator=(const SProperty *prop) { setPointed(prop); return *this; }
+
+  const SPropertyInformation *pointedToType() const;
+  static const SPropertyInformation *pointedToType(const SPropertyInformation *);
+
+  static void assignPointerInformation(SPropertyInformation *newInfo, const SPropertyInformation *pointedToInfo);
   };
 
 template <typename T> class TypedPointer : public Pointer
@@ -89,7 +94,9 @@ public:
     S_PROPERTY(name, Pointer, 0); }; \
     S_IMPLEMENT_INLINE_PROPERTY(name) \
   inline SPropertyInformation *name::createTypeInformation() { \
-    return SPropertyInformation::create<name>(#name); }
+    SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
+    assignPointerInformation(info, type::staticTypeInformation()); \
+    return info;}
 
 #define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
   class name : public TypedPointerArray<type> { \

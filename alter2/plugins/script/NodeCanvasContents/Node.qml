@@ -5,28 +5,50 @@ Item {
     property alias title: headerText.text
     property alias colour: header.color
 
-    function move(dx, dy) {
-        nodeItem.x += dx;
-        nodeItem.y += dy;
+    function move(dx, dy)
+      {
+      nodeItem.x += dx;
+      nodeItem.y += dy;
 
-        nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+      nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+      }
+
+    function getChildItem(index)
+      {
+      return properties.itemAt(index);
+      }
+
+    Rectangle {
+        property real pad: 4
+        id: nodePad
+
+        z: -0.05
+        x: -pad
+        y: -pad
+        width: node.width + pad * 2;
+        height: node.height + pad * 2;
+        color: "#999999"
+        border.color: "white"
+        opacity: 0.3
+        radius: 4 + pad
     }
 
     Rectangle {
         id: node
         width: 120
         height: childrenRect.height + 6
-        color: "#767676"
-        border.color: "#898989"
+        color: "#333333"
+        border.color: "#666666"
         radius: 4
 
         MouseArea {
             anchors.fill: contents
             hoverEnabled: true
 
-            onEntered: parent.color = "#808080"
-            onExited: parent.color = "#767676"
+            onEntered: parent.color = "#3F3F3F"
+            onExited: parent.color = "#333333"
             onDoubleClicked: nodecanvas.setRootToChildIndex(index)
+            onClicked: nodecanvas.bringToTop(nodeItem);
         }
 
         Column {
@@ -45,8 +67,12 @@ Item {
                 radius: 3
                 Text {
                     id: headerText
-                    anchors.centerIn: parent
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     font.bold: true
+                    font.pointSize: 10
+                    elide: Text.ElideRight
                     color: Qt.darker(header.color, 2.0)
                 }
                 MouseArea {
@@ -56,6 +82,7 @@ Item {
                     anchors.fill: parent
                     preventStealing: true
                     onPressed: {
+                        nodecanvas.bringToTop(nodeItem);
                         dragging = true
                         var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
                         lastX = gc.x
@@ -78,27 +105,8 @@ Item {
               color: "transparent"
             }
 
-            Rectangle {
-                width: 114
-                height: childrenRect.height
-                color: "transparent"
-
-                VisualDataModel {
-                    id: chilrenVisualModel
-                    model: db
-                    delegate: Property {
-                        text: name
-                        colour: propertyColour
-                    }
-                    rootIndex: nodecanvas.childIndex(index)
-                }
-
-                ListView {
-                    width: parent.width
-                    height: contentItem.childrenRect.height + 1
-                    interactive: false
-                    model: chilrenVisualModel
-                }
+            PropertyList {
+              rootIndex: nodecanvas.childIndex(index)
             }
         }
     }

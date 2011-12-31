@@ -42,6 +42,7 @@ class SPropertyColourInterface : public SStaticInterfaceBase
 public:
   SPropertyColourInterface(bool a) : SStaticInterfaceBase(a) { }
   virtual XColour colour(const SProperty *) const = 0;
+  virtual XColour colour(const SPropertyInformation *) const = 0;
   };
 
 class SBasicColourInterface : public SPropertyColourInterface
@@ -49,6 +50,7 @@ class SBasicColourInterface : public SPropertyColourInterface
 public:
   SBasicColourInterface();
   virtual XColour colour(const SProperty *) const;
+  virtual XColour colour(const SPropertyInformation *) const;
   };
 
 
