@@ -97,34 +97,30 @@ void ScPath::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
   bool oldAA = p->testRenderHint(QPainter::Antialiasing);
   p->setRenderHints(QPainter::Antialiasing, true);
 
-  p->setPen(Qt::transparent);
-  p->setBrush(_gradient);
+  p->setPen(_pen);
+  p->setBrush(Qt::transparent);
 
-  p->drawPolygon(_polygon, Qt::WindingFill);
+  p->drawPath(_path);
+
+#if DEBUG_RENDER_PATHS
+  p->setRenderHint(QPainter::Antialiasing, false);
+  p->setPen(Qt::red);
+  p->setBrush(Qt::transparent);
+  p->drawRect(0, 0, width(), height());
+#endif
 
   p->setRenderHint(QPainter::Antialiasing, oldAA);
   }
 
 void ScPath::updateRenderData()
   {
-  QRectF rect(_firstPoint, _lastPoint);
-  QRectF rect2(rect.topLeft() + _firstNormal, rect.bottomRight() + _lastNormal);
-
-  QRectF final(rect.united(rect2));
-
-  setX(final.left() - _penWidth/2);
-  setY(final.top() - _penWidth/2);
-
-  setWidth(final.width() + _penWidth);
-  setHeight(final.height() + _penWidth);
-
-  QPointF to = _lastPoint - pos();
-  QPointF from = _firstPoint - pos();
+  QPointF to = _lastPoint;
+  QPointF from = _firstPoint;
 
   float test = to.x() * 0.0f + to.y() * 0.0f + from.x() * 0.0f + from.y() * 0.0f;
   if(test != test)
     {
-    _polygon = QPolygonF();
+    _path = QPainterPath();
     update();
     return;
     }
@@ -134,19 +130,33 @@ void ScPath::updateRenderData()
   path.cubicTo(from.x() + _firstNormal.x(), from.y() + _firstNormal.y(),
                to.x() + _lastNormal.x(), to.y() + _lastNormal.y(),
                to.x(), to.y());
+  _path = path;
 
-  QPainterPathStroker stroker;
-  Q_ASSERT(_penWidth >= 1.0f);
-  stroker.setWidth(_penWidth);
+  //Q_ASSERT(_penWidth >= 1.0f);
+  //_stroker.setWidth(_penWidth);
 
-  QPainterPath strokedPath = stroker.createStroke(path);
+  //QPainterPath strokedPath = _stroker.createStroke(path);
 
-  _polygon = strokedPath.toFillPolygon(QTransform());
+  //_polygon = strokedPath.toFillPolygon(QTransform());
 
-  _gradient.setStart(from);
-  _gradient.setFinalStop(to);
+  QRectF rect = _path.boundingRect();
+
+  setX(rect.left() - _penWidth/2);
+  setY(rect.top() - _penWidth/2);
+
+  setWidth(rect.width() + _penWidth);
+  setHeight(rect.height() + _penWidth);
+
+  _path.translate(-rect.left(), -rect.top());
+
   _gradient.setColorAt(0.0, _firstColour);
   _gradient.setColorAt(1.0, _lastColour);
+  _gradient.setStart(from);
+  _gradient.setFinalStop(to);
+
+  QBrush br(_gradient);
+  _pen.setBrush(br);
+  _pen.setWidth(_penWidth);
 
   update();
   }

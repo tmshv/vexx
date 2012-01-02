@@ -5,7 +5,7 @@
 #include "QColor"
 #include "QVector3D"
 #include "QLinearGradient"
-#include "QPolygonF"
+#include "QPen"
 
 class ScPath : public QDeclarativeItem
   {
@@ -66,7 +66,8 @@ private:
   QPointF _firstNormal;
   QPointF _lastNormal;
 
-  QPolygonF _polygon;
+  QPainterPath _path;
+  QPen _pen;
   QLinearGradient _gradient;
   float _penWidth;
   };

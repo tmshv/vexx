@@ -14,7 +14,7 @@ Path {
     var xDist = firstPoint.x - lastPoint.x;
     var yDist = firstPoint.y - lastPoint.y;
 
-    return Math.sqrt(xDist * xDist + yDist * yDist) / 1.5;
+    return Math.sqrt(xDist * xDist + yDist * yDist) / 2;
   }
 
   width: 2
@@ -92,6 +92,15 @@ Path {
   }
 
   Timer {
+    id: resetupTimer
+    interval: 100
+    onTriggered: {
+      print("Resetup!");
+      setupTimer.start();
+    }
+  }
+
+  Timer {
     id: setupTimer
     interval: 1
     onTriggered: {
@@ -102,7 +111,15 @@ Path {
         return;
         }
 
-      var items = nodecanvas.findPropertyItem(inputIndex);
+      var items = nodecanvas.findPropertyItem(myIndex);
+      for(var i = 1, s = items.length; i < s; ++i)
+        {
+        var item = items[i];
+        item.xChanged.connect(inputHolder.update);
+        item.yChanged.connect(inputHolder.update);
+        }
+
+      items = nodecanvas.findPropertyItem(inputIndex);
       if(!items)
         {
         print("Input item is not available");
@@ -127,15 +144,6 @@ Path {
         {
         inputTarget.propertyChanged.connect(propertyChanged);
         }
-
-      items = nodecanvas.findPropertyItem(myIndex);
-      for(var i = 1, s = items.length; i < s; ++i)
-        {
-        var item = items[i];
-        item.xChanged.connect(inputHolder.update);
-        item.yChanged.connect(inputHolder.update);
-        }
-
 
       if(myProperty.propertyChanged)
         {

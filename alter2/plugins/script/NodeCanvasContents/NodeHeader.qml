@@ -14,6 +14,25 @@ Rectangle {
     border.width: 2
     radius: 3
 
+    Rectangle {
+      x: -5
+      y: (header.height/2) - 5
+      width: 10
+      height: 10
+      radius: 5
+      color: header.color
+    }
+
+    Rectangle {
+      x: header.width - 5
+      y: (header.height/2) - 5
+      width: 10
+      height: 10
+      radius: 5
+      color: header.color
+    }
+
+
     Text {
         id: headerText
         anchors.fill: parent

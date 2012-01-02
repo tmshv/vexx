@@ -20,12 +20,13 @@ Item {
 
   function getChildItem(index)
     {
-    var children = childListHolder.children[1];
+    var children = childListHolder.children[0];
     if(children)
       {
       return children.getChildItem(index);
       }
 
+    print("Asking for child from non children node.");
     return null;
     }
 

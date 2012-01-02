@@ -74,7 +74,6 @@ Rectangle
     var nextItem = parentItems[parentItems.length - 1].getChildItem(rowIndex);
     if(!nextItem)
       {
-      print("no Child index");
       return null;
       }
 
