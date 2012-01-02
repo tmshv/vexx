@@ -4,6 +4,7 @@ Item {
     id: nodeItem
     property alias title: header.text
     property alias colour: header.color
+    property real propertyTabIn: 10
 
     function move(dx, dy)
       {
@@ -20,14 +21,13 @@ Item {
 
     function getInputPosition(relative)
       {
-      var mapped = nodeItem.mapFromItem(relative, 0, 0);
+      var mapped = nodeItem.mapToItem(relative, 0, 0);
       return mapped;
       }
 
     function getOutputPosition(relative)
       {
-      var mapped = nodeItem.mapToItem(relative, 0, 0);
-      mapped.x += node.width;
+      var mapped = header.mapToItem(relative, header.width, header.height/2);
       return mapped;
       }
 
@@ -58,8 +58,8 @@ Item {
       }
     ]
 
-    Rectangle {
-        property real pad: 4
+    /*Rectangle {
+        property real pad: 3
         id: nodePad
 
         z: -0.05
@@ -71,7 +71,7 @@ Item {
         border.color: "white"
         opacity: 0.3
         radius: 4 + pad
-    }
+    }*/
 
     Rectangle {
         id: node
@@ -105,24 +105,34 @@ Item {
 
         Column {
             id: contents
-            x: 3
-            y: 3
-            width: 114
+            width: node.width
             height: childrenRect.height
-            spacing: 2
+            spacing: 4
 
-            NodeHeader {
-              id: header
-              width: contents.width
+            Item {
+              width: header.width + header.x
+              height: header.height + header.y
+              NodeHeader {
+                id: header
+                x: 5
+                y: 5
+                width: contents.width - 8
 
-              onDragged: {
-                move(x, y);
+                onDragged: {
+                  move(x, y);
+                }
               }
             }
 
-            PropertyList {
-              id: propertyList
-              rootIndex: nodecanvas.childIndex(index)
+            Item {
+              height: propertyList.height
+              width: node.width
+              PropertyList {
+                id: propertyList
+                width: node.width
+                xOffset: 0
+                rootIndex: nodecanvas.childIndex(index)
+              }
             }
         }
     }

@@ -24,6 +24,7 @@ Rectangle {
         elide: Text.ElideRight
         color: Qt.darker(header.color, 2.0)
     }
+
     MouseArea {
         property bool dragging: false
         property real lastX: 0

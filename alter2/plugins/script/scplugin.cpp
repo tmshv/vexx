@@ -17,6 +17,8 @@
 #include "QDeclarativeContext"
 #include "sdatabasemodel.h"
 #include "QGraphicsObject"
+#include "qdeclarative.h"
+#include "QMLExtensions/scpath.h"
 
 
 ALTER_PLUGIN(ScPlugin);
@@ -135,6 +137,8 @@ void ScPlugin::load()
       type.setProperty("typeName", t->typeName());
       }
     }
+
+  qmlRegisterType<ScPath>("VexxQMLExtensions", 1, 0, "Path");
 
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");

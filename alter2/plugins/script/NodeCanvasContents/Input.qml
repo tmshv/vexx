@@ -1,11 +1,27 @@
 import QtQuick 1.1
+import VexxQMLExtensions 1.0
 
-Rectangle {
+Path {
   id: inputHolder
   property variant myIndex: null
   property variant inputIndex: db.data(myIndex, "propertyInput");
   property variant myProperty: null
   property variant inputTarget: null
+
+  property real distanceBetweenPoints: 0
+
+  firstNormal.x: {
+    var xDist = firstPoint.x - lastPoint.x;
+    var yDist = firstPoint.y - lastPoint.y;
+
+    return Math.sqrt(xDist * xDist + yDist * yDist) / 1.5;
+  }
+
+  width: 2
+
+  firstNormal.y: 0
+  lastNormal.x: -firstNormal.x
+  lastNormal.y: 0
 
   function propertyChanged(prop)
     {
@@ -36,23 +52,25 @@ Rectangle {
     // re set this up, as our output property has been destroyed.
     if(prop != myProperty)
       {
-      nodecanvas.setupInput(myProperty, myIndex);
+      recreateTimer.start();
+      visible = false;
       }
-
-    inputHolder.destroy();
+    else
+      {
+      inputHolder.destroy();
+      }
     }
 
-  color: "red"
   function update()
     {
     var from = inputTarget.getOutputPosition(parent);
     var to = myProperty.getInputPosition(parent);
 
-    inputHolder.x = from.x;
-    inputHolder.y = from.y;
+    inputHolder.firstPoint.x = from.x;
+    inputHolder.firstPoint.y = from.y;
 
-    inputHolder.width = -from.x + to.x;
-    inputHolder.height = -from.y + to.y;
+    inputHolder.lastPoint.x = to.x;
+    inputHolder.lastPoint.y = to.y;
     }
 
   function setupInput()
@@ -61,13 +79,26 @@ Rectangle {
     }
 
   Timer {
+    id: recreateTimer
+    interval: 1
+    onTriggered: {
+      var items = nodecanvas.findPropertyItem(myIndex);
+      if(items)
+        {
+        nodecanvas.setupInput(items[items.length-1], myIndex);
+        }
+      inputHolder.destroy();
+    }
+  }
+
+  Timer {
     id: setupTimer
     interval: 1
     onTriggered: {
       if(!inputIndex)
         {
         print("Pants, input is invalid, hide!");
-        visible = false;
+        inputHolder.destroy();
         return;
         }
 
@@ -75,11 +106,10 @@ Rectangle {
       if(!items)
         {
         print("Input item is not available");
-        visible = false;
+        inputHolder.destroy();
         return;
         }
 
-      visible = true;
       for(var i = 1, s = items.length; i < s; ++i)
         {
         var item = items[i];
@@ -111,6 +141,10 @@ Rectangle {
         {
         myProperty.propertyChanged.connect(propertyChanged);
         }
+
+      inputHolder.visible = (function() { return myProperty.visible && inputTarget.visible })
+      inputHolder.firstColour = (function() { return inputTarget.colour; })
+      inputHolder.lastColour = (function() { return myProperty.colour; })
 
       update();
     }

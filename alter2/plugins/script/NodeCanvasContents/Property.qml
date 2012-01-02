@@ -1,10 +1,12 @@
 import QtQuick 1.1
 
-Rectangle {
+Item {
   id: propertyContainer
 
   property alias text: label.text
   property alias colour: inputBlob.color
+  property variant input: null
+  property real contentsOffset: 0
 
   signal propertyChanged(variant prop)
 
@@ -29,18 +31,16 @@ Rectangle {
 
   function getInputPosition(relative)
     {
-    var mapped = propertyContainer.mapFromItem(relative, 0, 0);
+    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2);
     return mapped;
     }
 
   function getOutputPosition(relative)
     {
-    var mapped = propertyContainer.mapToItem(relative, 0, 0);
-    mapped.x += propertyContainer.width;
+    var mapped = outputBlob.mapToItem(relative, outputBlob.width/2, outputBlob.height/2);
     return mapped;
     }
 
-  color: "transparent"
   width: col.width
   height: col.height
 
@@ -90,17 +90,26 @@ Rectangle {
     }
   ]
 
+  PropertyInterface {
+    id: inputBlob
+    y: 2.0
+    x: -4.0
+  }
+
+  PropertyInterface {
+    id: outputBlob
+    y: inputBlob.y
+    x: propertyContainer.width - 5.0
+    color: inputBlob.color
+  }
 
   Column {
     id: col
+
     Row {
       id: grouper
       spacing: 5
-
-      PropertyInterface {
-        id: inputBlob
-        y: 2
-      }
+      x: 10 + xOffset
 
       Image {
         id: expand
@@ -120,7 +129,9 @@ Rectangle {
                 var component = Qt.createComponent("PropertyList.qml");
                 var object = component.createObject(childListHolder);
 
-                object.rootIndex = (function() { return propertyList.childIndex(index); })
+                object.width = (function() { return propertyContainer.width; });
+                object.xOffset = (function() { return propertyContainer.contentsOffset + nodeItem.propertyTabIn; });
+                object.rootIndex = (function() { return propertyList.childIndex(index); });
               }
               propertyContainer.state = "Expanded";
             }
@@ -158,16 +169,9 @@ Rectangle {
       }
     }
 
-    Row {
+    Column {
       id: childListHolder
       visible: false
-
-      Rectangle {
-        id: spacer
-        width: 10
-        height: 10
-        color: "transparent"
-      }
     }
   }
 }

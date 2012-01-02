@@ -6,7 +6,7 @@ Rectangle
   id: nodecanvas
   color: "#343434"
 
-  property real maxNodeZ: 0.0;
+  property real maxNodeZ: 1.0;
 
   function childIndex(index)
     {
@@ -26,7 +26,7 @@ Rectangle
       inputGrouper.children[i].destroy();
       }
 
-    maxNodeZ = 0.0;
+    maxNodeZ = 1.0;
     }
 
   function setRootToChildIndex(index)
@@ -94,11 +94,26 @@ Rectangle
     if(inputModelIndex)
       {
       var component = Qt.createComponent("NodeCanvasContents/Input.qml");
+
+      if(component.status === Component.Error)
+        {
+        // Error Handling
+        console.log("Error loading Input component:", component.errorString());
+        return;
+        }
+
       var object = component.createObject(inputGrouper);
 
       object.myProperty = propertyItem;
       object.myIndex = myIndex;
       object.setupInput();
+
+      if(propertyItem.input)
+        {
+        propertyItem.input.propertyChanged(propertyItem);
+        }
+
+      propertyItem.input = object;
       }
     }
 
@@ -132,7 +147,7 @@ Rectangle
     id: inputGrouper
     x: 0
     y: 0
-    z: maxNodeZ + 1.0
+    z: 0
     width: 0
     height: 0
     }
