@@ -64,7 +64,7 @@ void SDatabaseDelegate::currentItemDestroyed()
   }
 
 SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _db(db), _root(ent),
-    _options(options)
+    _options(options), _currentTreeChange(0)
   {
   if(_root == 0)
     {
@@ -137,6 +137,18 @@ int SDatabaseModel::rowCount( const QModelIndex &parent ) const
   const SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
+    if(_currentTreeChange)
+      {
+      xAssert(container != _currentTreeChange->property());
+      if(container == _currentTreeChange->after())
+        {
+        return container->size() - 1;
+        }
+      else if(container == _currentTreeChange->before())
+        {
+        return container->size() + 1;
+        }
+      }
     return container->size();
     }
 
@@ -169,6 +181,30 @@ QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &paren
   const SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
+    if(_currentTreeChange)
+      {
+      xAssert(container != _currentTreeChange->property());
+      if(container == _currentTreeChange->before())
+        {
+        xsize oldRow = xMin(container->size(), _currentTreeChange->index());
+        if((xsize)row == oldRow)
+          {
+          return createIndex(row, column, _currentTreeChange->property());
+          }
+        else if((xsize)row > oldRow)
+          {
+          --row;
+          }
+        }
+      else if(container == _currentTreeChange->after())
+        {
+        xsize newRow = xMin(container->size()-1, _currentTreeChange->index());
+        if((xsize)row >= newRow)
+          {
+          ++row;
+          }
+        }
+      }
     SProperty *child = container->firstChild();
     while(child)
       {
@@ -179,6 +215,7 @@ QModelIndex SDatabaseModel::index( int row, int column, const QModelIndex &paren
       size++;
       child = child->nextSibling();
       }
+    xAssertFail();
     }
 
   return QModelIndex();
@@ -190,18 +227,25 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
   if(child.isValid())
     {
     SProperty *prop = (SProperty *)child.internalPointer();
-    if(prop->parent() && prop->parent() != _root)
+    SPropertyContainer *parent = prop->parent();
+
+    if(_currentTreeChange)
+      {
+      if(prop == _currentTreeChange->property())
+        {
+        parent = (SPropertyContainer*)_currentTreeChange->before();
+        }
+      }
+
+    if(parent && parent != _root)
       {
       if(_options.hasFlag(EntitiesOnly))
         {
-        SEntity *ent = prop->castTo<SEntity>();
-        xAssert(ent);
-
-        return createIndex(ent->parentEntity()->index(), 0, ent->parentEntity());
+        return createIndex(parent->entity()->index(), 0, parent->entity());
         }
       else
         {
-        return createIndex(prop->parent()->index(), 0, prop->parent());
+        return createIndex(parent->index(), 0, parent);
         }
       }
     }
@@ -249,6 +293,8 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   SProperty *prop = (SProperty *)index.internalPointer();
   if(prop)
     {
+    xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);
+
     if(role == Qt::DisplayRole)
       {
       if(_options.hasFlag(ShowValues) && index.column() == 1)
@@ -297,8 +343,26 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   return QVariant();
   }
 
+QVariant SDatabaseModel::data( const QModelIndex &index, const QString &role) const
+  {
+  QHash<int, QByteArray> roles = roleNames();
+
+  foreach(int i, roles.keys())
+    {
+    QByteArray name = roles.value(i);
+
+    if(role == name)
+      {
+      return data(index, i);
+      }
+    }
+
+  return QVariant();
+  }
+
 bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int role)
   {
+  xAssert(!_currentTreeChange);
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
   if(prop)
@@ -369,6 +433,7 @@ QVariant SDatabaseModel::headerData(int section, Qt::Orientation orientation, in
 
 Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
+  xAssert(!_currentTreeChange);
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
   if(prop && index.column() < 2)
@@ -382,12 +447,14 @@ void SDatabaseModel::onTreeChange(const SChange *c)
   {
   const SEntity::TreeChange *tC = c->castTo<SEntity::TreeChange>();
   if(tC)
-    {
+    {    
+    xAssert(!_currentTreeChange);
+    _currentTreeChange = tC;
+
     if(tC->property() == _root && tC->after() == 0)
       {
       _root = 0;
       }
-
 
     emit layoutAboutToBeChanged();
 
@@ -412,6 +479,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       emit endInsertRows();
       }
 
+    _currentTreeChange = 0;
     emit layoutChanged();
     }
 

@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="Tang"
 	ProjectGUID="{8E70261D-487D-38B9-A25D-B78985D18DC0}"
+	RootNamespace="Tang"
 	Keyword="Qt4VSv1.0"
 	TargetFrameworkVersion="0"
 	>
@@ -18,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="."
-			IntermediateDirectory="debug\"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -45,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;,&quot;$(QTDIR)\include\QtNetwork&quot;,&quot;$(QTDIR)\include\QtGui&quot;,&quot;$(QTDIR)\include\QtOpenGL&quot;,&quot;$(QTDIR)\include\QtXml&quot;,&quot;$(QTDIR)\include\QtWebKit&quot;,&quot;$(QTDIR)\include&quot;,&quot;..\include&quot;,&quot;..\EksCore&quot;,&quot;..\Eks3D\include&quot;,&quot;..\Shift&quot;,&quot;..\Shift\GraphicsCore&quot;,&quot;..\Alter2&quot;,&quot;..\EksCore&quot;,&quot;..\Alter2\Plugins\UI&quot;,&quot;..\Alter2\Plugins\Script&quot;,&quot;..\Alter2\Plugins\ShiftAlter&quot;,&quot;$(QTDIR)\include\ActiveQt&quot;,&quot;debug&quot;,..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\EksCore&quot;;&quot;.\..\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Alter2&quot;;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\debug&quot;;&quot;.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TANG_BUILD,QT_DLL,QT_WEBKIT_LIB,QT_XML_LIB,QT_OPENGL_LIB,QT_GUI_LIB,QT_NETWORK_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -55,8 +56,8 @@
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
 				AssemblerListingLocation="debug\"
-				ObjectFile="debug\"
-				ProgramDataBaseFileName=".\"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -109,7 +110,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="."
-			IntermediateDirectory="release\"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -136,7 +137,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="2"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;,&quot;$(QTDIR)\include\QtNetwork&quot;,&quot;$(QTDIR)\include\QtGui&quot;,&quot;$(QTDIR)\include\QtOpenGL&quot;,&quot;$(QTDIR)\include\QtXml&quot;,&quot;$(QTDIR)\include\QtWebKit&quot;,&quot;$(QTDIR)\include&quot;,&quot;..\include&quot;,&quot;..\EksCore&quot;,&quot;..\Eks3D\include&quot;,&quot;..\Shift&quot;,&quot;..\Shift\GraphicsCore&quot;,&quot;..\Alter2&quot;,&quot;..\EksCore&quot;,&quot;..\Alter2\Plugins\UI&quot;,&quot;..\Alter2\Plugins\Script&quot;,&quot;..\Alter2\Plugins\ShiftAlter&quot;,&quot;$(QTDIR)\include\ActiveQt&quot;,&quot;release&quot;,..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\EksCore&quot;;&quot;.\..\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Alter2&quot;;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\release&quot;;&quot;.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
 				PreprocessorDefinitions="QT_NO_DEBUG,NDEBUG,_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TANG_BUILD,QT_DLL,QT_NO_DEBUG,QT_WEBKIT_LIB,QT_XML_LIB,QT_OPENGL_LIB,QT_GUI_LIB,QT_NETWORK_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT,NDEBUG"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -146,8 +147,8 @@
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="true"
 				AssemblerListingLocation="release\"
-				ObjectFile="release\"
-				ProgramDataBaseFileName=".\"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
@@ -241,10 +242,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="MOC viewport.h"
-						CommandLine="$(QTDIR)\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I&quot;$(QTDIR)\include\QtCore&quot; -I&quot;$(QTDIR)\include\QtNetwork&quot; -I&quot;$(QTDIR)\include\QtGui&quot; -I&quot;$(QTDIR)\include\QtOpenGL&quot; -I&quot;$(QTDIR)\include\QtXml&quot; -I&quot;$(QTDIR)\include\QtWebKit&quot; -I&quot;$(QTDIR)\include&quot; -I&quot;..\include&quot; -I&quot;..\EksCore&quot; -I&quot;..\Eks3D\include&quot; -I&quot;..\Shift&quot; -I&quot;..\Shift\GraphicsCore&quot; -I&quot;..\Alter2&quot; -I&quot;..\EksCore&quot; -I&quot;..\Alter2\Plugins\UI&quot; -I&quot;..\Alter2\Plugins\Script&quot; -I&quot;..\Alter2\Plugins\ShiftAlter&quot; -I&quot;$(QTDIR)\include\ActiveQt&quot; -I&quot;debug&quot; -I..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default -D_MSC_VER=1500 -DWIN32 viewport.h -o debug\moc_viewport.cpp&#x0D;&#x0A;"
-						AdditionalDependencies="$(QTDIR)\bin\moc.exe;viewport.h"
-						Outputs="debug\moc_viewport.cpp"
+						Description="Moc&apos;ing viewport.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -252,10 +253,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="MOC viewport.h"
-						CommandLine="$(QTDIR)\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I&quot;$(QTDIR)\include\QtCore&quot; -I&quot;$(QTDIR)\include\QtNetwork&quot; -I&quot;$(QTDIR)\include\QtGui&quot; -I&quot;$(QTDIR)\include\QtOpenGL&quot; -I&quot;$(QTDIR)\include\QtXml&quot; -I&quot;$(QTDIR)\include\QtWebKit&quot; -I&quot;$(QTDIR)\include&quot; -I&quot;..\include&quot; -I&quot;..\EksCore&quot; -I&quot;..\Eks3D\include&quot; -I&quot;..\Shift&quot; -I&quot;..\Shift\GraphicsCore&quot; -I&quot;..\Alter2&quot; -I&quot;..\EksCore&quot; -I&quot;..\Alter2\Plugins\UI&quot; -I&quot;..\Alter2\Plugins\Script&quot; -I&quot;..\Alter2\Plugins\ShiftAlter&quot; -I&quot;$(QTDIR)\include\ActiveQt&quot; -I&quot;release&quot; -I..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default -D_MSC_VER=1500 -DWIN32 viewport.h -o release\moc_viewport.cpp&#x0D;&#x0A;"
-						AdditionalDependencies="$(QTDIR)\bin\moc.exe;viewport.h"
-						Outputs="release\moc_viewport.cpp"
+						Description="Moc&apos;ing viewport.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DQT_NO_DEBUG -DNDEBUG -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -267,10 +268,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="MOC webview.h"
-						CommandLine="$(QTDIR)\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I&quot;$(QTDIR)\include\QtCore&quot; -I&quot;$(QTDIR)\include\QtNetwork&quot; -I&quot;$(QTDIR)\include\QtGui&quot; -I&quot;$(QTDIR)\include\QtOpenGL&quot; -I&quot;$(QTDIR)\include\QtXml&quot; -I&quot;$(QTDIR)\include\QtWebKit&quot; -I&quot;$(QTDIR)\include&quot; -I&quot;..\include&quot; -I&quot;..\EksCore&quot; -I&quot;..\Eks3D\include&quot; -I&quot;..\Shift&quot; -I&quot;..\Shift\GraphicsCore&quot; -I&quot;..\Alter2&quot; -I&quot;..\EksCore&quot; -I&quot;..\Alter2\Plugins\UI&quot; -I&quot;..\Alter2\Plugins\Script&quot; -I&quot;..\Alter2\Plugins\ShiftAlter&quot; -I&quot;$(QTDIR)\include\ActiveQt&quot; -I&quot;debug&quot; -I..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default -D_MSC_VER=1500 -DWIN32 webview.h -o debug\moc_webview.cpp&#x0D;&#x0A;"
-						AdditionalDependencies="$(QTDIR)\bin\moc.exe;webview.h"
-						Outputs="debug\moc_webview.cpp"
+						Description="Moc&apos;ing webview.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -278,10 +279,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="MOC webview.h"
-						CommandLine="$(QTDIR)\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I&quot;$(QTDIR)\include\QtCore&quot; -I&quot;$(QTDIR)\include\QtNetwork&quot; -I&quot;$(QTDIR)\include\QtGui&quot; -I&quot;$(QTDIR)\include\QtOpenGL&quot; -I&quot;$(QTDIR)\include\QtXml&quot; -I&quot;$(QTDIR)\include\QtWebKit&quot; -I&quot;$(QTDIR)\include&quot; -I&quot;..\include&quot; -I&quot;..\EksCore&quot; -I&quot;..\Eks3D\include&quot; -I&quot;..\Shift&quot; -I&quot;..\Shift\GraphicsCore&quot; -I&quot;..\Alter2&quot; -I&quot;..\EksCore&quot; -I&quot;..\Alter2\Plugins\UI&quot; -I&quot;..\Alter2\Plugins\Script&quot; -I&quot;..\Alter2\Plugins\ShiftAlter&quot; -I&quot;$(QTDIR)\include\ActiveQt&quot; -I&quot;release&quot; -I..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default -D_MSC_VER=1500 -DWIN32 webview.h -o release\moc_webview.cpp&#x0D;&#x0A;"
-						AdditionalDependencies="$(QTDIR)\bin\moc.exe;webview.h"
-						Outputs="release\moc_webview.cpp"
+						Description="Moc&apos;ing webview.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DQT_NO_DEBUG -DNDEBUG -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.7.4\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -291,56 +292,80 @@
 			Filter="cpp;c;cxx;moc;h;def;odl;idl;res;"
 			UniqueIdentifier="{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}"
 			>
-			<File
-				RelativePath="release\moc_viewport.cpp"
+			<Filter
+				Name="Debug"
+				Filter="cpp;moc"
+				SourceControlFiles="false"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
+				<File
+					RelativePath=".\Debug\moc_viewport.cpp"
 					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="debug\moc_viewport.cpp"
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Debug\moc_webview.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
+				Name="Release"
+				Filter="cpp;moc"
+				SourceControlFiles="false"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
+				<File
+					RelativePath=".\Release\moc_viewport.cpp"
 					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="release\moc_webview.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Release\moc_webview.cpp"
 					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="debug\moc_webview.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="QtVersion Win32"
+			Value="4.8 RC"
+		/>
+		<Global
+			Name="RccDir"
+			Value=".\GeneratedFiles"
+		/>
+		<Global
+			Name="UicDir"
+			Value=".\GeneratedFiles"
+		/>
 	</Globals>
 </VisualStudioProject>

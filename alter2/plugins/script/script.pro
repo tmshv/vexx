@@ -54,7 +54,9 @@ OTHER_FILES += \
     NodeCanvasContents/Property.qml \
     NodeCanvasContents/Input.qml \
     QMLItemLookup.js \
-    NodeCanvasContents/PropertyList.qml
+    NodeCanvasContents/PropertyList.qml \
+    NodeCanvasContents/PropertyInterface.qml \
+    NodeCanvasContents/NodeHeader.qml
 
 
 

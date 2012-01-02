@@ -5,16 +5,20 @@ Column {
     property alias rootIndex: chilrenVisualModel.rootIndex
 
     function childIndex(id)
-    {
+      {
       return chilrenVisualModel.modelIndex(id);
-    }
+      }
+
+    function getChildItem(index)
+      {
+      return properties.itemAt(index);
+      }
 
     VisualDataModel {
         id: chilrenVisualModel
         delegate: Property {
             text: name
             colour: propertyColour
-            input: propertyInput
         }
         model: db
     }

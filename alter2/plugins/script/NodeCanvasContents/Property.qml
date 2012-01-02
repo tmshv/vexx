@@ -1,80 +1,136 @@
 import QtQuick 1.1
 
-Column {
+Rectangle {
   id: propertyContainer
 
   property alias text: label.text
-  property alias colour: colourBlob.color
-  property variant input: null
+  property alias colour: inputBlob.color
 
-  Row {
-    id: grouper
+  signal propertyChanged(variant prop)
 
-    Text {
-      text: " "
+  function setupProperty()
+    {
+    propertyContainer.propertyChanged(propertyContainer);
+    expand.setupExpand();
+
+    nodecanvas.setupInput(propertyContainer, propertyList.childIndex(index));
     }
 
-    Rectangle {
-      id: colourBlob
-      y: 2
-      border.color: Qt.darker(color, 1.4)
-      border.width: 1
-      radius: 5
-      width: 10
-      height: 10
-
-      function createInput() {
-        /*if(db.isValid(input)) {
-          var component = Qt.createComponent("Input.qml");
-          input = component.createObject(grouper, { inputIndex: input });
-
-          if (input == null) {
-            // Error Handling
-            console.log("Error creating object");
-          }
-        }*/
+  function getChildItem(index)
+    {
+    var children = childListHolder.children[1];
+    if(children)
+      {
+      return children.getChildItem(index);
       }
 
-      Component.onCompleted: createInput();
+    return null;
     }
 
-    Text {
-      text: "  "
+  function getInputPosition(relative)
+    {
+    var mapped = propertyContainer.mapFromItem(relative, 0, 0);
+    return mapped;
     }
 
-    Rectangle {
-      id: expand
-      y: 2
-      color: childListHolder.visible ? "red" : "white"
-      width: 10
-      height: 10
+  function getOutputPosition(relative)
+    {
+    var mapped = propertyContainer.mapToItem(relative, 0, 0);
+    mapped.x += propertyContainer.width;
+    return mapped;
+    }
 
-      MouseArea {
-        property bool setup: false
-        anchors.fill: parent
+  color: "transparent"
+  width: col.width
+  height: col.height
 
-        function toggleExpand()
-          {
-          if(!childListHolder.visible)
+  state: "NotExpandable"
+
+  states: [
+    State {
+        name: "NotExpandable"
+        PropertyChanges { target: childListHolder; visible: false }
+        PropertyChanges { target: expand; visible: false }
+    },
+    State {
+        name: "Expandable"
+        PropertyChanges { target: childListHolder; visible: false; opacity: 0.0; height: 0 }
+        PropertyChanges { target: expand; rotation: 270 }
+    },
+    State {
+        name: "Expanded"
+        PropertyChanges { target: childListHolder; visible: true; opacity: 1.0; height: childListHolder.childrenRect.height }
+        PropertyChanges { target: expand; rotation: 0 }
+    }
+  ]
+
+  transitions: [
+    Transition {
+      from: "Expanded"; to: "*"
+
+      SequentialAnimation {
+        NumberAnimation { property: "opacity"; easing.type: Easing.InOutQuad; duration: 400; from: 1.0; to: 0.01 }
+        NumberAnimation { property: "height"; easing.type: Easing.InOutQuad; duration: 200 }
+        NumberAnimation { property: "opacity"; duration: 0 }
+
+        PropertyAnimation { properties: "visible"; duration: 0 }
+      }
+    },
+
+    Transition {
+      from: "Expandable"; to: "*"
+
+      SequentialAnimation {
+        PropertyAnimation { properties: "visible"; duration: 0 }
+
+        NumberAnimation { property: "opacity"; duration: 0; from: 0.0; to: 0.01 }
+        NumberAnimation { property: "height"; easing.type: Easing.InOutQuad; duration: 200 }
+        NumberAnimation { property: "opacity"; easing.type: Easing.InOutQuad; duration: 400 }
+      }
+    }
+  ]
+
+
+  Column {
+    id: col
+    Row {
+      id: grouper
+      spacing: 5
+
+      PropertyInterface {
+        id: inputBlob
+        y: 2
+      }
+
+      Image {
+        id: expand
+        y: 2
+        source: "qrc:/Sc/expandExpanded.svg"
+
+        MouseArea {
+          property bool setup: false
+          anchors.fill: parent
+
+          onClicked: {
+            if(propertyContainer.state == "Expandable")
             {
-            if(!setup)
+              if(!setup)
               {
-              setup = true;
-              var component = Qt.createComponent("PropertyList.qml");
-              var object = component.createObject(childListHolder);
+                setup = true;
+                var component = Qt.createComponent("PropertyList.qml");
+                var object = component.createObject(childListHolder);
 
-              object.rootIndex = (function() { return propertyList.childIndex(index); })
+                object.rootIndex = (function() { return propertyList.childIndex(index); })
               }
-            childListHolder.visible = true;
+              propertyContainer.state = "Expanded";
             }
-          else
+            else
             {
-            childListHolder.visible = false;
+              propertyContainer.state = "Expandable";
             }
           }
 
-        onClicked: toggleExpand();
-      }
+        }
 
       function setupExpand()
         {
@@ -83,41 +139,35 @@ Column {
 
         if(hasChildren)
           {
-          expand.visible = true;
-          expandSpacer.visible = true;
+          propertyContainer.state = "Expandable";
           }
         else
           {
-          expand.visible = false;
-          expandSpacer.visible = false;
-          childListHolder.visible = false;
+          propertyContainer.state = "NotExpandable";
           }
         }
+      }
+
+      Text {
+        id: label
+        // hack, the component seems to be reused on property adds without calling Component.onCompleted()... so this catches it.
+        onTextChanged: propertyContainer.setupProperty()
+        font.pointSize: 8
+        color: "white"
+        elide: Text.ElideRight
+      }
     }
 
-    Text {
-      id: expandSpacer
-      text: " "
-    }
+    Row {
+      id: childListHolder
+      visible: false
 
-    Text {
-      id: label
-      onTextChanged: expand.setupExpand();
-      font.pointSize: 8
-      color: "white"
-      elide: Text.ElideRight
-    }
-  }
-
-  Row {
-    id: childListHolder
-    visible: false
-
-    Rectangle {
-      id: spacer
-      width: 10
-      height: 10
-      color: "transparent"
+      Rectangle {
+        id: spacer
+        width: 10
+        height: 10
+        color: "transparent"
+      }
     }
   }
 }

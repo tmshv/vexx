@@ -65,6 +65,7 @@ public:
   Q_INVOKABLE virtual QModelIndex parent( const QModelIndex &child ) const;
   virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
   virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
+  Q_INVOKABLE QVariant data( const QModelIndex &index, const QString &role) const;
   bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
   Q_INVOKABLE bool setData(const QModelIndex & index, const QString &role, const QVariant & value);
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -84,6 +85,7 @@ private:
   SDatabase *_db;
   SEntityWeakPointer _root;
   Options _options;
+  const SPropertyContainer::TreeChange *_currentTreeChange;
   };
 
 #endif // SDATABASEMODEL_H

@@ -19,18 +19,28 @@ Rectangle
     item.z = maxNodeZ;
     }
 
+  function resetCanvas()
+    {
+    for(var i = 0, s = inputGrouper.children.length; i < s; ++i)
+      {
+      inputGrouper.children[i].destroy();
+      }
+
+    maxNodeZ = 0.0;
+    }
+
   function setRootToChildIndex(index)
     {
+    resetCanvas();
     var modelInd = childIndex(index);
     visualModel.rootIndex = modelInd;
-    maxNodeZ = 0.0;
     }
 
   function setRootToParent()
     {
+    resetCanvas();
     var index = visualModel.parentModelIndex();
     visualModel.rootIndex = index;
-    maxNodeZ = 0.0;
     }
 
   function setNodePosition(nodeIndex, pos)
@@ -64,6 +74,7 @@ Rectangle
     var nextItem = parentItems[parentItems.length - 1].getChildItem(rowIndex);
     if(!nextItem)
       {
+      print("no Child index");
       return null;
       }
 
@@ -75,6 +86,20 @@ Rectangle
   function getChildItem(index)
     {
     return nodes.itemAt(index);
+    }
+
+  function setupInput(propertyItem, myIndex)
+    {
+    var inputModelIndex = db.data(myIndex, "propertyInput");
+    if(inputModelIndex)
+      {
+      var component = Qt.createComponent("NodeCanvasContents/Input.qml");
+      var object = component.createObject(inputGrouper);
+
+      object.myProperty = propertyItem;
+      object.myIndex = myIndex;
+      object.setupInput();
+      }
     }
 
   VisualDataModel
@@ -100,5 +125,15 @@ Rectangle
     {
     id: nodes
     model: visualModel
+    }
+
+  Rectangle
+    {
+    id: inputGrouper
+    x: 0
+    y: 0
+    z: maxNodeZ + 1.0
+    width: 0
+    height: 0
     }
   }

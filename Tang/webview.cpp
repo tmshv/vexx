@@ -32,7 +32,6 @@ void WebView::loadObject(const QString &id)
 
 void WebView::loadFinished(bool ok)
   {
-  xAssert(ok);
   QUrl url = _webView->url();
   QString host = url.host();
   QString base(baseHost());

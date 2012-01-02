@@ -2,7 +2,7 @@ import QtQuick 1.1
 
 Item {
     id: nodeItem
-    property alias title: headerText.text
+    property alias title: header.text
     property alias colour: header.color
 
     function move(dx, dy)
@@ -15,8 +15,48 @@ Item {
 
     function getChildItem(index)
       {
-      return properties.itemAt(index);
+      return propertyList.getChildItem(index);
       }
+
+    function getInputPosition(relative)
+      {
+      var mapped = nodeItem.mapFromItem(relative, 0, 0);
+      return mapped;
+      }
+
+    function getOutputPosition(relative)
+      {
+      var mapped = nodeItem.mapToItem(relative, 0, 0);
+      mapped.x += node.width;
+      return mapped;
+      }
+
+
+    state: "NotHovered"
+
+    states: [
+      State {
+          name: "NotHovered"
+          PropertyChanges {
+            target: fader
+            color: "#282828"
+          }
+      },
+      State {
+          name: "Hovered"
+          PropertyChanges {
+            target: fader
+            color: "#3F3F3F"
+          }
+      }
+    ]
+
+    transitions: [
+      Transition {
+        from: "*"; to: "*"
+        ColorAnimation { properties: "color"; easing.type: Easing.OutBounce; duration: 1000 }
+      }
+    ]
 
     Rectangle {
         property real pad: 4
@@ -37,7 +77,19 @@ Item {
         id: node
         width: 120
         height: childrenRect.height + 6
-        color: "#333333"
+
+        gradient: Gradient {
+          GradientStop {
+            position: 0.0
+            color: "#282828"
+          }
+          GradientStop {
+            id: fader
+            position: 1.0
+            color: "#3F3F3F"
+          }
+        }
+
         border.color: "#666666"
         radius: 4
 
@@ -45,8 +97,8 @@ Item {
             anchors.fill: contents
             hoverEnabled: true
 
-            onEntered: parent.color = "#3F3F3F"
-            onExited: parent.color = "#333333"
+            onEntered: nodeItem.state = "Hovered"
+            onExited: nodeItem.state = "NotHovered"
             onDoubleClicked: nodecanvas.setRootToChildIndex(index)
             onClicked: nodecanvas.bringToTop(nodeItem);
         }
@@ -57,55 +109,19 @@ Item {
             y: 3
             width: 114
             height: childrenRect.height
+            spacing: 2
 
-            Rectangle {
-                id: header
-                width: 114
-                height: 20
-                border.color: Qt.darker(color, 1.4)
-                border.width: 2
-                radius: 3
-                Text {
-                    id: headerText
-                    anchors.fill: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.bold: true
-                    font.pointSize: 10
-                    elide: Text.ElideRight
-                    color: Qt.darker(header.color, 2.0)
-                }
-                MouseArea {
-                    property bool dragging: false
-                    property real lastX: 0
-                    property real lastY: 0
-                    anchors.fill: parent
-                    preventStealing: true
-                    onPressed: {
-                        nodecanvas.bringToTop(nodeItem);
-                        dragging = true
-                        var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
-                        lastX = gc.x
-                        lastY = gc.y
-                    }
-                    onDoubleClicked: nodecanvas.setRootToChildIndex(index)
-                    onReleased: dragging = false
-                    onMousePositionChanged: {
-                        var gc = mapToItem(parent.parent.parent.parent.parent, mouse.x, mouse.y)
-                        parent.parent.parent.parent.move(gc.x - lastX, gc.y - lastY)
-                        lastX = gc.x
-                        lastY = gc.y
-                    }
-                }
-            }
+            NodeHeader {
+              id: header
+              width: contents.width
 
-            Rectangle {
-              width: 2
-              height: 2
-              color: "transparent"
+              onDragged: {
+                move(x, y);
+              }
             }
 
             PropertyList {
+              id: propertyList
               rootIndex: nodecanvas.childIndex(index)
             }
         }

@@ -46,6 +46,7 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCTransform::staticTypeInformation());
   STypeRegistry::addType(GCGeometryTransform::staticTypeInformation());
 
+  STypeRegistry::addType(GCRenderable::staticTypeInformation());
 
   STypeRegistry::addType(GCViewport::staticTypeInformation());
 
@@ -58,17 +59,16 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCScreenRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCTextureRenderTarget::staticTypeInformation());
 
-  STypeRegistry::addType(GCRenderable::staticTypeInformation());
-
   STypeRegistry::addType(GCGrid::staticTypeInformation());
   STypeRegistry::addType(GCScene::staticTypeInformation());
   STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
+
+  STypeRegistry::addType(GCShader::staticTypeInformation());
 
   STypeRegistry::addType(GCShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCFragmentShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCVertexShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCShadingGroup::staticTypeInformation());
-  STypeRegistry::addType(GCShader::staticTypeInformation());
 
   STypeRegistry::addType(GCCuboid::staticTypeInformation());
   STypeRegistry::addType(GCSphere::staticTypeInformation());
