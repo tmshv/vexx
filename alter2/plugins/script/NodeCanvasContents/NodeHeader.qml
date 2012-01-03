@@ -5,31 +5,31 @@ import QtQuick 1.1
 Rectangle {
     id: header
 
+    property bool dragging: false
     property alias text: headerText.text
 
     signal dragged(real x, real y)
 
+    smooth: true
     height: 20
     border.color: Qt.darker(color, 1.4)
     border.width: 2
     radius: 3
 
-    Rectangle {
-      x: -5
-      y: (header.height/2) - 5
-      width: 10
-      height: 10
-      radius: 5
+    PropertyInterface {
+      id: nodeInputBlob
+      x: 1 - nodeInputBlob.size/2
+      y: (header.height/2) + 1 - nodeInputBlob.size/2
+      size: 15
       color: header.color
     }
 
-    Rectangle {
-      x: header.width - 5
-      y: (header.height/2) - 5
-      width: 10
-      height: 10
-      radius: 5
+    PropertyInterface {
+      x: nodeInputBlob.x + header.width - 1
+      y: nodeInputBlob.y
+      size: nodeInputBlob.size
       color: header.color
+      //border.width: 0
     }
 
 
@@ -45,7 +45,6 @@ Rectangle {
     }
 
     MouseArea {
-        property bool dragging: false
         property real lastX: 0
         property real lastY: 0
 

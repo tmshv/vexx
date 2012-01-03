@@ -114,7 +114,7 @@ void ScPath::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 
 void ScPath::updateRenderData()
   {
-  QPointF to = _lastPoint;
+  /*QPointF to = _lastPoint;
   QPointF from = _firstPoint;
 
   float test = to.x() * 0.0f + to.y() * 0.0f + from.x() * 0.0f + from.y() * 0.0f;
@@ -151,5 +151,5 @@ void ScPath::updateRenderData()
   _pen.setBrush(br);
   _pen.setWidth(_penWidth);
 
-  update();
+  update();*/
   }

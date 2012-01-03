@@ -18,7 +18,7 @@ Path {
     return Math.max(Math.min(dist, 200.0), 50.0);
   }
 
-  width: 2
+  width: 4
 
   firstNormal.y: 0
   lastNormal.x: -firstNormal.x

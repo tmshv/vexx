@@ -32,13 +32,13 @@ Item {
 
   function getInputPosition(relative)
     {
-    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2);
+    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2+1);
     return mapped;
     }
 
   function getOutputPosition(relative)
     {
-    var mapped = outputBlob.mapToItem(relative, outputBlob.width/2, outputBlob.height/2);
+    var mapped = outputBlob.mapToItem(relative, outputBlob.width/2, outputBlob.height/2+1);
     return mapped;
     }
 
@@ -93,15 +93,17 @@ Item {
 
   PropertyInterface {
     id: inputBlob
-    y: 2.0
-    x: -4.0
+    y: 1.0
+    x: 1 - inputBlob.size/2
+    size: 12
   }
 
   PropertyInterface {
     id: outputBlob
-    y: inputBlob.y
-    x: propertyContainer.width - 5.0
+    anchors.top: inputBlob.top
+    x: propertyContainer.width + 1 - inputBlob.size/2
     color: inputBlob.color
+    size: inputBlob.size
   }
 
   Column {

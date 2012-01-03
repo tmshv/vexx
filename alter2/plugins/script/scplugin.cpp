@@ -21,6 +21,7 @@
 #include "QMLExtensions/scpath.h"
 #include "QMLExtensions/scellipse.h"
 #include "QMLExtensions/scbrush.h"
+#include "QGLWidget"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -314,6 +315,7 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
   return QScriptValue();
   }
 
+
 void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
   {
   APlugin<UIPlugin> ui(this, "ui");
@@ -329,6 +331,8 @@ void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QSt
           QDeclarativeContext *ctx = rootContext();
           ctx->setContextProperty("db", model);
           }
+
+        //setViewport(new QGLWidget);
 
         setSource(s);
         setResizeMode(QDeclarativeView::SizeRootObjectToView);

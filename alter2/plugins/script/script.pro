@@ -7,7 +7,7 @@ TEMPLATE = lib
 
 include("../../../EksCore/GeneralOptions.pri")
 
-QT += script scripttools declarative
+QT += script scripttools declarative opengl
 INCLUDEPATH += ../../ \
     $$ROOT/EksCore \
     $$ROOT/shift \

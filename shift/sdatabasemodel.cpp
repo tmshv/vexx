@@ -345,15 +345,18 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
 
 QVariant SDatabaseModel::data( const QModelIndex &index, const QString &role) const
   {
-  QHash<int, QByteArray> roles = roleNames();
+  SDataModelProfileFunction
+  const QHash<int, QByteArray> &roles = roleNames();
 
-  foreach(int i, roles.keys())
+  QHash<int, QByteArray>::const_iterator it = roles.begin();
+  QHash<int, QByteArray>::const_iterator end = roles.end();
+  for(; it != end; ++it)
     {
-    QByteArray name = roles.value(i);
+    const QByteArray &name = it.value();
 
     if(role == name)
       {
-      return data(index, i);
+      return data(index, it.key());
       }
     }
 
@@ -388,7 +391,7 @@ bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int 
       {
       SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
       if(interface)
-        {;
+        {
         QVector3D vec = val.value<QVector3D>();
         interface->setPosition(prop, XVector3D(vec.x(), vec.y(), vec.z()));
         return true;
@@ -400,15 +403,18 @@ bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int 
 
 bool SDatabaseModel::setData(const QModelIndex &index, const QString &role, const QVariant &value)
   {
-  QHash<int, QByteArray> roles = roleNames();
+  SDataModelProfileFunction
+  const QHash<int, QByteArray> &roles = roleNames();
 
-  foreach(int i, roles.keys())
+  QHash<int, QByteArray>::const_iterator it = roles.begin();
+  QHash<int, QByteArray>::const_iterator end = roles.end();
+  for(; it != end; ++it)
     {
-    QByteArray name = roles.value(i);
+    const QByteArray &name = it.value();
 
     if(role == name)
       {
-      return setData(index, value, i);
+      return setData(index, value, it.key());
       }
     }
 
