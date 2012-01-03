@@ -16,7 +16,7 @@ ScEllipse::~ScEllipse()
 
 void ScEllipse::doUpdate()
   {
-  _rectImage = QPixmap();
+  _ellipseImage = QPixmap();
   const int pw = _pen && _pen->isValid() ? _pen->width() : 0;
 
   setPaintMargin((pw+1)/2);
@@ -68,30 +68,30 @@ void ScEllipse::setColor(const QColor &c)
     }
 
   _color = c;
-  _rectImage = QPixmap();
+  _ellipseImage = QPixmap();
   update();
   emit colorChanged();
   }
 
 void ScEllipse::generateBorderedEllipse()
   {
-  if(_rectImage.isNull())
+  if(_ellipseImage.isNull())
     {
     const int pw = _pen && _pen->isValid() ? _pen->width() : 0;
 
-    QString key = QLatin1String("q_") + QString::number(pw) + _color.name() + QString::number(_color.alpha(), 16);
+    QString key = QLatin1String("EL_") + QString::number(pw) + _color.name() + QString::number(_color.alpha(), 16);
     if (_pen && _pen->isValid())
       {
       key += _pen->color().name() + QString::number(_pen->color().alpha(), 16);
       }
 
-    if (!QPixmapCache::find(key, &_rectImage))
+    if (!QPixmapCache::find(key, &_ellipseImage))
       {
       // Adding 5 here makes qDrawBorderPixmap() paint correctly with smooth: true
       // See QTBUG-7999 and QTBUG-10765 for more details.
-      _rectImage = QPixmap(pw*2 + 5, pw*2 + 5);
-      _rectImage.fill(Qt::transparent);
-      QPainter p(&(_rectImage));
+      _ellipseImage = QPixmap(width(), height());
+      _ellipseImage.fill(Qt::transparent);
+      QPainter p(&(_ellipseImage));
       p.setRenderHint(QPainter::Antialiasing);
       if (_pen && _pen->isValid()) {
           QPen pn(QColor(_pen->color()), _pen->width());
@@ -103,17 +103,17 @@ void ScEllipse::generateBorderedEllipse()
       p.setBrush(_color);
       if (pw%2)
         {
-        p.drawEllipse(QRectF(qreal(pw)/2+1, qreal(pw)/2+1, _rectImage.width()-(pw+1), _rectImage.height()-(pw+1)));
+        p.drawEllipse(QRectF(qreal(pw)/2+1, qreal(pw)/2+1, _ellipseImage.width()-(pw+1), _ellipseImage.height()-(pw+1)));
         }
       else
         {
-        p.drawEllipse(QRectF(qreal(pw)/2, qreal(pw)/2, _rectImage.width()-pw, _rectImage.height()-pw));
+        p.drawEllipse(QRectF(qreal(pw)/2, qreal(pw)/2, _ellipseImage.width()-pw, _ellipseImage.height()-pw));
         }
 
       // end painting before inserting pixmap
       // to pixmap cache to avoid a deep copy
       p.end();
-      QPixmapCache::insert(key, _rectImage);
+      QPixmapCache::insert(key, _ellipseImage);
       }
     }
   }
@@ -214,28 +214,7 @@ void ScEllipse::drawEllipse(QPainter &p)
 
     generateBorderedEllipse();
 
-    int xOffset = (_rectImage.width()-1)/2;
-    int yOffset = (_rectImage.height()-1)/2;
-
-    Q_ASSERT(_rectImage.width() == 2*xOffset + 1);
-    Q_ASSERT(_rectImage.height() == 2*yOffset + 1);
-
-    // check whether we've eliminated the center completely
-    if(2*xOffset > width()+pw)
-      {
-      xOffset = (width()+pw)/2;
-      }
-
-    if(2*yOffset > height()+pw)
-      {
-      yOffset = (height()+pw)/2;
-      }
-
-    QMargins margins(xOffset, yOffset, xOffset, yOffset);
-    QTileRules rules(Qt::StretchTile, Qt::StretchTile);
-
-    //NOTE: even though our item may have qreal-based width and height, qDrawBorderPixmap only supports QRects
-    qDrawBorderPixmap(&p, QRect(-pw/2, -pw/2, width()+pw, height()+pw), margins, _rectImage, _rectImage.rect(), margins, rules);
+    p.drawPixmap(QRect(-pw/2, -pw/2, width()+pw, height()+pw), _ellipseImage);
 
     if(sm)
       {

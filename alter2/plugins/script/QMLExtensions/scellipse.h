@@ -45,7 +45,7 @@ private:
   ScGradient *_gradient;
   ScPen *_pen;
   qreal _paintmargin;
-  QPixmap _rectImage;
+  QPixmap _ellipseImage;
 
   Q_DISABLE_COPY(ScEllipse)
   };
