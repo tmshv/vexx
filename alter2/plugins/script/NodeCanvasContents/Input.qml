@@ -14,7 +14,8 @@ Path {
     var xDist = firstPoint.x - lastPoint.x;
     var yDist = firstPoint.y - lastPoint.y;
 
-    return Math.sqrt(xDist * xDist + yDist * yDist) / 2;
+    var dist = Math.sqrt(xDist * xDist + yDist * yDist) / 2;
+    return Math.max(Math.min(dist, 200.0), 50.0);
   }
 
   width: 2

@@ -135,19 +135,19 @@ Rectangle
     onDoubleClicked: nodecanvas.setRootToParent()
     }
 
-  Repeater
-    {
-    id: nodes
-    model: visualModel
+  Item {
+    Repeater {
+      id: nodes
+      model: visualModel
     }
 
-  Rectangle
-    {
-    id: inputGrouper
-    x: 0
-    y: 0
-    z: 0
-    width: 0
-    height: 0
+    Rectangle {
+      id: inputGrouper
+      x: 0
+      y: 0
+      z: -1
+      width: 0
+      height: 0
     }
+  }
   }

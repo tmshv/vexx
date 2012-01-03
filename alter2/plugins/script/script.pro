@@ -29,7 +29,9 @@ SOURCES += scplugin.cpp \
     scshiftdatabase.cpp \
     scshiftfloatarrayproperty.cpp \
     scio.cpp \
-    QMLExtensions\scpath.cpp
+    QMLExtensions\scpath.cpp \
+    QMLExtensions/scellipse.cpp \
+    QMLExtensions/scbrush.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -42,7 +44,9 @@ HEADERS += scplugin.h \
     scshiftdatabase.h \
     scshiftfloatarrayproperty.h \
     scio.h \
-    QMLExtensions\scpath.h
+    QMLExtensions\scpath.h \
+    QMLExtensions/scellipse.h \
+    QMLExtensions/scbrush.h
 
 RESOURCES += \
     ScResources.qrc

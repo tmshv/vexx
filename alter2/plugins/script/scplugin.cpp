@@ -19,7 +19,8 @@
 #include "QGraphicsObject"
 #include "qdeclarative.h"
 #include "QMLExtensions/scpath.h"
-
+#include "QMLExtensions/scellipse.h"
+#include "QMLExtensions/scbrush.h"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -73,7 +74,7 @@ void ScPlugin::pluginAdded(const QString &type)
       APlugin<UIPlugin> ui(this, "ui");
       xAssert(ui.isValid());
       ui->addSurface(_surface);
-      
+
       includePath(":/Sc/StartupUI.js");
       }
     }
@@ -139,6 +140,10 @@ void ScPlugin::load()
     }
 
   qmlRegisterType<ScPath>("VexxQMLExtensions", 1, 0, "Path");
+  qmlRegisterType<ScEllipse>("VexxQMLExtensions", 1, 0, "Ellipse");
+  qmlRegisterType<ScGradient>("VexxQMLExtensions", 1, 0, "Gradient");
+  qmlRegisterType<ScGradientStop>("VexxQMLExtensions", 1, 0, "GradientStop");
+  qmlRegisterType<ScPen>("VexxQMLExtensions", 1, 0, "Pen");
 
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");
@@ -147,7 +152,7 @@ void ScPlugin::load()
 
   xAssert(!_model);
   _model = new SDatabaseModel(&db->db(), &db->db(), SDatabaseModel::NoOptions);
-  
+
   include("CoreStartup.js");
   }
 

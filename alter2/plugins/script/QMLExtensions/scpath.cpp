@@ -132,13 +132,6 @@ void ScPath::updateRenderData()
                to.x(), to.y());
   _path = path;
 
-  //Q_ASSERT(_penWidth >= 1.0f);
-  //_stroker.setWidth(_penWidth);
-
-  //QPainterPath strokedPath = _stroker.createStroke(path);
-
-  //_polygon = strokedPath.toFillPolygon(QTransform());
-
   QRectF rect = _path.boundingRect();
 
   setX(rect.left() - _penWidth/2);
@@ -151,8 +144,8 @@ void ScPath::updateRenderData()
 
   _gradient.setColorAt(0.0, _firstColour);
   _gradient.setColorAt(1.0, _lastColour);
-  _gradient.setStart(from);
-  _gradient.setFinalStop(to);
+  _gradient.setStart(from - pos());
+  _gradient.setFinalStop(to - pos());
 
   QBrush br(_gradient);
   _pen.setBrush(br);
