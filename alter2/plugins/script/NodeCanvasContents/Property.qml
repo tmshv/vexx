@@ -12,6 +12,15 @@ Item {
 
   function setupProperty()
     {
+    /*if(text == "children" || text == "__position")
+      {
+      visible = false;
+      }
+    else
+      {
+      visible = true;
+      }*/
+
     propertyContainer.propertyChanged(propertyContainer);
     expand.setupExpand();
 
@@ -33,13 +42,13 @@ Item {
   function getInputPosition(relative)
     {
     var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2+1);
-    return mapped;
+    return Qt.point(mapped.x, mapped.y);
     }
 
   function getOutputPosition(relative)
     {
     var mapped = outputBlob.mapToItem(relative, outputBlob.width/2, outputBlob.height/2+1);
-    return mapped;
+    return Qt.point(mapped.x, mapped.y);
     }
 
   width: col.width

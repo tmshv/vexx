@@ -102,11 +102,14 @@ void ScPath::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 
   p->drawPath(_path);
 
-#if DEBUG_RENDER_PATHS
+#define DEBUG_RENDER_PATHSx
+#ifdef DEBUG_RENDER_PATHS
   p->setRenderHint(QPainter::Antialiasing, false);
   p->setPen(Qt::red);
   p->setBrush(Qt::transparent);
   p->drawRect(0, 0, width(), height());
+
+  p->drawText(boundingRect(), QString::number((quint64)this, 16));
 #endif
 
   p->setRenderHint(QPainter::Antialiasing, oldAA);
@@ -114,7 +117,7 @@ void ScPath::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 
 void ScPath::updateRenderData()
   {
-  /*QPointF to = _lastPoint;
+  QPointF to = _lastPoint;
   QPointF from = _firstPoint;
 
   float test = to.x() * 0.0f + to.y() * 0.0f + from.x() * 0.0f + from.y() * 0.0f;
@@ -151,5 +154,5 @@ void ScPath::updateRenderData()
   _pen.setBrush(br);
   _pen.setWidth(_penWidth);
 
-  update();*/
+  update();
   }

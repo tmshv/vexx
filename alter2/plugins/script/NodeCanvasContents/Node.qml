@@ -21,14 +21,14 @@ Item {
 
     function getInputPosition(relative)
       {
-      var mapped = nodeItem.mapToItem(relative, 0, 0);
-      return mapped;
+      var mapped = nodeItem.mapToItem(relative, 0, header.height/2 + 2);
+      return Qt.point(mapped.x, mapped.y);
       }
 
     function getOutputPosition(relative)
       {
-      var mapped = header.mapToItem(relative, header.width, header.height/2);
-      return mapped;
+      var mapped = header.mapToItem(relative, header.width, header.height/2 + 2);
+      return Qt.point(mapped.x, mapped.y);
       }
 
 

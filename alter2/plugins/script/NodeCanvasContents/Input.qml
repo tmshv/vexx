@@ -10,18 +10,11 @@ Path {
 
   property real distanceBetweenPoints: 0
 
-  firstNormal.x: {
-    var xDist = firstPoint.x - lastPoint.x;
-    var yDist = firstPoint.y - lastPoint.y;
-
-    var dist = Math.sqrt(xDist * xDist + yDist * yDist) / 2;
-    return Math.max(Math.min(dist, 200.0), 50.0);
-  }
-
   width: 4
 
+  firstNormal.x: 100
   firstNormal.y: 0
-  lastNormal.x: -firstNormal.x
+  lastNormal.x: -100
   lastNormal.y: 0
 
   function propertyChanged(prop)
@@ -64,14 +57,9 @@ Path {
 
   function update()
     {
-    var from = inputTarget.getOutputPosition(parent);
-    var to = myProperty.getInputPosition(parent);
+    inputHolder.firstPoint = inputTarget.getOutputPosition(parent);
 
-    inputHolder.firstPoint.x = from.x;
-    inputHolder.firstPoint.y = from.y;
-
-    inputHolder.lastPoint.x = to.x;
-    inputHolder.lastPoint.y = to.y;
+    inputHolder.lastPoint = myProperty.getInputPosition(parent);
     }
 
   function setupInput()

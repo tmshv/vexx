@@ -29,7 +29,6 @@ Rectangle {
       y: nodeInputBlob.y
       size: nodeInputBlob.size
       color: header.color
-      //border.width: 0
     }
 
 
