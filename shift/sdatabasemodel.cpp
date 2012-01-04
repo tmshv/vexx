@@ -338,6 +338,10 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
         {
         return QVariant::fromValue(createIndex(inp->index(), 0, inp));
         }
+      else
+        {
+        return QVariant::fromValue(QModelIndex());
+        }
       }
     }
   return QVariant();

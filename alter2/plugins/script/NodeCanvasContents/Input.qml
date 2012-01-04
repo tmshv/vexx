@@ -27,30 +27,42 @@ Path {
       inputTarget.propertyChanged.disconnect(inputHolder.propertyChanged);
     }
 
-    var items = nodecanvas.findPropertyItem(inputIndex);
-    for(var i = 1, s = items.length; i < s; ++i)
+    var item = myProperty;
+    while(item)
       {
-      var item = items[i];
       item.xChanged.disconnect(inputHolder.update);
       item.yChanged.disconnect(inputHolder.update);
+      item = item.parent;
       }
 
-    items = nodecanvas.findPropertyItem(myIndex);
-    for(var i = 1, s = items.length; i < s; ++i)
+    item = inputTarget;
+    while(item)
       {
-      var item = items[i];
       item.xChanged.disconnect(inputHolder.update);
       item.yChanged.disconnect(inputHolder.update);
+      item = item.parent;
       }
 
     // re set this up, as our output property has been destroyed.
-    if(prop != myProperty)
+    print("setup property " + prop.text + " | " + inputTarget.text + " | " + myProperty.text);
+    print(prop);
+    print(inputTarget);
+    print(myProperty);
+    if(prop === inputTarget)
       {
+      print("Re create i am output");
       recreateTimer.start();
       visible = false;
       }
+    else if(prop === myProperty)
+      {
+      myProperty.input = null;
+      inputHolder.destroy();
+      }
     else
       {
+      print("Discarding input.");
+      myProperty.input = null;
       inputHolder.destroy();
       }
     }
@@ -58,7 +70,6 @@ Path {
   function update()
     {
     inputHolder.firstPoint = inputTarget.getOutputPosition(parent);
-
     inputHolder.lastPoint = myProperty.getInputPosition(parent);
     }
 
@@ -74,8 +85,10 @@ Path {
       var items = nodecanvas.findPropertyItem(myIndex);
       if(items)
         {
+        print("Recreate" + items[items.length-1].text);
         nodecanvas.setupInput(items[items.length-1], myIndex);
         }
+      myProperty.input = null;
       inputHolder.destroy();
     }
   }
@@ -93,9 +106,9 @@ Path {
     id: setupTimer
     interval: 1
     onTriggered: {
-      if(!inputIndex)
+      if(!db.isValid(inputIndex))
         {
-        print("Pants, input is invalid, hide!");
+        print("Pants, input is invalid, hide! SHOULDN'T REACH THIS");
         inputHolder.destroy();
         return;
         }
@@ -139,9 +152,9 @@ Path {
         myProperty.propertyChanged.connect(propertyChanged);
         }
 
-      inputHolder.visible = (function() { return myProperty.visible && inputTarget.visible })
-      inputHolder.firstColour = (function() { return inputTarget.colour; })
-      inputHolder.lastColour = (function() { return myProperty.colour; })
+      inputHolder.visible = (function() { return myProperty.visible && inputTarget.visible });
+      inputHolder.firstColour = (function() { return inputTarget.colour; });
+      inputHolder.lastColour = (function() { return myProperty.colour; });
 
       update();
     }

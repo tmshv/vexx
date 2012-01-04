@@ -5,8 +5,9 @@ Item {
 
   property alias text: label.text
   property alias colour: inputBlob.color
-  property variant input: null
   property real contentsOffset: 0
+
+  property variant input: null
 
   signal propertyChanged(variant prop)
 
@@ -41,7 +42,7 @@ Item {
 
   function getInputPosition(relative)
     {
-    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2+1);
+    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2+2);
     return Qt.point(mapped.x, mapped.y);
     }
 

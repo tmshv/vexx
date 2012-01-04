@@ -17,17 +17,24 @@ Column {
 
   VisualDataModel {
     id: chilrenVisualModel
-    delegate: Property {
+    model: db
+
+    Property {
       text: name
       colour: propertyColour
       contentsOffset: xOffset
       width: propertyList.width
     }
-    model: db
   }
 
   Repeater {
     id: properties
     model: chilrenVisualModel
+
+    /*onItemRemoved: {
+      print("Remove input?");
+      print(item.text);
+      print(item.input);
+    }*/
   }
 }

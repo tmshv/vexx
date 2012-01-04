@@ -90,7 +90,7 @@ Rectangle
   function setupInput(propertyItem, myIndex)
     {
     var inputModelIndex = db.data(myIndex, "propertyInput");
-    if(inputModelIndex)
+    if(db.isValid(inputModelIndex))
       {
       var component = Qt.createComponent("NodeCanvasContents/Input.qml");
 
