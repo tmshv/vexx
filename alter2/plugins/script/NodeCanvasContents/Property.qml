@@ -33,12 +33,12 @@ Item {
     return propertyList.childIndex(index)
     }
 
-  function getChildItem(index)
+  function childItem(index)
     {
     var children = childListHolder.children[0];
     if(children)
       {
-      return children.getChildItem(index);
+      return children.childItem(index);
       }
 
     print("Asking for child from non children node.");
@@ -110,15 +110,21 @@ Item {
     id: inputBlob
     y: 1.0
     x: 1 - inputBlob.size/2
+    z: 2.0
     size: 12
+
+    onStartDrag: nodecanvas.startCreatingConnection(getModelIndex(), inputBlob, "Input", x, y)
   }
 
   PropertyInterface {
     id: outputBlob
     anchors.top: inputBlob.top
     x: propertyContainer.width + 1 - inputBlob.size/2
+    z: 2.0
     color: inputBlob.color
     size: inputBlob.size
+
+    onStartDrag: nodecanvas.startCreatingConnection(getModelIndex(), outputBlob, "Output", x, y)
   }
 
   Column {

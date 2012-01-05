@@ -8,6 +8,7 @@ Rectangle {
     property bool dragging: false
     property alias text: headerText.text
 
+    signal createConnection(variant item, string mode, real x, real y)
     signal dragged(real x, real y)
 
     smooth: true
@@ -22,13 +23,22 @@ Rectangle {
       y: (header.height/2) + 1 - nodeInputBlob.size/2
       size: 15
       color: header.color
+
+      onStartDrag: {
+        createConnection(nodeInputBlob, "input", x, y);
+      }
     }
 
     PropertyInterface {
+      id: nodeOutputBlob
       x: nodeInputBlob.x + header.width - 1
       y: nodeInputBlob.y
       size: nodeInputBlob.size
       color: header.color
+
+      onStartDrag: {
+        createConnection(nodeOutputBlob, "output", x, y);
+      }
     }
 
 

@@ -13,6 +13,11 @@ Rectangle
     return visualModel.modelIndex(index);
     }
 
+  function childItem(index)
+    {
+    return nodes.itemAt(index);
+    }
+
   function bringToTop(item)
     {
     maxNodeZ += 0.05;
@@ -71,7 +76,7 @@ Rectangle
 
     var rowIndex = db.rowIndex(modelIndex);
 
-    var nextItem = parentItems[parentItems.length - 1].getChildItem(rowIndex);
+    var nextItem = parentItems[parentItems.length - 1].childItem(rowIndex);
     if(!nextItem)
       {
       return null;
@@ -80,11 +85,6 @@ Rectangle
     parentItems.push(nextItem);
 
     return parentItems;
-    }
-
-  function getChildItem(index)
-    {
-    return nodes.itemAt(index);
     }
 
   function setupInput(propertyItem, myIndex)
@@ -114,6 +114,53 @@ Rectangle
 
       propertyItem.input = object;
       }
+    }
+
+  property variant currentInputDragging: null
+  property variant currentInputDraggingItem: null
+  property variant currentInputDraggingIndex: null
+  property string currentInputBeginMode: ""
+  function startCreatingConnection(index, item, mode, x, y)
+    {
+    if(currentInputDragging != null)
+      {
+      print("Creating connection during creating connection");
+      }
+
+    currentInputDraggingItem = item;
+    currentInputDraggingIndex = index;
+    currentInputBeginMode = "mode";
+
+    item.moveDrag.connect(moveCreatingConnection);
+    item.endDrag.connect(endCreatingConnection);
+
+    var component = Qt.createComponent("NodeCanvasContents/DynamicInput.qml");
+
+    if(component.status === Component.Error)
+      {
+      // Error Handling
+      console.log("Error loading Input component:", component.errorString());
+      return;
+      }
+
+    currentInputDragging = component.createObject(inputGrouper);
+    }
+
+  function moveCreatingConnection(x, y)
+    {
+    print("Move")
+    }
+
+  function endCreatingConnection(x, y)
+    {
+    currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
+    currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
+
+    print("End")
+    currentInputDragging.destroy();
+    currentInputDragging = null;
+    currentInputDraggingItem = null;
+    currentInputDraggingIndex = null;
     }
 
   VisualDataModel

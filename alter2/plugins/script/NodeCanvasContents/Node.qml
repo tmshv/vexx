@@ -14,9 +14,14 @@ Item {
       nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
       }
 
-    function getChildItem(index)
+    function getModelIndex()
       {
-      return propertyList.getChildItem(index);
+      return nodecanvas.childIndex(index)
+      }
+
+    function childItem(index)
+      {
+      return propertyList.childItem(index);
       }
 
     function getInputPosition(relative)
@@ -142,6 +147,8 @@ Item {
                 x: 2
                 y: 3
                 width: contents.width - 4
+
+                onCreateConnection: nodecanvas.startCreatingConnection(getModelIndex(), item, mode, x, y)
 
                 onDraggingChanged: {
                   if(header.dragging)

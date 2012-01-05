@@ -62,7 +62,8 @@ OTHER_FILES += \
     QMLItemLookup.js \
     NodeCanvasContents/PropertyList.qml \
     NodeCanvasContents/PropertyInterface.qml \
-    NodeCanvasContents/NodeHeader.qml
+    NodeCanvasContents/NodeHeader.qml \
+    NodeCanvasContents/DynamicInput.qml
 
 
 

@@ -10,7 +10,7 @@ Column {
     return chilrenVisualModel.modelIndex(id);
     }
 
-  function getChildItem(index)
+  function childItem(index)
     {
     return properties.itemAt(index);
     }
