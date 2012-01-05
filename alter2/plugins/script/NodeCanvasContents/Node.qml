@@ -37,6 +37,7 @@ Item {
     states: [
       State {
           name: "NotHovered"
+          when: dragMouseArea.hovered !== true
 
           PropertyChanges {
             target: fader
@@ -50,6 +51,7 @@ Item {
       },
       State {
           name: "Hovered"
+          when: dragMouseArea.hovered === true
 
           PropertyChanges {
             target: fader
@@ -63,6 +65,7 @@ Item {
       },
       State {
           name: "Moving"
+          when: dragMouseArea.pressed === true
 
           PropertyChanges {
             target: node
@@ -114,11 +117,13 @@ Item {
         radius: 4
 
         MouseArea {
+            id: dragMouseArea
+            property bool hovered: false
             anchors.fill: contents
             hoverEnabled: true
 
-            onEntered: nodeItem.state = "Hovered"
-            onExited: nodeItem.state = "NotHovered"
+            onEntered: hovered = true
+            onExited: hovered = false
             onDoubleClicked: nodecanvas.setRootToChildIndex(index)
             onClicked: nodecanvas.bringToTop(nodeItem);
         }

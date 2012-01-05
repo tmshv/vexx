@@ -85,7 +85,7 @@ Path {
         myProperty.input = null;
         }
 
-      //inputHolder.destroy();
+      inputHolder.destroy();
     }
   }
 
