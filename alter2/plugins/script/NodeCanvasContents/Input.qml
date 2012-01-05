@@ -22,7 +22,7 @@ Path {
     // should i have to disconnect signals manually? i hope not, but reference errors otherwise,
     // test on 4.8 non-RC
     myProperty.propertyChanged.disconnect(inputHolder.propertyChanged);
-    if(inputTarget.propertyChanged)
+    if(inputTarget && inputTarget.propertyChanged)
     {
       inputTarget.propertyChanged.disconnect(inputHolder.propertyChanged);
     }
@@ -44,26 +44,15 @@ Path {
       }
 
     // re set this up, as our output property has been destroyed.
-    print("setup property " + prop.text + " | " + inputTarget.text + " | " + myProperty.text);
-    print(prop);
-    print(inputTarget);
-    print(myProperty);
-    if(prop === inputTarget)
-      {
-      print("Re create i am output");
-      recreateTimer.start();
-      visible = false;
-      }
-    else if(prop === myProperty)
+    if(prop === myProperty)
       {
       myProperty.input = null;
       inputHolder.destroy();
       }
     else
       {
-      print("Discarding input.");
-      myProperty.input = null;
-      inputHolder.destroy();
+      recreateTimer.start();
+      //visible = false;
       }
     }
 
@@ -82,14 +71,21 @@ Path {
     id: recreateTimer
     interval: 1
     onTriggered: {
-      var items = nodecanvas.findPropertyItem(myIndex);
-      if(items)
+      if(myProperty)
         {
-        print("Recreate" + items[items.length-1].text);
-        nodecanvas.setupInput(items[items.length-1], myIndex);
+        var index = myProperty.getModelIndex();
+        if(db.isValid(index))
+          {
+          var items = nodecanvas.findPropertyItem(index);
+          if(items)
+            {
+            nodecanvas.setupInput(items[items.length-1], index);
+            }
+          }
+        myProperty.input = null;
         }
-      myProperty.input = null;
-      inputHolder.destroy();
+
+      //inputHolder.destroy();
     }
   }
 

@@ -25,7 +25,12 @@ Item {
     propertyContainer.propertyChanged(propertyContainer);
     expand.setupExpand();
 
-    nodecanvas.setupInput(propertyContainer, propertyList.childIndex(index));
+    nodecanvas.setupInput(propertyContainer, getModelIndex());
+    }
+
+  function getModelIndex()
+    {
+    return propertyList.childIndex(index)
     }
 
   function getChildItem(index)
