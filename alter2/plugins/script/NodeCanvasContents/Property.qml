@@ -113,7 +113,7 @@ Item {
     z: 2.0
     size: 12
 
-    onStartDrag: nodecanvas.startCreatingConnection(getModelIndex(), inputBlob, "Input", x, y)
+    onStartDrag: nodecanvas.startCreatingConnection(inputBlob, "input", x, y)
   }
 
   PropertyInterface {
@@ -124,7 +124,7 @@ Item {
     color: inputBlob.color
     size: inputBlob.size
 
-    onStartDrag: nodecanvas.startCreatingConnection(getModelIndex(), outputBlob, "Output", x, y)
+    onStartDrag: nodecanvas.startCreatingConnection(outputBlob, "output", x, y)
   }
 
   Column {

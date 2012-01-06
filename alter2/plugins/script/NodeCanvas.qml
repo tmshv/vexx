@@ -87,6 +87,11 @@ Rectangle
     return parentItems;
     }
 
+  function intersect(x, y)
+    {
+    print("interse");
+    }
+
   function setupInput(propertyItem, myIndex)
     {
     var inputModelIndex = db.data(myIndex, "propertyInput");
@@ -120,19 +125,21 @@ Rectangle
   property variant currentInputDraggingItem: null
   property variant currentInputDraggingIndex: null
   property string currentInputBeginMode: ""
-  function startCreatingConnection(index, item, mode, x, y)
+  function startCreatingConnection(thing, mode, x, y)
     {
+    print(thing);
     if(currentInputDragging != null)
       {
       print("Creating connection during creating connection");
       }
 
-    currentInputDraggingItem = item;
-    currentInputDraggingIndex = index;
+    currentInputDraggingItem = thing;
     currentInputBeginMode = "mode";
 
-    item.moveDrag.connect(moveCreatingConnection);
-    item.endDrag.connect(endCreatingConnection);
+    print(currentInputDraggingItem);
+    print(mode);
+    currentInputDraggingItem.moveDrag.connect(moveCreatingConnection);
+    currentInputDraggingItem.endDrag.connect(endCreatingConnection);
 
     var component = Qt.createComponent("NodeCanvasContents/DynamicInput.qml");
 
@@ -143,7 +150,7 @@ Rectangle
       return;
       }
 
-    currentInputDragging = component.createObject(inputGrouper, { firstColour: item.color, lastColour: item.color } );
+    currentInputDragging = component.createObject(inputGrouper, { firstColour: currentInputDraggingItem.color, lastColour: currentInputDraggingItem.color } );
     currentInputDragging.firstPoint.x = x;
     currentInputDragging.firstPoint.y = y;
 
@@ -174,11 +181,43 @@ Rectangle
     currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
 
-    print("End")
+    var index = null;
+    var parent = currentInputDraggingIndex;
+    while(parent && index == null)
+      {
+      if(parent.getModelIndex)
+        {
+        index = parent.getModelIndex();
+        break;
+        }
+
+      parent = parent.parent;
+      }
+
+    var otherIndex = null;
+    var intersectedItemParent = intersect(x, y);
+    if(intersectedItemParent)
+      {
+      while(intersectedItemParent && otherIndex == null)
+        {
+        if(intersectedItemParent.getModelIndex)
+          {
+          index = intersectedItemParent.getModelIndex();
+          break;
+          }
+
+        intersectedItemParent = intersectedItemParent.parent;
+        }
+      }
+
     currentInputDragging.destroy();
     currentInputDragging = null;
     currentInputDraggingItem = null;
-    currentInputDraggingIndex = null;
+
+    if(index && otherIndex)
+      {
+      print("make connection")
+      }
     }
 
   VisualDataModel

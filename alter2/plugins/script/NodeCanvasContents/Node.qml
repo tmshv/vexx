@@ -148,7 +148,7 @@ Item {
                 y: 3
                 width: contents.width - 4
 
-                onCreateConnection: nodecanvas.startCreatingConnection(getModelIndex(), item, mode, x, y)
+                onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
 
                 onDraggingChanged: {
                   if(header.dragging)
