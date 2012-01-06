@@ -143,16 +143,34 @@ Rectangle
       return;
       }
 
-    currentInputDragging = component.createObject(inputGrouper);
+    currentInputDragging = component.createObject(inputGrouper, { firstColour: item.color, lastColour: item.color } );
+    currentInputDragging.firstPoint.x = x;
+    currentInputDragging.firstPoint.y = y;
+
+    currentInputDragging.lastPoint.x = x;
+    currentInputDragging.lastPoint.y = y;
+
+    if(mode === "output")
+      {
+      currentInputDragging.firstNormal.x = 100
+      }
+    else
+      {
+      currentInputDragging.firstNormal.x = -100
+      }
     }
 
   function moveCreatingConnection(x, y)
     {
-    print("Move")
+    currentInputDragging.lastPoint.x = x;
+    currentInputDragging.lastPoint.y = y;
     }
 
   function endCreatingConnection(x, y)
     {
+    currentInputDragging.lastPoint.x = x;
+    currentInputDragging.lastPoint.y = y;
+
     currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
 

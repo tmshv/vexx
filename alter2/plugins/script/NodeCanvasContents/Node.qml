@@ -82,7 +82,7 @@ Item {
     transitions: [
       Transition {
         from: "*"; to: "*"
-        ColorAnimation { properties: "color"; easing.type: Easing.OutBounce; duration: 1000 }
+        ColorAnimation { property: "color"; easing.type: Easing.OutBounce; duration: 1000 }
       }
     ]
 

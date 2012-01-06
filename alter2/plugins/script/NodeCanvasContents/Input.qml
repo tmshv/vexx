@@ -8,8 +8,6 @@ Path {
   property variant myProperty: null
   property variant inputTarget: null
 
-  property real distanceBetweenPoints: 0
-
   width: 4
 
   firstNormal.x: 100

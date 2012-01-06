@@ -19,7 +19,7 @@ Rectangle {
 
     PropertyInterface {
       id: nodeInputBlob
-      x: 1 - nodeInputBlob.size/2
+      x: -nodeInputBlob.size/2 - 1
       y: (header.height/2) + 1 - nodeInputBlob.size/2
       size: 15
       color: header.color
@@ -31,7 +31,7 @@ Rectangle {
 
     PropertyInterface {
       id: nodeOutputBlob
-      x: nodeInputBlob.x + header.width - 1
+      x: nodeInputBlob.x + header.width + 3
       y: nodeInputBlob.y
       size: nodeInputBlob.size
       color: header.color
