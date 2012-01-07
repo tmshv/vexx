@@ -36,7 +36,7 @@ protected:
   void initiateInheritedDatabaseType(const SPropertyInformation *info);
 
 private:
-  SProperty *createDynamicProperty(const SPropertyInformation *info, SPropertyContainer *parentToBe);
+  SProperty *createDynamicProperty(const SPropertyInformation *info, SPropertyContainer *parentToBe, SPropertyInstanceInformationInitialiser *inst);
   void deleteDynamicProperty(SProperty *);
   void deleteProperty(SProperty *);
 

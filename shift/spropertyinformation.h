@@ -19,6 +19,12 @@ namespace std
   template <typename T> class initializer_list;
 }
 
+class SPropertyInstanceInformationInitialiser
+  {
+public:
+  virtual void initialise(SPropertyInstanceInformation *) = 0;
+  };
+
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
   {
@@ -29,18 +35,33 @@ public:
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
 
+  enum Mode
+    {
+    Internal,
+    InputOutput,
+    Input,
+    Output,
+    Computed,
+
+    NumberOfModes,
+
+    Default = InputOutput
+    };
+
 XProperties:
   XProperty(const SPropertyInformation *, childInformation, setChildInformation);
   XProperty(SPropertyInformation *, holdingTypeInformation, setHoldingTypeInformation);
   XRefProperty(QString, name);
   XProperty(xsize, location, setLocation);
-  XProperty(ComputeFunction, compute, setCompute);
+  XROProperty(ComputeFunction, compute);
   XProperty(bool, computeLockedToMainThread, setComputeLockedToMainThread);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
   XROProperty(xsize *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
   XProperty(bool, extra, setExtra);
+
+  XROProperty(Mode, mode);
 
   XProperty(bool, dynamic, setDynamic);
   XRORefProperty(DataHash, data);
@@ -52,6 +73,12 @@ public:
   static SPropertyInstanceInformation *allocate(xsize size);
   static void destroy(SPropertyInstanceInformation *);
 
+  void setMode(Mode);
+  void setModeString(const QString &);
+  bool isDefaultMode() const;
+  const QString &modeString() const;
+
+  void setCompute(ComputeFunction fn);
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
 

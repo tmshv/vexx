@@ -11,6 +11,7 @@ SPropertyInstanceInformation::SPropertyInstanceInformation()
   _computeLockedToMainThread = false;
   _queueCompute = defaultQueue;
   _affects = 0;
+  _mode = Default;
   _extra = false;
   _dynamic = false;
   _defaultInput = 0;
@@ -270,6 +271,57 @@ SPropertyInstanceInformation::DataKey g_maxChildKey = 0;
 SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   {
   return g_maxChildKey++;
+  }
+
+QString g_modeStrings[] = {
+  /* Internal    */ "internal",
+  /* InputOutput */ "inputoutput",
+  /* Input       */ "input",
+  /* Output      */ "output",
+  /* Computed    */ "computed"
+};
+
+const QString &SPropertyInstanceInformation::modeString() const
+  {
+  xAssert(_mode < NumberOfModes);
+  return g_modeStrings[_mode];
+  }
+
+void SPropertyInstanceInformation::setMode(Mode m)
+  {
+  xAssert(!_compute);
+  if(!_compute)
+    {
+    _mode = m;
+    }
+  }
+
+void SPropertyInstanceInformation::setModeString(const QString &s)
+  {
+  for(xsize i = 0; i < NumberOfModes; ++i)
+    {
+    if(g_modeStrings[i] == s)
+      {
+      _mode = (Mode)i;
+      return;
+      }
+    }
+
+  _mode = Default;
+  }
+
+bool SPropertyInstanceInformation::isDefaultMode() const
+  {
+  return _mode == Default;
+  }
+
+void SPropertyInstanceInformation::setCompute(ComputeFunction fn)
+  {
+  _compute = fn;
+  if(_compute)
+    {
+    _mode = Computed;
+    }
   }
 
 void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation *info)

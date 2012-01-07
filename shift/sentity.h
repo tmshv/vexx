@@ -37,13 +37,15 @@ public:
 
   SProperty *addChild(const SPropertyInformation *info, const QString& name="");
 
-  template <typename T>T *addProperty(const QString& name="")
+  template <typename T>T *addProperty(const QString& name="", typename SPropertyInstanceInformationInitialiser *init=0)
     {
-    SProperty *p = addProperty(T::staticTypeInformation(), name);
+    SProperty *p = addProperty(T::staticTypeInformation(), name, init);
     xAssert(p);
+
     return p->uncheckedCastTo<T>();
     }
-  SProperty *addProperty(const SPropertyInformation *info, const QString& name="");
+
+  SProperty *addProperty(const SPropertyInformation *info, const QString& name="", SPropertyInstanceInformationInitialiser *inst=0);
 
   void removeProperty(SProperty *prop)
     {

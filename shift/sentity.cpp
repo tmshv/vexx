@@ -9,7 +9,8 @@ S_IMPLEMENT_PROPERTY(SEntity)
 SPropertyInformation *SEntity::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
-  info->add(&SEntity::children, "children");
+  SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
+  childInst->setMode(SPropertyInstanceInformation::Internal);
 
   return info;
   }
@@ -48,10 +49,10 @@ SProperty *SEntity::addChild(const SPropertyInformation *info, const QString& na
   return ent;
   }
 
-SProperty *SEntity::addProperty(const SPropertyInformation *info, const QString& name)
+SProperty *SEntity::addProperty(const SPropertyInformation *info, const QString& name, SPropertyInstanceInformationInitialiser *inst)
   {
   SBlock b(handler());
-  SProperty *p = SPropertyContainer::addProperty(info);
+  SProperty *p = SPropertyContainer::addProperty(info, X_SIZE_SENTINEL, inst);
   xAssert(p);
   p->setName(name);
   return p;

@@ -22,6 +22,7 @@ Column {
     Property {
       text: name
       colour: propertyColour
+      mode: propertyMode
       contentsOffset: xOffset
       width: propertyList.width
     }

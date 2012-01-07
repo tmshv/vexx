@@ -103,12 +103,21 @@ xsize SShaderPartEditorInterface::numberOfTypeParameters(SEntity *prop) const
 
 void SShaderPartEditorInterface::addProperty(SEntity *e) const
   {
-  ColourProperty *newProp = e->addProperty<ColourProperty>();
-  const ColourProperty::InstanceInformation *cI = newProp->instanceInformation();
-  ColourProperty::InstanceInformation *i = const_cast<ColourProperty::InstanceInformation*>(cI);
+  class Initialiser : public SPropertyInstanceInformationInitialiser
+    {
+  public:
+    void initialise(SPropertyInstanceInformation *i)
+      {
+      i->setAffects(shader->runtimeShader.instanceInformation());
+      }
 
-  GCShader *shader = e->uncheckedCastTo<GCShader>();
-  i->setAffects(shader->runtimeShader.instanceInformation());
+    GCShader *shader;
+    };
+
+  Initialiser i;
+  i.shader = e->uncheckedCastTo<GCShader>();
+
+  ColourProperty *newProp = e->addProperty<ColourProperty>("", &i);
   }
 
 QStringList SShaderPartEditorInterface::possiblePropertyTypes() const

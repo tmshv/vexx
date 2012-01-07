@@ -6,6 +6,7 @@ Item {
   property alias text: label.text
   property alias colour: inputBlob.color
   property real contentsOffset: 0
+  property string mode: ""
 
   property variant input: null
 
@@ -13,15 +14,6 @@ Item {
 
   function setupProperty()
     {
-    /*if(text == "children" || text == "__position")
-      {
-      visible = false;
-      }
-    else
-      {
-      visible = true;
-      }*/
-
     propertyContainer.propertyChanged(propertyContainer);
     expand.setupExpand();
 
@@ -59,6 +51,7 @@ Item {
 
   width: col.width
   height: col.height
+  visible: mode != "internal"
 
   state: "NotExpandable"
 
@@ -112,6 +105,7 @@ Item {
     x: 1 - inputBlob.size/2
     z: 2.0
     size: 12
+    visible: mode != "computed" && mode != "output"
 
     onStartDrag: nodecanvas.startCreatingConnection(inputBlob, "input", x, y)
   }
@@ -123,6 +117,7 @@ Item {
     z: 2.0
     color: inputBlob.color
     size: inputBlob.size
+    visible: mode != "input"
 
     onStartDrag: nodecanvas.startCreatingConnection(outputBlob, "output", x, y)
   }

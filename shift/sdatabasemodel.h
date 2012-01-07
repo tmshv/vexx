@@ -49,7 +49,8 @@ public:
     {
     PropertyPositionRole = Qt::UserRole,
     PropertyColourRole,
-    PropertyInputRole
+    PropertyInputRole,
+    PropertyModeRole
     };
 
   SDatabaseModel(SDatabase *db, SEntity *ent, Options options);

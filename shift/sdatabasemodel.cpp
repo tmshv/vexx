@@ -81,6 +81,7 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
   roles[PropertyPositionRole] = "propertyPosition";
   roles[PropertyColourRole] = "propertyColour";
   roles[PropertyInputRole] = "propertyInput";
+  roles[PropertyModeRole] = "propertyMode";
   setRoleNames(roles);
   }
 
@@ -342,6 +343,28 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
         {
         return QVariant::fromValue(QModelIndex());
         }
+      }
+    else if(role == PropertyModeRole)
+      {
+      const SPropertyInstanceInformation *inst = prop->instanceInformation();
+      xAssert(inst);
+
+      switch(inst->mode())
+        {
+      case SPropertyInstanceInformation::InputOutput:
+        return "inputoutput";
+      case SPropertyInstanceInformation::Computed:
+        return "computed";
+      case SPropertyInstanceInformation::Output:
+        return "output";
+      case SPropertyInstanceInformation::Input:
+        return "input";
+      case SPropertyInstanceInformation::Internal:
+        return "internal";
+        }
+
+      xAssertFail();
+      return QString();
       }
     }
   return QVariant();

@@ -245,14 +245,6 @@ bool ScShiftDatabase::parseChildProperties(QScriptContext *ctx, SPropertyInforma
           return false;
           }
 
-        // Compute function
-        SPropertyInstanceInformation::ComputeFunction computeFn = 0;
-        QScriptValue computeObject = propertyObject.property("compute");
-        if(computeObject.isFunction())
-          {
-          computeFn = computeNode;
-          }
-
         // Default value
         QScriptValue valueObject = propertyObject.property("defaultValue");
         QString valueStr;
@@ -269,13 +261,16 @@ bool ScShiftDatabase::parseChildProperties(QScriptContext *ctx, SPropertyInforma
           info->setDefaultValue(valueStr);
           }
 
-        info->setCompute(computeFn);
-        info->setExtra(true);
-
-        if(computeFn)
+        // Compute function
+        SPropertyInstanceInformation::ComputeFunction computeFn = 0;
+        QScriptValue computeObject = propertyObject.property("compute");
+        if(computeObject.isFunction())
           {
+          info->setCompute(computeNode);
           info->setData(g_computeKey, qVariantFromValue(typeObject));
           }
+
+        info->setExtra(true);
         }
       else
         {

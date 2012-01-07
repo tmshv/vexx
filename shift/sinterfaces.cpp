@@ -23,11 +23,21 @@ XVector3D SBasicPositionInterface::position(const SProperty *p) const
 
 void SBasicPositionInterface::setPosition(SProperty *p, const XVector3D &val) const
   {
+  class Initialiser : public SPropertyInstanceInformationInitialiser
+    {
+  public:
+    void initialise(SPropertyInstanceInformation *inst)
+      {
+      inst->setMode(SPropertyInstanceInformation::Internal);
+      }
+    };
+
   SEntity *ent = p->uncheckedCastTo<SEntity>();
   Vector3DProperty *prop = ent->uncheckedCastTo<SEntity>()->findChild<Vector3DProperty>(PositionName);
   if(!prop)
     {
-    prop = ent->addProperty<Vector3DProperty>(PositionName);
+    Initialiser init;
+    prop = ent->addProperty<Vector3DProperty>(PositionName, &init);
     }
   xAssert(prop);
 
