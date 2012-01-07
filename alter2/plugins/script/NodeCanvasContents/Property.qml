@@ -65,11 +65,13 @@ Item {
         name: "Expandable"
         PropertyChanges { target: childListHolder; visible: false; opacity: 0.0; height: 0 }
         PropertyChanges { target: expand; rotation: 270 }
+        PropertyChanges { target: expand; visible: true }
     },
     State {
         name: "Expanded"
         PropertyChanges { target: childListHolder; visible: true; opacity: 1.0; height: childListHolder.childrenRect.height }
         PropertyChanges { target: expand; rotation: 0 }
+        PropertyChanges { target: expand; visible: true }
     }
   ]
 
@@ -164,7 +166,7 @@ Item {
 
       function setupExpand()
         {
-        var myModelIndex = propertyList.childIndex(index);
+        var myModelIndex = getModelIndex();
         var hasChildren = db.rowCount(myModelIndex) !== 0;
 
         if(hasChildren)

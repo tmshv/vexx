@@ -160,10 +160,12 @@ Rectangle
     if(mode === "output")
       {
       currentInputDragging.firstNormal.x = 100
+      currentInputDragging.lastNormal.x = -100
       }
     else
       {
       currentInputDragging.firstNormal.x = -100
+      currentInputDragging.lastNormal.x = 100
       }
     }
 
