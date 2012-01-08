@@ -87,9 +87,36 @@ Rectangle
     return parentItems;
     }
 
+  function intersectItem(item, inX, inY)
+    {
+    var x = item.x;
+    var y = item.y;
+    var fX = x + item.width;
+    var fY = y + item.height;
+    if(inX >= x && inY >= y && inX < fX && inY < fY)
+      {
+      return true;
+      }
+
+    return false;
+    }
+
   function intersect(x, y)
     {
-    print("interse");
+    for(var i = 0, s = nodes.count; i < s; ++i)
+      {
+      var hit = intersect(nodes.itemAt(i), x, y);
+      //if(hit)
+        {
+        print(nodes.itemAt(i));
+        }
+      }
+
+    //var hit = intersectItem(item, x, y);
+    //if(hit)
+      {
+      print(item);
+      }
     }
 
   function setupInput(propertyItem, myIndex)
@@ -127,7 +154,6 @@ Rectangle
   property string currentInputBeginMode: ""
   function startCreatingConnection(thing, mode, x, y)
     {
-    print(thing);
     if(currentInputDragging != null)
       {
       print("Creating connection during creating connection");
