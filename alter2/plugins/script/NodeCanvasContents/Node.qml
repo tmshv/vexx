@@ -36,6 +36,31 @@ Item {
       return Qt.point(mapped.x, mapped.y);
       }
 
+    function intersect(x, y)
+      {
+      var isect = header.intersect(x, y)
+      if(isect)
+        {
+        print(isect);
+        return isect;
+        }
+
+      /*for(var i = 0, s = nodes.count; i < s; ++i)
+        {
+        var item = nodes.itemAt(i);
+        var isect = item.intersect;
+        if(isect)
+          {
+          var hit = isect(x, y);
+          if(hit)
+            {
+            return hit;
+            }
+          }
+        }*/
+
+      return null;
+      }
 
     state: "NotHovered"
 

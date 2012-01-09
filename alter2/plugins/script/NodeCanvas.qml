@@ -89,11 +89,9 @@ Rectangle
 
   function intersectItem(item, inX, inY)
     {
-    var x = item.x;
-    var y = item.y;
-    var fX = x + item.width;
-    var fY = y + item.height;
-    if(inX >= x && inY >= y && inX < fX && inY < fY)
+    var minPos = nodecanvas.mapFromItem(item, 0, 0);
+    var maxPos = nodecanvas.mapFromItem(item, item.width, item.height);
+    if(inX >= minPos.x && inY >= minPos.y && inX < maxPos.x && inY < maxPos.y)
       {
       return true;
       }
@@ -105,17 +103,16 @@ Rectangle
     {
     for(var i = 0, s = nodes.count; i < s; ++i)
       {
-      var hit = intersect(nodes.itemAt(i), x, y);
-      //if(hit)
+      var item = nodes.itemAt(i);
+      var isect = item.intersect;
+      if(isect)
         {
-        print(nodes.itemAt(i));
+        var hit = isect(x, y);
+        if(hit)
+          {
+          return hit;
+          }
         }
-      }
-
-    //var hit = intersectItem(item, x, y);
-    //if(hit)
-      {
-      print(item);
       }
     }
 
@@ -162,8 +159,6 @@ Rectangle
     currentInputDraggingItem = thing;
     currentInputBeginMode = "mode";
 
-    print(currentInputDraggingItem);
-    print(mode);
     currentInputDraggingItem.moveDrag.connect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.connect(endCreatingConnection);
 
@@ -210,7 +205,7 @@ Rectangle
     currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
 
     var index = null;
-    var parent = currentInputDraggingIndex;
+    var parent = currentInputDraggingItem;
     while(parent && index == null)
       {
       if(parent.getModelIndex)
@@ -224,6 +219,7 @@ Rectangle
 
     var otherIndex = null;
     var intersectedItemParent = intersect(x, y);
+    print(intersectedItemParent);
     if(intersectedItemParent)
       {
       while(intersectedItemParent && otherIndex == null)
@@ -242,6 +238,8 @@ Rectangle
     currentInputDragging = null;
     currentInputDraggingItem = null;
 
+    print(index);
+    print(otherIndex);
     if(index && otherIndex)
       {
       print("make connection")

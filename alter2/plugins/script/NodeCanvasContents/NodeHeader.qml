@@ -11,6 +11,30 @@ Rectangle {
     signal createConnection(variant item, string mode, real x, real y)
     signal dragged(real x, real y)
 
+    function intersect(x, y)
+      {
+      if(nodecanvas.intersectItem(nodeOutputBlob, x, y))
+        {
+        print("0");
+        print(nodeOutputBlob);
+        return nodeOutputBlob;
+        }
+
+      if(nodecanvas.intersectItem(nodeInputBlob, x, y))
+        {
+        print("I");
+        return nodeInputBlob;
+        }
+
+      if(nodecanvas.intersectItem(header, x, y))
+        {
+        print("H");
+        return header;
+        }
+
+      return null;
+      }
+
     smooth: true
     height: 20
     border.color: Qt.darker(color, 1.4)
