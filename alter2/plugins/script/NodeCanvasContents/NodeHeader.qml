@@ -13,26 +13,22 @@ Rectangle {
 
     function intersect(x, y)
       {
-      if(nodecanvas.intersectItem(nodeOutputBlob, x, y))
+      var isect = null;
+      if(!isect && nodecanvas.intersectItem(nodeOutputBlob, x, y))
         {
-        print("0");
-        print(nodeOutputBlob);
-        return nodeOutputBlob;
+        isect = nodeOutputBlob;
         }
 
-      if(nodecanvas.intersectItem(nodeInputBlob, x, y))
+      if(!isect && nodecanvas.intersectItem(nodeInputBlob, x, y))
         {
-        print("I");
-        return nodeInputBlob;
+        isect = nodeInputBlob;
         }
 
-      if(nodecanvas.intersectItem(header, x, y))
+      if(!isect && nodecanvas.intersectItem(header, x, y))
         {
-        print("H");
-        return header;
+        isect = header;
         }
-
-      return null;
+      return isect;
       }
 
     smooth: true

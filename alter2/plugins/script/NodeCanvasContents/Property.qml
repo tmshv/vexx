@@ -12,6 +12,10 @@ Item {
 
   signal propertyChanged(variant prop)
 
+  onInputChanged: {
+    print("INPUT CHANGED!");
+  }
+
   function setupProperty()
     {
     propertyContainer.propertyChanged(propertyContainer);

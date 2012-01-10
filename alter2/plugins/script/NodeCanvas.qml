@@ -104,16 +104,16 @@ Rectangle
     for(var i = 0, s = nodes.count; i < s; ++i)
       {
       var item = nodes.itemAt(i);
-      var isect = item.intersect;
-      if(isect)
+      if(item.intersect)
         {
-        var hit = isect(x, y);
+        var hit = item.intersect(x, y);
         if(hit)
           {
           return hit;
           }
         }
       }
+    return null;
     }
 
   function setupInput(propertyItem, myIndex)
@@ -157,7 +157,7 @@ Rectangle
       }
 
     currentInputDraggingItem = thing;
-    currentInputBeginMode = "mode";
+    currentInputBeginMode = mode;
 
     currentInputDraggingItem.moveDrag.connect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.connect(endCreatingConnection);
@@ -219,30 +219,38 @@ Rectangle
 
     var otherIndex = null;
     var intersectedItemParent = intersect(x, y);
-    print(intersectedItemParent);
     if(intersectedItemParent)
       {
       while(intersectedItemParent && otherIndex == null)
         {
         if(intersectedItemParent.getModelIndex)
           {
-          index = intersectedItemParent.getModelIndex();
+          otherIndex = intersectedItemParent.getModelIndex();
           break;
           }
 
         intersectedItemParent = intersectedItemParent.parent;
         }
       }
+    else
+      {
+      print("no prop hit");
+      }
 
     currentInputDragging.destroy();
     currentInputDragging = null;
     currentInputDraggingItem = null;
 
-    print(index);
-    print(otherIndex);
     if(index && otherIndex)
       {
-      print("make connection")
+      if(currentInputBeginMode == "input")
+        {
+        db.setData(index, "propertyInput", otherIndex);
+        }
+      else
+        {
+        db.setData(otherIndex, "propertyInput", index);
+        }
       }
     }
 

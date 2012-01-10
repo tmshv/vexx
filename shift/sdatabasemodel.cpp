@@ -424,6 +424,13 @@ bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int 
         return true;
         }
       }
+    else if(role == PropertyInputRole)
+      {
+      QModelIndex inputIndex = val.value<QModelIndex>();
+      SProperty *input = (SProperty *)inputIndex.internalPointer();
+
+      input->connect(prop);
+      }
     }
   return false;
   }
@@ -480,7 +487,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
   {
   const SEntity::TreeChange *tC = c->castTo<SEntity::TreeChange>();
   if(tC)
-    {    
+    {
     xAssert(!_currentTreeChange);
     _currentTreeChange = tC;
 

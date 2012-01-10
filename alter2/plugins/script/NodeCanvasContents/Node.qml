@@ -38,10 +38,9 @@ Item {
 
     function intersect(x, y)
       {
-      var isect = header.intersect(x, y)
+      var isect = header.intersect(x, y);
       if(isect)
         {
-        print(isect);
         return isect;
         }
 
