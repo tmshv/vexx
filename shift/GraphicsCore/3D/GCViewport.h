@@ -3,8 +3,9 @@
 
 #include "GCGlobal.h"
 #include "sbaseproperties.h"
+#include "GCRenderTarget.h"
 
-class GRAPHICSCORE_EXPORT GCViewport : public SEntity
+class GRAPHICSCORE_EXPORT GCViewport : public GCRenderTarget
   {
   S_ENTITY(GCViewport, SEntity, 0)
 
@@ -13,10 +14,6 @@ public:
 
   UnsignedIntProperty x;
   UnsignedIntProperty y;
-  UnsignedIntProperty width;
-  UnsignedIntProperty height;
-
-  FloatProperty aspectRatio;
   };
 
 #endif // GCVIEWPORT_H

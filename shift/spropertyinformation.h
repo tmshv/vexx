@@ -78,6 +78,19 @@ public:
   bool isDefaultMode() const;
   const QString &modeString() const;
 
+  template <typename T> void setCompute(void (*fn)( const SPropertyInstanceInformation *, T * ))
+    {
+    class <typename T, void (*FN)( const SPropertyInstanceInformation *, T * )> ComputeClass
+      {
+      static void compute(const SPropertyInstanceInformation *i, SPropertyContainer *c)
+        {
+        FN(i, c);
+        }
+      };
+
+    setCompute(ComputeClass<T, fn>::compute);
+    }
+
   void setCompute(ComputeFunction fn);
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);

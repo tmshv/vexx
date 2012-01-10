@@ -14,6 +14,11 @@ public:
 
   GCRenderablePointer source;
 
+  UnsignedIntProperty width;
+  UnsignedIntProperty height;
+
+  FloatProperty aspectRatio;
+
   void render(XRenderer *);
   };
 
