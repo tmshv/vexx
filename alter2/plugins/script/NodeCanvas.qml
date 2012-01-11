@@ -10,7 +10,7 @@ Rectangle
 
   function childIndex(index)
     {
-    return visualModel.modelIndex(index);
+    return childModel.modelIndex(index);
     }
 
   function childItem(index)
@@ -38,14 +38,14 @@ Rectangle
     {
     resetCanvas();
     var modelInd = childIndex(index);
-    visualModel.rootIndex = modelInd;
+    thisModel.rootIndex = modelInd;
     }
 
   function setRootToParent()
     {
     resetCanvas();
-    var index = visualModel.parentModelIndex();
-    visualModel.rootIndex = index;
+    var index = thisModel.parentModelIndex();
+    thisModel.rootIndex = db.parent(index);
     }
 
   function setNodePosition(nodeIndex, pos)
@@ -61,7 +61,7 @@ Rectangle
       return null;
       }
 
-    if(db.isEqual(modelIndex, visualModel.rootIndex))
+    if(db.isEqual(modelIndex, childModel.rootIndex))
       {
       return [ nodecanvas ];
       }
@@ -256,8 +256,25 @@ Rectangle
 
   VisualDataModel
     {
-    id: visualModel
+    id: thisModel
     model: db
+    delegate: Node
+      {
+      title: name
+      x: propertyPosition.x
+      y: propertyPosition.y
+      colour: propertyColour
+      }
+    }
+
+  VisualDataModel
+    {
+    id: childModel
+    model: thisModel
+    rootIndex: {
+      print(db.rowCount(thisModel.modelIndex(0)));
+      return thisModel.modelIndex(0);
+    }
     delegate: Node
       {
       title: name
@@ -274,10 +291,10 @@ Rectangle
     }
 
   Item {
-    Repeater {
+    /*Repeater {
       id: nodes
-      model: visualModel
-    }
+      model: thisModel
+    }*/
 
     Rectangle {
       id: inputGrouper

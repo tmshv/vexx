@@ -13,7 +13,8 @@ SPropertyInformation *GCRenderTarget::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<GCRenderTarget>("GCRenderTarget");
 
-  info->add(&GCRenderTarget::source, "source");
+  GCRenderablePointer::InstanceInformation *sourceInst = info->add(&GCRenderTarget::source, "source");
+  sourceInst->setMode(SPropertyInstanceInformation::Input);
 
   FloatProperty::InstanceInformation* aR = info->add(&GCRenderTarget::aspectRatio, "aspectRatio");
   aR->setCompute(computeAspectRatio);
@@ -21,8 +22,10 @@ SPropertyInformation *GCRenderTarget::createTypeInformation()
 
   UnsignedIntProperty::InstanceInformation *width = info->add(&GCRenderTarget::width, "width");
   width->setAffects(aR);
+  width->setMode(SPropertyInstanceInformation::Output);
   UnsignedIntProperty::InstanceInformation *height = info->add(&GCRenderTarget::height, "height");
   height->setAffects(aR);
+  height->setMode(SPropertyInstanceInformation::Output);
 
   return info;
   }

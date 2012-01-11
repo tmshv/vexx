@@ -3,11 +3,11 @@
 
 #include "GCGlobal.h"
 #include "sbaseproperties.h"
-#include "GCRenderTarget.h"
+#include "GCScreenRenderTarget.h"
 
-class GRAPHICSCORE_EXPORT GCViewport : public GCRenderTarget
+class GRAPHICSCORE_EXPORT GCViewport : public GCScreenRenderTarget
   {
-  S_ENTITY(GCViewport, SEntity, 0)
+  S_ENTITY(GCViewport, GCScreenRenderTarget, 0)
 
 public:
   GCViewport();

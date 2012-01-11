@@ -82,6 +82,7 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
   roles[PropertyColourRole] = "propertyColour";
   roles[PropertyInputRole] = "propertyInput";
   roles[PropertyModeRole] = "propertyMode";
+  roles[IsEntityRole] = "isEntity";
   setRoleNames(roles);
   }
 
@@ -365,6 +366,10 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
 
       xAssertFail();
       return QString();
+      }
+    else if(role == IsEntityRole)
+      {
+      return prop->entity() == prop;
       }
     }
   return QVariant();

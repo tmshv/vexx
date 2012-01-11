@@ -85,7 +85,7 @@ public:
   virtual void saveFile(const QString &filename="");
 
 private:
-  static void incrementRevision(const SPropertyInstanceInformation *info, SPropertyContainer *c);
+  static void incrementRevision(const SPropertyInstanceInformation *info, SDocument *c);
   UnsignedIntProperty revision;
   xuint32 _checkpoint;
   };

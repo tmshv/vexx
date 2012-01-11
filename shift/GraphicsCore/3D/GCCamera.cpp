@@ -6,10 +6,8 @@
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform)
 
-void computeView(const SPropertyInstanceInformation *, SPropertyContainer *ent)
+void computeView(const SPropertyInstanceInformation *, GCViewableTransform *tr)
   {
-  GCViewableTransform* tr = ent->uncheckedCastTo<GCViewableTransform>();
-
   XTransform inv;
 
   bool invertible = false;
@@ -19,10 +17,8 @@ void computeView(const SPropertyInstanceInformation *, SPropertyContainer *ent)
   tr->viewTransform = inv;
   }
 
-void computeInverseProjection(const SPropertyInstanceInformation *, SPropertyContainer *ent)
+void computeInverseProjection(const SPropertyInstanceInformation *, GCViewableTransform *tr)
   {
-  GCViewableTransform* tr = ent->uncheckedCastTo<GCViewableTransform>();
-
   XTransform inv;
 
   bool invertible = false;
@@ -239,9 +235,8 @@ GCCamera::GCCamera()
 
 S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
 
-void computePerspective(const SPropertyInstanceInformation *, SPropertyContainer *prop)
+void computePerspective(const SPropertyInstanceInformation *, GCPerspectiveCamera *c)
   {
-  GCPerspectiveCamera *c = prop->uncheckedCastTo<GCPerspectiveCamera>();
   c->projection = XTransformUtilities::perspective(c->fieldOfView(), (float)c->viewportWidth() / (float)c->viewportHeight(), c->nearClip(), c->farClip());
   }
 

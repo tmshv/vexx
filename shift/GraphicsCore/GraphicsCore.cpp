@@ -48,7 +48,6 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
 
-  STypeRegistry::addType(GCViewport::staticTypeInformation());
 
   STypeRegistry::addType(GCViewableTransform::staticTypeInformation());
   STypeRegistry::addType(GCCamera::staticTypeInformation());
@@ -58,6 +57,7 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCScreenRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCTextureRenderTarget::staticTypeInformation());
+  STypeRegistry::addType(GCViewport::staticTypeInformation());
 
   STypeRegistry::addType(GCGrid::staticTypeInformation());
   STypeRegistry::addType(GCScene::staticTypeInformation());

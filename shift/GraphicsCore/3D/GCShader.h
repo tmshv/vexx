@@ -53,7 +53,7 @@ public:
 private:
   bool _rebuildShader;
   bool _setVariables;
-  static void computeShaderRuntime(const SPropertyInstanceInformation *info, SPropertyContainer *cont);
+  static void computeShaderRuntime(const SPropertyInstanceInformation *info, GCShader *cont);
   };
 
 S_TYPED_POINTER_TYPE(GCShaderPointer, GCShader);

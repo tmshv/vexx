@@ -80,15 +80,12 @@ public:
 
   template <typename T> void setCompute(void (*fn)( const SPropertyInstanceInformation *, T * ))
     {
-    class <typename T, void (*FN)( const SPropertyInstanceInformation *, T * )> ComputeClass
-      {
-      static void compute(const SPropertyInstanceInformation *i, SPropertyContainer *c)
-        {
-        FN(i, c);
-        }
-      };
+    SPropertyContainer *c = static_cast<T*>((SPropertyContainer*)0);
+    xAssert(c == 0);
 
-    setCompute(ComputeClass<T, fn>::compute);
+    ComputeFunction t = (ComputeFunction)fn;
+
+    setCompute(t);
     }
 
   void setCompute(ComputeFunction fn);
