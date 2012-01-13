@@ -519,7 +519,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       const SPropertyContainer *parent = tC->after();
       xAssert(parent);
 
-      xsize i = tC->index();
+      xsize i = xMin(parent->size()-1, tC->index());
       emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+1);
       emit endInsertRows();
       }

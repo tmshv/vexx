@@ -10,7 +10,7 @@ Rectangle
 
   function childIndex(index)
     {
-    return childModel.modelIndex(index);
+    return thisModel.modelIndex(index);
     }
 
   function childItem(index)
@@ -265,15 +265,18 @@ Rectangle
       y: propertyPosition.y
       colour: propertyColour
       }
+
+    onItemsInserted: print("AAA")
     }
 
-  VisualDataModel
+  /*VisualDataModel
     {
     id: childModel
-    model: thisModel
+    model: db
     rootIndex: {
-      print(db.rowCount(thisModel.modelIndex(0)));
-      return thisModel.modelIndex(0);
+      print("###");
+      print(db.rowCount(db.index(0,0)));
+      db.index(0, 0);
     }
     delegate: Node
       {
@@ -282,7 +285,8 @@ Rectangle
       y: propertyPosition.y
       colour: propertyColour
       }
-    }
+    onItemsInserted: print("BBB")
+    }*/
 
   MouseArea
     {
@@ -291,10 +295,24 @@ Rectangle
     }
 
   Item {
-    /*Repeater {
-      id: nodes
-      model: thisModel
-    }*/
+    Column {
+      spacing: 10
+      Repeater {
+        id: nodes
+        model: thisModel
+        onItemAdded: {
+          print("A");
+        }
+      }
+
+      /*Repeater {
+        id: childNodes
+        model: childModel
+        onItemAdded: {
+          print("B");
+        }
+      }*/
+    }
 
     Rectangle {
       id: inputGrouper
