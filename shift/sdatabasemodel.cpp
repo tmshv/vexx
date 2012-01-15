@@ -520,12 +520,14 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       xAssert(parent);
 
       xsize i = xMin(parent->size()-1, tC->index());
+      qDebug() << "Adding Prop" << tC->property()->name() << "at" << i;
       emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+1);
       emit endInsertRows();
       }
 
     _currentTreeChange = 0;
     emit layoutChanged();
+    qDebug() << "Add ended";
     }
 
   const SProperty::NameChange *nameChange = c->castTo<SProperty::NameChange>();

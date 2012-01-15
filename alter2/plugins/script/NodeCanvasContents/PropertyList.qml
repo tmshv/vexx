@@ -26,6 +26,10 @@ Column {
       contentsOffset: xOffset
       width: propertyList.width
     }
+
+    onItemsInserted: {
+      print("Properties added", index, count);
+    }
   }
 
   Repeater {
@@ -37,5 +41,9 @@ Column {
       print(item.text);
       print(item.input);
     }*/
+
+    onItemAdded: {
+      print("b", item, item.visible, item.text);
+    }
   }
 }

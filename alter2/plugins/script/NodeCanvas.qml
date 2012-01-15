@@ -61,7 +61,7 @@ Rectangle
       return null;
       }
 
-    if(db.isEqual(modelIndex, childModel.rootIndex))
+    if(db.isEqual(modelIndex, thisModel.rootIndex))
       {
       return [ nodecanvas ];
       }
@@ -260,13 +260,13 @@ Rectangle
     model: db
     delegate: Node
       {
-      title: name
+      title: name + " " + index.toString()
       x: propertyPosition.x
       y: propertyPosition.y
       colour: propertyColour
       }
 
-    onItemsInserted: print("AAA")
+    onItemsInserted: print("AAA", index, count);
     }
 
   /*VisualDataModel
