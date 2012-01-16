@@ -376,9 +376,8 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   SProperty *prop = 0;
   if(dynamic != 0)
     {
-    prop = parent->addProperty(type, X_SIZE_SENTINEL, &initialiser);
+    prop = parent->addProperty(type, X_SIZE_SENTINEL, name, &initialiser);
     xAssert(prop);
-    prop->setName(name);
     }
   else
     {

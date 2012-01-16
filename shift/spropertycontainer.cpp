@@ -198,11 +198,12 @@ void SPropertyContainer::internalClear()
   _child = 0;
   }
 
-SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsize index, SPropertyInstanceInformationInitialiser *init)
+SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsize index, const QString& name, SPropertyInstanceInformationInitialiser *init)
   {
   xAssert(index >= _containedProperties);
 
   SProperty *newProp = database()->createDynamicProperty(info, this, init);
+  ((SPropertyInstanceInformation*)newProp->_instanceInfo)->_name = name;
 
   handler()->doChange<TreeChange>((SPropertyContainer*)0, this, newProp, index);
   return newProp;

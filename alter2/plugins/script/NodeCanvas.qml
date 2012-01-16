@@ -37,7 +37,7 @@ Rectangle
   function setRootToChildIndex(index)
     {
     resetCanvas();
-    var modelInd = childIndex(index);
+    var modelInd = childModel.modelIndex(index);
     thisModel.rootIndex = modelInd;
     }
 
@@ -258,25 +258,24 @@ Rectangle
     {
     id: thisModel
     model: db
-    delegate: Node
+    /*delegate: Node
       {
       title: name + " " + index.toString()
       x: propertyPosition.x
       y: propertyPosition.y
       colour: propertyColour
-      }
-
-    onItemsInserted: print("AAA", index, count);
+      visible: false
+      }*/
     }
 
-  /*VisualDataModel
+  VisualDataModel
     {
     id: childModel
     model: db
     rootIndex: {
       print("###");
       print(db.rowCount(db.index(0,0)));
-      db.index(0, 0);
+      db.index(0, 0,thisModel.rootIndex);
     }
     delegate: Node
       {
@@ -284,9 +283,9 @@ Rectangle
       x: propertyPosition.x
       y: propertyPosition.y
       colour: propertyColour
+      modelIndex: childModel.modelIndex(index)
       }
-    onItemsInserted: print("BBB")
-    }*/
+    }
 
   MouseArea
     {
@@ -295,23 +294,36 @@ Rectangle
     }
 
   Item {
-    Column {
-      spacing: 10
-      Repeater {
-        id: nodes
-        model: thisModel
-        onItemAdded: {
-          print("A");
-        }
-      }
+    Node {
+      id: inputs
+      title: "Inputs"
+      x: 0
+      y: 0
+      colour: db.data(thisModel.rootIndex, "propertyColour")
+      modelIndex: thisModel.rootIndex
+      special: true
+      propertyMask: "input"
+    }
 
-      /*Repeater {
-        id: childNodes
-        model: childModel
-        onItemAdded: {
-          print("B");
-        }
-      }*/
+    Node {
+      id: outputs
+      title: "Outputs"
+      x: 0
+      y: 0
+      colour: inputs.colour
+      modelIndex: thisModel.rootIndex
+      special: true
+      propertyMask: "outputs"
+    }
+
+    /*Repeater {
+      id: nodes
+      model: thisModel
+    }*/
+
+    Repeater {
+      id: childNodes
+      model: childModel
     }
 
     Rectangle {
@@ -323,4 +335,4 @@ Rectangle
       height: 0
     }
   }
-  }
+}

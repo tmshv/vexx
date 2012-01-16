@@ -4,6 +4,7 @@ Column {
   id: propertyList
   property real xOffset: 0
   property alias rootIndex: chilrenVisualModel.rootIndex
+  property string propertyMask: "inputoutput"
 
   function childIndex(id)
     {
@@ -22,13 +23,21 @@ Column {
     Property {
       text: name
       colour: propertyColour
-      mode: propertyMode
+      mode: {
+        if(propertyMask === "input" && (propertyMode === "output" || propertyMode === "computed"))
+        {
+          return "internal";
+        }
+
+        if(propertyMask === "output" && propertyMode === "input")
+        {
+          return "internal";
+        }
+
+        return propertyMode
+      }
       contentsOffset: xOffset
       width: propertyList.width
-    }
-
-    onItemsInserted: {
-      print("Properties added", index, count);
     }
   }
 
@@ -41,9 +50,5 @@ Column {
       print(item.text);
       print(item.input);
     }*/
-
-    onItemAdded: {
-      print("b", item, item.visible, item.text);
-    }
   }
 }

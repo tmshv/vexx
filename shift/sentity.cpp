@@ -43,18 +43,16 @@ bool SEntity::acceptsParent(const SEntity *) const
 SProperty *SEntity::addChild(const SPropertyInformation *info, const QString& name)
   {
   SBlock b(handler());
-  SProperty *ent = children.add(info);
+  SProperty *ent = children.add(info, name);
   xAssert(ent);
-  ent->setName(name);
   return ent;
   }
 
 SProperty *SEntity::addProperty(const SPropertyInformation *info, const QString& name, SPropertyInstanceInformationInitialiser *inst)
   {
   SBlock b(handler());
-  SProperty *p = SPropertyContainer::addProperty(info, X_SIZE_SENTINEL, inst);
+  SProperty *p = SPropertyContainer::addProperty(info, X_SIZE_SENTINEL, name, inst);
   xAssert(p);
-  p->setName(name);
   return p;
   }
 

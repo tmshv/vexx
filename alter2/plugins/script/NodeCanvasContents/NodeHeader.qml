@@ -5,6 +5,7 @@ import QtQuick 1.1
 Rectangle {
     id: header
 
+    property alias showInterfaces: nodeInputBlob.visible
     property bool dragging: false
     property alias text: headerText.text
 
@@ -55,6 +56,7 @@ Rectangle {
       y: nodeInputBlob.y
       size: nodeInputBlob.size
       color: header.color
+      visible: nodeInputBlob.visible
 
       onStartDrag: {
         createConnection(nodeOutputBlob, "output", x, y);

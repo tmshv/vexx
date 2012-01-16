@@ -108,7 +108,7 @@ protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.
   // you cannot add another contained property once dynamic properties have been added, this bool
   // should really be left alone and not exposed in sub classes
-  SProperty *addProperty(const SPropertyInformation *info, xsize index=X_SIZE_SENTINEL, SPropertyInstanceInformationInitialiser *inst=0);
+  SProperty *addProperty(const SPropertyInformation *info, xsize index=X_SIZE_SENTINEL, const QString& name=QString(), SPropertyInstanceInformationInitialiser *inst=0);
   void removeProperty(SProperty *);
 
   void clear();

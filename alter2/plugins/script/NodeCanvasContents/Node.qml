@@ -5,18 +5,28 @@ Item {
     property alias title: header.text
     property alias colour: header.color
     property real propertyTabIn: 10
+    property alias modelIndex: propertyList.rootIndex
+    property alias propertyMask: propertyList.propertyMask
+    property bool special: false
 
     function move(dx, dy)
       {
       nodeItem.x += dx;
       nodeItem.y += dy;
 
-      nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+      if(!special)
+        {
+        nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+        }
       }
 
     function getModelIndex()
       {
-      return nodecanvas.childIndex(index)
+      if(!special)
+        {
+        return nodecanvas.childIndex(index);
+        }
+      return null;
       }
 
     function childItem(index)
@@ -171,6 +181,7 @@ Item {
                 x: 2
                 y: 3
                 width: contents.width - 4
+                showInterfaces: !special
 
                 onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
 
@@ -198,7 +209,6 @@ Item {
                 id: propertyList
                 width: node.width
                 xOffset: 0
-                rootIndex: nodecanvas.childIndex(index)
               }
             }
         }

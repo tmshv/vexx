@@ -292,86 +292,90 @@ int SDatabaseModel::columnCount( const QModelIndex &parent ) const
 QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   {
   SDataModelProfileFunction
-  SProperty *prop = (SProperty *)index.internalPointer();
-  if(prop)
+  const SProperty *prop = (const SProperty *)index.internalPointer();
+  if(!prop)
+  {
+    prop = _root;
+  }
+  xAssert(prop);
+
+  xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);
+
+  if(role == Qt::DisplayRole)
     {
-    xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);
-
-    if(role == Qt::DisplayRole)
+    if(_options.hasFlag(ShowValues) && index.column() == 1)
       {
-      if(_options.hasFlag(ShowValues) && index.column() == 1)
-        {
-        SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
-        if(interface)
-          {
-          return interface->asVariant(prop);
-          }
-        return QVariant();
-        }
-      else
-        {
-        QString name = prop->name();
-        xAssert(!name.isEmpty());
-        return name;
-        }
-      }
-    else if(role == PropertyPositionRole)
-      {
-      SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+      const SPropertyVariantInterface *interface = prop->interface<SPropertyVariantInterface>();
       if(interface)
         {
-        return toQt(interface->position(prop));
+        return interface->asVariant(prop);
         }
-      return QVector3D();
+      return QVariant();
       }
-    else if(role == PropertyColourRole)
+    else
       {
-      SPropertyColourInterface *interface = prop->interface<SPropertyColourInterface>();
-      if(interface)
-        {
-        return interface->colour(prop).toLDRColour();
-        }
-      return QColor();
-      }
-    else if(role == PropertyInputRole)
-      {
-      SProperty *inp = prop->input();
-      if(inp)
-        {
-        return QVariant::fromValue(createIndex(inp->index(), 0, inp));
-        }
-      else
-        {
-        return QVariant::fromValue(QModelIndex());
-        }
-      }
-    else if(role == PropertyModeRole)
-      {
-      const SPropertyInstanceInformation *inst = prop->instanceInformation();
-      xAssert(inst);
-
-      switch(inst->mode())
-        {
-      case SPropertyInstanceInformation::InputOutput:
-        return "inputoutput";
-      case SPropertyInstanceInformation::Computed:
-        return "computed";
-      case SPropertyInstanceInformation::Output:
-        return "output";
-      case SPropertyInstanceInformation::Input:
-        return "input";
-      case SPropertyInstanceInformation::Internal:
-        return "internal";
-        }
-
-      xAssertFail();
-      return QString();
-      }
-    else if(role == IsEntityRole)
-      {
-      return prop->entity() == prop;
+      QString name = prop->name();
+      xAssert(!name.isEmpty());
+      return name;
       }
     }
+  else if(role == PropertyPositionRole)
+    {
+    const SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+    if(interface)
+      {
+      return toQt(interface->position(prop));
+      }
+    return QVector3D();
+    }
+  else if(role == PropertyColourRole)
+    {
+    const SPropertyColourInterface *interface = prop->interface<SPropertyColourInterface>();
+    if(interface)
+      {
+      return interface->colour(prop).toLDRColour();
+      }
+    return QColor();
+    }
+  else if(role == PropertyInputRole)
+    {
+    SProperty *inp = prop->input();
+    if(inp)
+      {
+      return QVariant::fromValue(createIndex(inp->index(), 0, inp));
+      }
+    else
+      {
+      return QVariant::fromValue(QModelIndex());
+      }
+    }
+  else if(role == PropertyModeRole)
+    {
+    const SPropertyInstanceInformation *inst = prop->instanceInformation();
+    xAssert(inst);
+
+    switch(inst->mode())
+      {
+    case SPropertyInstanceInformation::InputOutput:
+      return "inputoutput";
+    case SPropertyInstanceInformation::Computed:
+      return "computed";
+    case SPropertyInstanceInformation::Output:
+      return "output";
+    case SPropertyInstanceInformation::Input:
+      return "input";
+    case SPropertyInstanceInformation::Internal:
+      return "internal";
+      }
+
+    xAssertFail();
+    return QString();
+    }
+  else if(role == IsEntityRole)
+    {
+    return prop->entity() == prop;
+    }
+
   return QVariant();
   }
 
@@ -512,6 +516,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
 
       xsize i = tC->index();
       emit beginRemoveRows(createIndex(parent->index(), 0, (void *)parent), i, i);
+      _currentTreeChange = 0;
       emit endRemoveRows();
       }
     else
@@ -520,14 +525,12 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       xAssert(parent);
 
       xsize i = xMin(parent->size()-1, tC->index());
-      qDebug() << "Adding Prop" << tC->property()->name() << "at" << i;
-      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i+1, i+1);
+      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i, i);
+      _currentTreeChange = 0;
       emit endInsertRows();
       }
 
-    _currentTreeChange = 0;
     emit layoutChanged();
-    qDebug() << "Add ended";
     }
 
   const SProperty::NameChange *nameChange = c->castTo<SProperty::NameChange>();
