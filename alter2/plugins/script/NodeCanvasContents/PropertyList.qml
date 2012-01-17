@@ -5,6 +5,7 @@ Column {
   property real xOffset: 0
   property alias rootIndex: chilrenVisualModel.rootIndex
   property string propertyMask: "inputoutput"
+  property bool showInternalProperties: false
 
   function childIndex(id)
     {
@@ -24,6 +25,11 @@ Column {
       text: name
       colour: propertyColour
       mode: {
+        if(propertyMode === "internalinput" && !showInternalProperties)
+        {
+          return "internal";
+        }
+
         if(propertyMask === "input" && (propertyMode === "output" || propertyMode === "computed"))
         {
           return "internal";

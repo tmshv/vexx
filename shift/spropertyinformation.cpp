@@ -274,11 +274,12 @@ SPropertyInstanceInformation::DataKey SPropertyInstanceInformation::newDataKey()
   }
 
 QString g_modeStrings[] = {
-  /* Internal    */ "internal",
-  /* InputOutput */ "inputoutput",
-  /* Input       */ "input",
-  /* Output      */ "output",
-  /* Computed    */ "computed"
+  /* Internal      */ "internal",
+  /* InputOutput   */ "inputoutput",
+  /* InternalInput */ "internalinput",
+  /* Input         */ "input",
+  /* Output        */ "output",
+  /* Computed      */ "computed"
 };
 
 const QString &SPropertyInstanceInformation::modeString() const

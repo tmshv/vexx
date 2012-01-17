@@ -14,7 +14,7 @@ SPropertyInformation *GCRenderTarget::createTypeInformation()
   SPropertyInformation *info = SPropertyInformation::create<GCRenderTarget>("GCRenderTarget");
 
   GCRenderablePointer::InstanceInformation *sourceInst = info->add(&GCRenderTarget::source, "source");
-  sourceInst->setMode(SPropertyInstanceInformation::Input);
+  sourceInst->setMode(SPropertyInstanceInformation::InternalInput);
 
   FloatProperty::InstanceInformation* aR = info->add(&GCRenderTarget::aspectRatio, "aspectRatio");
   aR->setCompute(computeAspectRatio);

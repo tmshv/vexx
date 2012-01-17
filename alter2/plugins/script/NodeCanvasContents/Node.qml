@@ -7,14 +7,14 @@ Item {
     property real propertyTabIn: 10
     property alias modelIndex: propertyList.rootIndex
     property alias propertyMask: propertyList.propertyMask
-    property bool special: false
+    property string externalMode: ""
 
     function move(dx, dy)
       {
       nodeItem.x += dx;
       nodeItem.y += dy;
 
-      if(!special)
+      if(externalMode === "")
         {
         nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
         }
@@ -22,7 +22,7 @@ Item {
 
     function getModelIndex()
       {
-      if(!special)
+      if(externalMode === "")
         {
         return nodecanvas.childIndex(index);
         }
@@ -181,7 +181,7 @@ Item {
                 x: 2
                 y: 3
                 width: contents.width - 4
-                showInterfaces: !special
+                showInterfaces: externalMode === ""
 
                 onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
 
@@ -209,6 +209,7 @@ Item {
                 id: propertyList
                 width: node.width
                 xOffset: 0
+                showInternalProperties: externalMode !== ""
               }
             }
         }

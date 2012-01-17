@@ -39,6 +39,7 @@ public:
     {
     Internal,
     InputOutput,
+    InternalInput,
     Input,
     Output,
     Computed,

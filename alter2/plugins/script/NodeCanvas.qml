@@ -301,8 +301,8 @@ Rectangle
       y: 0
       colour: db.data(thisModel.rootIndex, "propertyColour")
       modelIndex: thisModel.rootIndex
-      special: true
-      propertyMask: "input"
+      externalMode: "output"
+      propertyMask: "output"
     }
 
     Node {
@@ -312,8 +312,8 @@ Rectangle
       y: 0
       colour: inputs.colour
       modelIndex: thisModel.rootIndex
-      special: true
-      propertyMask: "outputs"
+      externalMode: "input"
+      propertyMask: "input"
     }
 
     /*Repeater {

@@ -123,7 +123,7 @@ Item {
     z: 2.0
     color: inputBlob.color
     size: inputBlob.size
-    visible: mode != "input"
+    visible: mode != "input" && mode != "internalinput"
 
     onStartDrag: nodecanvas.startCreatingConnection(outputBlob, "output", x, y)
   }
