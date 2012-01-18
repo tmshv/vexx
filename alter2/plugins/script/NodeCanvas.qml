@@ -10,12 +10,13 @@ Rectangle
 
   function childIndex(index)
     {
-    return thisModel.modelIndex(index);
+    return childModel.modelIndex(index);
     }
 
   function childItem(index)
     {
-    return nodes.itemAt(index);
+    print("NC Child index", childNodes.itemAt(index).title);
+    return childNodes.itemAt(index);
     }
 
   function bringToTop(item)
@@ -76,7 +77,10 @@ Rectangle
 
     var rowIndex = db.rowIndex(modelIndex);
 
+    print("child ", rowIndex, " for parent ", db.data(modelIndex, "name"));
     var nextItem = parentItems[parentItems.length - 1].childItem(rowIndex);
+    print(nextItem);
+
     if(!nextItem)
       {
       return null;
@@ -273,9 +277,7 @@ Rectangle
     id: childModel
     model: db
     rootIndex: {
-      print("###");
-      print(db.rowCount(db.index(0,0)));
-      db.index(0, 0,thisModel.rootIndex);
+      return db.index(0, 0,thisModel.rootIndex);
     }
     delegate: Node
       {

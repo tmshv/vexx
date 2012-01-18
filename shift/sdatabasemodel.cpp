@@ -239,7 +239,7 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
         }
       }
 
-    if(parent && parent != _root)
+    if(parent)
       {
       if(_options.hasFlag(EntitiesOnly))
         {
@@ -293,9 +293,9 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   {
   SDataModelProfileFunction
   const SProperty *prop = (const SProperty *)index.internalPointer();
-  if(!prop)
+  if(!index.isValid())
   {
-    prop = _root;
+    return QVariant();
   }
   xAssert(prop);
 
