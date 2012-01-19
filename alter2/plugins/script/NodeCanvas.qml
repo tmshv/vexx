@@ -54,7 +54,7 @@ Rectangle
     db.setData(modelInd, "propertyPosition", pos);
     }
 
-  function findPropertyItem(modelIndex)
+  function findPropertyItem(modelIndex, io)
     {
     if(!db.isValid(modelIndex))
       {
@@ -67,12 +67,26 @@ Rectangle
       return [ nodecanvas ];
       }
 
+    if(db.isEqual(modelIndex, thisModel.rootIndex))
+      {
+      if(io === "input")
+        {
+        return [ inputs ];
+        }
+      else if(io === "output")
+        {
+        return [ outputs ];
+        }
+      print("incorrect io type specified", io);
+      return null;
+      }
+
     var parentIndex = db.parent(modelIndex);
-    var parentItems = findPropertyItem(parentIndex);
+    var parentItems = findPropertyItem(parentIndex, io);
     if(!parentItems)
       {
       // probably not displayed.
-      print("#  Couldnt find parent item", db.data(parentIndex, "name"));
+      print("Couldnt find parent item", db.data(parentIndex, "name"));
       return null;
       }
 
@@ -301,7 +315,7 @@ Rectangle
       title: "Inputs"
       x: 0
       y: 0
-      colour: db.data(thisModel.rootIndex, "propertyColour")
+      colour: "red" // db.data(thisModel.rootIndex, "propertyColour")
       modelIndex: thisModel.rootIndex
       externalMode: "output"
       propertyMask: "output"
@@ -312,7 +326,7 @@ Rectangle
       title: "Outputs"
       x: 0
       y: 0
-      colour: inputs.colour
+      colour: "blue" // inputs.colour
       modelIndex: thisModel.rootIndex
       externalMode: "input"
       propertyMask: "input"

@@ -74,7 +74,7 @@ Path {
         var index = myProperty.getModelIndex();
         if(db.isValid(index))
           {
-          var items = nodecanvas.findPropertyItem(index);
+          var items = nodecanvas.findPropertyItem(index, "input");
           if(items)
             {
             nodecanvas.setupInput(items[items.length-1], index);
@@ -107,7 +107,7 @@ Path {
         return;
         }
 
-      var items = nodecanvas.findPropertyItem(myIndex);
+      var items = nodecanvas.findPropertyItem(myIndex, "input");
       if(!items)
         {
         print("Iitem is not available, this is way bad.");
@@ -122,7 +122,7 @@ Path {
         }
 
 
-      items = nodecanvas.findPropertyItem(inputIndex);
+      items = nodecanvas.findPropertyItem(inputIndex, "output");
       if(!items)
         {
         print("Input item is not available");
