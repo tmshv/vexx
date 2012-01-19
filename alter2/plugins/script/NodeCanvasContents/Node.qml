@@ -31,7 +31,6 @@ Item {
 
     function childItem(index)
       {
-      print("ChildItem from", nodeItem.title);
       return propertyList.childItem(index);
       }
 

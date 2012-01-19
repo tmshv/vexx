@@ -20,9 +20,6 @@ Item {
     {
     propertyContainer.propertyChanged(propertyContainer);
     expand.setupExpand();
-
-    var input = db.data(getModelIndex(), "propertyInput");
-    print("setup input ", propertyContainer.text,  db.data(input, "name"));
     nodecanvas.setupInput(propertyContainer, getModelIndex());
     }
 
@@ -33,7 +30,6 @@ Item {
 
   function childItem(index)
     {
-    print(propertyContainer.text);
     var children = childListHolder.children[0];
     if(children)
       {

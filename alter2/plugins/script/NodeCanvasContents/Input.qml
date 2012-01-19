@@ -108,12 +108,19 @@ Path {
         }
 
       var items = nodecanvas.findPropertyItem(myIndex);
+      if(!items)
+        {
+        print("Iitem is not available, this is way bad.");
+        inputHolder.destroy();
+        return;
+        }
       for(var i = 1, s = items.length; i < s; ++i)
         {
         var item = items[i];
         item.xChanged.connect(inputHolder.update);
         item.yChanged.connect(inputHolder.update);
         }
+
 
       items = nodecanvas.findPropertyItem(inputIndex);
       if(!items)
@@ -146,7 +153,7 @@ Path {
         myProperty.propertyChanged.connect(propertyChanged);
         }
 
-      inputHolder.visible = (function() { return myProperty.visible && inputTarget.visible });
+      //inputHolder.visible = (function() { return myProperty.visible && inputTarget.visible });
       inputHolder.firstColour = (function() { return inputTarget.colour; });
       inputHolder.lastColour = (function() { return myProperty.colour; });
 

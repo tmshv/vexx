@@ -15,7 +15,6 @@ Rectangle
 
   function childItem(index)
     {
-    print("NC Child index", childNodes.itemAt(index).title);
     return childNodes.itemAt(index);
     }
 
@@ -59,10 +58,11 @@ Rectangle
     {
     if(!db.isValid(modelIndex))
       {
+      print("Couldnt find root");
       return null;
       }
 
-    if(db.isEqual(modelIndex, thisModel.rootIndex))
+    if(db.isEqual(modelIndex, childModel.rootIndex))
       {
       return [ nodecanvas ];
       }
@@ -72,22 +72,21 @@ Rectangle
     if(!parentItems)
       {
       // probably not displayed.
+      print("#  Couldnt find parent item", db.data(parentIndex, "name"));
       return null;
       }
 
     var rowIndex = db.rowIndex(modelIndex);
 
-    print("child ", rowIndex, " for parent ", db.data(modelIndex, "name"));
     var nextItem = parentItems[parentItems.length - 1].childItem(rowIndex);
-    print(nextItem);
 
     if(!nextItem)
       {
+      print("Couldnt find ", db.data(parentIndex, "name"));
       return null;
       }
 
     parentItems.push(nextItem);
-
     return parentItems;
     }
 
@@ -123,6 +122,7 @@ Rectangle
   function setupInput(propertyItem, myIndex)
     {
     var inputModelIndex = db.data(myIndex, "propertyInput");
+
     if(db.isValid(inputModelIndex))
       {
       var component = Qt.createComponent("NodeCanvasContents/Input.qml");
