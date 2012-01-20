@@ -34,7 +34,7 @@ int main( int argc, char **argv )
     return EXIT_FAILURE;
     }
 
-  SEntity *objectParent = &db->db().documents;
+  SPropertyArray *objectParent = &db->db().children;
 
   WebView *webData = new WebView(objectParent);
   script->registerScriptGlobal(webData);

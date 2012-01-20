@@ -393,6 +393,11 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
   xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
   xAssert(location > 0);
 
+  if(extendedParent())
+    {
+    location -= extendedParent()->location();
+    }
+
   return add<U>(location, name);
   }
 

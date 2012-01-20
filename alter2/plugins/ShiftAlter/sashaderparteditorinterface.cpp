@@ -22,19 +22,17 @@ class ShaderPreviewViewport : public SViewport
   XROProperty(const GCShader *, shader);
 
 public:
-  ShaderPreviewViewport(const SEntity *s, SPropertyArray *holder) : SViewport(holder->add<SEntity>()), _log(0),
+  ShaderPreviewViewport(const SEntity *s, SPropertyArray *holder) : SViewport(holder->add<GCViewport>()), _log(0),
       _shader(s->uncheckedCastTo<GCShader>())
     {
     const GCShader *sha = shader();
     xAssert(sha);
 
-    SEntity *sc = scene();
+    GCViewport *vp = viewport();
 
-    GCViewport* vp = sc->addChild<GCViewport>("Viewport");
-    _viewport = vp;
-    GCScreenRenderTarget* op = sc->addChild<GCScreenRenderTarget>("Output");
+    GCScreenRenderTarget* op = vp->addChild<GCScreenRenderTarget>("Output");
 
-    GCPerspectiveCamera* cam = sc->addChild<GCPerspectiveCamera>("Camera");
+    GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
     vp->x.connect(&cam->viewportX);
     vp->y.connect(&cam->viewportY);
     vp->width.connect(&cam->viewportWidth);
@@ -43,22 +41,22 @@ public:
     cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
     cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
 
-    GCManipulatableScene* msc = sc->addChild<GCManipulatableScene>("Scene");
+    GCManipulatableScene* msc = vp->addChild<GCManipulatableScene>("Scene");
     cam->projection.connect(&msc->cameraProjection);
     cam->viewTransform.connect(&msc->cameraTransform);
     cam->connect(&msc->activeCamera);
     setController(msc);
 
-    GCShadingGroup *group = sc->addChild<GCShadingGroup>("Groups");
+    GCShadingGroup *group = vp->addChild<GCShadingGroup>("Groups");
     msc->shadingGroups.addPointer(group);
 
     group->shader.setPointed(sha);
 
-    GCGeometryTransform *transform = sc->addChild<GCGeometryTransform>("Transform");
+    GCGeometryTransform *transform = vp->addChild<GCGeometryTransform>("Transform");
     group->geometry.addPointer(transform);
 
 
-    GCSphere *shape = sc->addChild<GCSphere>("Sphere");
+    GCSphere *shape = vp->addChild<GCSphere>("Sphere");
     transform->geometry.setPointed(&shape->geometry);
 
     op->source.setPointed(msc);

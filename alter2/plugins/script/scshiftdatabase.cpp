@@ -262,7 +262,6 @@ bool ScShiftDatabase::parseChildProperties(QScriptContext *ctx, SPropertyInforma
           }
 
         // Compute function
-        SPropertyInstanceInformation::ComputeFunction computeFn = 0;
         QScriptValue computeObject = propertyObject.property("compute");
         if(computeObject.isFunction())
           {

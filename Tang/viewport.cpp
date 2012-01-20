@@ -18,12 +18,9 @@
 #include "3D/Renderable/GCCuboid.h"
 #include "object.h"
 
-Viewport::Viewport(SPlugin &db) : SViewport(&db.db()), UISurface("Viewport", this, UISurface::Dock)
+Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeScene")), UISurface("Viewport", this, UISurface::Dock)
   {
-  SEntity *sc = scene();
-
-  GCViewport* vp = sc->addChild<GCViewport>("Viewport");
-  _viewport = vp;
+  GCViewport *vp = viewport();
 
   GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
   vp->x.connect(&cam->viewportX);

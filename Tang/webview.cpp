@@ -9,7 +9,7 @@
 #define baseHost() QString("ec2-46-137-71-148.eu-west-1.compute.amazonaws.com")
 #define baseUrlWithHttp() QString("http://ec2-46-137-71-148.eu-west-1.compute.amazonaws.com/")
 
-WebView::WebView(SEntity *objectParent) : UISurface("Explore", _webView = new QWebView, UISurface::Dock)
+WebView::WebView(SPropertyArray *objectParent) : UISurface("Explore", _webView = new QWebView, UISurface::Dock)
   {
   _objectParent = objectParent;
 
@@ -39,13 +39,12 @@ void WebView::loadFinished(bool ok)
     {
     QByteArray idData = QByteArray::fromHex(url.queryItemValue("current").toAscii());
 
-    SEntity *objectParent = _objectParent.entity();
-    if(idData.length() == 16 && objectParent)
+    if(idData.length() == 16 && _objectParent)
       {
       Object *object = 0;
 
       // switch on object type?
-      Area *area = objectParent->addChild<Area>("");
+      Area *area = _objectParent->add<Area>();
       object = area;
 
       if(object)
