@@ -62,26 +62,27 @@ Rectangle
       return null;
       }
 
-    if(db.isEqual(modelIndex, childModel.rootIndex))
-      {
-      return [ nodecanvas ];
-      }
-
     if(db.isEqual(modelIndex, thisModel.rootIndex))
       {
       if(io === "input")
         {
-        return [ inputs ];
+        return [ outputs ];
         }
       else if(io === "output")
         {
-        return [ outputs ];
+        return [ inputs ];
         }
       print("incorrect io type specified", io);
       return null;
       }
 
     var parentIndex = db.parent(modelIndex);
+    var rowIndex = db.rowIndex(modelIndex);
+    if(db.isEqual(parentIndex, childModel.rootIndex))
+      {
+      return [ nodecanvas.childItem(rowIndex) ];
+      }
+
     var parentItems = findPropertyItem(parentIndex, io);
     if(!parentItems)
       {
@@ -89,8 +90,6 @@ Rectangle
       print("Couldnt find parent item", db.data(parentIndex, "name"));
       return null;
       }
-
-    var rowIndex = db.rowIndex(modelIndex);
 
     var nextItem = parentItems[parentItems.length - 1].childItem(rowIndex);
 
@@ -118,9 +117,9 @@ Rectangle
 
   function intersect(x, y)
     {
-    for(var i = 0, s = nodes.count; i < s; ++i)
+    for(var i = 0, s = childNodes.count; i < s; ++i)
       {
-      var item = nodes.itemAt(i);
+      var item = childNodes.itemAt(i);
       if(item.intersect)
         {
         var hit = item.intersect(x, y);
@@ -130,6 +129,9 @@ Rectangle
           }
         }
       }
+
+    // todo: input / output
+
     return null;
     }
 
@@ -315,7 +317,7 @@ Rectangle
       title: "Inputs"
       x: 0
       y: 0
-      colour: "red" // db.data(thisModel.rootIndex, "propertyColour")
+      colour: db.data(thisModel.rootIndex, "propertyColour")
       modelIndex: thisModel.rootIndex
       externalMode: "output"
       propertyMask: "output"
@@ -326,7 +328,7 @@ Rectangle
       title: "Outputs"
       x: 0
       y: 0
-      colour: "blue" // inputs.colour
+      colour: inputs.colour
       modelIndex: thisModel.rootIndex
       externalMode: "input"
       propertyMask: "input"

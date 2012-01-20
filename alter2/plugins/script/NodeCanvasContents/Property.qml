@@ -18,9 +18,12 @@ Item {
 
   function setupProperty()
     {
-    propertyContainer.propertyChanged(propertyContainer);
-    expand.setupExpand();
-    nodecanvas.setupInput(propertyContainer, getModelIndex());
+    if(visible)
+      {
+      propertyContainer.propertyChanged(propertyContainer);
+      expand.setupExpand();
+      nodecanvas.setupInput(propertyContainer, getModelIndex());
+      }
     }
 
   function getModelIndex()
@@ -30,7 +33,7 @@ Item {
 
   function childItem(index)
     {
-    var children = childListHolder.children[0];
+    var children = childListHolder.children[0];propertyMode === "internalinput"
     if(children)
       {
       return children.childItem(index);

@@ -35,12 +35,12 @@ Column {
           return "internal";
         }
 
-        if(propertyMask === "output" && propertyMode === "input")
+        if(propertyMask === "output" && (propertyMode === "input" || propertyMode === "internalinput"))
         {
           return "internal";
         }
 
-        return propertyMode
+        return propertyMode;
       }
       contentsOffset: xOffset
       width: propertyList.width

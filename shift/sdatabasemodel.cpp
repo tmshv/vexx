@@ -294,9 +294,18 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
   SDataModelProfileFunction
   const SProperty *prop = (const SProperty *)index.internalPointer();
   if(!index.isValid())
-  {
+    {
+    if(role == PropertyColourRole)
+      {
+      const SPropertyColourInterface *interface = _root->interface<SPropertyColourInterface>();
+      if(interface)
+        {
+        return interface->colour(_root).toLDRColour();
+        }
+      return QColor();
+      }
     return QVariant();
-  }
+    }
   xAssert(prop);
 
   xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);

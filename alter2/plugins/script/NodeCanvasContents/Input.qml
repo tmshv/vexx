@@ -114,7 +114,7 @@ Path {
         inputHolder.destroy();
         return;
         }
-      for(var i = 1, s = items.length; i < s; ++i)
+      for(var i = 0, s = items.length; i < s; ++i)
         {
         var item = items[i];
         item.xChanged.connect(inputHolder.update);
@@ -122,22 +122,22 @@ Path {
         }
 
 
-      items = nodecanvas.findPropertyItem(inputIndex, "output");
-      if(!items)
+      var oItems = nodecanvas.findPropertyItem(inputIndex, "output");
+      if(!oItems)
         {
         print("Input item is not available");
         inputHolder.destroy();
         return;
         }
 
-      for(var i = 1, s = items.length; i < s; ++i)
+      for(var i = 0, s = oItems.length; i < s; ++i)
         {
-        var item = items[i];
+        var item = oItems[i];
         item.xChanged.connect(inputHolder.update);
         item.yChanged.connect(inputHolder.update);
         }
 
-      inputTarget = items[items.length-1];
+      inputTarget = oItems[oItems.length-1];
       if(!inputTarget)
         {
         print("cant find the item with the input???");
