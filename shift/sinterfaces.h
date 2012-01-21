@@ -22,8 +22,15 @@ class SPropertyPositionInterface : public SStaticInterfaceBase
 
 public:
   SPropertyPositionInterface(bool a) : SStaticInterfaceBase(a) { }
+
   virtual XVector3D position(const SProperty *) const = 0;
   virtual void setPosition(SProperty *, const XVector3D &) const = 0;
+
+  virtual XVector3D inputsPosition(const SProperty *) const = 0;
+  virtual void setInputsPosition(SProperty *, const XVector3D &) const = 0;
+
+  virtual XVector3D outputsPosition(const SProperty *) const = 0;
+  virtual void setOutputsPosition(SProperty *, const XVector3D &) const = 0;
   };
 
 class SBasicPositionInterface : public SPropertyPositionInterface
@@ -33,6 +40,16 @@ public:
 
   virtual XVector3D position(const SProperty *) const;
   virtual void setPosition(SProperty *, const XVector3D &) const;
+
+  virtual XVector3D inputsPosition(const SProperty *) const;
+  virtual void setInputsPosition(SProperty *, const XVector3D &) const;
+
+  virtual XVector3D outputsPosition(const SProperty *) const;
+  virtual void setOutputsPosition(SProperty *, const XVector3D &) const;
+
+private:
+  virtual XVector3D positionGeneric(const SProperty *, const QString &name) const;
+  virtual void setPositionGeneric(SProperty *, const XVector3D &, const QString &name) const;
   };
 
 class SPropertyColourInterface : public SStaticInterfaceBase

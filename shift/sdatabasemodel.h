@@ -51,12 +51,15 @@ public:
     PropertyColourRole,
     PropertyInputRole,
     PropertyModeRole,
-    IsEntityRole
+    IsEntityRole,
+    EntityInputPositionRole,
+    EntityOutputPositionRole
     };
 
   SDatabaseModel(SDatabase *db, SEntity *ent, Options options);
   ~SDatabaseModel();
 
+  Q_INVOKABLE QModelIndex root() const;
   Q_INVOKABLE bool isEqual(const QModelIndex &a, const QModelIndex &b) const;
   Q_INVOKABLE bool isValid(const QModelIndex &i) const;
   Q_INVOKABLE int rowIndex(const QModelIndex &i) const;

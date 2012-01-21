@@ -22,17 +22,17 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   {
   GCViewport *vp = viewport();
 
-  GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
+  /*GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
   vp->x.connect(&cam->viewportX);
   vp->y.connect(&cam->viewportY);
   vp->width.connect(&cam->viewportWidth);
   vp->height.connect(&cam->viewportHeight);
 
   cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
-  cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
+  cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));*/
 
   GCManipulatableScene* msc = vp->addChild<GCManipulatableScene>("Scene");
-  cam->projection.connect(&msc->cameraProjection);
+  /*cam->projection.connect(&msc->cameraProjection);
   cam->viewTransform.connect(&msc->cameraTransform);
   cam->connect(&msc->activeCamera);
   setController(msc);
@@ -60,7 +60,7 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   GCCuboid *cube = vp->addChild<GCCuboid>("Cube");
   transform->geometry.setPointed(&cube->geometry);
-  transform2->geometry.setPointed(&cube->geometry);
+  transform2->geometry.setPointed(&cube->geometry);*/
 
   vp->source.setPointed(msc);
   }

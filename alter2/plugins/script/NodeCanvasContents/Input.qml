@@ -17,6 +17,7 @@ Path {
 
   function propertyChanged(prop)
     {
+    print("Property changed");
     // should i have to disconnect signals manually? i hope not, but reference errors otherwise,
     // test on 4.8 non-RC
     myProperty.propertyChanged.disconnect(inputHolder.propertyChanged);

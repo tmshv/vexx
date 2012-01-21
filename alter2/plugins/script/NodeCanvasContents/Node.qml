@@ -9,6 +9,12 @@ Item {
     property alias propertyMask: propertyList.propertyMask
     property string externalMode: ""
 
+    signal propertyChanged(variant prop)
+
+    Component.onDestruction: {
+      nodeItem.propertyChanged(nodeItem);
+    }
+
     function move(dx, dy)
       {
       nodeItem.x += dx;
@@ -17,6 +23,14 @@ Item {
       if(externalMode === "")
         {
         nodecanvas.setNodePosition(index, Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+        }
+      else if(externalMode === "input")
+        {
+        nodecanvas.setInputsPosition(Qt.vector3d(nodeItem.x, nodeItem.y, 0));
+        }
+      else if(externalMode === "output")
+        {
+        nodecanvas.setOutputsPosition(Qt.vector3d(nodeItem.x, nodeItem.y, 0));
         }
       }
 

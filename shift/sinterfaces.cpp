@@ -2,26 +2,29 @@
 #include "sbaseproperties.h"
 #include "sbasepointerproperties.h"
 #include "QColor"
+#include "QString"
 
-#define PositionName "__position"
+const QString g_positionName("__position");
+const QString g_inputsPositionName("__inputsPosition");
+const QString g_outputsPositionName("__outputsPosition");
 
 SBasicPositionInterface::SBasicPositionInterface() : SPropertyPositionInterface(true)
   {
   }
 
-XVector3D SBasicPositionInterface::position(const SProperty *p) const
+XVector3D SBasicPositionInterface::positionGeneric(const SProperty * p, const QString &name) const
   {
   const SEntity *ent = p->uncheckedCastTo<SEntity>();
-  const Vector3DProperty *prop = ent->findChild<Vector3DProperty>(PositionName);
+  const Vector3DProperty *prop = ent->findChild<Vector3DProperty>(name);
   if(prop)
     {
     return prop->value();
     }
-  xAssert(!ent->findChild("position"));
+  xAssert(!ent->findChild(name));
   return XVector3D::Zero();
   }
 
-void SBasicPositionInterface::setPosition(SProperty *p, const XVector3D &val) const
+void SBasicPositionInterface::setPositionGeneric(SProperty * p, const XVector3D &val, const QString &name) const
   {
   class Initialiser : public SPropertyInstanceInformationInitialiser
     {
@@ -33,15 +36,45 @@ void SBasicPositionInterface::setPosition(SProperty *p, const XVector3D &val) co
     };
 
   SEntity *ent = p->uncheckedCastTo<SEntity>();
-  Vector3DProperty *prop = ent->uncheckedCastTo<SEntity>()->findChild<Vector3DProperty>(PositionName);
+  Vector3DProperty *prop = ent->uncheckedCastTo<SEntity>()->findChild<Vector3DProperty>(name);
   if(!prop)
     {
     Initialiser init;
-    prop = ent->addProperty<Vector3DProperty>(PositionName, &init);
+    prop = ent->addProperty<Vector3DProperty>(name, &init);
     }
   xAssert(prop);
 
   prop->assign(val);
+  }
+
+XVector3D SBasicPositionInterface::position(const SProperty *p) const
+  {
+  return positionGeneric(p, g_positionName);
+  }
+
+void SBasicPositionInterface::setPosition(SProperty *p, const XVector3D &val) const
+  {
+  setPositionGeneric(p, val, g_positionName);
+  }
+
+XVector3D SBasicPositionInterface::inputsPosition(const SProperty *p) const
+  {
+  return positionGeneric(p, g_inputsPositionName);
+  }
+
+void SBasicPositionInterface::setInputsPosition(SProperty *p, const XVector3D &val) const
+  {
+  setPositionGeneric(p, val, g_inputsPositionName);
+  }
+
+XVector3D SBasicPositionInterface::outputsPosition(const SProperty *p) const
+  {
+  return positionGeneric(p, g_outputsPositionName);
+  }
+
+void SBasicPositionInterface::setOutputsPosition(SProperty *p, const XVector3D &val) const
+  {
+  setPositionGeneric(p, val, g_outputsPositionName);
   }
 
 SBasicColourInterface::SBasicColourInterface() : SPropertyColourInterface(true)

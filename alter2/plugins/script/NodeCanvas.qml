@@ -54,6 +54,16 @@ Rectangle
     db.setData(modelInd, "propertyPosition", pos);
     }
 
+  function setInputsPosition(pos)
+    {
+    db.setData(thisModel.rootIndex, "entityInputPosition", pos);
+    }
+
+  function setOutputsPosition(pos)
+    {
+    db.setData(thisModel.rootIndex, "entityOutputPosition", pos);
+    }
+
   function findPropertyItem(modelIndex, io)
     {
     if(!db.isValid(modelIndex))
@@ -286,6 +296,20 @@ Rectangle
       colour: propertyColour
       visible: false
       }*/
+
+    rootIndex: db.root()
+    onRootIndexChanged:
+      {
+      var eIPos = db.data(thisModel.rootIndex, "entityOutputPosition");
+      var eOPos = db.data(thisModel.rootIndex, "entityInputPosition");
+      if(eIPos && eOPos)
+        {
+        inputs.pos.x = eIPos.x;
+        inputs.pos.y = eIPos.y;
+        outputs.pos.x = eOPos.x;
+        outputs.pos.y = eOPos.y;
+        }
+      }
     }
 
   VisualDataModel
@@ -315,23 +339,21 @@ Rectangle
     Node {
       id: inputs
       title: "Inputs"
-      x: 0
-      y: 0
       colour: db.data(thisModel.rootIndex, "propertyColour")
       modelIndex: thisModel.rootIndex
       externalMode: "output"
       propertyMask: "output"
+      visible: !db.isEqual(db.root(), thisModel.rootIndex)
     }
 
     Node {
       id: outputs
       title: "Outputs"
-      x: 0
-      y: 0
       colour: inputs.colour
       modelIndex: thisModel.rootIndex
       externalMode: "input"
       propertyMask: "input"
+      visible: inputs.visible
     }
 
     /*Repeater {

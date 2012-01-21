@@ -83,6 +83,8 @@ SDatabaseModel::SDatabaseModel(SDatabase *db, SEntity *ent, Options options) : _
   roles[PropertyInputRole] = "propertyInput";
   roles[PropertyModeRole] = "propertyMode";
   roles[IsEntityRole] = "isEntity";
+  roles[EntityInputPositionRole] = "entityInputPosition";
+  roles[EntityOutputPositionRole] = "entityOutputPosition";
   setRoleNames(roles);
   }
 
@@ -96,7 +98,22 @@ SDatabaseModel::~SDatabaseModel()
 
 bool SDatabaseModel::isEqual(const QModelIndex &a, const QModelIndex &b) const
   {
-  return a.internalPointer() == b.internalPointer();
+  const void *ap = a.internalPointer();
+  const void *bp = b.internalPointer();
+  if(!ap)
+    {
+    ap = _root.entity();
+    }
+  if(!bp)
+    {
+    bp = _root.entity();
+    }
+  return ap == bp;
+  }
+
+QModelIndex SDatabaseModel::root() const
+  {
+  return createIndex(0, 0, (void*)_root.entity());
   }
 
 bool SDatabaseModel::isValid(const QModelIndex &a) const
@@ -337,6 +354,24 @@ QVariant SDatabaseModel::data( const QModelIndex &index, int role ) const
       }
     return QVector3D();
     }
+  else if(role == EntityInputPositionRole)
+    {
+    const SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+    if(interface)
+      {
+      return toQt(interface->inputsPosition(prop));
+      }
+    return QVector3D();
+    }
+  else if(role == EntityOutputPositionRole)
+    {
+    const SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+    if(interface)
+      {
+      return toQt(interface->outputsPosition(prop));
+      }
+    return QVector3D();
+    }
   else if(role == PropertyColourRole)
     {
     const SPropertyColourInterface *interface = prop->interface<SPropertyColourInterface>();
@@ -424,6 +459,26 @@ bool SDatabaseModel::setData(const QModelIndex &index, const QVariant &val, int 
         {
         QVector3D vec = val.value<QVector3D>();
         interface->setPosition(prop, XVector3D(vec.x(), vec.y(), vec.z()));
+        return true;
+        }
+      }
+    else if(role == EntityInputPositionRole)
+      {
+      SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+      if(interface)
+        {
+        QVector3D vec = val.value<QVector3D>();
+        interface->setInputsPosition(prop, XVector3D(vec.x(), vec.y(), vec.z()));
+        return true;
+        }
+      }
+    else if(role == EntityOutputPositionRole)
+      {
+      SPropertyPositionInterface *interface = prop->interface<SPropertyPositionInterface>();
+      if(interface)
+        {
+        QVector3D vec = val.value<QVector3D>();
+        interface->setOutputsPosition(prop, XVector3D(vec.x(), vec.y(), vec.z()));
         return true;
         }
       }

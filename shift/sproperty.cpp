@@ -214,7 +214,7 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
 
     const SPropertyInstanceInformation *instInfo = p->instanceInformation();
 
-    if(instInfo->isDefaultMode())
+    if(!instInfo->isDefaultMode())
       {
       QString mode = instInfo->modeString();
 
