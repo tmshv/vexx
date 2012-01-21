@@ -16,6 +16,10 @@ Item {
     //print("INPUT CHANGED!");
   }
 
+  Component.onDestruction: {
+    propertyContainer.propertyChanged(propertyContainer);
+  }
+
   function setupProperty()
     {
     if(visible)

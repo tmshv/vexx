@@ -96,11 +96,6 @@ Item {
             target: fader
             color: "#282828"
           }
-
-          PropertyChanges {
-            target: node
-            smooth: true
-          }
       },
       State {
           name: "Hovered"
@@ -109,20 +104,6 @@ Item {
           PropertyChanges {
             target: fader
             color: "#3F3F3F"
-          }
-
-          PropertyChanges {
-            target: node
-            smooth: true
-          }
-      },
-      State {
-          name: "Moving"
-          when: dragMouseArea.pressed === true
-
-          PropertyChanges {
-            target: node
-            smooth: false
           }
       }
     ]
@@ -153,6 +134,7 @@ Item {
         id: node
         width: 121
         height: childrenRect.height + 6
+        smooth: true
 
         gradient: Gradient {
           GradientStop {

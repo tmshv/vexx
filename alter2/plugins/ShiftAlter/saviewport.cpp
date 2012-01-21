@@ -46,10 +46,10 @@ void SViewport::resizeGL( int w, int h )
 
 void SViewport::paintGL()
   {
-  /*_renderer.clear();
+  _renderer.clear();
   const GCRenderable* renderable = _viewport->uncheckedCastTo<GCViewport>()->source();
   if(renderable)
     {
     renderable->render(&_renderer);
-    }*/
+    }
   }

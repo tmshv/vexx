@@ -18,6 +18,8 @@ Path {
   function propertyChanged(prop)
     {
     print("Property changed");
+    print(inputHolder);
+    print(myProperty);
     // should i have to disconnect signals manually? i hope not, but reference errors otherwise,
     // test on 4.8 non-RC
     myProperty.propertyChanged.disconnect(inputHolder.propertyChanged);
@@ -144,6 +146,7 @@ Path {
         print("cant find the item with the input???");
         }
 
+      //print("Setup input", inputTarget, myProperty, inputTarget.propertyChanged, myProperty.propertyChanged);
       if(inputTarget.propertyChanged)
         {
         inputTarget.propertyChanged.connect(propertyChanged);
