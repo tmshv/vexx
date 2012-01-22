@@ -1,4 +1,5 @@
 import QtQuick 1.1
+import VexxQMLExtensions 1.0
 import "NodeCanvasContents"
 
 Rectangle
@@ -18,34 +19,27 @@ Rectangle
     return childNodes.itemAt(index);
     }
 
+  function reset()
+    {
+    maxNodeZ = 1.0;
+    }
+
   function bringToTop(item)
     {
     maxNodeZ += 0.05;
     item.z = maxNodeZ;
     }
 
-  function resetCanvas()
+  function setRootIndex(obj)
     {
-    for(var i = 0, s = inputGrouper.children.length; i < s; ++i)
-      {
-      inputGrouper.children[i].destroy();
-      }
-
-    maxNodeZ = 1.0;
-    }
-
-  function setRootToChildIndex(index)
-    {
-    resetCanvas();
-    var modelInd = childModel.modelIndex(index);
-    thisModel.rootIndex = modelInd;
+    reset();
+    display.setRootIndex(obj);
     }
 
   function setRootToParent()
     {
-    resetCanvas();
-    var index = thisModel.parentModelIndex();
-    thisModel.rootIndex = db.parent(index);
+    reset();
+    display.setRootToParent();
     }
 
   function setNodePosition(nodeIndex, pos)
@@ -284,95 +278,33 @@ Rectangle
       }
     }
 
-  VisualDataModel
-    {
-    id: thisModel
-    model: db
-    /*delegate: Node
-      {
-      title: name + " " + index.toString()
-      x: propertyPosition.x
-      y: propertyPosition.y
-      colour: propertyColour
-      visible: false
-      }*/
-
-    rootIndex: db.root()
-    onRootIndexChanged:
-      {
-      var eIPos = db.data(thisModel.rootIndex, "entityOutputPosition");
-      var eOPos = db.data(thisModel.rootIndex, "entityInputPosition");
-      if(eIPos && eOPos)
-        {
-        inputs.pos.x = eIPos.x;
-        inputs.pos.y = eIPos.y;
-        outputs.pos.x = eOPos.x;
-        outputs.pos.y = eOPos.y;
-        }
-      }
-    }
-
-  VisualDataModel
-    {
-    id: childModel
-    model: db
-    rootIndex: {
-      return db.index(0, 0,thisModel.rootIndex);
-    }
-    delegate: Node
-      {
-      title: name
-      x: propertyPosition.x
-      y: propertyPosition.y
-      colour: propertyColour
-      modelIndex: childModel.modelIndex(index)
-      }
-    }
-
   MouseArea
     {
     anchors.fill: parent
     onDoubleClicked: nodecanvas.setRootToParent()
     }
 
-  Item {
-    Node {
+  NodeDisplay {
+    id: display
+    model: db
+    rootIndex: db.root()
+
+    onNodeAdded: {
+      node.z = nodecanvas.maxNodeZ;
+    }
+
+    input: Node {
       id: inputs
-      title: "Inputs"
-      colour: db.data(thisModel.rootIndex, "propertyColour")
-      modelIndex: thisModel.rootIndex
-      externalMode: "output"
-      propertyMask: "output"
-      visible: !db.isEqual(db.root(), thisModel.rootIndex)
     }
 
-    Node {
+    output: Node {
       id: outputs
-      title: "Outputs"
-      colour: inputs.colour
-      modelIndex: thisModel.rootIndex
-      externalMode: "input"
-      propertyMask: "input"
-      visible: inputs.visible
     }
 
-    /*Repeater {
-      id: nodes
-      model: thisModel
-    }*/
-
-    Repeater {
-      id: childNodes
-      model: childModel
+    node: Node {
     }
 
-    Rectangle {
-      id: inputGrouper
-      x: 0
-      y: 0
-      z: -1
-      width: 0
-      height: 0
+    connector: Input {
     }
   }
 }

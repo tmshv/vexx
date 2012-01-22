@@ -31,7 +31,12 @@ SOURCES += scplugin.cpp \
     scio.cpp \
     QMLExtensions\scpath.cpp \
     QMLExtensions/scellipse.cpp \
-    QMLExtensions/scbrush.cpp
+    QMLExtensions/scbrush.cpp \
+    QMLExtensions/scnodedisplay.cpp \
+    QMLExtensions/scnodeitem.cpp \
+    QMLExtensions/scpropertyitem.cpp \
+    QMLExtensions/scpropertydisplay.cpp \
+    QMLExtensions/scconnectoritem.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -46,7 +51,12 @@ HEADERS += scplugin.h \
     scio.h \
     QMLExtensions\scpath.h \
     QMLExtensions/scellipse.h \
-    QMLExtensions/scbrush.h
+    QMLExtensions/scbrush.h \
+    QMLExtensions/scnodedisplay.h \
+    QMLExtensions/scnodeitem.h \
+    QMLExtensions/scpropertyitem.h \
+    QMLExtensions/scpropertydisplay.h \
+    QMLExtensions/scconnectoritem.h
 
 RESOURCES += \
     ScResources.qrc

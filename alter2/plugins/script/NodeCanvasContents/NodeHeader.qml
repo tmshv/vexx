@@ -9,8 +9,22 @@ Rectangle {
     property bool dragging: false
     property alias text: headerText.text
 
+    signal bringToTop()
+    signal enter()
     signal createConnection(variant item, string mode, real x, real y)
     signal dragged(real x, real y)
+
+    function drivenPoint()
+      {
+      return Qt.point(header.x + nodeInputBlob.x + nodeInputBlob.size/2-2,
+                      header.y + nodeInputBlob.y + nodeInputBlob.size/2+2);
+      }
+
+    function driverPoint()
+      {
+      return Qt.point(header.x + nodeOutputBlob.x + nodeOutputBlob.size/2,
+                      header.y + nodeOutputBlob.y + nodeOutputBlob.size/2+2);
+      }
 
     function intersect(x, y)
       {
@@ -83,14 +97,14 @@ Rectangle {
         preventStealing: true
 
         onPressed: {
-            nodecanvas.bringToTop(nodeItem);
-            dragging = true
-            var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-            lastX = gc.x
-            lastY = gc.y
+          bringToTop();
+          dragging = true
+          var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+          lastX = gc.x
+          lastY = gc.y
         }
 
-        onDoubleClicked: nodecanvas.setRootToChildIndex(index)
+        onDoubleClicked: enter()
         onReleased: dragging = false
         onMousePositionChanged: {
             var gc = mapToItem(nodecanvas, mouse.x, mouse.y)

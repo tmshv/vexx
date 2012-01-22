@@ -10,6 +10,12 @@ Ellipse {
   signal moveDrag(real x, real y)
   signal endDrag(real x, real y)
 
+  function attachPoint(rel)
+    {
+    var pt = ellipse.mapToItem(rel, size/2, size/2+2);
+    return Qt.point(pt.x, pt.y);
+    }
+
   border.color: Qt.darker(color, 1.4)
   border.width: 1
   height: width

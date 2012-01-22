@@ -1,78 +1,32 @@
 import QtQuick 1.1
+import VexxQMLExtensions 1.0
 
-Item {
+PropertyItem {
   id: propertyContainer
+  property real xOffset: 0
 
-  property alias text: label.text
-  property alias colour: inputBlob.color
-  property real contentsOffset: 0
-  property string mode: ""
-
-  property variant input: null
-
-  signal propertyChanged(variant prop)
-
-  onInputChanged: {
-    //print("INPUT CHANGED!");
-  }
-
-  Component.onDestruction: {
-    propertyContainer.propertyChanged(propertyContainer);
-  }
-
-  function setupProperty()
-    {
-    if(visible)
-      {
-      propertyContainer.propertyChanged(propertyContainer);
-      expand.setupExpand();
-      nodecanvas.setupInput(propertyContainer, getModelIndex());
-      }
-    }
-
-  function getModelIndex()
-    {
-    return propertyList.childIndex(index)
-    }
-
-  function childItem(index)
-    {
-    var children = childListHolder.children[0];propertyMode === "internalinput"
-    if(children)
-      {
-      return children.childItem(index);
-      }
-
-    print("Asking for child from non children node.");
-    return null;
-    }
-
-  function getInputPosition(relative)
-    {
-    var mapped = inputBlob.mapToItem(relative, inputBlob.width/2, inputBlob.height/2+2);
-    return Qt.point(mapped.x, mapped.y);
-    }
-
-  function getOutputPosition(relative)
-    {
-    var mapped = outputBlob.mapToItem(relative, outputBlob.width/2, outputBlob.height/2+1);
-    return Qt.point(mapped.x, mapped.y);
-    }
-
-  width: col.width
+  width: parent.width
   height: col.height
-  visible: mode != "internal"
+
+  driverPoint: outputBlob.attachPoint(propertyContainer)
+  drivenPoint: inputBlob.attachPoint(propertyContainer)
+  driverNormal.x: 1.0
+  driverNormal.y: 0.0
+  drivenNormal.x: -1.0
+  drivenNormal.y: 0.0
 
   state: "NotExpandable"
 
   states: [
     State {
         name: "NotExpandable"
+        when: !propertyContainer.hasChildren
         PropertyChanges { target: childListHolder; visible: false }
         PropertyChanges { target: expand; visible: false }
     },
     State {
         name: "Expandable"
+        when: propertyContainer.hasChildren
         PropertyChanges { target: childListHolder; visible: false; opacity: 0.0; height: 0 }
         PropertyChanges { target: expand; rotation: 270 }
         PropertyChanges { target: expand; visible: true }
@@ -117,7 +71,8 @@ Item {
     x: 1 - inputBlob.size/2
     z: 2.0
     size: 12
-    visible: mode != "computed" && mode != "output"
+    color: propertyContainer.colour
+    visible: mode !== "computed" && mode !== "output"
 
     onStartDrag: nodecanvas.startCreatingConnection(inputBlob, "input", x, y)
   }
@@ -129,7 +84,7 @@ Item {
     z: 2.0
     color: inputBlob.color
     size: inputBlob.size
-    visible: mode != "input" && mode != "internalinput"
+    visible: mode !== "input" && mode !== "internalinput"
 
     onStartDrag: nodecanvas.startCreatingConnection(outputBlob, "output", x, y)
   }
@@ -161,8 +116,8 @@ Item {
                 var object = component.createObject(childListHolder);
 
                 object.width = (function() { return propertyContainer.width; });
-                object.xOffset = (function() { return propertyContainer.contentsOffset + nodeItem.propertyTabIn; });
-                object.rootIndex = (function() { return propertyList.childIndex(index); });
+                object.xOffset = (function() { return propertyContainer.xOffset + nodeItem.propertyTabIn; });
+                object.rootItem = (function() { return propertyContainer; });
               }
               propertyContainer.state = "Expanded";
             }
@@ -171,29 +126,12 @@ Item {
               propertyContainer.state = "Expandable";
             }
           }
-
-        }
-
-      function setupExpand()
-        {
-        var myModelIndex = getModelIndex();
-        var hasChildren = db.rowCount(myModelIndex) !== 0;
-
-        if(hasChildren)
-          {
-          propertyContainer.state = "Expandable";
-          }
-        else
-          {
-          propertyContainer.state = "NotExpandable";
-          }
         }
       }
 
       Text {
         id: label
-        // hack, the component seems to be reused on property adds without calling Component.onCompleted()... so this catches it.
-        onTextChanged: propertyContainer.setupProperty()
+        text: propertyContainer.name
         font.pointSize: 8
         color: "white"
         elide: Text.ElideRight

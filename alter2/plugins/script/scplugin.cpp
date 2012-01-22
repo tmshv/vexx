@@ -21,6 +21,9 @@
 #include "QMLExtensions/scpath.h"
 #include "QMLExtensions/scellipse.h"
 #include "QMLExtensions/scbrush.h"
+#include "QMLExtensions/scnodedisplay.h"
+#include "QMLExtensions/scnodeitem.h"
+#include "QMLExtensions/scconnectoritem.h"
 #include "QGLWidget"
 
 ALTER_PLUGIN(ScPlugin);
@@ -145,6 +148,11 @@ void ScPlugin::load()
   qmlRegisterType<ScGradient>("VexxQMLExtensions", 1, 0, "Gradient");
   qmlRegisterType<ScGradientStop>("VexxQMLExtensions", 1, 0, "GradientStop");
   qmlRegisterType<ScPen>("VexxQMLExtensions", 1, 0, "Pen");
+  qmlRegisterType<ScNodeDisplay>("VexxQMLExtensions", 1, 0, "NodeDisplay");
+  qmlRegisterType<ScPropertyDisplay>("VexxQMLExtensions", 1, 0, "PropertyDisplay");
+  qmlRegisterType<ScNodeItem>("VexxQMLExtensions", 1, 0, "NodeItem");
+  qmlRegisterType<ScPropertyItem>("VexxQMLExtensions", 1, 0, "PropertyItem");
+  qmlRegisterType<ScConnectorItem>("VexxQMLExtensions", 1, 0, "ConnectorItem");
 
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");

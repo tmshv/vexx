@@ -37,7 +37,7 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   cam->connect(&msc->activeCamera);
   setController(msc);
 
-  /*GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
+  GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
   msc->shadingGroups.addPointer(group);
 
   const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
@@ -60,7 +60,7 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   GCCuboid *cube = msc->addChild<GCCuboid>("Cube");
   transform->geometry.setPointed(&cube->geometry);
-  transform2->geometry.setPointed(&cube->geometry);*/
+  transform2->geometry.setPointed(&cube->geometry);
 
   vp->source.setPointed(msc);
   }
