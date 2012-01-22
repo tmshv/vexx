@@ -19,6 +19,22 @@ ScPropertyDisplay::~ScPropertyDisplay()
     }
   }
 
+int ScPropertyDisplay::count() const
+  {
+  return _properties.size();
+  }
+
+ScPropertyItem *ScPropertyDisplay::propertyAt(int i)
+  {
+  if(i < _properties.size())
+    {
+    return _properties[i];
+    }
+
+  xAssertFail();
+  return 0;
+  }
+
 void ScPropertyDisplay::updateConnectionParenting()
   {
   if(!isVisibleTo(0))
@@ -193,6 +209,8 @@ void ScPropertyDisplay::addProperty(SProperty *e)
   node->setProperty(e);
 
   _property->completeCreate();
+
+  emit propertyAdded(node);
   }
 
 bool ScPropertyDisplay::onPropertyAdded(SProperty *p)

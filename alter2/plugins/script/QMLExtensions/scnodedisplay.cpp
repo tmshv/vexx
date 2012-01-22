@@ -24,6 +24,22 @@ QAbstractItemModel* ScNodeDisplay::model() const
   return _model;
   }
 
+int ScNodeDisplay::count() const
+  {
+  return _nodes.size();
+  }
+
+ScNodeItem *ScNodeDisplay::nodeAt(int i)
+  {
+  if(i < _nodes.size())
+    {
+    return _nodes[i];
+    }
+
+  xAssertFail();
+  return 0;
+  }
+
 void ScNodeDisplay::onTreeChange(const SChange *c)
   {
   if(!_rootIndex)
@@ -389,4 +405,29 @@ void ScNodeDisplay::addConnector(SProperty *dvnProp, SProperty *dvrProp, ScPrope
   connector->setNodeDisplay(this);
 
   _connector->completeCreate();
+  }
+
+void ScNodeDisplay::changeItemInput(QDeclarativeItem *item, QDeclarativeItem *newInput)
+  {
+  ScPropertyItem *prop = 0;
+  while(item && !prop)
+    {
+    prop = qobject_cast<ScPropertyItem*>(item);
+    item = item->parentItem();
+    }
+
+  ScPropertyItem *input = 0;
+  while(newInput && !input)
+    {
+    input = qobject_cast<ScPropertyItem*>(newInput);
+    newInput = newInput->parentItem();
+    }
+
+  xAssert(prop && input);
+  if(!prop || !input)
+    {
+    qWarning() << "Invalid inputs to changeItemInput(...)";
+    }
+
+  input->property()->connect(prop->property());
   }

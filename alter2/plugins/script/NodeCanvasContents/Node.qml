@@ -14,6 +14,17 @@ NodeItem {
     drivenNormal.x: -1.0
     drivenNormal.y: 0.0
 
+    function intersect(x, y)
+      {
+      var isect = header.intersect(x, y);
+      if(isect)
+        {
+        return isect;
+        }
+
+      return propertyList.intersect(x, y);
+      }
+
     states: [
       State {
           name: "NotHovered"
@@ -108,7 +119,7 @@ NodeItem {
                 width: contents.width - 4
                 showInterfaces: specialMode === ""
 
-                //onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
+                onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
 
                 onEnter: {
                   nodecanvas.setRootIndex(nodeItem);

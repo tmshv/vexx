@@ -21,11 +21,16 @@ class ScNodeDisplay : public QDeclarativeItem, STreeObserver
   Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
   //Q_PROPERTY(QModelIndex topRootIndex READ topRootIndex WRITE setTopRootIndex NOTIFY topRootIndexChanged)
 
+  Q_PROPERTY(int count READ count NOTIFY nodeAdded)
+
 public:
   ScNodeDisplay(QDeclarativeItem *parent = 0);
 
   void setModel(QObject* );
   QAbstractItemModel* model() const;
+
+  int count() const;
+  Q_INVOKABLE ScNodeItem *nodeAt(int i);
 
   Q_INVOKABLE void setRootToParent();
   Q_INVOKABLE void setRootIndex(QObject *);
@@ -42,6 +47,8 @@ public:
   void setOutput(QDeclarativeComponent *);
   void setNode(QDeclarativeComponent *);
   void setConnector(QDeclarativeComponent *);
+
+  Q_INVOKABLE void changeItemInput(QDeclarativeItem *item, QDeclarativeItem *newInput);
 
 signals:
   void rootIndexChanged();

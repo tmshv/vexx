@@ -15,6 +15,21 @@ PropertyItem {
   drivenNormal.x: -1.0
   drivenNormal.y: 0.0
 
+  function intersect(x, y)
+    {
+    var isect = null;
+    if(!isect && nodecanvas.intersectItem(outputBlob, x, y))
+      {
+      isect = outputBlob;
+      }
+
+    if(!isect && nodecanvas.intersectItem(inputBlob, x, y))
+      {
+      isect = inputBlob;
+      }
+    return isect;
+    }
+
   state: "NotExpandable"
 
   states: [

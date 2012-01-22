@@ -15,9 +15,14 @@ class ScPropertyDisplay : public QDeclarativeItem
   Q_PROPERTY(QDeclarativeComponent *property READ propertyComponent WRITE setPropertyComponent)
   Q_PROPERTY(ScPropertyItem *rootItem READ rootItem WRITE setRootItem)
 
+  Q_PROPERTY(int count READ count NOTIFY propertyAdded)
+
 public:
   explicit ScPropertyDisplay(QDeclarativeItem *parent = 0);
   ~ScPropertyDisplay();
+
+  int count() const;
+  Q_INVOKABLE ScPropertyItem *propertyAt(int i);
 
   void setRootItem(ScPropertyItem *);
   ScPropertyItem *rootItem() const;
@@ -31,6 +36,7 @@ public:
   const QVector <ScPropertyItem *> properties() { return _properties; }
 
 signals:
+  void propertyAdded(ScPropertyItem *);
   
 public slots:
 

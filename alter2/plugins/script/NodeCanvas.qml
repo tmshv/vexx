@@ -121,9 +121,9 @@ Rectangle
 
   function intersect(x, y)
     {
-    for(var i = 0, s = childNodes.count; i < s; ++i)
+    for(var i = 0, s = display.count; i < s; ++i)
       {
-      var item = childNodes.itemAt(i);
+      var item = display.nodeAt(i);
       if(item.intersect)
         {
         var hit = item.intersect(x, y);
@@ -195,7 +195,7 @@ Rectangle
       return;
       }
 
-    currentInputDragging = component.createObject(inputGrouper, { firstColour: currentInputDraggingItem.color, lastColour: currentInputDraggingItem.color } );
+    currentInputDragging = component.createObject(display, { firstColour: currentInputDraggingItem.color, lastColour: currentInputDraggingItem.color } );
     currentInputDragging.firstPoint.x = x;
     currentInputDragging.firstPoint.y = y;
 
@@ -228,54 +228,23 @@ Rectangle
     currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
 
-    var index = null;
-    var parent = currentInputDraggingItem;
-    while(parent && index == null)
-      {
-      if(parent.getModelIndex)
-        {
-        index = parent.getModelIndex();
-        break;
-        }
-
-      parent = parent.parent;
-      }
-
-    var otherIndex = null;
     var intersectedItemParent = intersect(x, y);
-    if(intersectedItemParent)
-      {
-      while(intersectedItemParent && otherIndex == null)
-        {
-        if(intersectedItemParent.getModelIndex)
-          {
-          otherIndex = intersectedItemParent.getModelIndex();
-          break;
-          }
 
-        intersectedItemParent = intersectedItemParent.parent;
-        }
-      }
-    else
+    if(currentInputDraggingItem && intersectedItemParent)
       {
-      print("no prop hit");
+      if(currentInputBeginMode == "input")
+        {
+        display.changeItemInput(currentInputDraggingItem, intersectedItemParent);
+        }
+      else
+        {
+        display.changeItemInput(intersectedItemParent, currentInputDraggingItem);
+        }
       }
 
     currentInputDragging.destroy();
     currentInputDragging = null;
     currentInputDraggingItem = null;
-
-    if(index && otherIndex)
-      {
-      if(currentInputBeginMode == "input")
-        {
-        db.setData(index, "propertyInput", otherIndex);
-        }
-      else
-        {
-        db.setData(otherIndex, "propertyInput", index);
-        }
-      }
     }
 
   MouseArea
