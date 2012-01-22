@@ -88,6 +88,23 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
     }
   }
 
+void ScNodeDisplay::onConnectionChange(const SChange *change)
+  {
+  const SProperty::ConnectionChange *c = change->castTo<SProperty::ConnectionChange>();
+  xAssert(c);
+  if(c)
+    {
+    if(c->mode() == SProperty::ConnectionChange::Connect)
+      {
+      addConnector(c->driven());
+      }
+    else
+      {
+      xAssertFail();
+      }
+    }
+  }
+
 void ScNodeDisplay::setRootToParent()
   {
   setRootIndex(_rootIndex->parentEntity());
@@ -119,6 +136,7 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
   if(_rootIndex)
     {
     _rootIndex->removeTreeObserver(this);
+    _rootIndex->removeConnectionObserver(this);
     }
 
   _rootIndex = i;
@@ -127,6 +145,7 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
   if(_rootIndex)
     {
     _rootIndex->addTreeObserver(this);
+    _rootIndex->addConnectionObserver(this);
     }
 
   rebuild();
@@ -298,7 +317,7 @@ void ScNodeDisplay::removeNode(SEntity *e)
   xAssertFail();
   }
 
-ScPropertyItem *ScNodeDisplay::findProperty(SProperty *p, bool driver)
+ScPropertyItem *ScNodeDisplay::findProperty(const SProperty *p, bool driver)
   {
   xAssert(_rootIndex.isValid());
   if(p->parent() == &_rootIndex->children)
@@ -356,17 +375,7 @@ void ScNodeDisplay::addConnectors(SPropertyContainer *e)
   {
   for(SProperty *c=e->firstChild(); c; c=c->nextSibling())
     {
-    SProperty *input = c->input();
-    if(input && input != _rootIndex)
-      {
-      ScPropertyItem *driven = findProperty(c, false);
-      ScPropertyItem *driver = findProperty(input, true);
-
-      if(driven && driver)
-        {
-        addConnector(c, input, driven, driver);
-        }
-      }
+    addConnector(c);
 
     SPropertyContainer *cont = c->castTo<SPropertyContainer>();
     if(cont)
@@ -376,7 +385,22 @@ void ScNodeDisplay::addConnectors(SPropertyContainer *e)
     }
   }
 
-void ScNodeDisplay::addConnector(SProperty *dvnProp, SProperty *dvrProp, ScPropertyItem *driven, ScPropertyItem *driver)
+void ScNodeDisplay::addConnector(const SProperty *c)
+  {
+  const SProperty *input = c->input();
+  if(input && input != _rootIndex)
+    {
+    ScPropertyItem *driven = findProperty(c, false);
+    ScPropertyItem *driver = findProperty(input, true);
+
+    if(driven && driver)
+      {
+      addConnector(c, input, driven, driver);
+      }
+    }
+  }
+
+void ScNodeDisplay::addConnector(const SProperty *dvnProp, const SProperty *dvrProp, ScPropertyItem *driven, ScPropertyItem *driver)
   {
   xAssert(driven);
   xAssert(driver);

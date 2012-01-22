@@ -12,7 +12,7 @@ ScConnectorItem::ScConnectorItem(QDeclarativeItem *parent) :
   _drivenProperty = 0;
   }
 
-void ScConnectorItem::setProperties(SProperty *driver, SProperty *driven)
+void ScConnectorItem::setProperties(const SProperty *driver, const SProperty *driven)
   {
   _driverProperty = driver;
   _drivenProperty = driven;

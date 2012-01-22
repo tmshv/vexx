@@ -10,7 +10,7 @@ class ScPropertyItem;
 class ScNodeItem;
 class ScConnectorItem;
 
-class ScNodeDisplay : public QDeclarativeItem, STreeObserver
+class ScNodeDisplay : public QDeclarativeItem, STreeObserver, SConnectionObserver
   {
   Q_OBJECT
   Q_PROPERTY(QDeclarativeComponent *input READ input WRITE setInput)
@@ -61,6 +61,7 @@ private slots:
 
 private:
   void onTreeChange(const SChange *);
+  void onConnectionChange(const SChange *);
 
   enum Mode
     {
@@ -71,10 +72,11 @@ private:
   ScNodeItem *addNode(QDeclarativeComponent *c, SEntity *e, Mode m = None);
   void removeNode(SEntity *e);
 
-  ScPropertyItem *findProperty(SProperty *, bool driver);
+  ScPropertyItem *findProperty(const SProperty *, bool driver);
 
   void addConnectors(SPropertyContainer *);
-  void addConnector(SProperty *dvnProp, SProperty *dvrProp, ScPropertyItem *driven, ScPropertyItem *driver);
+  void addConnector(const SProperty *);
+  void addConnector(const SProperty *dvnProp, const SProperty *dvrProp, ScPropertyItem *driven, ScPropertyItem *driver);
 
   QDeclarativeComponent *_input;
   QDeclarativeComponent *_output;

@@ -19,15 +19,15 @@ class ScConnectorItem : public QDeclarativeItem
   Q_PROPERTY(QColor driverColour READ driverColour NOTIFY colourChanged)
   Q_PROPERTY(QColor drivenColour READ drivenColour NOTIFY colourChanged)
 
-  XROProperty(SProperty *, driverProperty);
-  XROProperty(SProperty *, drivenProperty);
+  XROProperty(const SProperty *, driverProperty);
+  XROProperty(const SProperty *, drivenProperty);
   XROProperty(ScPropertyItem *, driver);
   XROProperty(ScPropertyItem *, driven);
 
 public:
   explicit ScConnectorItem(QDeclarativeItem *parent = 0);
 
-  void setProperties(SProperty *driver, SProperty *driven);
+  void setProperties(const SProperty *driver, const SProperty *driven);
   void setNodeDisplay(ScNodeDisplay *disp);
   void setDriverItem(ScPropertyItem *i);
   void setDrivenItem(ScPropertyItem *i);
