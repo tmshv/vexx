@@ -96,6 +96,11 @@ SDatabaseModel::~SDatabaseModel()
     }
   }
 
+QModelIndex SDatabaseModel::index(const SProperty *p) const
+  {
+  return createIndex(p->index(), 0, (void*)p);
+  }
+
 bool SDatabaseModel::isEqual(const QModelIndex &a, const QModelIndex &b) const
   {
   const void *ap = a.internalPointer();

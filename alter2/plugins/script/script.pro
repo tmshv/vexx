@@ -73,7 +73,9 @@ OTHER_FILES += \
     NodeCanvasContents/PropertyList.qml \
     NodeCanvasContents/PropertyInterface.qml \
     NodeCanvasContents/NodeHeader.qml \
-    NodeCanvasContents/DynamicInput.qml
+    NodeCanvasContents/DynamicInput.qml \
+    NodeCanvasContents/PathHolder.qml \
+    NodeCanvasContents/PathItem.qml
 
 
 

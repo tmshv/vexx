@@ -36,10 +36,10 @@ Rectangle
     display.setRootIndex(obj);
     }
 
-  function setRootToParent()
+  function setRootToParent(count)
     {
     reset();
-    display.setRootToParent();
+    display.setRootToParent(count);
     }
 
   function setNodePosition(nodeIndex, pos)
@@ -252,6 +252,13 @@ Rectangle
     anchors.fill: parent
     onDoubleClicked: nodecanvas.setRootToParent()
     }
+
+  PathHolder {
+    x: -2
+    y: -2
+    model: display.path.length
+    nameData: display.path
+  }
 
   NodeDisplay {
     id: display

@@ -5,6 +5,7 @@
 #include "QAbstractItemModel"
 #include "sentityweakpointer.h"
 #include "sobserver.h"
+#include "sdatabasemodel.h"
 
 class ScPropertyItem;
 class ScNodeItem;
@@ -19,12 +20,16 @@ class ScNodeDisplay : public QDeclarativeItem, STreeObserver, SConnectionObserve
   Q_PROPERTY(QDeclarativeComponent *connector READ connector WRITE setConnector)
   Q_PROPERTY(QObject *model READ model WRITE setModel)
   Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
-  //Q_PROPERTY(QModelIndex topRootIndex READ topRootIndex WRITE setTopRootIndex NOTIFY topRootIndexChanged)
+  Q_PROPERTY(QModelIndex topRootIndex READ topRootIndex WRITE setTopRootIndex NOTIFY topRootIndexChanged)
+
+  Q_PROPERTY(QStringList path READ path NOTIFY pathChanged)
 
   Q_PROPERTY(int count READ count NOTIFY nodeAdded)
 
 public:
   ScNodeDisplay(QDeclarativeItem *parent = 0);
+
+  const QStringList& path() { return _path; }
 
   void setModel(QObject* );
   QAbstractItemModel* model() const;
@@ -32,11 +37,13 @@ public:
   int count() const;
   Q_INVOKABLE ScNodeItem *nodeAt(int i);
 
-  Q_INVOKABLE void setRootToParent();
+  Q_INVOKABLE void setRootToParent(int cound);
   Q_INVOKABLE void setRootIndex(QObject *);
   void setRootIndex(const QModelIndex& );
   void setRootIndex(SEntity *);
-  QModelIndex rootIndex() const { return QModelIndex(); }
+  QModelIndex rootIndex() const;
+  void setTopRootIndex(const QModelIndex& );
+  QModelIndex topRootIndex() const;
 
   QDeclarativeComponent *input() const;
   QDeclarativeComponent *output() const;
@@ -53,11 +60,13 @@ public:
 signals:
   void rootIndexChanged();
   void nodeAdded(ScNodeItem *node);
-  //void topRootIndexChanged();
+  void topRootIndexChanged();
+  void pathChanged();
 
 private slots:
   void clear();
   void rebuild();
+  void updatePath();
 
 private:
   void onTreeChange(const SChange *);
@@ -83,8 +92,11 @@ private:
   QDeclarativeComponent *_node;
   QDeclarativeComponent *_connector;
 
-  QAbstractItemModel *_model;
+  SDatabaseModel *_model;
   SEntityWeakPointer _rootIndex;
+  SEntityWeakPointer _topRootIndex;
+
+  QStringList _path;
 
   QVector <ScNodeItem*> _nodes;
   QVector <ScConnectorItem*> _connectors;

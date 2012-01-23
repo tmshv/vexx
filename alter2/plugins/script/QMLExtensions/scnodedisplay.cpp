@@ -11,12 +11,26 @@ ScNodeDisplay::ScNodeDisplay(QDeclarativeItem *parent) : QDeclarativeItem(parent
   _output = 0;
   _node = 0;
   _connector = 0;
+
+  connect(this, SIGNAL(topRootIndexChanged()), this, SLOT(updatePath()));
+  connect(this, SIGNAL(rootIndexChanged()), this, SLOT(updatePath()));
   }
 
 void ScNodeDisplay::setModel(QObject* m)
   {
-  _model = qobject_cast<QAbstractItemModel*>(m);
+  _model = qobject_cast<SDatabaseModel*>(m);
   rebuild();
+  }
+
+void ScNodeDisplay::updatePath()
+  {
+  _path.clear();
+
+  for(SEntity *e = _rootIndex; e && (!_topRootIndex || e != _topRootIndex->parentEntity()); e = e->parentEntity())
+    {
+    _path.insert(0, e->name());
+    }
+  emit pathChanged();
   }
 
 QAbstractItemModel* ScNodeDisplay::model() const
@@ -105,7 +119,7 @@ void ScNodeDisplay::onConnectionChange(const SChange *change)
     }
   }
 
-void ScNodeDisplay::setRootToParent()
+void ScNodeDisplay::setRootToParent(int parent)
   {
   setRootIndex(_rootIndex->parentEntity());
   }
@@ -149,6 +163,25 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
     }
 
   rebuild();
+  }
+
+void ScNodeDisplay::setTopRootIndex(const QModelIndex& i)
+  {
+  SProperty *p = (SProperty*)i.internalPointer();
+  _topRootIndex = p->entity();
+  emit topRootIndexChanged();
+  }
+
+QModelIndex ScNodeDisplay::topRootIndex() const
+  {
+  xAssert(_model);
+  return _model->index(_topRootIndex);
+  }
+
+QModelIndex ScNodeDisplay::rootIndex() const
+  {
+  xAssert(_model);
+  return _model->index(_rootIndex);
   }
 
 QDeclarativeComponent *ScNodeDisplay::input() const

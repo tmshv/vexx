@@ -66,7 +66,7 @@ void ScPropertyDisplay::updateConnectionParenting()
     for(int i = 0, s = _parentItem->drivens().size(); i < s; ++i)
       {
       ScConnectorItem *driven = _parentItem->drivens()[i];
-      SProperty *prop = driven->drivenProperty();
+      const SProperty *prop = driven->drivenProperty();
       if(parentProp != prop)
         {
         foreach(ScPropertyItem *childProp, _properties)
@@ -86,7 +86,7 @@ void ScPropertyDisplay::updateConnectionParenting()
     for(int i = 0, s = _parentItem->drivers().size(); i < s; ++i)
       {
       ScConnectorItem *driver = _parentItem->drivers()[i];
-      SProperty *prop = driver->driverProperty();
+      const SProperty *prop = driver->driverProperty();
       if(parentProp != prop)
         {
         foreach(ScPropertyItem *childProp, _properties)
