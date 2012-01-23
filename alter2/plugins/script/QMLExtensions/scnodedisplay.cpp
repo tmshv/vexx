@@ -121,7 +121,16 @@ void ScNodeDisplay::onConnectionChange(const SChange *change)
 
 void ScNodeDisplay::setRootToParent(int parent)
   {
-  setRootIndex(_rootIndex->parentEntity());
+  SEntity *ent = _rootIndex;
+  while(parent-- && ent)
+    {
+    ent = ent->parentEntity();
+    }
+
+  if(ent && (!_topRootIndex || ent->isDescendedFrom(_topRootIndex)))
+    {
+    setRootIndex(ent);
+    }
   }
 
 void ScNodeDisplay::setRootIndex(QObject *itemToMatch)

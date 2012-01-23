@@ -33,7 +33,12 @@ Rectangle {
             return "ROOTICON";
           }
 
-          return nameData[modelData];
+          var a = nameData[modelData];
+          if(!a)
+            {
+            a = "";
+            }
+          return a;
         }
 
         onClicked: {

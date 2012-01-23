@@ -249,15 +249,43 @@ Rectangle
 
   MouseArea
     {
+    property real lastClickX: 0
+    property real lastClickY: 0
+    property bool translating: false
+
     anchors.fill: parent
     onDoubleClicked: nodecanvas.setRootToParent()
+
+    onPressed: {
+      if(pressedButtons == Qt.LeftButton && mouse.modifiers & Qt.AltModifier)
+        {
+        translating = true;
+        }
+
+      lastClickX = mouse.x
+      lastClickY = mouse.y
+    }
+
+    onMousePositionChanged: {
+      if(translating)
+        {
+        var x = mouse.x - lastClickX
+        var y = mouse.y - lastClickY
+
+        display.x += x;
+        display.y += y;
+        }
+
+      lastClickX = mouse.x
+      lastClickY = mouse.y
+      }
     }
 
   PathHolder {
     x: -2
     y: -2
-    model: display.path.length
     nameData: display.path
+    model: display.path.length
   }
 
   NodeDisplay {
