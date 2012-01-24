@@ -1,85 +1,32 @@
 #include "scmousearea.h"
-#include "qquickitem_p.h"
 
-#include <QtGui/qevent.h>
-#include <QtCore/qbasictimer.h>
+#include "QDateTime"
+#include "QBasicTimer"
+#include "QGraphicsSceneEvent"
+#include "QApplication"
+#include "QGraphicsScene"
 
-#include "qquickmousearea_p.h"
-#include "qquickmousearea_p_p.h"
-#include "qquickcanvas.h"
-#include "qquickevents_p_p.h"
-#include "qquickdrag_p.h"
-
-#include <QtGui/qevent.h>
-#include <QtGui/qguiapplication.h>
-#include <QtGui/qstylehints.h>
+#include <QGraphicsSceneMouseEvent>
 
 #include <float.h>
 
-class QQuickMouseEvent;
-class QQuickMouseArea;
-class QQuickMouseAreaPrivate : public QQuickItemPrivate
-{
-    Q_DECLARE_PUBLIC(QQuickMouseArea)
-
-public:
-    QQuickMouseAreaPrivate();
-    ~QQuickMouseAreaPrivate();
-    void init();
-
-    void saveEvent(QMouseEvent *event);
-    enum PropagateType{
-        Click,
-        DoubleClick,
-        PressAndHold
-    };
-    void propagate(QQuickMouseEvent* event, PropagateType);
-    bool propagateHelper(QQuickMouseEvent*, QQuickItem*,const QPointF &, PropagateType);
-
-    bool isPressAndHoldConnected();
-    bool isDoubleClickConnected();
-    bool isClickConnected();
-
-    bool absorb : 1;
-    bool hovered : 1;
-    bool pressed : 1;
-    bool longPress : 1;
-    bool moved : 1;
-    bool dragX : 1;
-    bool dragY : 1;
-    bool stealMouse : 1;
-    bool doubleClick : 1;
-    bool preventStealing : 1;
-    bool propagateComposedEvents : 1;
-    QQuickDrag *drag;
-    QPointF startScene;
-    QPointF targetStartPos;
-    QPointF lastPos;
-    QDeclarativeNullableValue<QPointF> lastScenePos;
-    Qt::MouseButton lastButton;
-    Qt::MouseButtons lastButtons;
-    Qt::KeyboardModifiers lastModifiers;
-    QBasicTimer pressAndHoldTimer;
-};
-
 static const int PressAndHoldDelay = 800;
 
-QQuickDrag::QQuickDrag(QObject *parent)
-: QObject(parent), _target(0), _axis(XandYAxis), _xmin(-FLT_MAX),
-_xmax(FLT_MAX), _ymin(-FLT_MAX), _ymax(FLT_MAX), _active(false), _filterChildren(false)
+ScDrag::ScDrag(QObject *parent) : QObject(parent), _target(0), _axis(XandYAxis), _xmin(-FLT_MAX), _xmax(FLT_MAX),
+  _ymin(-FLT_MAX), _ymax(FLT_MAX), _active(false), _filterChildren(false)
 {
 }
 
-QQuickDrag::~QQuickDrag()
+ScDrag::~ScDrag()
 {
 }
 
-QQuickItem *QQuickDrag::target() const
+QGraphicsObject *ScDrag::target() const
 {
     return _target;
 }
 
-void QQuickDrag::setTarget(QQuickItem *t)
+void ScDrag::setTarget(QGraphicsObject *t)
 {
     if (_target == t)
         return;
@@ -87,20 +34,20 @@ void QQuickDrag::setTarget(QQuickItem *t)
     emit targetChanged();
 }
 
-void QQuickDrag::resetTarget()
+void ScDrag::resetTarget()
 {
-    if (_target == 0)
+    if (!_target)
         return;
     _target = 0;
     emit targetChanged();
 }
 
-QQuickDrag::Axis QQuickDrag::axis() const
+ScDrag::Axis ScDrag::axis() const
 {
     return _axis;
 }
 
-void QQuickDrag::setAxis(QQuickDrag::Axis a)
+void ScDrag::setAxis(ScDrag::Axis a)
 {
     if (_axis == a)
         return;
@@ -108,12 +55,12 @@ void QQuickDrag::setAxis(QQuickDrag::Axis a)
     emit axisChanged();
 }
 
-qreal QQuickDrag::xmin() const
+qreal ScDrag::xmin() const
 {
     return _xmin;
 }
 
-void QQuickDrag::setXmin(qreal m)
+void ScDrag::setXmin(qreal m)
 {
     if (_xmin == m)
         return;
@@ -121,12 +68,12 @@ void QQuickDrag::setXmin(qreal m)
     emit minimumXChanged();
 }
 
-qreal QQuickDrag::xmax() const
+qreal ScDrag::xmax() const
 {
     return _xmax;
 }
 
-void QQuickDrag::setXmax(qreal m)
+void ScDrag::setXmax(qreal m)
 {
     if (_xmax == m)
         return;
@@ -134,12 +81,12 @@ void QQuickDrag::setXmax(qreal m)
     emit maximumXChanged();
 }
 
-qreal QQuickDrag::ymin() const
+qreal ScDrag::ymin() const
 {
     return _ymin;
 }
 
-void QQuickDrag::setYmin(qreal m)
+void ScDrag::setYmin(qreal m)
 {
     if (_ymin == m)
         return;
@@ -147,12 +94,12 @@ void QQuickDrag::setYmin(qreal m)
     emit minimumYChanged();
 }
 
-qreal QQuickDrag::ymax() const
+qreal ScDrag::ymax() const
 {
     return _ymax;
 }
 
-void QQuickDrag::setYmax(qreal m)
+void ScDrag::setYmax(qreal m)
 {
     if (_ymax == m)
         return;
@@ -160,12 +107,12 @@ void QQuickDrag::setYmax(qreal m)
     emit maximumYChanged();
 }
 
-bool QQuickDrag::active() const
+bool ScDrag::active() const
 {
     return _active;
 }
 
-void QQuickDrag::setActive(bool drag)
+void ScDrag::setActive(bool drag)
 {
     if (_active == drag)
         return;
@@ -173,12 +120,12 @@ void QQuickDrag::setActive(bool drag)
     emit activeChanged();
 }
 
-bool QQuickDrag::filterChildren() const
+bool ScDrag::filterChildren() const
 {
     return _filterChildren;
 }
 
-void QQuickDrag::setFilterChildren(bool filter)
+void ScDrag::setFilterChildren(bool filter)
 {
     if (_filterChildren == filter)
         return;
@@ -186,459 +133,338 @@ void QQuickDrag::setFilterChildren(bool filter)
     emit filterChildrenChanged();
 }
 
-QQuickDragAttached *QQuickDrag::qmlAttachedProperties(QObject *obj)
+ScMouseArea::ScMouseArea(QDeclarativeItem *parent)
+  : QDeclarativeItem(parent), _absorb(true), _hovered(false), _pressed(false), _longPress(false),
+    _moved(false), _stealMouse(false), _doubleClick(false), _preventStealing(false), _drag(0)
 {
-    return new QQuickDragAttached(obj);
+  setAcceptedMouseButtons(Qt::LeftButton);
+  setFiltersChildEvents(true);
 }
 
-QQuickMouseAreaPrivate::QQuickMouseAreaPrivate()
-: absorb(true), hovered(false), pressed(false), longPress(false),
-  moved(false), stealMouse(false), doubleClick(false), preventStealing(false),
-  propagateComposedEvents(false), drag(0)
+ScMouseArea::~ScMouseArea()
 {
+  delete _drag;
 }
 
-QQuickMouseAreaPrivate::~QQuickMouseAreaPrivate()
+void ScMouseArea::saveEvent(QGraphicsSceneMouseEvent *event)
 {
-    delete drag;
+  _lastPos = event->pos();
+  _lastScenePos = event->scenePos();
+  _lastButton = event->button();
+  _lastButtons = event->buttons();
+  _lastModifiers = event->modifiers();
 }
 
-void QQuickMouseAreaPrivate::init()
+qreal ScMouseArea::mouseX() const
 {
-    Q_Q(QQuickMouseArea);
-    q->setAcceptedMouseButtons(Qt::LeftButton);
-    q->setFiltersChildMouseEvents(true);
+  return _lastPos.x();
 }
 
-void QQuickMouseAreaPrivate::saveEvent(QMouseEvent *event)
+qreal ScMouseArea::mouseY() const
 {
-    lastPos = event->localPos();
-    lastScenePos = event->windowPos();
-    lastButton = event->button();
-    lastButtons = event->buttons();
-    lastModifiers = event->modifiers();
+  return _lastPos.y();
 }
 
-bool QQuickMouseAreaPrivate::isPressAndHoldConnected()
+bool ScMouseArea::isEnabled() const
 {
-    Q_Q(QQuickMouseArea);
-    static int idx = QObjectPrivate::get(q)->signalIndex("pressAndHold(QQuickMouseEvent*)");
-    return QObjectPrivate::get(q)->isSignalConnected(idx);
+  return _absorb;
 }
 
-bool QQuickMouseAreaPrivate::isDoubleClickConnected()
+void ScMouseArea::setEnabled(bool a)
 {
-    Q_Q(QQuickMouseArea);
-    static int idx = QObjectPrivate::get(q)->signalIndex("doubleClicked(QQuickMouseEvent*)");
-    return QObjectPrivate::get(q)->isSignalConnected(idx);
-}
-
-bool QQuickMouseAreaPrivate::isClickConnected()
-{
-    Q_Q(QQuickMouseArea);
-    static int idx = QObjectPrivate::get(q)->signalIndex("clicked(QQuickMouseEvent*)");
-    return QObjectPrivate::get(q)->isSignalConnected(idx);
-}
-
-void QQuickMouseAreaPrivate::propagate(QQuickMouseEvent* event, PropagateType t)
-{
-    Q_Q(QQuickMouseArea);
-    if (!propagateComposedEvents)
-        return;
-    QPointF scenePos = q->mapToScene(QPointF(event->x(), event->y()));
-    propagateHelper(event, canvas->rootItem(), scenePos, t);
-}
-
-bool QQuickMouseAreaPrivate::propagateHelper(QQuickMouseEvent *ev, QQuickItem *item,const QPointF &sp, PropagateType sig)
-{
-    //Based off of QQuickCanvas::deliverInitialMousePressEvent
-    //But specific to MouseArea, so doesn't belong in canvas
-    Q_Q(const QQuickMouseArea);
-    QQuickItemPrivate *itemPrivate = QQuickItemPrivate::get(item);
-    if (itemPrivate->opacity == 0.0)
-        return false;
-
-    if (itemPrivate->flags & QQuickItem::ItemClipsChildrenToShape) {
-        QPointF p = item->mapFromScene(sp);
-        if (!QRectF(0, 0, item->width(), item->height()).contains(p))
-            return false;
-    }
-
-    QList<QQuickItem *> children = itemPrivate->paintOrderChildItems();
-    for (int ii = children.count() - 1; ii >= 0; --ii) {
-        QQuickItem *child = children.at(ii);
-        if (!child->isVisible() || !child->isEnabled())
-            continue;
-        if (propagateHelper(ev, child, sp, sig))
-            return true;
-    }
-
-    QQuickMouseArea* ma = qobject_cast<QQuickMouseArea*>(item);
-    if (ma && ma != q && itemPrivate->acceptedMouseButtons & ev->button()) {
-        switch (sig) {
-        case Click:
-            if (!ma->d_func()->isClickConnected())
-                return false;
-            break;
-        case DoubleClick:
-            if (!ma->d_func()->isDoubleClickConnected())
-                return false;
-            break;
-        case PressAndHold:
-            if (!ma->d_func()->isPressAndHoldConnected())
-                return false;
-            break;
-        }
-        QPointF p = item->mapFromScene(sp);
-        if (QRectF(0, 0, item->width(), item->height()).contains(p)) {
-            ev->setX(p.x());
-            ev->setY(p.y());
-            ev->setAccepted(true);//It is connected, they have to explicitly ignore to let it slide
-            switch (sig) {
-            case Click: emit ma->clicked(ev); break;
-            case DoubleClick: emit ma->doubleClicked(ev); break;
-            case PressAndHold: emit ma->pressAndHold(ev); break;
-            }
-            if (ev->isAccepted())
-                return true;
-        }
-    }
-    return false;
-
-}
-
-QQuickMouseArea::QQuickMouseArea(QQuickItem *parent)
-  : QQuickItem(*(new QQuickMouseAreaPrivate), parent)
-{
-    Q_D(QQuickMouseArea);
-    d->init();
-}
-
-QQuickMouseArea::~QQuickMouseArea()
-{
-}
-
-qreal QQuickMouseArea::mouseX() const
-{
-    Q_D(const QQuickMouseArea);
-    return d->lastPos.x();
-}
-
-qreal QQuickMouseArea::mouseY() const
-{
-    Q_D(const QQuickMouseArea);
-    return d->lastPos.y();
-}
-
-bool QQuickMouseArea::isEnabled() const
-{
-    Q_D(const QQuickMouseArea);
-    return d->absorb;
-}
-
-void QQuickMouseArea::setEnabled(bool a)
-{
-    Q_D(QQuickMouseArea);
-    if (a != d->absorb) {
-        d->absorb = a;
-        emit enabledChanged();
+  if (a != _absorb)
+    {
+    _absorb = a;
+    emit enabledChanged();
     }
 }
 
-bool QQuickMouseArea::preventStealing() const
+bool ScMouseArea::preventStealing() const
 {
-    Q_D(const QQuickMouseArea);
-    return d->preventStealing;
+  return _preventStealing;
 }
 
-void QQuickMouseArea::setPreventStealing(bool prevent)
+void ScMouseArea::setPreventStealing(bool prevent)
 {
-    Q_D(QQuickMouseArea);
-    if (prevent != d->preventStealing) {
-        d->preventStealing = prevent;
-        setKeepMouseGrab(d->preventStealing && d->absorb);
-        emit preventStealingChanged();
+  if (prevent != _preventStealing) {
+    _preventStealing = prevent;
+    setKeepMouseGrab(_preventStealing && _absorb);
+    emit preventStealingChanged();
+  }
+}
+
+Qt::MouseButtons ScMouseArea::pressedButtons() const
+{
+  return _lastButtons;
+}
+
+void ScMouseArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+  _moved = false;
+  _stealMouse = _preventStealing;
+  if (!_absorb)
+    QDeclarativeItem::mousePressEvent(event);
+  else {
+    _longPress = false;
+    saveEvent(event);
+    if (_drag) {
+      _dragX = drag()->axis() & ScDrag::XAxis;
+      _dragY = drag()->axis() & ScDrag::YAxis;
     }
+    if (_drag)
+      _drag->setActive(false);
+    setHovered(true);
+    _startScene = event->scenePos();
+    // we should only start timer if pressAndHold is connected to.
+    _pressAndHoldTimer.start(PressAndHoldDelay, this);
+    setKeepMouseGrab(_stealMouse);
+    event->setAccepted(setPressed(true));
+  }
 }
 
-bool QQuickMouseArea::propagateComposedEvents() const
+void ScMouseArea::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_D(const QQuickMouseArea);
-    return d->propagateComposedEvents;
-}
-
-void QQuickMouseArea::setPropagateComposedEvents(bool prevent)
-{
-    Q_D(QQuickMouseArea);
-    if (prevent != d->propagateComposedEvents) {
-        d->propagateComposedEvents = prevent;
-        setKeepMouseGrab(d->propagateComposedEvents && d->absorb);
-        emit propagateComposedEventsChanged();
-    }
-}
-
-Qt::MouseButtons QQuickMouseArea::pressedButtons() const
-{
-    Q_D(const QQuickMouseArea);
-    return d->lastButtons;
-}
-
-void QQuickMouseArea::mousePressEvent(QMouseEvent *event)
-{
-    Q_D(QQuickMouseArea);
-    d->moved = false;
-    d->stealMouse = d->preventStealing;
-    if (!d->absorb)
-        QQuickItem::mousePressEvent(event);
-    else {
-        d->longPress = false;
-        d->saveEvent(event);
-        if (d->drag) {
-            d->dragX = drag()->axis() & QQuickDrag::XAxis;
-            d->dragY = drag()->axis() & QQuickDrag::YAxis;
-        }
-        if (d->drag)
-            d->drag->setActive(false);
-        setHovered(true);
-        d->startScene = event->windowPos();
-        d->pressAndHoldTimer.start(PressAndHoldDelay, this);
-        setKeepMouseGrab(d->stealMouse);
-        event->setAccepted(setPressed(true));
-
-    }
-}
-
-void QQuickMouseArea::mouseMoveEvent(QMouseEvent *event)
-{
-    Q_D(QQuickMouseArea);
-    if (!d->absorb) {
-        QQuickItem::mouseMoveEvent(event);
+    if (!_absorb) {
+        QDeclarativeItem::mouseMoveEvent(event);
         return;
     }
 
-    d->saveEvent(event);
+    saveEvent(event);
 
     // ### we should skip this if these signals aren't used
     // ### can GV handle this for us?
-    bool contains = boundingRect().contains(d->lastPos);
-    if (d->hovered && !contains)
+    bool contains = boundingRect().contains(_lastPos);
+    if (_hovered && !contains)
         setHovered(false);
-    else if (!d->hovered && contains)
+    else if (!_hovered && contains)
         setHovered(true);
 
-    if (d->drag && d->drag->target()) {
-        if (!d->moved) {
-            d->targetStartPos = d->drag->target()->parentItem()
-                    ? d->drag->target()->parentItem()->mapToScene(d->drag->target()->pos())
-                    : d->drag->target()->pos();
+    if (_drag && _drag->target()) {
+        if (!_moved) {
+            _startX = drag()->target()->x();
+            _startY = drag()->target()->y();
         }
 
         QPointF startLocalPos;
         QPointF curLocalPos;
         if (drag()->target()->parentItem()) {
-            startLocalPos = drag()->target()->parentItem()->mapFromScene(d->startScene);
-            curLocalPos = drag()->target()->parentItem()->mapFromScene(event->windowPos());
+            startLocalPos = drag()->target()->parentItem()->mapFromScene(_startScene);
+            curLocalPos = drag()->target()->parentItem()->mapFromScene(event->scenePos());
         } else {
-            startLocalPos = d->startScene;
-            curLocalPos = event->windowPos();
+            startLocalPos = _startScene;
+            curLocalPos = event->scenePos();
         }
 
-        const int dragThreshold = qApp->styleHints()->startDragDistance();
+        const int dragThreshold = QApplication::startDragDistance();
         qreal dx = qAbs(curLocalPos.x() - startLocalPos.x());
         qreal dy = qAbs(curLocalPos.y() - startLocalPos.y());
 
-        if (keepMouseGrab() && d->stealMouse && !d->drag->active())
-            d->drag->setActive(true);
+        if (keepMouseGrab() &&_stealMouse)
+            _drag->setActive(true);
 
-        QPointF startPos = d->drag->target()->parentItem()
-                ? d->drag->target()->parentItem()->mapFromScene(d->targetStartPos)
-                : d->targetStartPos;
-
-        QPointF dragPos = d->drag->target()->pos();
-
-        if (d->dragX && d->drag->active()) {
-            qreal x = (curLocalPos.x() - startLocalPos.x()) + startPos.x();
+        if (_dragX && _drag->active()) {
+            qreal x = (curLocalPos.x() - startLocalPos.x()) + _startX;
             if (x < drag()->xmin())
                 x = drag()->xmin();
             else if (x > drag()->xmax())
                 x = drag()->xmax();
-            dragPos.setX(x);
+            drag()->target()->setX(x);
         }
-        if (d->dragY && d->drag->active()) {
-            qreal y = (curLocalPos.y() - startLocalPos.y()) + startPos.y();
+        if (_dragY && _drag->active()) {
+            qreal y = (curLocalPos.y() - startLocalPos.y()) + _startY;
             if (y < drag()->ymin())
                 y = drag()->ymin();
             else if (y > drag()->ymax())
                 y = drag()->ymax();
-            dragPos.setY(y);
+            drag()->target()->setY(y);
         }
-        d->drag->target()->setPos(dragPos);
 
         if (!keepMouseGrab()) {
-            if ((!d->dragY && dy < dragThreshold && d->dragX && dx > dragThreshold)
-                || (!d->dragX && dx < dragThreshold && d->dragY && dy > dragThreshold)
-                || (d->dragX && d->dragY && (dx > dragThreshold || dy > dragThreshold))) {
+            if ((!_dragY && dy < dragThreshold && _dragX && dx > dragThreshold)
+                || (!_dragX && dx < dragThreshold && _dragY && dy > dragThreshold)
+                || (_dragX && _dragY && (dx > dragThreshold || dy > dragThreshold))) {
                 setKeepMouseGrab(true);
-                d->stealMouse = true;
+                _stealMouse = true;
             }
         }
 
-        d->moved = true;
+        _moved = true;
     }
-    QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), d->lastButton, d->lastButtons, d->lastModifiers, false, d->longPress);
-    emit mouseXChanged(&me);
-    me.setPosition(d->lastPos);
-    emit mouseYChanged(&me);
-    me.setPosition(d->lastPos);
+    ScMouseEvent me(_lastPos.x(), _lastPos.y(), _lastButton, _lastButtons, _lastModifiers, false, _longPress);
+    emit mousePositionChanged(&me);
+    me.setX(_lastPos.x());
+    me.setY(_lastPos.y());
     emit positionChanged(&me);
 }
 
-void QQuickMouseArea::mouseReleaseEvent(QMouseEvent *event)
+
+void ScMouseArea::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    d->stealMouse = false;
-    if (!d->absorb) {
-        QQuickItem::mouseReleaseEvent(event);
+    _stealMouse = false;
+    if (!_absorb) {
+        QDeclarativeItem::mouseReleaseEvent(event);
     } else {
-        d->saveEvent(event);
+        saveEvent(event);
         setPressed(false);
-        if (d->drag)
-            d->drag->setActive(false);
+        if (_drag)
+            _drag->setActive(false);
         // If we don't accept hover, we need to reset containsMouse.
         if (!acceptHoverEvents())
             setHovered(false);
-        QQuickCanvas *c = canvas();
-        if (c && c->mouseGrabberItem() == this)
+        QGraphicsScene *s = scene();
+        if (s && s->mouseGrabberItem() == this)
             ungrabMouse();
         setKeepMouseGrab(false);
-
     }
-    d->doubleClick = false;
+    _doubleClick = false;
 }
 
-void QQuickMouseArea::mouseDoubleClickEvent(QMouseEvent *event)
+void ScMouseArea::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    if (d->absorb) {
-        d->saveEvent(event);
-        QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), d->lastButton, d->lastButtons, d->lastModifiers, true, false);
-        me.setAccepted(d->isDoubleClickConnected());
-        emit this->doubleClicked(&me);
-        if (!me.isAccepted())
-            d->propagate(&me, QQuickMouseAreaPrivate::DoubleClick);
-        d->doubleClick = d->isDoubleClickConnected() || me.isAccepted();
-    }
-    QQuickItem::mouseDoubleClickEvent(event);
-}
-
-void QQuickMouseArea::hoverEnterEvent(QHoverEvent *event)
-{
-    Q_D(QQuickMouseArea);
-    if (!d->absorb) {
-        QQuickItem::hoverEnterEvent(event);
+    if (!_absorb) {
+        QDeclarativeItem::mouseDoubleClickEvent(event);
     } else {
-        d->lastPos = event->posF();
-        d->lastModifiers = event->modifiers();
+        //if (_isDoubleClickConnected())
+            _doubleClick = true;
+        saveEvent(event);
+        ScMouseEvent me(_lastPos.x(), _lastPos.y(), _lastButton, _lastButtons, _lastModifiers, true, false);
+        //me.setAccepted(_isDoubleClickConnected());
+        emit doubleClicked(&me);
+        QDeclarativeItem::mouseDoubleClickEvent(event);
+    }
+}
+
+void ScMouseArea::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    if (!_absorb)
+        QDeclarativeItem::hoverEnterEvent(event);
+    else {
+        _lastPos = event->pos();
         setHovered(true);
-        QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), Qt::NoButton, Qt::NoButton, d->lastModifiers, false, false);
-        emit mouseXChanged(&me);
-        me.setPosition(d->lastPos);
-        emit mouseYChanged(&me);
-        me.setPosition(d->lastPos);
+        ScMouseEvent me(_lastPos.x(), _lastPos.y(), Qt::NoButton, Qt::NoButton, event->modifiers(), false, false);
+        emit mousePositionChanged(&me);
     }
 }
 
-void QQuickMouseArea::hoverMoveEvent(QHoverEvent *event)
+void ScMouseArea::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    if (!d->absorb) {
-        QQuickItem::hoverMoveEvent(event);
+    if (!_absorb) {
+        QDeclarativeItem::hoverMoveEvent(event);
     } else {
-        d->lastPos = event->posF();
-        d->lastModifiers = event->modifiers();
-        QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), Qt::NoButton, Qt::NoButton, d->lastModifiers, false, false);
-        emit mouseXChanged(&me);
-        me.setPosition(d->lastPos);
-        emit mouseYChanged(&me);
-        me.setPosition(d->lastPos);
+        _lastPos = event->pos();
+        ScMouseEvent me(_lastPos.x(), _lastPos.y(), Qt::NoButton, Qt::NoButton, event->modifiers(), false, false);
+        emit mousePositionChanged(&me);
+        me.setX(_lastPos.x());
+        me.setY(_lastPos.y());
         emit positionChanged(&me);
     }
 }
 
-void QQuickMouseArea::hoverLeaveEvent(QHoverEvent *event)
+void ScMouseArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    if (!d->absorb)
-        QQuickItem::hoverLeaveEvent(event);
+    if (!_absorb)
+        QDeclarativeItem::hoverLeaveEvent(event);
     else
         setHovered(false);
 }
 
-void QQuickMouseArea::ungrabMouse()
+#ifndef QT_NO_CONTEXTMENU
+void ScMouseArea::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    if (d->pressed) {
-        // if our mouse grab has been removed (probably by Flickable), fix our
-        // state
-        d->pressed = false;
-        d->stealMouse = false;
-        setKeepMouseGrab(false);
-        emit canceled();
-        emit pressedChanged();
-        if (d->hovered) {
-            d->hovered = false;
-            emit hoveredChanged();
+    bool acceptsContextMenuButton;
+#if defined(Q_OS_SYMBIAN)
+    // In Symbian a Long Tap on the screen will trigger. See QSymbianControl::HandleLongTapEventL().
+    acceptsContextMenuButton = acceptedButtons() & Qt::LeftButton;
+#elif defined(Q_WS_WINCE)
+    // ### WinCE can trigger context menu event with a gesture in the left button or a
+    // click with the right button. Since we have no way here to differentiate them when
+    // event happens, accepting either of the them will block the event.
+    acceptsContextMenuButton = acceptedButtons() & (Qt::LeftButton | Qt::RightButton);
+#else
+    acceptsContextMenuButton = acceptedButtons() & Qt::RightButton;
+#endif
+
+    if (isEnabled() && event->reason() == QGraphicsSceneContextMenuEvent::Mouse
+        && acceptsContextMenuButton) {
+        // Do not let the context menu event propagate to items behind.
+        return;
+    }
+
+    QDeclarativeItem::contextMenuEvent(event);
+}
+#endif // QT_NO_CONTEXTMENU
+
+bool ScMouseArea::sceneEvent(QEvent *event)
+{
+    bool rv = QDeclarativeItem::sceneEvent(event);
+    if (event->type() == QEvent::UngrabMouse) {
+        if (_pressed) {
+            // if our mouse grab has been removed (probably by Flickable), fix our
+            // state
+            _pressed = false;
+            _stealMouse = false;
+            setKeepMouseGrab(false);
+            emit canceled();
+            emit pressedChanged();
+            if (_hovered) {
+                _hovered = false;
+                emit hoveredChanged();
+            }
         }
     }
+    return rv;
 }
 
-void QQuickMouseArea::mouseUngrabEvent()
+bool ScMouseArea::sendMouseEvent(QGraphicsSceneMouseEvent *event)
 {
-    ungrabMouse();
-}
+    QGraphicsSceneMouseEvent mouseEvent(event->type());
+    QRectF myRect = mapToScene(QRectF(0, 0, width(), height())).boundingRect();
 
-bool QQuickMouseArea::sendMouseEvent(QMouseEvent *event)
-{
-    Q_D(QQuickMouseArea);
-    QRectF myRect = mapRectToScene(QRectF(0, 0, width(), height()));
-
-    QQuickCanvas *c = canvas();
-    QQuickItem *grabber = c ? c->mouseGrabberItem() : 0;
-    bool stealThisEvent = d->stealMouse;
-    if ((stealThisEvent || myRect.contains(event->windowPos())) && (!grabber || !grabber->keepMouseGrab())) {
-        QMouseEvent mouseEvent(event->type(), mapFromScene(event->windowPos()), event->windowPos(), event->screenPos(),
-                               event->button(), event->buttons(), event->modifiers());
+    QGraphicsScene *s = scene();
+    QDeclarativeItem *grabber = s ? qobject_cast<QDeclarativeItem*>(s->mouseGrabberItem()) : 0;
+    bool stealThisEvent = _stealMouse;
+    if ((stealThisEvent || myRect.contains(event->scenePos().toPoint())) && (!grabber || !grabber->keepMouseGrab())) {
         mouseEvent.setAccepted(false);
+        for (int i = 0x1; i <= 0x10; i <<= 1) {
+            if (event->buttons() & i) {
+                Qt::MouseButton button = Qt::MouseButton(i);
+                mouseEvent.setButtonDownPos(button, mapFromScene(event->buttonDownPos(button)));
+            }
+        }
+        mouseEvent.setScenePos(event->scenePos());
+        mouseEvent.setLastScenePos(event->lastScenePos());
+        mouseEvent.setPos(mapFromScene(event->scenePos()));
+        mouseEvent.setLastPos(mapFromScene(event->lastScenePos()));
 
-        switch (event->type()) {
-        case QEvent::MouseMove:
+        switch(mouseEvent.type()) {
+        case QEvent::GraphicsSceneMouseMove:
             mouseMoveEvent(&mouseEvent);
             break;
-        case QEvent::MouseButtonPress:
+        case QEvent::GraphicsSceneMousePress:
             mousePressEvent(&mouseEvent);
             break;
-        case QEvent::MouseButtonRelease:
+        case QEvent::GraphicsSceneMouseRelease:
             mouseReleaseEvent(&mouseEvent);
             break;
         default:
             break;
         }
-        grabber = c->mouseGrabberItem();
+        grabber = qobject_cast<QDeclarativeItem*>(s->mouseGrabberItem());
         if (grabber && stealThisEvent && !grabber->keepMouseGrab() && grabber != this)
             grabMouse();
 
         return stealThisEvent;
     }
-    if (event->type() == QEvent::MouseButtonRelease) {
-        if (d->pressed) {
-            d->pressed = false;
-            d->stealMouse = false;
-            if (c && c->mouseGrabberItem() == this)
+    if (mouseEvent.type() == QEvent::GraphicsSceneMouseRelease) {
+        if (_pressed) {
+            _pressed = false;
+            _stealMouse = false;
+            if (s && s->mouseGrabberItem() == this)
                 ungrabMouse();
             emit canceled();
             emit pressedChanged();
-            if (d->hovered) {
-                d->hovered = false;
+            if (_hovered) {
+                _hovered = false;
                 emit hoveredChanged();
             }
         }
@@ -646,117 +472,102 @@ bool QQuickMouseArea::sendMouseEvent(QMouseEvent *event)
     return false;
 }
 
-bool QQuickMouseArea::childMouseEventFilter(QQuickItem *i, QEvent *e)
+bool ScMouseArea::sceneEventFilter(QGraphicsItem *i, QEvent *e)
 {
-    Q_D(QQuickMouseArea);
-    if (!d->absorb || !isVisible() || !d->drag || !d->drag->filterChildren())
-        return QQuickItem::childMouseEventFilter(i, e);
+    if (!_absorb || !isVisible() || !_drag || !_drag->filterChildren())
+        return QDeclarativeItem::sceneEventFilter(i, e);
     switch (e->type()) {
-    case QEvent::MouseButtonPress:
-    case QEvent::MouseMove:
-    case QEvent::MouseButtonRelease:
-        return sendMouseEvent(static_cast<QMouseEvent *>(e));
+    case QEvent::GraphicsSceneMousePress:
+    case QEvent::GraphicsSceneMouseMove:
+    case QEvent::GraphicsSceneMouseRelease:
+        return sendMouseEvent(static_cast<QGraphicsSceneMouseEvent *>(e));
     default:
         break;
     }
 
-    return QQuickItem::childMouseEventFilter(i, e);
+    return QDeclarativeItem::sceneEventFilter(i, e);
 }
 
-void QQuickMouseArea::timerEvent(QTimerEvent *event)
+void ScMouseArea::timerEvent(QTimerEvent *event)
 {
-    Q_D(QQuickMouseArea);
-    if (event->timerId() == d->pressAndHoldTimer.timerId()) {
-        d->pressAndHoldTimer.stop();
-        bool dragged = d->drag && d->drag->active();
-        if (d->pressed && dragged == false && d->hovered == true) {
-            d->longPress = true;
-            QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), d->lastButton, d->lastButtons, d->lastModifiers, false, d->longPress);
-            me.setAccepted(d->isPressAndHoldConnected());
+    if (event->timerId() == _pressAndHoldTimer.timerId()) {
+        _pressAndHoldTimer.stop();
+        bool dragged = _drag && _drag->active();
+        if (_pressed && dragged == false && _hovered == true) {
+            _longPress = true;
+            ScMouseEvent me(_lastPos.x(), _lastPos.y(), _lastButton, _lastButtons, _lastModifiers, false, _longPress);
             emit pressAndHold(&me);
-            if (!me.isAccepted())
-                d->propagate(&me, QQuickMouseAreaPrivate::PressAndHold);
-            if (!me.isAccepted()) // no one handled the long press - allow click
-                d->longPress = false;
         }
     }
 }
 
-void QQuickMouseArea::windowDeactivateEvent()
-{
-    ungrabMouse();
-    QQuickItem::windowDeactivateEvent();
-}
-
-void QQuickMouseArea::geometryChanged(const QRectF &newGeometry,
+void ScMouseArea::geometryChanged(const QRectF &newGeometry,
                                             const QRectF &oldGeometry)
 {
-    Q_D(QQuickMouseArea);
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QDeclarativeItem::geometryChanged(newGeometry, oldGeometry);
 
-    if (d->lastScenePos.isNull)
-        d->lastScenePos = mapToScene(d->lastPos);
+    if (_lastScenePos.isNull())
+        _lastScenePos = mapToScene(_lastPos);
     else if (newGeometry.x() != oldGeometry.x() || newGeometry.y() != oldGeometry.y())
-        d->lastPos = mapFromScene(d->lastScenePos);
+        _lastPos = mapFromScene(_lastScenePos);
 }
 
-void QQuickMouseArea::itemChange(ItemChange change, const ItemChangeData &value)
+QVariant ScMouseArea::itemChange(GraphicsItemChange change,
+                                       const QVariant &value)
 {
-    Q_D(QQuickMouseArea);
     switch (change) {
     case ItemVisibleHasChanged:
-        if (acceptHoverEvents() && d->hovered != (isVisible() && isUnderMouse()))
-            setHovered(!d->hovered);
+        if (acceptHoverEvents() && _hovered != (isVisible() && isUnderMouse()))
+            setHovered(!_hovered);
         break;
     default:
         break;
     }
 
-    QQuickItem::itemChange(change, value);
+    return QDeclarativeItem::itemChange(change, value);
 }
 
-bool QQuickMouseArea::hoverEnabled() const
+bool ScMouseArea::hoverEnabled() const
 {
     return acceptHoverEvents();
 }
 
-void QQuickMouseArea::setHoverEnabled(bool h)
+void ScMouseArea::setHoverEnabled(bool h)
 {
     if (h == acceptHoverEvents())
         return;
 
     setAcceptHoverEvents(h);
     emit hoverEnabledChanged();
+    if (_hovered != isUnderMouse())
+        setHovered(!_hovered);
 }
 
-bool QQuickMouseArea::hovered() const
+bool ScMouseArea::hovered() const
 {
-    Q_D(const QQuickMouseArea);
-    return d->hovered;
+    return _hovered;
 }
 
-bool QQuickMouseArea::pressed() const
+bool ScMouseArea::pressed() const
 {
-    Q_D(const QQuickMouseArea);
-    return d->pressed;
+    return _pressed;
 }
 
-void QQuickMouseArea::setHovered(bool h)
+void ScMouseArea::setHovered(bool h)
 {
-    Q_D(QQuickMouseArea);
-    if (d->hovered != h) {
-        d->hovered = h;
+    if (_hovered != h) {
+        _hovered = h;
         emit hoveredChanged();
-        d->hovered ? emit entered() : emit exited();
+        _hovered ? emit entered() : emit exited();
     }
 }
 
-Qt::MouseButtons QQuickMouseArea::acceptedButtons() const
+Qt::MouseButtons ScMouseArea::acceptedButtons() const
 {
     return acceptedMouseButtons();
 }
 
-void QQuickMouseArea::setAcceptedButtons(Qt::MouseButtons buttons)
+void ScMouseArea::setAcceptedButtons(Qt::MouseButtons buttons)
 {
     if (buttons != acceptedMouseButtons()) {
         setAcceptedMouseButtons(buttons);
@@ -764,33 +575,28 @@ void QQuickMouseArea::setAcceptedButtons(Qt::MouseButtons buttons)
     }
 }
 
-bool QQuickMouseArea::setPressed(bool p)
+bool ScMouseArea::setPressed(bool p)
 {
-    Q_D(QQuickMouseArea);
-    bool dragged = d->drag && d->drag->active();
-    bool isclick = d->pressed == true && p == false && dragged == false && d->hovered == true;
+    bool dragged = _drag && _drag->active();
+    bool isclick = _pressed == true && p == false && dragged == false && _hovered == true;
 
-    if (d->pressed != p) {
-        d->pressed = p;
-        QQuickMouseEvent me(d->lastPos.x(), d->lastPos.y(), d->lastButton, d->lastButtons, d->lastModifiers, isclick, d->longPress);
-        if (d->pressed) {
-            if (!d->doubleClick)
+    if (_pressed != p) {
+        _pressed = p;
+        ScMouseEvent me(_lastPos.x(), _lastPos.y(), _lastButton, _lastButtons, _lastModifiers, isclick, _longPress);
+        if (_pressed) {
+            if (!_doubleClick)
                 emit pressed(&me);
-            me.setPosition(d->lastPos);
-            emit mouseXChanged(&me);
-            me.setPosition(d->lastPos);
-            emit mouseYChanged(&me);
+            me.setX(_lastPos.x());
+            me.setY(_lastPos.y());
+            emit mousePositionChanged(&me);
             emit pressedChanged();
         } else {
             emit released(&me);
-            me.setPosition(d->lastPos);
+            me.setX(_lastPos.x());
+            me.setY(_lastPos.y());
             emit pressedChanged();
-            if (isclick && !d->longPress && !d->doubleClick){
-                me.setAccepted(d->isClickConnected());
+            if (isclick && !_longPress && !_doubleClick)
                 emit clicked(&me);
-                if (!me.isAccepted())
-                    d->propagate(&me, QQuickMouseAreaPrivate::Click);
-            }
         }
 
         return me.isAccepted();
@@ -798,10 +604,9 @@ bool QQuickMouseArea::setPressed(bool p)
     return false;
 }
 
-QQuickDrag *QQuickMouseArea::drag()
+ScDrag *ScMouseArea::drag()
 {
-    Q_D(QQuickMouseArea);
-    if (!d->drag)
-        d->drag = new QQuickDrag;
-    return d->drag;
+    if (!_drag)
+        _drag = new ScDrag;
+    return _drag;
 }
