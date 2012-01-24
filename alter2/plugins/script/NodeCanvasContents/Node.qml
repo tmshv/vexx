@@ -89,7 +89,7 @@ NodeItem {
           }
         }*/
 
-        MouseArea {
+        MouseAreaV2 {
             id: dragMouseArea
             property bool hovered: false
             anchors.fill: contents

@@ -1,5 +1,5 @@
-// import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
 import QtQuick 1.1
+import VexxQMLExtensions 1.0
 
 Rectangle {
   id: rect
@@ -7,7 +7,7 @@ Rectangle {
 
   signal clicked()
 
-  MouseArea {
+  MouseAreaV2 {
     anchors.fill: parent
     hoverEnabled: true
     onHoveredChanged: rect.border.width = containsMouse ? 1.0 : 0.0

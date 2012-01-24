@@ -39,6 +39,11 @@ Rectangle
   function setRootToParent(count)
     {
     reset();
+    if(!count || count < 1)
+      {
+      count = 1;
+      }
+
     display.setRootToParent(count);
     }
 
@@ -247,8 +252,7 @@ Rectangle
     currentInputDraggingItem = null;
     }
 
-  MouseAreaV2
-    {
+  MouseAreaV2 {
     property real lastClickX: 0
     property real lastClickY: 0
     property bool translating: false

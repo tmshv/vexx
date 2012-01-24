@@ -117,7 +117,7 @@ PropertyItem {
         y: 2
         source: "qrc:/Sc/expandExpanded.svg"
 
-        MouseArea {
+        MouseAreaV2 {
           property bool setup: false
           anchors.fill: parent
 

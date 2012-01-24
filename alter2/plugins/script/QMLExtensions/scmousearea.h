@@ -124,7 +124,7 @@ class ScMouseArea : public QDeclarativeItem
   Q_PROPERTY(Qt::MouseButtons acceptedButtons READ acceptedButtons WRITE setAcceptedButtons NOTIFY acceptedButtonsChanged)
   Q_PROPERTY(bool hoverEnabled READ hoverEnabled WRITE setHoverEnabled NOTIFY hoverEnabledChanged)
   Q_PROPERTY(ScDrag *drag READ drag CONSTANT) //### add flicking to QDeclarativeDrag or add a QDeclarativeFlick ???
-  Q_PROPERTY(bool preventStealing READ preventStealing WRITE setPreventStealing NOTIFY preventStealingChanged REVISION 1)
+  Q_PROPERTY(bool preventStealing READ preventStealing WRITE setPreventStealing NOTIFY preventStealingChanged)
 
 public:
   ScMouseArea(QDeclarativeItem *parent=0);
@@ -160,7 +160,7 @@ Q_SIGNALS:
   void hoverEnabledChanged();
   void positionChanged(ScMouseEvent *mouse);
   void mousePositionChanged(ScMouseEvent *mouse);
-  Q_REVISION(1) void preventStealingChanged();
+  void preventStealingChanged();
 
   void pressed(ScMouseEvent *mouse);
   void pressAndHold(ScMouseEvent *mouse);

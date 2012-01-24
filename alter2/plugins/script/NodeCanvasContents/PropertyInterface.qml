@@ -20,7 +20,7 @@ Ellipse {
   border.width: 1
   height: width
 
-  MouseArea {
+  MouseAreaV2 {
     anchors.fill: parent
     preventStealing: true
 

@@ -1,6 +1,5 @@
-// import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
 import QtQuick 1.1
-
+import VexxQMLExtensions 1.0
 
 Rectangle {
     id: header
@@ -89,7 +88,7 @@ Rectangle {
         color: Qt.darker(header.color, 2.0)
     }
 
-    MouseArea {
+    MouseAreaV2 {
         property real lastX: 0
         property real lastY: 0
 
