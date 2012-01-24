@@ -247,7 +247,7 @@ Rectangle
     currentInputDraggingItem = null;
     }
 
-  MouseArea
+  MouseAreaV2
     {
     property real lastClickX: 0
     property real lastClickY: 0

@@ -227,5 +227,6 @@ private:
 
 QML_DECLARE_TYPE(ScDrag)
 QML_DECLARE_TYPE(ScMouseArea)
+QML_DECLARE_TYPE(ScMouseEvent)
 
 #endif // SCMOUSEAREA_H
