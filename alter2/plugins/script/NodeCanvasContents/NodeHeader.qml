@@ -88,7 +88,7 @@ Rectangle {
         color: Qt.darker(header.color, 2.0)
     }
 
-    MouseAreaV2 {
+    MouseArea {
         property real lastX: 0
         property real lastY: 0
 
@@ -96,22 +96,48 @@ Rectangle {
         preventStealing: true
 
         onPressed: {
-          bringToTop();
-          dragging = true
-          var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-          lastX = gc.x
-          lastY = gc.y
-        }
+          mouse.accepted = false;
+          if(mouse.modifiers === 0)
+            {
+            mouse.accepted = true;
+            bringToTop();
+            dragging = true
+            var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+            lastX = gc.x
+            lastY = gc.y
+            }
+          print("Pressed", mouse.accepted);
+          }
 
-        onDoubleClicked: enter()
-        onReleased: dragging = false
+        onDoubleClicked: {
+          mouse.accepted = true;
+          enter()
+          print("double", mouse.accepted);
+          }
+
+        onReleased: {
+          mouse.accepted = false;
+          if(dragging)
+            {
+            dragging = false;
+            mouse.accepted = true;
+            }
+          print("rel", mouse.accepted);
+          }
+
         onMousePositionChanged: {
+          mouse.accepted = mouse.modifiers === 0;
+          if(dragging)
+            {
+            mouse.accepted = true;
             var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
 
             header.dragged(gc.x - lastX, gc.y - lastY)
 
             lastX = gc.x
             lastY = gc.y
-        }
+            }
+          print("mod", mouse.accepted);
+          }
     }
 }

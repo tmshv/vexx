@@ -117,7 +117,7 @@ PropertyItem {
         y: 2
         source: "qrc:/Sc/expandExpanded.svg"
 
-        MouseAreaV2 {
+        MouseArea {
           property bool setup: false
           anchors.fill: parent
 
@@ -140,6 +140,7 @@ PropertyItem {
             {
               propertyContainer.state = "Expandable";
             }
+            print("YEAH PRESSED!", mouse.accepted);
           }
         }
       }

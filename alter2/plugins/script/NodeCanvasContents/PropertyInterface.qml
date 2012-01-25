@@ -20,23 +20,44 @@ Ellipse {
   border.width: 1
   height: width
 
-  MouseAreaV2 {
+  MouseArea {
+    property bool dragging: false
     anchors.fill: parent
     preventStealing: true
 
     onPressed: {
-      var gc = mapToItem(nodecanvas, size/2, size/2)
-      ellipse.startDrag(gc.x, gc.y);
-    }
+      mouse.accepted = false;
+      if(mouse.modifiers === 0)
+        {
+        dragging = true;
+        var gc = mapToItem(nodecanvas, size/2, size/2)
+        ellipse.startDrag(gc.x, gc.y);
+        mouse.accepted = true;
+        }
+      print("22Pressed", mouse.accepted);
+      }
 
     onMousePositionChanged: {
-      var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-      ellipse.moveDrag(gc.x, gc.y);
-    }
+      mouse.accepted = false;
+      if(dragging)
+        {
+        var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+        ellipse.moveDrag(gc.x, gc.y);
+        mouse.accepted = true;
+        }
+      print("22mov", mouse.accepted);
+      }
 
     onReleased: {
-      var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-      ellipse.endDrag(gc.x, gc.y);
+      mouse.accepted = false;
+      if(dragging)
+        {
+        dragging = false;
+        var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+        ellipse.endDrag(gc.x, gc.y);
+        mouse.accepted = true;
+        }
+      print("22rel", mouse.accepted);
+      }
     }
   }
-}

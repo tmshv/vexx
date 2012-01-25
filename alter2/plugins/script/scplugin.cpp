@@ -154,8 +154,8 @@ void ScPlugin::load()
   qmlRegisterType<ScNodeItem>("VexxQMLExtensions", 1, 0, "NodeItem");
   qmlRegisterType<ScPropertyItem>("VexxQMLExtensions", 1, 0, "PropertyItem");
   qmlRegisterType<ScConnectorItem>("VexxQMLExtensions", 1, 0, "ConnectorItem");
-  qmlRegisterType<ScMouseArea>("VexxQMLExtensions", 1, 0, "MouseAreaV2");
-  qmlRegisterUncreatableType<ScMouseEvent>("VexxQMLExtensions", 1, 0, "MouseEventV2", "thing");
+  //qmlRegisterType<ScMouseArea>("VexxQMLExtensions", 1, 0, "MouseAreaV2");
+  //qmlRegisterUncreatableType<ScMouseEvent>("VexxQMLExtensions", 1, 0, "MouseEventV2", "thing");
 
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");

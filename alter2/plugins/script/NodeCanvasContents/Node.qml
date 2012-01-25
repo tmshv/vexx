@@ -89,7 +89,7 @@ NodeItem {
           }
         }*/
 
-        MouseAreaV2 {
+        MouseArea {
             id: dragMouseArea
             property bool hovered: false
             anchors.fill: contents
@@ -97,8 +97,21 @@ NodeItem {
 
             onEntered: hovered = true
             onExited: hovered = false
-            onDoubleClicked: nodecanvas.setRootIndex(nodeItem)
-            onClicked: nodecanvas.bringToTop(nodeItem);
+            onDoubleClicked: {
+              print("Double Clicked Header");
+              mouse.accepted = true;
+              nodecanvas.setRootIndex(nodeItem);
+              print("Double Clicked Header2");
+              }
+            onClicked: {
+              mouse.accepted = mouse.modifiers === 0;
+              if(mouse.modifiers === 0)
+                {
+                mouse.accepted = true;
+                nodecanvas.bringToTop(nodeItem);
+                }
+              print("clicked")
+              }
         }
 
         Column {

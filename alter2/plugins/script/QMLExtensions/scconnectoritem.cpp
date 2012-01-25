@@ -54,13 +54,13 @@ void ScConnectorItem::setDrivenItem(ScPropertyItem *driven)
 QPointF ScConnectorItem::driverPoint() const
   {
   xAssert(_driver);
-  return _display->QGraphicsObject::mapFromItem(_driver, 0, 0) + _driver->driverPoint();
+  return QGraphicsObject::mapFromItem(_driver, 0, 0) + _driver->driverPoint();
   }
 
 QPointF ScConnectorItem::drivenPoint() const
   {
   xAssert(_driven);
-  return _display->QGraphicsObject::mapFromItem(_driven, 0, 0) + _driven->drivenPoint();
+  return QGraphicsObject::mapFromItem(_driven, 0, 0) + _driven->drivenPoint();
   }
 
 QPointF ScConnectorItem::driverNormal() const

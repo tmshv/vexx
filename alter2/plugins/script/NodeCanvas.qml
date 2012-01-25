@@ -201,11 +201,14 @@ Rectangle
       }
 
     currentInputDragging = component.createObject(display, { firstColour: currentInputDraggingItem.color, lastColour: currentInputDraggingItem.color } );
-    currentInputDragging.firstPoint.x = x;
-    currentInputDragging.firstPoint.y = y;
 
-    currentInputDragging.lastPoint.x = x;
-    currentInputDragging.lastPoint.y = y;
+    var pos = display.mapFromItem(null, x, y);
+
+    currentInputDragging.firstPoint.x = pos.x;
+    currentInputDragging.firstPoint.y = pos.y;
+
+    currentInputDragging.lastPoint.x = pos.x;
+    currentInputDragging.lastPoint.y = pos.y;
 
     if(mode === "output")
       {
@@ -221,15 +224,13 @@ Rectangle
 
   function moveCreatingConnection(x, y)
     {
-    currentInputDragging.lastPoint.x = x;
-    currentInputDragging.lastPoint.y = y;
+    var pos = display.mapFromItem(null, x, y);
+    currentInputDragging.lastPoint.x = pos.x;
+    currentInputDragging.lastPoint.y = pos.y;
     }
 
   function endCreatingConnection(x, y)
     {
-    currentInputDragging.lastPoint.x = x;
-    currentInputDragging.lastPoint.y = y;
-
     currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
     currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
 
@@ -252,22 +253,25 @@ Rectangle
     currentInputDraggingItem = null;
     }
 
-  MouseAreaV2 {
+  MouseArea {
     property real lastClickX: 0
     property real lastClickY: 0
     property bool translating: false
 
     anchors.fill: parent
-    onDoubleClicked: nodecanvas.setRootToParent()
+    onDoubleClicked: {
+      nodecanvas.setRootToParent()
+      }
 
     onPressed: {
-      if(pressedButtons == Qt.LeftButton && mouse.modifiers & Qt.AltModifier)
+      if(mouse.modifiers & Qt.AltModifier)
         {
         translating = true;
         }
 
       lastClickX = mouse.x
       lastClickY = mouse.y
+      print("YEAH PRESSED!", mouse.accepted);
     }
 
     onMousePositionChanged: {
@@ -282,6 +286,7 @@ Rectangle
 
       lastClickX = mouse.x
       lastClickY = mouse.y
+      print("YEAH PRESSED!", mouse.accepted);
       }
     }
 

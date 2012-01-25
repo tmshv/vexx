@@ -7,7 +7,7 @@ Rectangle {
 
   signal clicked()
 
-  MouseAreaV2 {
+  MouseArea {
     anchors.fill: parent
     hoverEnabled: true
     onHoveredChanged: rect.border.width = containsMouse ? 1.0 : 0.0
