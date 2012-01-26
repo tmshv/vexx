@@ -34,7 +34,6 @@ Ellipse {
         ellipse.startDrag(gc.x, gc.y);
         mouse.accepted = true;
         }
-      print("22Pressed", mouse.accepted);
       }
 
     onMousePositionChanged: {
@@ -45,7 +44,6 @@ Ellipse {
         ellipse.moveDrag(gc.x, gc.y);
         mouse.accepted = true;
         }
-      print("22mov", mouse.accepted);
       }
 
     onReleased: {
@@ -57,7 +55,6 @@ Ellipse {
         ellipse.endDrag(gc.x, gc.y);
         mouse.accepted = true;
         }
-      print("22rel", mouse.accepted);
       }
     }
   }

@@ -11,8 +11,15 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: true
     onHoveredChanged: rect.border.width = containsMouse ? 1.0 : 0.0
-    onClicked: rect.clicked()
-  }
+    onPressed: {
+      mouse.accepted = false;
+      if(mouse.modifiers === 0)
+        {
+        rect.clicked();
+        mouse.accepted = true;
+        }
+      }
+    }
 
   border.width: 0.0
   border.color: "#777777"

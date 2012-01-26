@@ -140,7 +140,6 @@ PropertyItem {
             {
               propertyContainer.state = "Expandable";
             }
-            print("YEAH PRESSED!", mouse.accepted);
           }
         }
       }

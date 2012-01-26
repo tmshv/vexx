@@ -254,45 +254,81 @@ Rectangle
     }
 
   MouseArea {
+    id: mouseArea
+
     property real lastClickX: 0
     property real lastClickY: 0
     property bool translating: false
+    property bool selecting: false
 
+    acceptedButtons: Qt.LeftButton|Qt.MiddleButton;
     anchors.fill: parent
     onDoubleClicked: {
       nodecanvas.setRootToParent()
       }
 
+    onPressedChanged: {
+      if(!pressed)
+        {
+        translating = false;
+        selecting = false;
+        }
+      }
+
     onPressed: {
-      if(mouse.modifiers & Qt.AltModifier)
+      lastClickX = mouse.x;
+      lastClickY = mouse.y;
+
+      if(((mouse.modifiers & Qt.AltModifier) !== 0 && mouse.button === Qt.LeftButton))
         {
         translating = true;
+        return;
+        }
+      else if(mouse.modifiers === 0 && mouse.button === Qt.MiddleButton)
+        {
+        translating = true;
+        return;
         }
 
-      lastClickX = mouse.x
-      lastClickY = mouse.y
-      print("YEAH PRESSED!", mouse.accepted);
-    }
+      if(mouse.modifiers === 0 && mouse.button === Qt.LeftButton)
+        {
+        selecting = true;
+        selection.x = mouse.x;
+        selection.y = mouse.y;
+        return;
+        }
+      }
 
     onMousePositionChanged: {
-      if(translating)
-        {
-        var x = mouse.x - lastClickX
-        var y = mouse.y - lastClickY
-
-        display.x += x;
-        display.y += y;
-        }
-
-      lastClickX = mouse.x
-      lastClickY = mouse.y
-      print("YEAH PRESSED!", mouse.accepted);
+      selection.width = mouse.x - selection.x;
+      selection.height = mouse.y - selection.y;
       }
     }
+
+  Rectangle {
+    id: selection
+
+    x: 100
+    y: 100
+    width: 200
+    height: 200
+
+    z: 2
+
+    visible: mouseArea.selecting
+
+    smooth: true
+    radius: 2
+    color: "#551F9AFF"
+
+    border.width: 2
+    border.color: "#007BE0"
+  }
 
   PathHolder {
     x: -2
     y: -2
+    z: 3
     nameData: display.path
     model: display.path.length
   }
