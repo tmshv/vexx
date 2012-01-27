@@ -253,7 +253,7 @@ Rectangle
     currentInputDraggingItem = null;
     }
 
-  MouseArea {
+  MouseAndScrollArea {
     id: mouseArea
 
     property real lastClickX: 0
@@ -274,6 +274,17 @@ Rectangle
         selecting = false;
         }
       }
+
+    onScroll: {
+      var oldSF = display.scale;
+      var sF = Math.max(0.1, Math.min(1.0, display.scale + (delta * 0.0005)));
+      display.scale = sF;
+
+      var mult = sF / oldSF;
+      print(mult, mouse.x, mouse.x - (mouse.x * mult));
+      display.x += mouse.x - (mouse.x * mult);
+      display.y += mouse.y - (mouse.y * mult);
+    }
 
     onPressed: {
       lastClickX = mouse.x;

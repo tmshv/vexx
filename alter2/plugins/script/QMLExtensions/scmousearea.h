@@ -112,7 +112,7 @@ private:
 };
 
 class ScMouseEvent;
-class ScMouseArea : public QDeclarativeItem
+class ScMouseAndScrollArea : public QDeclarativeItem
 {
   Q_OBJECT
   Q_PROPERTY(qreal mouseX READ mouseX NOTIFY mousePositionChanged)
@@ -127,8 +127,8 @@ class ScMouseArea : public QDeclarativeItem
   Q_PROPERTY(bool preventStealing READ preventStealing WRITE setPreventStealing NOTIFY preventStealingChanged)
 
 public:
-  ScMouseArea(QDeclarativeItem *parent=0);
-  ~ScMouseArea();
+  ScMouseAndScrollArea(QDeclarativeItem *parent=0);
+  ~ScMouseAndScrollArea();
 
   qreal mouseX() const;
   qreal mouseY() const;
@@ -162,6 +162,7 @@ Q_SIGNALS:
   void mousePositionChanged(ScMouseEvent *mouse);
   void preventStealingChanged();
 
+  void scroll(ScMouseEvent *mouse, float delta);
   void pressed(ScMouseEvent *mouse);
   void pressAndHold(ScMouseEvent *mouse);
   void released(ScMouseEvent *mouse);
@@ -175,6 +176,7 @@ protected:
   void setHovered(bool);
   bool setPressed(bool);
 
+  void wheelEvent(QGraphicsSceneWheelEvent * event);
   void mousePressEvent(QGraphicsSceneMouseEvent *event);
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
@@ -199,7 +201,7 @@ private:
   void handleRelease();
 
 private:
-  Q_DISABLE_COPY(ScMouseArea)
+  Q_DISABLE_COPY(ScMouseAndScrollArea)
 
   void saveEvent(QGraphicsSceneMouseEvent *event);
 
@@ -226,7 +228,7 @@ private:
 };
 
 QML_DECLARE_TYPE(ScDrag)
-QML_DECLARE_TYPE(ScMouseArea)
+QML_DECLARE_TYPE(ScMouseAndScrollArea)
 QML_DECLARE_TYPE(ScMouseEvent)
 
 #endif // SCMOUSEAREA_H

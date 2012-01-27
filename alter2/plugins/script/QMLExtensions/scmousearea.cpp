@@ -1,4 +1,4 @@
-#include "scmousearea.h"
+#include "ScMouseArea.h"
 
 #include "QDateTime"
 #include "QBasicTimer"
@@ -133,7 +133,7 @@ void ScDrag::setFilterChildren(bool filter)
     emit filterChildrenChanged();
 }
 
-ScMouseArea::ScMouseArea(QDeclarativeItem *parent)
+ScMouseAndScrollArea::ScMouseAndScrollArea(QDeclarativeItem *parent)
   : QDeclarativeItem(parent), _absorb(true), _hovered(false), _pressed(false), _longPress(false),
     _moved(false), _stealMouse(false), _doubleClick(false), _preventStealing(false), _drag(0)
 {
@@ -141,12 +141,12 @@ ScMouseArea::ScMouseArea(QDeclarativeItem *parent)
   setFiltersChildEvents(true);
 }
 
-ScMouseArea::~ScMouseArea()
+ScMouseAndScrollArea::~ScMouseAndScrollArea()
 {
   delete _drag;
 }
 
-void ScMouseArea::saveEvent(QGraphicsSceneMouseEvent *event)
+void ScMouseAndScrollArea::saveEvent(QGraphicsSceneMouseEvent *event)
 {
   _lastPos = event->pos();
   _lastScenePos = event->scenePos();
@@ -155,22 +155,22 @@ void ScMouseArea::saveEvent(QGraphicsSceneMouseEvent *event)
   _lastModifiers = event->modifiers();
 }
 
-qreal ScMouseArea::mouseX() const
+qreal ScMouseAndScrollArea::mouseX() const
 {
   return _lastPos.x();
 }
 
-qreal ScMouseArea::mouseY() const
+qreal ScMouseAndScrollArea::mouseY() const
 {
   return _lastPos.y();
 }
 
-bool ScMouseArea::isEnabled() const
+bool ScMouseAndScrollArea::isEnabled() const
 {
   return _absorb;
 }
 
-void ScMouseArea::setEnabled(bool a)
+void ScMouseAndScrollArea::setEnabled(bool a)
 {
   if (a != _absorb)
     {
@@ -179,12 +179,12 @@ void ScMouseArea::setEnabled(bool a)
     }
 }
 
-bool ScMouseArea::preventStealing() const
+bool ScMouseAndScrollArea::preventStealing() const
 {
   return _preventStealing;
 }
 
-void ScMouseArea::setPreventStealing(bool prevent)
+void ScMouseAndScrollArea::setPreventStealing(bool prevent)
 {
   if (prevent != _preventStealing) {
     _preventStealing = prevent;
@@ -193,12 +193,25 @@ void ScMouseArea::setPreventStealing(bool prevent)
   }
 }
 
-Qt::MouseButtons ScMouseArea::pressedButtons() const
+Qt::MouseButtons ScMouseAndScrollArea::pressedButtons() const
 {
   return _lastButtons;
 }
 
-void ScMouseArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void ScMouseAndScrollArea::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+  _lastPos = event->pos();
+  _lastScenePos = event->scenePos();
+  _lastButton = Qt::NoButton;
+  _lastButtons = event->buttons();
+  _lastModifiers = event->modifiers();
+
+  ScMouseEvent me(_lastPos.x(), _lastPos.y(), _lastButton, _lastButtons, _lastModifiers, false, _longPress);
+  emit scroll(&me, event->delta());
+  event->setAccepted(me.isAccepted());
+}
+
+void ScMouseAndScrollArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   _moved = false;
   _stealMouse = _preventStealing;
@@ -222,7 +235,7 @@ void ScMouseArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
   }
 }
 
-void ScMouseArea::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void ScMouseAndScrollArea::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!_absorb) {
         QDeclarativeItem::mouseMoveEvent(event);
@@ -298,7 +311,7 @@ void ScMouseArea::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 
-void ScMouseArea::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void ScMouseAndScrollArea::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     _stealMouse = false;
     if (!_absorb) {
@@ -319,7 +332,7 @@ void ScMouseArea::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     _doubleClick = false;
 }
 
-void ScMouseArea::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void ScMouseAndScrollArea::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!_absorb) {
         QDeclarativeItem::mouseDoubleClickEvent(event);
@@ -334,7 +347,7 @@ void ScMouseArea::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void ScMouseArea::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void ScMouseAndScrollArea::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!_absorb)
         QDeclarativeItem::hoverEnterEvent(event);
@@ -346,7 +359,7 @@ void ScMouseArea::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     }
 }
 
-void ScMouseArea::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+void ScMouseAndScrollArea::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!_absorb) {
         QDeclarativeItem::hoverMoveEvent(event);
@@ -360,7 +373,7 @@ void ScMouseArea::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     }
 }
 
-void ScMouseArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void ScMouseAndScrollArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!_absorb)
         QDeclarativeItem::hoverLeaveEvent(event);
@@ -369,7 +382,7 @@ void ScMouseArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 }
 
 #ifndef QT_NO_CONTEXTMENU
-void ScMouseArea::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void ScMouseAndScrollArea::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     bool acceptsContextMenuButton;
 #if defined(Q_OS_SYMBIAN)
@@ -394,7 +407,7 @@ void ScMouseArea::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 }
 #endif // QT_NO_CONTEXTMENU
 
-bool ScMouseArea::sceneEvent(QEvent *event)
+bool ScMouseAndScrollArea::sceneEvent(QEvent *event)
 {
     bool rv = QDeclarativeItem::sceneEvent(event);
     if (event->type() == QEvent::UngrabMouse) {
@@ -415,7 +428,7 @@ bool ScMouseArea::sceneEvent(QEvent *event)
     return rv;
 }
 
-bool ScMouseArea::sendMouseEvent(QGraphicsSceneMouseEvent *event)
+bool ScMouseAndScrollArea::sendMouseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsSceneMouseEvent mouseEvent(event->type());
     QRectF myRect = mapToScene(QRectF(0, 0, width(), height())).boundingRect();
@@ -472,7 +485,7 @@ bool ScMouseArea::sendMouseEvent(QGraphicsSceneMouseEvent *event)
     return false;
 }
 
-bool ScMouseArea::sceneEventFilter(QGraphicsItem *i, QEvent *e)
+bool ScMouseAndScrollArea::sceneEventFilter(QGraphicsItem *i, QEvent *e)
 {
     if (!_absorb || !isVisible() || !_drag || !_drag->filterChildren())
         return QDeclarativeItem::sceneEventFilter(i, e);
@@ -488,7 +501,7 @@ bool ScMouseArea::sceneEventFilter(QGraphicsItem *i, QEvent *e)
     return QDeclarativeItem::sceneEventFilter(i, e);
 }
 
-void ScMouseArea::timerEvent(QTimerEvent *event)
+void ScMouseAndScrollArea::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == _pressAndHoldTimer.timerId()) {
         _pressAndHoldTimer.stop();
@@ -501,7 +514,7 @@ void ScMouseArea::timerEvent(QTimerEvent *event)
     }
 }
 
-void ScMouseArea::geometryChanged(const QRectF &newGeometry,
+void ScMouseAndScrollArea::geometryChanged(const QRectF &newGeometry,
                                             const QRectF &oldGeometry)
 {
     QDeclarativeItem::geometryChanged(newGeometry, oldGeometry);
@@ -512,7 +525,7 @@ void ScMouseArea::geometryChanged(const QRectF &newGeometry,
         _lastPos = mapFromScene(_lastScenePos);
 }
 
-QVariant ScMouseArea::itemChange(GraphicsItemChange change,
+QVariant ScMouseAndScrollArea::itemChange(GraphicsItemChange change,
                                        const QVariant &value)
 {
     switch (change) {
@@ -527,12 +540,12 @@ QVariant ScMouseArea::itemChange(GraphicsItemChange change,
     return QDeclarativeItem::itemChange(change, value);
 }
 
-bool ScMouseArea::hoverEnabled() const
+bool ScMouseAndScrollArea::hoverEnabled() const
 {
     return acceptHoverEvents();
 }
 
-void ScMouseArea::setHoverEnabled(bool h)
+void ScMouseAndScrollArea::setHoverEnabled(bool h)
 {
     if (h == acceptHoverEvents())
         return;
@@ -543,17 +556,17 @@ void ScMouseArea::setHoverEnabled(bool h)
         setHovered(!_hovered);
 }
 
-bool ScMouseArea::hovered() const
+bool ScMouseAndScrollArea::hovered() const
 {
     return _hovered;
 }
 
-bool ScMouseArea::pressed() const
+bool ScMouseAndScrollArea::pressed() const
 {
     return _pressed;
 }
 
-void ScMouseArea::setHovered(bool h)
+void ScMouseAndScrollArea::setHovered(bool h)
 {
     if (_hovered != h) {
         _hovered = h;
@@ -562,12 +575,12 @@ void ScMouseArea::setHovered(bool h)
     }
 }
 
-Qt::MouseButtons ScMouseArea::acceptedButtons() const
+Qt::MouseButtons ScMouseAndScrollArea::acceptedButtons() const
 {
     return acceptedMouseButtons();
 }
 
-void ScMouseArea::setAcceptedButtons(Qt::MouseButtons buttons)
+void ScMouseAndScrollArea::setAcceptedButtons(Qt::MouseButtons buttons)
 {
     if (buttons != acceptedMouseButtons()) {
         setAcceptedMouseButtons(buttons);
@@ -575,7 +588,7 @@ void ScMouseArea::setAcceptedButtons(Qt::MouseButtons buttons)
     }
 }
 
-bool ScMouseArea::setPressed(bool p)
+bool ScMouseAndScrollArea::setPressed(bool p)
 {
     bool dragged = _drag && _drag->active();
     bool isclick = _pressed == true && p == false && dragged == false && _hovered == true;
@@ -604,7 +617,7 @@ bool ScMouseArea::setPressed(bool p)
     return false;
 }
 
-ScDrag *ScMouseArea::drag()
+ScDrag *ScMouseAndScrollArea::drag()
 {
     if (!_drag)
         _drag = new ScDrag;
