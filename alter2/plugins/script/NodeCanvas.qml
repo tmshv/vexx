@@ -282,11 +282,13 @@ Rectangle
       if(((mouse.modifiers & Qt.AltModifier) !== 0 && mouse.button === Qt.LeftButton))
         {
         translating = true;
+        mouse.accepted = true;
         return;
         }
       else if(mouse.modifiers === 0 && mouse.button === Qt.MiddleButton)
         {
         translating = true;
+        mouse.accepted = true;
         return;
         }
 
@@ -295,18 +297,65 @@ Rectangle
         selecting = true;
         selection.x = mouse.x;
         selection.y = mouse.y;
+        mouse.accepted = true;
         return;
         }
       }
 
     onMousePositionChanged: {
-      selection.width = mouse.x - selection.x;
-      selection.height = mouse.y - selection.y;
+      if(selecting)
+        {
+        if(selection.moveLeft)
+          {
+          selection.width += selection.x - mouse.x;
+          selection.x = mouse.x;
+          }
+        else
+          {
+          selection.width = mouse.x - selection.x;
+          }
+
+        if(selection.moveTop)
+          {
+          selection.height += selection.y - mouse.y;
+          selection.y = mouse.y;
+          }
+        else
+          {
+          selection.height = mouse.y - selection.y;
+          }
+
+        if(selection.width < 0)
+          {
+          selection.moveLeft ^= true;
+          selection.x += selection.width;
+          selection.width = Math.abs(selection.width);
+          }
+
+        if(selection.height < 0)
+          {
+          selection.moveTop ^= true;
+          selection.y += selection.height;
+          selection.height = Math.abs(selection.height);
+          }
+        }
+      else if(translating)
+        {
+        var dx = mouse.x - lastClickX
+        var dy = mouse.y - lastClickY
+
+        display.x += dx;
+        display.y += dy;
+        }
+      lastClickX = mouse.x
+      lastClickY = mouse.y
       }
     }
 
   Rectangle {
     id: selection
+    property bool moveTop: false
+    property bool moveLeft: false
 
     x: 100
     y: 100
