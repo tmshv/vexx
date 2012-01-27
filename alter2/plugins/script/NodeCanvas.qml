@@ -277,13 +277,13 @@ Rectangle
 
     onScroll: {
       var oldSF = display.scale;
-      var sF = Math.max(0.1, Math.min(1.0, display.scale + (delta * 0.0005)));
+      var sF = Math.max(0.25, Math.min(1.0, display.scale + (delta * 0.00025)));
       display.scale = sF;
 
       var mult = sF / oldSF;
-      print(mult, mouse.x, mouse.x - (mouse.x * mult));
-      display.x += mouse.x - (mouse.x * mult);
-      display.y += mouse.y - (mouse.y * mult);
+      var mappedMouse = display.mapFromItem(null, mouse.x, mouse.y);
+      display.x += mappedMouse.x - (mappedMouse.x * mult);
+      display.y += mappedMouse.y - (mappedMouse.y * mult);
     }
 
     onPressed: {
