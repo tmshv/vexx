@@ -24,6 +24,8 @@ class ScPath : public QDeclarativeItem
 public:
   ScPath(QDeclarativeItem *parent = 0);
 
+  Q_INVOKABLE float intersect(float x, float y, float tol) const;
+
   const QPointF &firstPoint() const;
   void setFirstPoint(const QPointF &c);
   const QPointF &lastPoint() const;

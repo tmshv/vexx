@@ -1,5 +1,6 @@
 #include "scnodedisplay.h"
 #include "scnodeitem.h"
+#include "sproperty.h"
 #include "scconnectoritem.h"
 #include "sentity.h"
 #include "XAssert"
@@ -69,12 +70,14 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
       {
       if(tC->before() == &_rootIndex->children)
         {
-        removeNode(ent);
+        removeNode(ent);        
+        ent->removeConnectionObserver(this);
         return;
         }
       if(tC->after() == &_rootIndex->children)
         {
         addNode(_node, ent);
+        ent->addConnectionObserver(this);
         return;
         }
 
@@ -114,7 +117,17 @@ void ScNodeDisplay::onConnectionChange(const SChange *change)
       }
     else
       {
-      xAssertFail();
+      for(xsize i = 0, s = _connectors.size(); i < s; ++i)
+        {
+        ScConnectorItem *conn = _connectors[i];
+        if(conn->drivenProperty() == c->driven() &&
+            conn->driverProperty() == c->driver())
+          {
+          conn->deleteLater();
+          _connectors.remove(i);
+          break;
+          }
+        }
       }
     }
   }
@@ -160,6 +173,15 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
     {
     _rootIndex->removeTreeObserver(this);
     _rootIndex->removeConnectionObserver(this);
+    for(SProperty *p=_rootIndex->children.firstChild(); p; p=p->nextSibling())
+      {
+      SEntity *ent = p->castTo<SEntity>();
+      xAssert(ent);
+      if(ent)
+        {
+        p->entity()->removeConnectionObserver(this);
+        }
+      }
     }
 
   _rootIndex = i;
@@ -169,6 +191,15 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
     {
     _rootIndex->addTreeObserver(this);
     _rootIndex->addConnectionObserver(this);
+    for(SProperty *p=_rootIndex->children.firstChild(); p; p=p->nextSibling())
+      {
+      SEntity *ent = p->castTo<SEntity>();
+      xAssert(ent);
+      if(ent)
+        {
+        p->entity()->addConnectionObserver(this);
+        }
+      }
     }
 
   rebuild();
@@ -471,6 +502,16 @@ void ScNodeDisplay::addConnector(const SProperty *dvnProp, const SProperty *dvrP
   connector->setNodeDisplay(this);
 
   _connector->completeCreate();
+  }
+
+void ScNodeDisplay::destroyConnection(ScConnectorItem *c)
+  {
+  xAssert(c);
+  SProperty *driven = (SProperty*)c->drivenProperty();
+  xAssert(driven);
+  xAssert(driven->input());
+
+  driven->input()->disconnect(driven);
   }
 
 void ScNodeDisplay::changeItemInput(QDeclarativeItem *item, QDeclarativeItem *newInput)

@@ -5,6 +5,7 @@ import "NodeCanvasContents"
 Rectangle
   {
   id: nodecanvas
+  property variant selection: [ ]
   color: "#343434"
 
   property real maxNodeZ: 1.0;
@@ -22,6 +23,62 @@ Rectangle
   function reset()
     {
     maxNodeZ = 1.0;
+    clearSelection();
+    }
+
+  function drag(item, x, y)
+    {
+    if(!item.selected)
+      {
+      item.setPosition(item.x + x, item.y + y);
+      }
+    else
+      {
+      for(var i = 0, s = nodecanvas.selection.length; i < s; ++i)
+        {
+        var theItem = nodecanvas.selection[i];
+        theItem.setPosition(theItem.x + x, theItem.y + y);
+        }
+      }
+    }
+
+  function dragSelect(x, y, width, height)
+    {
+    clearSelection();
+    for(var i = 0, s = display.count; i < s; ++i)
+      {
+      var item = display.nodeAt(i);
+      if(item.x > x &&
+          item.y > y &&
+          (item.x+item.width) < x+width &&
+          (item.y+item.height) < y+height)
+        {
+        select(item, false);
+        }
+      }
+    }
+
+  function clearSelection()
+    {
+    for(var i = 0; i < nodecanvas.selection.length; ++i)
+      {
+      nodecanvas.selection[i].selected = false;
+      }
+    nodecanvas.selection = [ ];
+    }
+
+  function select(item, clear)
+    {
+    if(clear)
+      {
+      clearSelection();
+      }
+
+    var sel = nodecanvas.selection;
+    sel.push(item);
+    nodecanvas.selection = sel;
+
+    item.selected = true;
     }
 
   function bringToTop(item)
@@ -176,7 +233,7 @@ Rectangle
 
   property variant currentInputDragging: null
   property variant currentInputDraggingItem: null
-  property variant currentInputDraggingIndex: null
+  property variant destroyOnConnectionComplete: null
   property string currentInputBeginMode: ""
   function startCreatingConnection(thing, mode, x, y)
     {
@@ -222,17 +279,78 @@ Rectangle
       }
     }
 
+  function editConnection(conn, mode, x, y)
+    {
+    destroyOnConnectionComplete = conn;
+    destroyOnConnectionComplete.visible = false;
+
+    var output = mode !== "input";
+
+    currentInputDraggingItem = output ? conn.driver : conn.driven;
+    currentInputBeginMode = mode;
+
+    conn.moveDrag.connect(moveCreatingConnection);
+    conn.endDrag.connect(endCreatingConnection);
+
+    var component = Qt.createComponent("NodeCanvasContents/DynamicInput.qml");
+
+    if(component.status === Component.Error)
+      {
+      // Error Handling
+      console.log("Error loading Input component:", component.errorString());
+      return;
+      }
+
+    var col = output ? conn.driverColour : conn.drivenColour;
+    currentInputDragging = component.createObject(display, { firstColour: col, lastColour: col } );
+
+    var pos = display.mapFromItem(null, x, y);
+    var inp = output ? conn.driverPoint : conn.drivenPoint;
+
+    currentInputDragging.firstPoint.x = inp.x;
+    currentInputDragging.firstPoint.y = inp.y;
+
+    currentInputDragging.lastPoint.x = pos.x;
+    currentInputDragging.lastPoint.y = pos.y;
+
+    if(output)
+      {
+      currentInputDragging.firstNormal.x = 100
+      currentInputDragging.lastNormal.x = -100
+      }
+    else
+      {
+      currentInputDragging.firstNormal.x = -100
+      currentInputDragging.lastNormal.x = 100
+      }
+    }
+
   function moveCreatingConnection(x, y)
     {
-    var pos = display.mapFromItem(null, x, y);
+    var pos = display.mapFromItem(destroyOnConnectionComplete, x, y);
     currentInputDragging.lastPoint.x = pos.x;
     currentInputDragging.lastPoint.y = pos.y;
     }
 
   function endCreatingConnection(x, y)
     {
-    currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
-    currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
+    if(currentInputDraggingItem.moveDrag)
+      {
+      currentInputDraggingItem.moveDrag.disconnect(moveCreatingConnection);
+      currentInputDraggingItem.endDrag.disconnect(endCreatingConnection);
+      }
+
+    if(destroyOnConnectionComplete)
+      {
+      if(destroyOnConnectionComplete.moveDrag)
+        {
+        destroyOnConnectionComplete.moveDrag.disconnect(moveCreatingConnection);
+        destroyOnConnectionComplete.endDrag.disconnect(endCreatingConnection);
+        }
+
+      display.destroyConnection(destroyOnConnectionComplete);
+      destroyOnConnectionComplete = null;
+      }
 
     var intersectedItemParent = intersect(x, y);
 
@@ -268,10 +386,17 @@ Rectangle
       }
 
     onPressedChanged: {
+
       if(!pressed)
         {
-        translating = false;
+        if(selecting)
+          {
+          var mappedMouseA = display.mapFromItem(null, selection.x, selection.y);
+          var mappedMouseB = display.mapFromItem(null, selection.x + selection.width, selection.y + selection.height);
+          nodecanvas.dragSelect(mappedMouseA.x, mappedMouseA.y, mappedMouseB.x, mappedMouseB.y);
+          }
         selecting = false;
+        translating = false;
         }
       }
 
@@ -308,6 +433,8 @@ Rectangle
         selecting = true;
         selection.x = mouse.x;
         selection.y = mouse.y;
+        selection.width = 0;
+        selection.height = 0;
         mouse.accepted = true;
         return;
         }

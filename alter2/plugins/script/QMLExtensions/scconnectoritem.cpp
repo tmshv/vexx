@@ -10,6 +10,13 @@ ScConnectorItem::ScConnectorItem(QDeclarativeItem *parent) :
   _driven = 0;
   _driverProperty = 0;
   _drivenProperty = 0;
+  connect(this, SIGNAL(drivenChanged()), this, SIGNAL(drivenNormalChanged()));
+  connect(this, SIGNAL(drivenChanged()), this, SIGNAL(colourChanged()));
+  connect(this, SIGNAL(drivenChanged()), this, SIGNAL(drivenPointChanged()));
+
+  connect(this, SIGNAL(driverChanged()), this, SIGNAL(driverNormalChanged()));
+  connect(this, SIGNAL(driverChanged()), this, SIGNAL(colourChanged()));
+  connect(this, SIGNAL(driverChanged()), this, SIGNAL(driverPointChanged()));
   }
 
 void ScConnectorItem::setProperties(const SProperty *driver, const SProperty *driven)
@@ -34,8 +41,7 @@ void ScConnectorItem::setDriverItem(ScPropertyItem *driver)
   _driver = driver;
 
   connect(driver, SIGNAL(scenePositionChanged()), this, SIGNAL(driverPointChanged()));
-  emit driverPointChanged();
-  emit colourChanged();
+  emit driverChanged();
   }
 
 void ScConnectorItem::setDrivenItem(ScPropertyItem *driven)
@@ -47,8 +53,7 @@ void ScConnectorItem::setDrivenItem(ScPropertyItem *driven)
 
   _driven = driven;
   connect(driven, SIGNAL(scenePositionChanged()), this, SIGNAL(drivenPointChanged()));
-  emit drivenPointChanged();
-  emit colourChanged();
+  emit drivenChanged();
   }
 
 QPointF ScConnectorItem::driverPoint() const

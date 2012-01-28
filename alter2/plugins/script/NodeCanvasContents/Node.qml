@@ -4,8 +4,7 @@ import VexxQMLExtensions 1.0
 NodeItem {
   id: nodeItem
   property real propertyTabIn: 10
-
-  state: "NotHovered"
+  property bool selected: false
 
   driverPoint: header.driverPoint()
   drivenPoint: header.drivenPoint()
@@ -24,34 +23,6 @@ NodeItem {
 
     return propertyList.intersect(x, y);
     }
-
-  states: [
-    State {
-        name: "NotHovered"
-        when: dragMouseArea.hovered !== true
-
-        /*PropertyChanges {
-          target: fader
-          color: "#282828"
-        }*/
-      },
-    State {
-        name: "Hovered"
-        when: dragMouseArea.hovered === true
-
-        /*PropertyChanges {
-          target: fader
-          color: "#3F3F3F"
-        }*/
-      }
-    ]
-
-  transitions: [
-    Transition {
-      from: "*"; to: "*"
-      ColorAnimation { property: "color"; easing.type: Easing.OutBounce; duration: 1000 }
-      }
-    ]
 
   Rectangle {
     property real pad: 3
@@ -73,21 +44,46 @@ NodeItem {
     width: 121
     height: childrenRect.height + 6
     smooth: true
-    color: "#282828"
     border.color: "#666666"
     radius: 4
 
-    /*gradient: Gradient {
-      GradientStop {
-        position: 0.0
-        color: "#282828"
-      }
-      GradientStop {
-        id: fader
-        position: 1.0
-        color: "#3F3F3F"
-      }
-    }*/
+    state: "NotHovered"
+    states: [
+      State {
+        name: "Selected"
+        when: nodeItem.selected === true
+
+        PropertyChanges {
+          target: node
+          color: "#C1BDB7"
+          }
+        },
+      State {
+          name: "NotHovered"
+          when: dragMouseArea.hovered !== true
+
+          PropertyChanges {
+            target: node
+            color: "#282828"
+            }
+        },
+      State {
+          name: "Hovered"
+          when: dragMouseArea.hovered === true
+
+          PropertyChanges {
+            target: node
+            color: "#3F3F3F"
+          }
+        }
+      ]
+
+    transitions: [
+      Transition {
+        from: "*"; to: "*"
+        ColorAnimation { property: "color"; easing.type: Easing.OutBounce; duration: 500 }
+        }
+      ]
 
     MouseArea {
       id: dragMouseArea
@@ -106,6 +102,7 @@ NodeItem {
         if(mouse.modifiers === 0)
           {
           mouse.accepted = true;
+          nodecanvas.select(nodeItem, true);
           nodecanvas.bringToTop(nodeItem);
           }
         }
@@ -129,18 +126,29 @@ NodeItem {
           width: contents.width - 4
           showInterfaces: specialMode === ""
 
+          property bool shouldSelect: false
+
           onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
 
           onEnter: {
             nodecanvas.setRootIndex(nodeItem);
             }
 
-          onBringToTop: {
+          onClick: {
+            shouldSelect = true;
             nodecanvas.bringToTop(nodeItem);
             }
 
+          onClickReleased: {
+            if(shouldSelect)
+              {
+              nodecanvas.select(nodeItem, true);
+              }
+            }
+
           onDragged: {
-            nodeItem.setPosition(nodeItem.x + x, nodeItem.y + y);
+            shouldSelect = false;
+            nodecanvas.drag(nodeItem, x, y);
             }
           }
         }

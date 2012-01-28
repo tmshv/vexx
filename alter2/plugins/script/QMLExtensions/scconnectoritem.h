@@ -18,6 +18,8 @@ class ScConnectorItem : public QDeclarativeItem
   Q_PROPERTY(QPointF drivenNormal READ drivenNormal NOTIFY drivenNormalChanged)
   Q_PROPERTY(QColor driverColour READ driverColour NOTIFY colourChanged)
   Q_PROPERTY(QColor drivenColour READ drivenColour NOTIFY colourChanged)
+  Q_PROPERTY(ScPropertyItem *driver READ driver NOTIFY driverChanged)
+  Q_PROPERTY(ScPropertyItem *driven READ driven NOTIFY drivenChanged)
 
   XROProperty(const SProperty *, driverProperty);
   XROProperty(const SProperty *, drivenProperty);
@@ -40,6 +42,8 @@ public:
   QColor drivenColour() const;
 
 signals:
+  void driverChanged();
+  void drivenChanged();
   void driverPointChanged();
   void drivenPointChanged();
   void driverNormalChanged();

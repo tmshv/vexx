@@ -55,6 +55,7 @@ public:
   void setNode(QDeclarativeComponent *);
   void setConnector(QDeclarativeComponent *);
 
+  Q_INVOKABLE void destroyConnection(ScConnectorItem *c);
   Q_INVOKABLE void changeItemInput(QDeclarativeItem *item, QDeclarativeItem *newInput);
 
 signals:

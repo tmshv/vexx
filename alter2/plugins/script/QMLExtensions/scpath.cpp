@@ -1,11 +1,36 @@
 #include "scpath.h"
 #include "QPainter"
+#include "XVector2D"
 
 ScPath::ScPath(QDeclarativeItem *parent)
     : QDeclarativeItem(parent), _penWidth(1)
   {
   // need to disable this flag to draw inside a QDeclarativeItem
   setFlag(QGraphicsItem::ItemHasNoContents, false);
+  }
+
+float ScPath::intersect(float xIn, float yIn, float tol) const
+  {
+  QPainterPathStroker stroker;
+  stroker.setWidth(width() * tol);
+  QPainterPath path = stroker.createStroke(_path);
+
+  QPointF pt(xIn, yIn);
+  path.setFillRule(Qt::WindingFill);
+  if(path.contains(pt))
+    {
+    XVector2D pos(x(), y());
+    XVector2D fP(_firstPoint.x(), _firstPoint.y());
+    XVector2D lP(_lastPoint.x(), _lastPoint.y());
+    XVector2D offset = XVector2D(pt.x(), pt.y()) - (fP - pos);
+    XVector2D vec = lP - fP;
+    XVector2D delta = vec.normalized();
+
+    float projectedLength = delta.dot(offset);
+    return projectedLength / vec.norm();
+    }
+
+  return -HUGE_VAL;
   }
 
 const QPointF &ScPath::firstPoint() const

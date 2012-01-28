@@ -8,7 +8,8 @@ Rectangle {
   property bool dragging: false
   property alias text: headerText.text
 
-  signal bringToTop()
+  signal click()
+  signal clickReleased()
   signal enter()
   signal createConnection(variant item, string mode, real x, real y)
   signal dragged(real x, real y)
@@ -100,7 +101,7 @@ Rectangle {
       if(mouse.modifiers === 0)
         {
         mouse.accepted = true;
-        bringToTop();
+        click();
         dragging = true
         var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
         lastX = gc.x
@@ -119,6 +120,7 @@ Rectangle {
         {
         dragging = false;
         mouse.accepted = true;
+        clickReleased();
         }
       }
 
@@ -129,7 +131,12 @@ Rectangle {
         mouse.accepted = true;
         var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
 
-        header.dragged(gc.x - lastX, gc.y - lastY)
+        var x = gc.x - lastX;
+        var y = gc.y - lastY;
+        if(x != 0 && y != 0)
+          {
+          header.dragged(x,   y);
+          }
 
         lastX = gc.x
         lastY = gc.y
