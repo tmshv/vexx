@@ -41,7 +41,7 @@ public:
 
   QScriptEngine *engine();
 
-  Q_INVOKABLE void addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData);
+  Q_INVOKABLE QObject *addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData);
 
   static QScriptValue call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args);
 

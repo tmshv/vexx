@@ -37,7 +37,8 @@ SOURCES += scplugin.cpp \
     QMLExtensions/scpropertyitem.cpp \
     QMLExtensions/scpropertydisplay.cpp \
     QMLExtensions/scconnectoritem.cpp \
-    QMLExtensions/scmousearea.cpp
+    QMLExtensions/scmousearea.cpp \
+    scdeclarativesurface.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -58,7 +59,8 @@ HEADERS += scplugin.h \
     QMLExtensions/scpropertyitem.h \
     QMLExtensions/scpropertydisplay.h \
     QMLExtensions/scconnectoritem.h \
-    QMLExtensions/scmousearea.h
+    QMLExtensions/scmousearea.h \
+    scdeclarativesurface.h
 
 RESOURCES += \
     ScResources.qrc
@@ -71,7 +73,6 @@ OTHER_FILES += \
     NodeCanvasContents/Node.qml \
     NodeCanvasContents/Property.qml \
     NodeCanvasContents/Input.qml \
-    QMLItemLookup.js \
     NodeCanvasContents/PropertyList.qml \
     NodeCanvasContents/PropertyInterface.qml \
     NodeCanvasContents/NodeHeader.qml \

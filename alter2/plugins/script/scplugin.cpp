@@ -13,8 +13,6 @@
 #include "QDebug"
 #include "QMainWindow"
 #include "scio.h"
-#include "QDeclarativeView"
-#include "QDeclarativeContext"
 #include "sdatabasemodel.h"
 #include "QGraphicsObject"
 #include "qdeclarative.h"
@@ -26,6 +24,7 @@
 #include "QMLExtensions/scconnectoritem.h"
 #include "QMLExtensions/scmousearea.h"
 #include "QGLWidget"
+#include "scdeclarativesurface.h"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -160,7 +159,6 @@ void ScPlugin::load()
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");
 #endif
-
 
   xAssert(!_model);
   _model = new SDatabaseModel(&db->db(), &db->db(), SDatabaseModel::NoOptions);
@@ -326,41 +324,20 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
   return QScriptValue();
   }
 
-
-void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
+QObject *ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
   {
   APlugin<UIPlugin> ui(this, "ui");
-  if(ui.isValid())
+  if(!ui.isValid())
     {
-    class DeclarativeSurface : public UISurface, QDeclarativeView
-      {
-    public:
-      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, SDatabaseModel *model, const QVariantMap &) : UISurface(name, this, type)
-        {
-        if(model)
-          {
-          QDeclarativeContext *ctx = rootContext();
-          ctx->setContextProperty("db", model);
-          }
-
-        //setViewport(new QGLWidget);
-
-        setSource(s);
-        setResizeMode(QDeclarativeView::SizeRootObjectToView);
-
-        /*QGraphicsObject *root = rootObject();
-        foreach(const QString &s, data.keys())
-          {
-          root->setProperty(s.toLatin1().constData(), data.value(s));
-          }*/
-        }
-      };
-
-    UISurface::SurfaceType t = (type == "Properties") ? UISurface::PropertiesPage : UISurface::Dock;
-
-    DeclarativeSurface *s = new DeclarativeSurface(name, url, t, _model, qmlData);
-    ui->addSurface(s);
+    return 0;
     }
+
+  UISurface::SurfaceType t = (type == "Properties") ? UISurface::PropertiesPage : UISurface::Dock;
+
+  ScDeclarativeSurface *s = new ScDeclarativeSurface(name, url, t, _model, qmlData);
+  ui->addSurface(s);
+
+  return s;
   }
 
 bool ScPlugin::execute(const QString &code)
