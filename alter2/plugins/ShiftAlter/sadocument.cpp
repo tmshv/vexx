@@ -4,10 +4,8 @@
 #include "QMenu"
 #include "splugin.h"
 
-void SDocument::incrementRevision(const SPropertyInstanceInformation *, SPropertyContainer *c)
+void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocument *doc)
   {
-  SDocument *doc = c->uncheckedCastTo<SDocument>();
-
   doc->revision = doc->revision() + 1;
   }
 

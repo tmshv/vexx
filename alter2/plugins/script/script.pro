@@ -7,7 +7,7 @@ TEMPLATE = lib
 
 include("../../../EksCore/GeneralOptions.pri")
 
-QT += script scripttools
+QT += script scripttools declarative opengl
 INCLUDEPATH += ../../ \
     $$ROOT/EksCore \
     $$ROOT/shift \
@@ -28,7 +28,16 @@ SOURCES += scplugin.cpp \
     scshiftentity.cpp \
     scshiftdatabase.cpp \
     scshiftfloatarrayproperty.cpp \
-    scio.cpp
+    scio.cpp \
+    QMLExtensions\scpath.cpp \
+    QMLExtensions/scellipse.cpp \
+    QMLExtensions/scbrush.cpp \
+    QMLExtensions/scnodedisplay.cpp \
+    QMLExtensions/scnodeitem.cpp \
+    QMLExtensions/scpropertyitem.cpp \
+    QMLExtensions/scpropertydisplay.cpp \
+    QMLExtensions/scconnectoritem.cpp \
+    QMLExtensions/scmousearea.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -40,14 +49,36 @@ HEADERS += scplugin.h \
     scshiftentity.h \
     scshiftdatabase.h \
     scshiftfloatarrayproperty.h \
-    scio.h
+    scio.h \
+    QMLExtensions\scpath.h \
+    QMLExtensions/scellipse.h \
+    QMLExtensions/scbrush.h \
+    QMLExtensions/scnodedisplay.h \
+    QMLExtensions/scnodeitem.h \
+    QMLExtensions/scpropertyitem.h \
+    QMLExtensions/scpropertydisplay.h \
+    QMLExtensions/scconnectoritem.h \
+    QMLExtensions/scmousearea.h
 
 RESOURCES += \
     ScResources.qrc
 
 OTHER_FILES += \
     JSPartExporter.js \
-    CoreStartup.js
+    CoreStartup.js \
+    StartupUI.js \
+    NodeCanvas.qml \
+    NodeCanvasContents/Node.qml \
+    NodeCanvasContents/Property.qml \
+    NodeCanvasContents/Input.qml \
+    QMLItemLookup.js \
+    NodeCanvasContents/PropertyList.qml \
+    NodeCanvasContents/PropertyInterface.qml \
+    NodeCanvasContents/NodeHeader.qml \
+    NodeCanvasContents/DynamicInput.qml \
+    NodeCanvasContents/PathHolder.qml \
+    NodeCanvasContents/PathItem.qml
+
 
 
 

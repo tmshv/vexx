@@ -13,11 +13,23 @@
 #include "QDebug"
 #include "QMainWindow"
 #include "scio.h"
-
+#include "QDeclarativeView"
+#include "QDeclarativeContext"
+#include "sdatabasemodel.h"
+#include "QGraphicsObject"
+#include "qdeclarative.h"
+#include "QMLExtensions/scpath.h"
+#include "QMLExtensions/scellipse.h"
+#include "QMLExtensions/scbrush.h"
+#include "QMLExtensions/scnodedisplay.h"
+#include "QMLExtensions/scnodeitem.h"
+#include "QMLExtensions/scconnectoritem.h"
+#include "QMLExtensions/scmousearea.h"
+#include "QGLWidget"
 
 ALTER_PLUGIN(ScPlugin);
 
-ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0)
+ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0), _model(0)
   {
   setObjectName("script");
   }
@@ -27,7 +39,9 @@ ScPlugin::~ScPlugin()
   delete _io;
   delete _engine;
   delete _types;
+  delete _model;
 
+  _model = 0;
   _engine = 0;
   _surface = 0;
   }
@@ -65,6 +79,8 @@ void ScPlugin::pluginAdded(const QString &type)
       APlugin<UIPlugin> ui(this, "ui");
       xAssert(ui.isValid());
       ui->addSurface(_surface);
+
+      includePath(":/Sc/StartupUI.js");
       }
     }
   }
@@ -73,7 +89,12 @@ void ScPlugin::pluginRemoved(const QString &type)
   {
   engine()->globalObject().setProperty(type, QScriptValue());
 
-  if(type == "ui")
+  if(type == "db")
+    {
+    delete _model;
+    _model = 0;
+    }
+  else if(type == "ui")
     {
     delete _surface;
     _surface = 0;
@@ -123,9 +144,26 @@ void ScPlugin::load()
       }
     }
 
+  qmlRegisterType<ScPath>("VexxQMLExtensions", 1, 0, "Path");
+  qmlRegisterType<ScEllipse>("VexxQMLExtensions", 1, 0, "Ellipse");
+  qmlRegisterType<ScGradient>("VexxQMLExtensions", 1, 0, "Gradient");
+  qmlRegisterType<ScGradientStop>("VexxQMLExtensions", 1, 0, "GradientStop");
+  qmlRegisterType<ScPen>("VexxQMLExtensions", 1, 0, "Pen");
+  qmlRegisterType<ScNodeDisplay>("VexxQMLExtensions", 1, 0, "NodeDisplay");
+  qmlRegisterType<ScPropertyDisplay>("VexxQMLExtensions", 1, 0, "PropertyDisplay");
+  qmlRegisterType<ScNodeItem>("VexxQMLExtensions", 1, 0, "NodeItem");
+  qmlRegisterType<ScPropertyItem>("VexxQMLExtensions", 1, 0, "PropertyItem");
+  qmlRegisterType<ScConnectorItem>("VexxQMLExtensions", 1, 0, "ConnectorItem");
+  qmlRegisterType<ScMouseAndScrollArea>("VexxQMLExtensions", 1, 0, "MouseAndScrollArea");
+  qmlRegisterUncreatableType<ScMouseEvent>("VexxQMLExtensions", 1, 0, "MouseEventV2", "thing");
+
 #ifdef X_DEBUG
   core()->addDirectory(core()->rootPath() + "../alter2/plugins/script/");
 #endif
+
+
+  xAssert(!_model);
+  _model = new SDatabaseModel(&db->db(), &db->db(), SDatabaseModel::NoOptions);
 
   include("CoreStartup.js");
   }
@@ -286,6 +324,43 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
     qDebug() << "Script Returned: " << ret.toString() << endl;
     }
   return QScriptValue();
+  }
+
+
+void ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
+  {
+  APlugin<UIPlugin> ui(this, "ui");
+  if(ui.isValid())
+    {
+    class DeclarativeSurface : public UISurface, QDeclarativeView
+      {
+    public:
+      DeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, SDatabaseModel *model, const QVariantMap &) : UISurface(name, this, type)
+        {
+        if(model)
+          {
+          QDeclarativeContext *ctx = rootContext();
+          ctx->setContextProperty("db", model);
+          }
+
+        //setViewport(new QGLWidget);
+
+        setSource(s);
+        setResizeMode(QDeclarativeView::SizeRootObjectToView);
+
+        /*QGraphicsObject *root = rootObject();
+        foreach(const QString &s, data.keys())
+          {
+          root->setProperty(s.toLatin1().constData(), data.value(s));
+          }*/
+        }
+      };
+
+    UISurface::SurfaceType t = (type == "Properties") ? UISurface::PropertiesPage : UISurface::Dock;
+
+    DeclarativeSurface *s = new DeclarativeSurface(name, url, t, _model, qmlData);
+    ui->addSurface(s);
+    }
   }
 
 bool ScPlugin::execute(const QString &code)

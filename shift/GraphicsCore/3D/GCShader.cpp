@@ -33,10 +33,9 @@ SPropertyInformation *GCVertexShaderComponent::createTypeInformation()
 
 S_IMPLEMENT_PROPERTY(GCShader)
 
-void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, SPropertyContainer *cont)
+void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, GCShader *shader)
   {
   xAssert(SProcessManager::isMainThread());
-  GCShader* shader = cont->uncheckedCastTo<GCShader>();
 
   GCRuntimeShader::ComputeLock lock(&shader->runtimeShader);
 

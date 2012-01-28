@@ -129,11 +129,9 @@ void GCGeometryAttribute::setPolygon(xuint32 index, const xuint32 *indices, xsiz
 
 S_IMPLEMENT_PROPERTY(GCGeometry)
 
-void computeRuntimeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *cont)
+void computeRuntimeGeometry(const SPropertyInstanceInformation *, GCGeometry *rtGeo)
   {
   xAssert(SProcessManager::isMainThread());
-
-  GCGeometry* rtGeo = cont->uncheckedCastTo<GCGeometry>();
 
   XGeometry x;
   rtGeo->appendTo(&x);

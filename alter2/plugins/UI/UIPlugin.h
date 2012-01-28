@@ -20,6 +20,8 @@ public:
 
   Q_INVOKABLE void show();
 
+  Q_INVOKABLE void addQMLSurface(const QString &);
+
 signals:
   void aboutToClose();
 

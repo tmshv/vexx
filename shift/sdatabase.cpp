@@ -44,13 +44,18 @@ SDatabase::~SDatabase()
 #endif
   }
 
-SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe)
+SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe, SPropertyInstanceInformationInitialiser *init)
   {
   SProfileFunction
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
   type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
+
+  if(init)
+    {
+    init->initialise((SPropertyInstanceInformation*)prop->_instanceInfo);
+    }
 
   prop->_info = type;
   prop->_handler = SHandler::findHandler(parentToBe, prop);

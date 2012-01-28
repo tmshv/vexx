@@ -4,10 +4,9 @@
 
 S_IMPLEMENT_PROPERTY(GCSphere)
 
-void computeSphere(const SPropertyInstanceInformation *, SPropertyContainer *cont)
+void computeSphere(const SPropertyInstanceInformation *, GCSphere *sph)
   {
   GCProfileFunction
-  GCSphere *sph = cont->uncheckedCastTo<GCSphere>();
   GCGeometry &geo = sph->geometry;
 
   float radius = sph->radius();

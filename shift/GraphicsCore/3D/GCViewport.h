@@ -3,20 +3,17 @@
 
 #include "GCGlobal.h"
 #include "sbaseproperties.h"
+#include "GCScreenRenderTarget.h"
 
-class GRAPHICSCORE_EXPORT GCViewport : public SEntity
+class GRAPHICSCORE_EXPORT GCViewport : public GCScreenRenderTarget
   {
-  S_ENTITY(GCViewport, SEntity, 0)
+  S_ENTITY(GCViewport, GCScreenRenderTarget, 0)
 
 public:
   GCViewport();
 
   UnsignedIntProperty x;
   UnsignedIntProperty y;
-  UnsignedIntProperty width;
-  UnsignedIntProperty height;
-
-  FloatProperty aspectRatio;
   };
 
 #endif // GCVIEWPORT_H

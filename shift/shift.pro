@@ -39,7 +39,8 @@ SOURCES += \
     Serialisation/sbinaryio.cpp \
     Serialisation/sjsonio.cpp \
     sloader.cpp \
-    shandler.cpp
+    shandler.cpp \
+    sinterfaces.cpp
 
 HEADERS += \
     sglobal.h \
@@ -68,7 +69,8 @@ HEADERS += \
     Serialisation/sxmlio.h \
     Serialisation/sbinaryio.h \
     Serialisation/sjsonio.h \
-    shandler.h
+    shandler.h \
+    sinterfaces.h
 
 
 

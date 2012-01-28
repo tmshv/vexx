@@ -14,6 +14,7 @@ class ScInputThread;
 class ScSurface;
 class ScEmbeddedTypes;
 class ScIO;
+class SDatabaseModel;
 
 class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
   {
@@ -39,6 +40,8 @@ public:
   Q_INVOKABLE bool isDebuggingEnabled();
 
   QScriptEngine *engine();
+
+  Q_INVOKABLE void addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData);
 
   static QScriptValue call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args);
 
@@ -68,6 +71,8 @@ private:
   ScSurface *_surface;
   ScEmbeddedTypes *_types;
   ScIO *_io;
+
+  SDatabaseModel *_model;
   };
 
 #endif // SCPLUGIN_H

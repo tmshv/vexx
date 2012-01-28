@@ -16,9 +16,6 @@ XProperties:
   XProperty(SPlugin *, plugin, setPlugin);
 
 public:
-  SEntity documents;
-  SEntity settings;
-
   SAppDatabase();
 
   template <typename T> T *addDocument()
@@ -30,6 +27,8 @@ public:
       }
     return 0;
     }
+
+  SEntity settings;
 
   SDocument *addDocument(const SPropertyInformation *info);
   };

@@ -24,6 +24,7 @@ public:
   void beginBlock();
   void endBlock(bool cancel = false);
 
+
   SDatabase *database() { xAssert(_database); return _database; }
   const SDatabase *database() const { xAssert(_database); return _database; }
 

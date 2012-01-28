@@ -9,6 +9,10 @@ win32-msvc2008 {
   QMAKE_CXXFLAGS += /MDd
 }
 
+win32-msvc2010 {
+  QMAKE_CXXFLAGS += /MDd
+}
+
 ROOT = $$PWD"/../"
 BINFOLDER = $$ROOT"/bin/"
 

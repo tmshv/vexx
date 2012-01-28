@@ -2,13 +2,16 @@
 #include "QStringList"
 #include "styperegistry.h"
 #include "sdatabase.h"
+#include "sinterfaces.h"
 
 S_IMPLEMENT_PROPERTY(SEntity)
 
 SPropertyInformation *SEntity::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
-  info->add(&SEntity::children, "children");
+  SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
+  childInst->setMode(SPropertyInstanceInformation::Internal);
+
   return info;
   }
 
@@ -35,6 +38,22 @@ bool SEntity::acceptsChild(const SEntity *) const
 bool SEntity::acceptsParent(const SEntity *) const
   {
   return true;
+  }
+
+SProperty *SEntity::addChild(const SPropertyInformation *info, const QString& name)
+  {
+  SBlock b(handler());
+  SProperty *ent = children.add(info, name);
+  xAssert(ent);
+  return ent;
+  }
+
+SProperty *SEntity::addProperty(const SPropertyInformation *info, const QString& name, SPropertyInstanceInformationInitialiser *inst)
+  {
+  SBlock b(handler());
+  SProperty *p = SPropertyContainer::addProperty(info, X_SIZE_SENTINEL, name, inst);
+  xAssert(p);
+  return p;
   }
 
 SEntity *SEntity::parentEntity() const

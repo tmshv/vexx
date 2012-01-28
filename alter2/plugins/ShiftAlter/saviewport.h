@@ -4,32 +4,36 @@
 #include "saglobal.h"
 #include "sobserver.h"
 #include "sentityweakpointer.h"
+#include "3D/GCViewport.h"
 #include "X3DCanvas.h"
 #include "XGLRenderer.h"
 
 class XRenderer;
 class GCScreenRenderTarget;
 
-class SHIFTALTER_EXPORT SViewport : public X3DCanvas, STreeObserver
+class SHIFTALTER_EXPORT SViewport : public X3DCanvas
   {
 public:
-  SViewport(SEntity *viewpoint);
+  SViewport(GCViewport *viewpoint);
   ~SViewport();
 
-  SEntity *scene() { return _scene.entity(); }
+  GCViewport *viewport()
+    {
+    SEntity *e = _viewport.entity();
+    if(e)
+      {
+      return e->uncheckedCastTo<GCViewport>();
+      }
+    return 0;
+    }
 
 protected:
   void initializeGL();
   void resizeGL( int w, int h );
   void paintGL();
 
-  virtual void onTreeChange(const SChange *);
-
   XGLRenderer _renderer;
   QTimer *_timer;
-
-  SEntityWeakPointer _scene;
-  QList<GCScreenRenderTarget*> _screenRenderers;
   SEntityWeakPointer _viewport;
   };
 

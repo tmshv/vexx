@@ -78,10 +78,8 @@ private:
 
 S_IMPLEMENT_PROPERTY(GCDistanceManipulator)
 
-void computeAbsDisp(const SPropertyInstanceInformation *, SPropertyContainer *c)
+void computeAbsDisp(const SPropertyInstanceInformation *, GCDistanceManipulator *d)
   {
-  GCDistanceManipulator *d = c->uncheckedCastTo<GCDistanceManipulator>();
-
   d->absoluteDisplacement = d->lockDirection().normalized() * (d->distance() * d->scaleFactor());
   }
 

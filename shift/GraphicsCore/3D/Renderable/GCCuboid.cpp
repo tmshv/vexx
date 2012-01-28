@@ -4,10 +4,9 @@
 
 S_IMPLEMENT_PROPERTY(GCCuboid)
 
-void computeCube(const SPropertyInstanceInformation *, SPropertyContainer *cont)
+void computeCube(const SPropertyInstanceInformation *, GCCuboid *cube)
   {
   GCProfileFunction
-  GCCuboid *cube = cont->uncheckedCastTo<GCCuboid>();
   GCGeometry &geo = cube->geometry;
 
   float x = cube->width() / 2;

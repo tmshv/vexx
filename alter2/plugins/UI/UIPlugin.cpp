@@ -166,6 +166,10 @@ void UIPlugin::addSurface(UISurface *surface)
     }
   }
 
+void UIPlugin::addQMLSurface(const QString &)
+  {
+  }
+
 void UIPlugin::removeSurface(QString name)
   {
   foreach(UISurface *s, _priv->_surfaces)

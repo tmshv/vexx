@@ -49,9 +49,8 @@ void GCScene::render(XRenderer *r) const
 
 S_IMPLEMENT_PROPERTY(GCManipulatableScene)
 
-void computeManips(const SPropertyInstanceInformation *, SPropertyContainer *cont)
+void computeManips(const SPropertyInstanceInformation *, GCManipulatableScene *s)
   {
-  GCManipulatableScene *s = cont->uncheckedCastTo<GCManipulatableScene>();
   s->refreshManipulators();
   }
 

@@ -213,6 +213,16 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
     l.endAttribute("dynamic");
 
     const SPropertyInstanceInformation *instInfo = p->instanceInformation();
+
+    if(!instInfo->isDefaultMode())
+      {
+      QString mode = instInfo->modeString();
+
+      l.beginAttribute("mode");
+      writeValue(l, mode);
+      l.endAttribute("mode");
+      }
+
     xsize *affects = instInfo->affects();
     if(affects)
       {
@@ -256,9 +266,25 @@ void SProperty::saveProperty(const SProperty *p, SSaver &l)
 
 SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   {
+  class Initialiser : public SPropertyInstanceInformationInitialiser
+    {
+  public:
+    Initialiser() : affects(0) { }
+    void initialise(SPropertyInstanceInformation *inst)
+      {
+      inst->setAffects(affects);
+      inst->setModeString(mode);
+      }
+
+    xsize *affects;
+    QString mode;
+    };
+
   SProfileFunction
   const SPropertyInformation *type = l.type();
   xAssert(type);
+
+  Initialiser initialiser;
 
   l.beginAttribute("name");
   QString name;
@@ -270,11 +296,14 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   readValue(l, dynamic);
   l.endAttribute("dynamic");
 
+  l.beginAttribute("mode");
+  readValue(l, initialiser.mode);
+  l.endAttribute("mode");
+
   l.beginAttribute("affects");
   QString affectsString;
   readValue(l, affectsString);
   l.endAttribute("affects");
-  xsize *affects = 0;
   if(!affectsString.isEmpty())
     {
     xsize numAffects = 0;
@@ -297,7 +326,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
         }
       }
 
-    affects = new xsize[numAffects];
+    initialiser.affects = new xsize[numAffects];
     const SPropertyInformation *parentType = parent->typeInformation();
 
     int num = 0;
@@ -319,7 +348,7 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
         const SPropertyInstanceInformation *inst = parentType->childFromName(affectsName);
         xAssert(inst);
 
-        affects[affectsCount++] = inst->location();
+        initialiser.affects[affectsCount++] = inst->location();
 
         num = 0;
         lastPos = i+1;
@@ -347,9 +376,8 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
   SProperty *prop = 0;
   if(dynamic != 0)
     {
-    prop = parent->addProperty(type, X_SIZE_SENTINEL);
+    prop = parent->addProperty(type, X_SIZE_SENTINEL, name, &initialiser);
     xAssert(prop);
-    prop->setName(name);
     }
   else
     {

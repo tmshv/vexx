@@ -4,5 +4,7 @@
         <file>debug.svg</file>
         <file>runDebugged.svg</file>
         <file>debugWindow.svg</file>
+        <file>StartupUI.js</file>
+        <file>expandExpanded.svg</file>
     </qresource>
 </RCC>

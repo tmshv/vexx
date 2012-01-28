@@ -32,6 +32,7 @@ private:
 class SInterfaceBase : public SProperty::UserData
   {
   S_INTERFACE_TYPE(Invalid)
+  bool onPropertyDelete(SProperty *) { return true; }
   };
 
 
@@ -44,6 +45,7 @@ class SStaticInterfaceBase : public SInterfaceBase, public SInterfaceBaseFactory
 public:
   SStaticInterfaceBase(bool deleteOnNoReferences) : SInterfaceBaseFactory(deleteOnNoReferences) { }
   virtual SInterfaceBase *classInterface(SProperty *) { return this; }
+  bool onPropertyDelete(SProperty *) { return false; }
   };
 
 #endif // SINTERFACE_H

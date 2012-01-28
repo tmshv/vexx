@@ -77,7 +77,7 @@ public:
   template <typename T> const T *settingProperty(const QString &ns, const QString &name) const
     {
     xAssert(_db);
-    SEntity *nsEnt = _db->settings.findChildEntity(ns);
+    SEntity *nsEnt = _db->settings().findChildEntity(ns);
     if(nsEnt)
       {
       SProperty *prop = nsEnt->findChild(name);

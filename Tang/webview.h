@@ -15,7 +15,7 @@ XProperties:
   XROProperty(Object *, currentObject);
 
 public:
-  WebView(SEntity *objectParent);
+  WebView(SPropertyArray *objectParent);
 
 public slots:
   void loadObject(const QString& id);
@@ -31,7 +31,7 @@ private slots:
 
 private:
   QWebView *_webView;
-  SEntityWeakPointer _objectParent;
+  SPropertyArray *_objectParent;
   };
 
 #endif // WEBVIEW_H

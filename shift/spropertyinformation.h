@@ -19,6 +19,12 @@ namespace std
   template <typename T> class initializer_list;
 }
 
+class SPropertyInstanceInformationInitialiser
+  {
+public:
+  virtual void initialise(SPropertyInstanceInformation *) = 0;
+  };
+
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
   {
@@ -29,18 +35,34 @@ public:
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
 
+  enum Mode
+    {
+    Internal,
+    InputOutput,
+    InternalInput,
+    Input,
+    Output,
+    Computed,
+
+    NumberOfModes,
+
+    Default = InputOutput
+    };
+
 XProperties:
   XProperty(const SPropertyInformation *, childInformation, setChildInformation);
   XProperty(SPropertyInformation *, holdingTypeInformation, setHoldingTypeInformation);
   XRefProperty(QString, name);
   XProperty(xsize, location, setLocation);
-  XProperty(ComputeFunction, compute, setCompute);
+  XROProperty(ComputeFunction, compute);
   XProperty(bool, computeLockedToMainThread, setComputeLockedToMainThread);
   XProperty(QueueComputeFunction, queueCompute, setQueueCompute);
   XROProperty(xsize *, affects);
   // this index is internal to this instance information only
   XProperty(xsize, index, setIndex);
   XProperty(bool, extra, setExtra);
+
+  XROProperty(Mode, mode);
 
   XProperty(bool, dynamic, setDynamic);
   XRORefProperty(DataHash, data);
@@ -52,6 +74,22 @@ public:
   static SPropertyInstanceInformation *allocate(xsize size);
   static void destroy(SPropertyInstanceInformation *);
 
+  void setMode(Mode);
+  void setModeString(const QString &);
+  bool isDefaultMode() const;
+  const QString &modeString() const;
+
+  template <typename T> void setCompute(void (*fn)( const SPropertyInstanceInformation *, T * ))
+    {
+    SPropertyContainer *c = static_cast<T*>((SPropertyContainer*)0);
+    xAssert(c == 0);
+
+    ComputeFunction t = (ComputeFunction)fn;
+
+    setCompute(t);
+    }
+
+  void setCompute(ComputeFunction fn);
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(xsize *affects);
 
@@ -138,7 +176,7 @@ public:
 
   template <typename T> bool inheritsFromType() const
     {
-    return inheritsFromType(T::Type);
+    return inheritsFromType(T::staticTypeInformation());
     }
 
   bool inheritsFromType(const SPropertyInformation *type) const;
@@ -190,6 +228,8 @@ public:
 
   SPropertyInformation *findAllocatableBase(xsize &offset);
   const SPropertyInformation *findAllocatableBase(xsize &offset) const;
+
+  void setData(DataKey, const QVariant &);
 
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
@@ -244,6 +284,8 @@ private:
   friend class SProperty;
   friend class SDatabase;
 };
+
+Q_DECLARE_METATYPE(const SPropertyInformation*);
 
 #include "sproperty.h"
 
@@ -350,6 +392,11 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
   U *offset = &(u->*ptr);
   xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
   xAssert(location > 0);
+
+  if(extendedParent())
+    {
+    location -= extendedParent()->location();
+    }
 
   return add<U>(location, name);
   }
