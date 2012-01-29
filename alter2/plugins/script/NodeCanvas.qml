@@ -417,7 +417,9 @@ Rectangle
 
       if(mouse.button === Qt.RightButton)
         {
-        external.send("contextMenu", [ mouse.x, mouse.y ]);
+        external.emitRequest("contextMenu", [ mouse.x, mouse.y ]);
+        mouse.accepted = true;
+        return;
         }
 
       if(((mouse.modifiers & Qt.AltModifier) !== 0 && mouse.button === Qt.LeftButton))

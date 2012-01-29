@@ -324,6 +324,19 @@ QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScrip
   return QScriptValue();
   }
 
+QWidget *ScPlugin::addQMLWindow(const QString &url, const QVariantMap &qmlData)
+  {
+  APlugin<UIPlugin> ui(this, "ui");
+  if(!ui.isValid())
+    {
+    return 0;
+    }
+
+  ScDeclarativeWindow *s = new ScDeclarativeWindow(url, _model, qmlData);
+
+  return s;
+  }
+
 QObject *ScPlugin::addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData)
   {
   APlugin<UIPlugin> ui(this, "ui");

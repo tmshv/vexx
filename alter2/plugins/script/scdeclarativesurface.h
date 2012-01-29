@@ -3,19 +3,39 @@
 
 #include "QDeclarativeView"
 #include "UISurface.h"
+#include "QScriptValue"
 
 class SDatabaseModel;
 
-class ScDeclarativeSurface : public QDeclarativeView, public UISurface
+class ScDeclarativeWindow : public QDeclarativeView
+  {
+  Q_OBJECT
+
+public:
+  ScDeclarativeWindow(const QString &s, SDatabaseModel *model, const QVariantMap &);
+
+  Q_INVOKABLE QVariantMap mapTo(QWidget *, const float x, const float y) const;
+  Q_INVOKABLE void destroyWindow();
+
+  Q_INVOKABLE void setPosition(int x, int y);
+
+public slots:
+  void focus();
+
+signals:
+  void emitRequest(const QString &, const QVariantList &);
+  void focusLost();
+
+protected:
+  void focusOutEvent(QFocusEvent *event);
+  };
+
+class ScDeclarativeSurface : public ScDeclarativeWindow, public UISurface
   {
   Q_OBJECT
 
 public:
   ScDeclarativeSurface(const QString &name, const QString &s, UISurface::SurfaceType type, SDatabaseModel *model, const QVariantMap &);
-
-signals:
-  void send(const QString &, const QVariantList &);
-  void recieve(const QString &, const QVariantList &);
   };
 
 #endif // SCDECLARATIVESURFACE_H
