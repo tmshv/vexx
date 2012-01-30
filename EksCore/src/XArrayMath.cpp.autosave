@@ -303,9 +303,25 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
         res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
         }
       }
-
     break;
   case XMathsOperation::AddConst:
+    xAssert(a);
+    xAssert(!b);
+
+    if(type == XMathsOperation::Float)
+      {
+      for(xsize i = 0; i < minLenC; ++i)
+        {
+        res->_floats[i] = a->_floats[i] + o->inputB()->;
+        }
+      }
+    else if(type == XMathsOperation::Byte)
+      {
+      for(xsize i = 0; i < minLenC; ++i)
+        {
+        res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
+        }
+      }
     break;
   case XMathsOperation::Multiply:
     break;

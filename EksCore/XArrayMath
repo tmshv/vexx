@@ -2,9 +2,31 @@
 #define XARRAYMATH_H
 
 #include "XVector4D"
+#include "XProperty"
 
 class EKSCORE_EXPORT XMathsOperation
   {
+public:
+  enum OperationType
+    {
+    Load,
+    Add,
+    AddConst,
+    Multiply,
+    MultiplyConst,
+    Convolve,
+    Shuffle,
+    Splice
+    };
+
+XProperties:
+  XROProperty(OperationType, operation);
+  XROProperty(XMathsOperation *, inputA);
+  XROProperty(XMathsOperation *, inputB);
+  XROProperty(XVector4D, vectorData);
+  XROProperty(xuint32, integerData);
+  XROProperty(void *, userData);
+
 public:
   XMathsOperation();
   ~XMathsOperation();
@@ -32,22 +54,10 @@ private:
   XMathsOperation(const XMathsOperation &);
   XMathsOperation& operator=(const XMathsOperation &);
 
+  void setInputDirty();
   void setOperationDirty();
   void setValueDirty();
 
-  enum OperationType
-    {
-    Load,
-    Add,
-    AddConst,
-    Multiply,
-    MultiplyConst,
-    Convolve,
-    Shuffle,
-    Splice
-    };
-
-  void setValue(void *);
   void setValue(const XVector4D &);
   void setValue(xuint32 );
   void setOperation(OperationType t);
@@ -57,22 +67,28 @@ private:
 
   mutable XMathsOperation *_user;
   mutable XMathsOperation *_nextUser;
-
-  XMathsOperation *_inputA;
-  XMathsOperation *_inputB;
-  OperationType _operation;
-  XVector4D _dataVec;
-  xuint32 _dataInt;
-  void * _dataPtr;
   };
 
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xsize channels) = 0;
+  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xuint8 channels) = 0;
+  virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
+  virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
+  virtual void onInputDirty(const XMathsOperation *, void **userData) = 0;
+  virtual void onCleanUp(const XMathsOperation *, void **userData) = 0;
 
   static XMathsEngine *engine();
   static void setEngine(XMathsEngine *);
+  };
+
+class EKSCORE_EXPORT XReferenceMathsEngine
+  {
+  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xuint8 channels);
+  virtual void onOperationDirty(const XMathsOperation *, void **userData);
+  virtual void onValueDirty(const XMathsOperation *, void **userData);
+  virtual void onInputDirty(const XMathsOperation *, void **userData);
+  virtual void onCleanUp(const XMathsOperation *, void **userData);
   };
 
 class EKSCORE_EXPORT XMathsResult
