@@ -1,0 +1,93 @@
+#ifndef XARRAYMATH_H
+#define XARRAYMATH_H
+
+#include "XVector4D"
+
+class EKSCORE_EXPORT XMathsOperation
+  {
+public:
+  XMathsOperation();
+  ~XMathsOperation();
+
+  enum DataType
+    {
+    Byte,
+    HalfFloat,
+    Float
+    };
+
+  void load(DataType, xuint8* data, xsize dataWidth, xsize dataHeight, xsize dataChannels);
+
+  void add(const XMathsOperation &, const XMathsOperation &);
+  void add(const XMathsOperation &, const XVector4D &);
+
+  void multiply(const XMathsOperation &, const XMathsOperation &);
+  void multiply(const XMathsOperation &, const XVector4D &);
+
+  void convolve(const XMathsOperation &, const XMathsOperation &);
+  void shuffle(const XMathsOperation &, xuint32 mask);
+  void splice(const XMathsOperation &, const XMathsOperation &, xuint32 mask);
+
+private:
+  XMathsOperation(const XMathsOperation &);
+  XMathsOperation& operator=(const XMathsOperation &);
+
+  void setOperationDirty();
+  void setValueDirty();
+
+  enum OperationType
+    {
+    Load,
+    Add,
+    AddConst,
+    Multiply,
+    MultiplyConst,
+    Convolve,
+    Shuffle,
+    Splice
+    };
+
+  void setValue(void *);
+  void setValue(const XVector4D &);
+  void setValue(xuint32 );
+  void setOperation(OperationType t);
+  void setInput(XMathsOperation **inp, const XMathsOperation *in);
+  void addUser(XMathsOperation*) const;
+  void removeUser(XMathsOperation*) const;
+
+  mutable XMathsOperation *_user;
+  mutable XMathsOperation *_nextUser;
+
+  XMathsOperation *_inputA;
+  XMathsOperation *_inputB;
+  OperationType _operation;
+  XVector4D _dataVec;
+  xuint32 _dataInt;
+  void * _dataPtr;
+  };
+
+class EKSCORE_EXPORT XMathsEngine
+  {
+public:
+  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xsize channels) = 0;
+
+  static XMathsEngine *engine();
+  static void setEngine(XMathsEngine *);
+  };
+
+class EKSCORE_EXPORT XMathsResult
+  {
+public:
+  XMathsResult(const XMathsOperation &);
+
+  XMathsOperation::DataType dataType() const;
+  xuint8 *data() const;
+  xsize dataWidth() const;
+  xsize dataHeight() const;
+
+private:
+  XMathsResult(const XMathsResult &);
+  XMathsResult& operator=(const XMathsResult &);
+  };
+
+#endif // XARRAYMATH_H
