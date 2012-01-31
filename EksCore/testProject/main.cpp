@@ -10,19 +10,19 @@ int main()
 
   float arrData[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
   XMathsOperation arr;
-  arr.load(XMathsOperation::Float, (xuint8*)arrData, 1, sizeof(arrData)/sizeof(arrData[0]), 1);
+  arr.load(XMathsOperation::Float, arrData, 1, sizeof(arrData)/sizeof(arrData[0]), 1);
 
   float arrData2[] = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
   XMathsOperation arr2;
-  arr2.load(XMathsOperation::Float, (xuint8*)arrData2, 1, sizeof(arrData2)/sizeof(arrData2[0]), 1);
+  arr2.load(XMathsOperation::Float, arrData2, 1, sizeof(arrData2)/sizeof(arrData2[0]), 1);
 
   XMathsOperation add;
   add.add(arr, arr2);
 
   XMathsOperation convolve;
-  float convData[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+  float convData[] = { 0.25, 0.5, 0.25 };
   XMathsOperation conv;
-  conv.load(XMathsOperation::Float, (xuint8*)convData, 1, sizeof(convData)/sizeof(convData[0]), 1);
+  conv.load(XMathsOperation::Float, convData, 1, sizeof(convData)/sizeof(convData[0]), 1);
   convolve.convolve(add, conv);
 
   XMathsOperation shuffle;
