@@ -38,6 +38,7 @@ xsize XMathsResult::dataHeight() const
 
 XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
   {
+  _operation = NoOp;
   }
 
 XMathsOperation::~XMathsOperation()
@@ -71,7 +72,7 @@ void XMathsOperation::removeUser(XMathsOperation *o) const
   i->_nextUser = 0;
   }
 
-void XMathsOperation::setInput(XMathsOperation **inp, const XMathsOperation *in)
+void XMathsOperation::setInput(const XMathsOperation **inp, const XMathsOperation *in)
   {
   if(in != (*inp))
     {
@@ -80,6 +81,7 @@ void XMathsOperation::setInput(XMathsOperation **inp, const XMathsOperation *in)
       (*inp)->removeUser(this);
       }
 
+    *inp = in;
     if(in)
       {
       in->addUser(this);
@@ -244,6 +246,10 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   if(!res)
     {
     res = new ReferenceMathsEngineResult;
+    res->_type = XMathsOperation::None;
+    res->_width = 0;
+    res->_height = 0;
+    res->_channels = 0;
     }
   else
     {
@@ -251,25 +257,31 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
       {
       delete [] res->_floats;
       }
-    else if(res->_type == XMathsOperation::Float)
+    else if(res->_type == XMathsOperation::Byte)
       {
       delete [] res->_bytes;
       }
     }
 
-  const ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA() : 0);
-  const ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB() : 0);
+  if(o->operation() == XMathsOperation::NoOp || o->operation() == XMathsOperation::Load)
+  {
+    xAssert(*userData);
+    return;
+    }
 
-  xsize aLen = a->_width * a->_height;
-  xsize bLen = b->_width * b->_height;
+  const ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
+  const ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
+
+  xsize aLen = a ? a->_width * a->_height : 0;
+  xsize bLen = b ? b->_width * b->_height : 0;
   xsize minLen = xMin(aLen, bLen);
 
-  xsize aLenC = aLen * a->_channels;
-  xsize bLenC = bLen * b->_channels;
+  xsize aLenC = a ? aLen * a->_channels : 0;
+  xsize bLenC = b ? bLen * b->_channels : 0;
   xsize minLenC = xMin(aLenC, bLenC);
 
-  xAssert(a->_type == b->_type);
-  XMathsOperation::DataType type = a->_type;
+  xAssert(!a || !b || a->_type == b->_type);
+  XMathsOperation::DataType type = a ? a->_type : XMathsOperation::Float;
 
   if(type == XMathsOperation::Float)
     {
@@ -280,11 +292,11 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
     res->_bytes = new xuint8[minLenC];
     }
 
+  xAssert(!a || a->_floats);
+  xAssert(!b || b->_floats);
+
   switch(o->operation())
     {
-  case XMathsOperation::Load:
-    xAssert(*userData);
-    break;
   case XMathsOperation::Add:
     xAssert(a);
     xAssert(b);
