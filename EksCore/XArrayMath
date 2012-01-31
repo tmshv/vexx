@@ -9,6 +9,7 @@ class EKSCORE_EXPORT XMathsOperation
 public:
   enum OperationType
     {
+    NoOp,
     Load,
     Add,
     AddConst,
@@ -21,8 +22,8 @@ public:
 
 XProperties:
   XROProperty(OperationType, operation);
-  XROProperty(XMathsOperation *, inputA);
-  XROProperty(XMathsOperation *, inputB);
+  XROProperty(const XMathsOperation *, inputA);
+  XROProperty(const XMathsOperation *, inputB);
   XROProperty(XVector4D, vectorData);
   XROProperty(xuint32, integerData);
   XROProperty(void *, userData);
@@ -33,12 +34,13 @@ public:
 
   enum DataType
     {
+    None,
     Byte,
     HalfFloat,
     Float
     };
 
-  void load(DataType, xuint8* data, xsize dataWidth, xsize dataHeight, xsize dataChannels);
+  void load(DataType, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels);
 
   void add(const XMathsOperation &, const XMathsOperation &);
   void add(const XMathsOperation &, const XVector4D &);
@@ -61,7 +63,7 @@ private:
   void setValue(const XVector4D &);
   void setValue(xuint32 );
   void setOperation(OperationType t);
-  void setInput(XMathsOperation **inp, const XMathsOperation *in);
+  void setInput(const XMathsOperation **inp, const XMathsOperation *in);
   void addUser(XMathsOperation*) const;
   void removeUser(XMathsOperation*) const;
 
@@ -72,7 +74,7 @@ private:
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xuint8 channels) = 0;
+  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels) = 0;
   virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onInputDirty(const XMathsOperation *, void **userData) = 0;
@@ -82,9 +84,9 @@ public:
   static void setEngine(XMathsEngine *);
   };
 
-class EKSCORE_EXPORT XReferenceMathsEngine
+class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
   {
-  virtual void *loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xuint8 channels);
+  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels);
   virtual void onOperationDirty(const XMathsOperation *, void **userData);
   virtual void onValueDirty(const XMathsOperation *, void **userData);
   virtual void onInputDirty(const XMathsOperation *, void **userData);
