@@ -133,7 +133,7 @@ void XMathsOperation::setValueDirty()
   XMathsEngine::engine()->onValueDirty(this, &_userData);
   }
 
-void XMathsOperation::load(DataType t, xuint8* data, xsize dataWidth, xsize dataHeight, xsize dataChannels)
+void XMathsOperation::load(DataType t, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels)
   {
   setInput(&_inputA, 0);
   setInput(&_inputB, 0);
@@ -215,7 +215,7 @@ struct ReferenceMathsEngineResult
     };
   };
 
-void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, xuint8* data, xsize width, xsize height, xuint8 channels)
+void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels)
   {
   ReferenceMathsEngineResult *ret = new ReferenceMathsEngineResult;
   ret->_type = type;
@@ -340,6 +340,30 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   case XMathsOperation::MultiplyConst:
     break;
   case XMathsOperation::Convolve:
+    xAssert(a);
+    xAssert(b);
+
+    if(type == XMathsOperation::Float)
+      {
+      for(xsize i = 0; i < aLenC; ++i)
+        {
+        res->_floats[i] = 0.0f;
+
+###
+        for(xsize j = 0; j < bLenC; ++j)
+          {
+          res->_floats[i] += a->_floats[i] * b->_floats[j]
+          }
+        res->_floats[i] = a->_floats[i] + b->_floats[i];
+        }
+      }
+    else if(type == XMathsOperation::Byte)
+      {
+      for(xsize i = 0; i < minLenC; ++i)
+        {
+        res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
+        }
+      }
     break;
   case XMathsOperation::Shuffle:
     break;
