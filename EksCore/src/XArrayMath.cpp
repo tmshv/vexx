@@ -213,6 +213,8 @@ struct ReferenceMathsEngineResult
     float *_floats;
     xuint8 *_bytes;
     };
+
+  typedef void (*FloatMathsFunction)(XVector4D&, const XMathsOperation *o);
   };
 
 void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels)
@@ -292,83 +294,29 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
     res->_bytes = new xuint8[minLenC];
     }
 
-  xAssert(!a || a->_floats);
-  xAssert(!b || b->_floats);
-
-  switch(o->operation())
+  if(type == XMathsOperation::Float)
     {
-  case XMathsOperation::Add:
-    xAssert(a);
-    xAssert(b);
+    static const ReferenceMathsEngineResult::FloatMathsFunction fFns[] =
+      {
+      Load,
+      Add,
+      AddConst,
+      Multiply,
+      MultiplyConst,
+      Convolve,
+      Shuffle,
+      Splice
+      };
 
-    if(type == XMathsOperation::Float)
-      {
-      for(xsize i = 0; i < minLenC; ++i)
-        {
-        res->_floats[i] = a->_floats[i] + b->_floats[i];
-        }
-      }
-    else if(type == XMathsOperation::Byte)
-      {
-      for(xsize i = 0; i < minLenC; ++i)
-        {
-        res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
-        }
-      }
-    break;
-  case XMathsOperation::AddConst:
-    xAssert(a);
-    xAssert(!b);
+    ReferenceMathsEngineResult::FloatMathsFunction fn = fFns[o->operation()];
 
-    if(type == XMathsOperation::Float)
+    for(xsize y = 0; y < a->_height; ++y)
       {
-      for(xsize i = 0; i < minLenC; ++i)
+      for(xsize x = 0; x < a->_width; ++x)
         {
-        res->_floats[i] = a->_floats[i] + o->inputB()->;
+        fn();
         }
       }
-    else if(type == XMathsOperation::Byte)
-      {
-      for(xsize i = 0; i < minLenC; ++i)
-        {
-        res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
-        }
-      }
-    break;
-  case XMathsOperation::Multiply:
-    break;
-  case XMathsOperation::MultiplyConst:
-    break;
-  case XMathsOperation::Convolve:
-    xAssert(a);
-    xAssert(b);
-
-    if(type == XMathsOperation::Float)
-      {
-      for(xsize i = 0; i < aLenC; ++i)
-        {
-        res->_floats[i] = 0.0f;
-
-###
-        for(xsize j = 0; j < bLenC; ++j)
-          {
-          res->_floats[i] += a->_floats[i] * b->_floats[j]
-          }
-        res->_floats[i] = a->_floats[i] + b->_floats[i];
-        }
-      }
-    else if(type == XMathsOperation::Byte)
-      {
-      for(xsize i = 0; i < minLenC; ++i)
-        {
-        res->_bytes[i] = a->_bytes[i] + b->_bytes[i];
-        }
-      }
-    break;
-  case XMathsOperation::Shuffle:
-    break;
-  case XMathsOperation::Splice:
-    break;
     }
   }
 
