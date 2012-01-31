@@ -79,7 +79,8 @@ OTHER_FILES += \
     NodeCanvasContents/DynamicInput.qml \
     NodeCanvasContents/PathHolder.qml \
     NodeCanvasContents/PathItem.qml \
-    NodeCanvasContextMenu.qml
+    NodeCanvasContextMenu.qml \
+    CreateMenuContents/Menu.qml
 
 
 
