@@ -73,6 +73,14 @@ void ScDeclarativeWindow::setPosition(int x, int y)
   move(x, y);
   }
 
+QVariantMap  ScDeclarativeWindow::position() const
+  {
+  QVariantMap v;
+  v["x"] = x();
+  v["y"] = y();
+  return v;
+  }
+
 void ScDeclarativeWindow::focus()
   {
   activateWindow();

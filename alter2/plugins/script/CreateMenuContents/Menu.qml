@@ -15,6 +15,36 @@ Rectangle {
   radius: 3
   smooth: true
 
+  function expand()
+    {
+    var tl = contents.mapToItem(null, 0, 0);
+
+    var pos = { x: 0.0, y: 0.0 };
+    if(0.0 > tl.x)
+      {
+      pos.x = tl.x;
+      }
+    if(0.0 > tl.y)
+      {
+      pos.y = tl.y;
+      }
+    holder.move(pos);
+
+
+    var br = contents.mapToItem(null, contents.width, list.childrenRect.height + padding*2 + titleHeight);
+    br.x -= pos.x;
+    br.y -= pos.y;
+
+    if((holder.x + holder.width) < br.x)
+      {
+      holder.width = br.x// + holder.x;
+      }
+    if((holder.y + holder.height) < br.y)
+      {
+      holder.height = br.y// + holder.y;
+      }
+    }
+
   state: "Hidden"
   states: [
     State {
@@ -64,7 +94,6 @@ Rectangle {
 
         ScriptAction {
           script: {
-            print("Going doen");
             contents.destroy();
             }
           }
@@ -164,7 +193,7 @@ Rectangle {
 
         Timer {
           id: subMenu
-          interval: 500
+          interval: 250
           onTriggered: {
             if(subMenuItem)
               {
@@ -177,9 +206,10 @@ Rectangle {
 
             object.title = "";
             object.x = (function(){ return item.x + item.width + 1; });
-            object.y = -padding;
+            object.y = -padding - 40;
             object.z = 2;
             object.state = "Shown";
+            object.expand();
 
 
             subMenuItem = object;

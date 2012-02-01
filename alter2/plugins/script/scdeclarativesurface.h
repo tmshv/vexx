@@ -18,6 +18,7 @@ public:
   Q_INVOKABLE void destroyWindow();
 
   Q_INVOKABLE void setPosition(int x, int y);
+  Q_INVOKABLE QVariantMap position() const;
 
 public slots:
   void focus();

@@ -12,6 +12,18 @@ Rectangle {
     external.destroyWindow();
     }
 
+  function move(pos)
+    {
+    menu.x -= pos.x;
+    menu.y -= pos.y;
+
+    var newPos = external.position();
+    newPos.x += pos.x;
+    newPos.y += pos.y;
+
+    external.setPosition(newPos.x, newPos.y);
+    }
+
   Timer {
     id: grabber
     interval: 1
