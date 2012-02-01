@@ -1,5 +1,7 @@
 #include "XArrayMath"
 #include "XAssert"
+#include "Eigen/Core"
+#include "QRect"
 
 XMathsEngine *g_engine = 0;
 XMathsEngine *XMathsEngine::engine()
@@ -202,37 +204,133 @@ void XMathsOperation::splice(const XMathsOperation &a, const XMathsOperation &b,
   setValue(mask);
   }
 
+template <typename T> struct Defs
+  {
+  typedef Eigen::Matrix <T, 4, 1> Vec;
+  typedef Eigen::Array <Vec, Eigen::Dynamic, Eigen::Dynamic> Array;
+  };
+
 struct ReferenceMathsEngineResult
   {
   XMathsOperation::DataType _type;
-  xsize _width;
-  xsize _height;
   xuint8 _channels;
-  union
-    {
-    float *_floats;
-    xuint8 *_bytes;
-    };
+  XMatrix3x3 _transform;
 
-  typedef void (*FloatMathsFunction)(XVector4D&, const XMathsOperation *o);
+  Defs<float>::Array _floats;
+  Defs<xuint32>::Array _ints;
+
+  QRect rect() const
+    {
+    }
+  };
+
+template <typename T> struct Utils
+  {
+  typedef typename Defs<T>::Array Array;
+  typedef typename Defs<T>::Vec Vec;
+  typedef void (*InitFunction)(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b);
+  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b);
+
+  static void unite(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+    {
+    }
+
+  static void takeA(const XMathsOperation*, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+    {
+    mat = a->_transform;
+    arr.resize(a->rows(), a->cols());
+    }
+
+  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+    {
+    }
+
+  static void doOperation(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+    {
+    static const InitFunction iFns[] =
+      {
+      0,     // Load
+      unite, // Add
+      takeA, // AddConst
+      unite, // Multiply
+      takeA, // MultiplyConst
+      takeA, // Convolve
+      takeA, // Shuffle
+      unite  // Splice
+      };
+
+    xAssert(iFns[o->operation()]);
+    iFns[o->operation()](o, mat, arr, a, b);
+
+    static const MathsFunction fFns[] =
+      {
+      0,    // Load
+      add,  // Add
+      0,    // AddConst
+      0,    // Multiply
+      0,    // MultiplyConst
+      0,    // Convolve
+      0,    // Shuffle
+      0     // Splice
+      };
+
+    MathsFunction fn = fFns[o->operation()];
+    xAssert(fn);
+
+    for(int y = 0; y < arr.cols(); ++y)
+      {
+      for(int x = 0; x < arr.rows(); ++x)
+        {
+        XVector3D pt(x, y, 1.0);
+
+        Vec& v = arr(x, y);
+        fn(pt, o, mat, v, a, b);
+        }
+      }
+    }
   };
 
 void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels)
   {
   ReferenceMathsEngineResult *ret = new ReferenceMathsEngineResult;
   ret->_type = type;
-  ret->_width = width;
-  ret->_height = height;
   ret->_channels = channels;
+
+  xAssert(channels <= 4);
+
+
   if(type == XMathsOperation::Float)
     {
-    ret->_floats = new float [width * height * channels];
-    memcpy(ret->_floats, data, width*height*sizeof(float)*channels);
+    float *dataPtr = (float*)data;
+    ret->_floats.resize(width, height);
+
+    for(int y = 0; y < ret->_floats.cols(); ++y)
+      {
+      for(int x = 0; x < ret->_floats.rows(); ++x)
+        {
+        XVector4D& v = ret->_floats(x, y);
+        memcpy(v.data(), dataPtr, sizeof(float)*channels);
+        dataPtr += channels;
+        }
+      }
     }
   else if(type == XMathsOperation::Byte)
     {
-    ret->_bytes = new xuint8 [width * height * channels];
-    memcpy(ret->_bytes, data, width*height*sizeof(xuint8)*channels);
+    xuint8 *dataPtr = (xuint8*)data;
+    ret->_ints.resize(width, height);
+
+    for(int y = 0; y < ret->_ints.cols(); ++y)
+      {
+      for(int x = 0; x < ret->_ints.rows(); ++x)
+        {
+        Defs<xuint32>::Vec& v = ret->_ints(x, y);
+        for(int w = 0; w < channels; ++w)
+          {
+          v(w) = dataPtr[w];
+          }
+        dataPtr += channels;
+        }
+      }
     }
   else
     {
@@ -248,21 +346,9 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   if(!res)
     {
     res = new ReferenceMathsEngineResult;
+    res->_transform = XMatrix3x3::Identity();
     res->_type = XMathsOperation::None;
-    res->_width = 0;
-    res->_height = 0;
     res->_channels = 0;
-    }
-  else
-    {
-    if(res->_type == XMathsOperation::Float)
-      {
-      delete [] res->_floats;
-      }
-    else if(res->_type == XMathsOperation::Byte)
-      {
-      delete [] res->_bytes;
-      }
     }
 
   if(o->operation() == XMathsOperation::NoOp || o->operation() == XMathsOperation::Load)
@@ -271,52 +357,44 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
     return;
     }
 
+  static const xuint8 expectedInputs[] =
+  {
+    0, // Load
+    2, // Add
+    1, // AddConst
+    2, // Multiply
+    1, // MultiplyConst
+    2, // Convolve
+    1, // Shuffle
+    2  // Splice
+  };
+
+  xuint8 expInputs = expectedInputs[o->operation()];
   const ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
+  if(expInputs >= 1 && !a)
+    {
+    xAssertFail();
+    return;
+    }
+
   const ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
-
-  xsize aLen = a ? a->_width * a->_height : 0;
-  xsize bLen = b ? b->_width * b->_height : 0;
-  xsize minLen = xMin(aLen, bLen);
-
-  xsize aLenC = a ? aLen * a->_channels : 0;
-  xsize bLenC = b ? bLen * b->_channels : 0;
-  xsize minLenC = xMin(aLenC, bLenC);
-
-  xAssert(!a || !b || a->_type == b->_type);
-  XMathsOperation::DataType type = a ? a->_type : XMathsOperation::Float;
-
-  if(type == XMathsOperation::Float)
+  if(expInputs >= 2 && !b)
     {
-    res->_floats = new float[minLenC];
-    }
-  else if(type == XMathsOperation::Byte)
-    {
-    res->_bytes = new xuint8[minLenC];
+    xAssertFail();
+    return;
     }
 
-  if(type == XMathsOperation::Float)
+  xAssert(a);
+
+  res->_channels = a->_channels;
+  res->_type = a->_type;
+  if(a->_type == XMathsOperation::Float)
     {
-    static const ReferenceMathsEngineResult::FloatMathsFunction fFns[] =
-      {
-      Load,
-      Add,
-      AddConst,
-      Multiply,
-      MultiplyConst,
-      Convolve,
-      Shuffle,
-      Splice
-      };
-
-    ReferenceMathsEngineResult::FloatMathsFunction fn = fFns[o->operation()];
-
-    for(xsize y = 0; y < a->_height; ++y)
-      {
-      for(xsize x = 0; x < a->_width; ++x)
-        {
-        fn();
-        }
-      }
+    Utils<float>::doOperation(o, res->_transform, res->_floats, a, b);
+    }
+  else if(a->_type == XMathsOperation::Byte)
+    {
+    Utils<xuint32>::doOperation(o, res->_transform, res->_ints, a, b);
     }
   }
 
@@ -333,16 +411,5 @@ void XReferenceMathsEngine::onInputDirty(const XMathsOperation *o, void **userDa
 void XReferenceMathsEngine::onCleanUp(const XMathsOperation *, void **userData)
   {
   ReferenceMathsEngineResult *&res = *(ReferenceMathsEngineResult**)userData;
-  if(res)
-    {
-    if(res->_type == XMathsOperation::Float)
-      {
-      delete [] res->_floats;
-      }
-    else if(res->_type == XMathsOperation::Float)
-      {
-      delete [] res->_bytes;
-      }
-    }
   delete res;
   }

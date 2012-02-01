@@ -1,6 +1,7 @@
 #ifndef XARRAYMATH_H
 #define XARRAYMATH_H
 
+#include "XMatrix3x3"
 #include "XVector4D"
 #include "XProperty"
 
@@ -51,6 +52,8 @@ public:
   void convolve(const XMathsOperation &, const XMathsOperation &);
   void shuffle(const XMathsOperation &, xuint32 mask);
   void splice(const XMathsOperation &, const XMathsOperation &, xuint32 mask);
+
+  void transform(const XMathsOperation &, const XMatrix3x3 &);
 
 private:
   XMathsOperation(const XMathsOperation &);
