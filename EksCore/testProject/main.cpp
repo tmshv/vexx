@@ -9,23 +9,23 @@ int main()
   XMathsEngine::setEngine(new XReferenceMathsEngine);
 
   XMatrix3x3 tr1 = XMatrix3x3::Identity();
-  tr1(2) = XVector3(1, 1, 0);
+  tr1.col(2) = XVector3D(1, 1, 0);
   
   XMatrix3x3 tr2 = XMatrix3x3::Identity();
-  tr2(2) = XVector3(3, 3, 0);
+  tr2.col(2) = XVector3D(3, 3, 0);
   
   
   float arrData[] = { 1, 1, 1,
                       1, 1, 1,
                       1, 1, 1 };
   XMathsOperation arr;
-  arr.load(XMathsOperation::Float, arrData, 1, sizeof(arrData)/sizeof(arrData[0]), 1, tr1);
+  arr.load(XMathsOperation::Float, arrData, 3, 3, 1, tr1);
 
   float arrData2[] = { 2, 2, 2,
                        2, 2, 2, 
                        2, 2, 2 };
   XMathsOperation arr2;
-  arr2.load(XMathsOperation::Float, arrData2, 1, sizeof(arrData2)/sizeof(arrData2[0]), 1, tr2);
+  arr2.load(XMathsOperation::Float, arrData2, 3, 3, 1, tr2);
 
   XMathsOperation add;
   add.add(arr, arr2);
