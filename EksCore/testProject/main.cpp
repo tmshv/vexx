@@ -8,18 +8,29 @@ int main()
   {
   XMathsEngine::setEngine(new XReferenceMathsEngine);
 
-  float arrData[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+  XMatrix3x3 tr1 = XMatrix3x3::Identity();
+  tr1(2) = XVector3(1, 1, 0);
+  
+  XMatrix3x3 tr2 = XMatrix3x3::Identity();
+  tr2(2) = XVector3(3, 3, 0);
+  
+  
+  float arrData[] = { 1, 1, 1,
+                      1, 1, 1,
+                      1, 1, 1 };
   XMathsOperation arr;
-  arr.load(XMathsOperation::Float, arrData, 1, sizeof(arrData)/sizeof(arrData[0]), 1);
+  arr.load(XMathsOperation::Float, arrData, 1, sizeof(arrData)/sizeof(arrData[0]), 1, tr1);
 
-  float arrData2[] = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+  float arrData2[] = { 2, 2, 2,
+                       2, 2, 2, 
+                       2, 2, 2 };
   XMathsOperation arr2;
-  arr2.load(XMathsOperation::Float, arrData2, 1, sizeof(arrData2)/sizeof(arrData2[0]), 1);
+  arr2.load(XMathsOperation::Float, arrData2, 1, sizeof(arrData2)/sizeof(arrData2[0]), 1, tr2);
 
   XMathsOperation add;
   add.add(arr, arr2);
 
-  XMathsOperation convolve;
+  /*XMathsOperation convolve;
   float convData[] = { 0.25, 0.5, 0.25 };
   XMathsOperation conv;
   conv.load(XMathsOperation::Float, convData, 1, sizeof(convData)/sizeof(convData[0]), 1);
@@ -34,9 +45,9 @@ int main()
   shuffle.shuffle(convolve, mask);
 
   XMathsOperation mul;
-  mul.multiply(shuffle, arr);
+  mul.multiply(shuffle, arr);*/
 
-  XMathsResult res(mul);
+  XMathsResult res(add);
   float* data = (float*)res.data();
   xsize length = res.dataWidth();
 
