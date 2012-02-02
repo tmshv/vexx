@@ -1,6 +1,7 @@
 #include "XArrayMath"
 #include "XAssert"
 #include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "QRect"
 
 XMathsEngine *g_engine = 0;
@@ -135,13 +136,13 @@ void XMathsOperation::setValueDirty()
   XMathsEngine::engine()->onValueDirty(this, &_userData);
   }
 
-void XMathsOperation::load(DataType t, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels)
+void XMathsOperation::load(DataType t, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &m)
   {
   setInput(&_inputA, 0);
   setInput(&_inputB, 0);
 
   setOperation(Load);
-  _userData = XMathsEngine::engine()->loadData(t, data, dataWidth, dataHeight, dataChannels);
+  _userData = XMathsEngine::engine()->loadData(t, data, dataWidth, dataHeight, dataChannels, m);
   }
 
 void XMathsOperation::add(const XMathsOperation &a, const XMathsOperation &b)
@@ -220,21 +221,42 @@ template <typename T> struct Defs
     const XMatrix3x3& transform() const { return *_transform; }
     const Array& image() const { return *_image; }
 
-    XVector3D &xAxis() { return transform().col(0); }
-    XVector3D &yAxis() { return transform().col(1); }
-    XVector3D &translation() { return transform().col(2); }
+    XVector3D xAxis() { return transform().col(0); }
+    XVector3D yAxis() { return transform().col(1); }
+    XVector3D translation() { return transform().col(2); }
+    void setTranslation(const XVector3D &in) { transform().col(2) = in; }
 
-    void expandToFit(const ImageRef &, QRectF& rect);
+    void expandToFit(const ImageRef &im, QRectF& rect)
+      {
+      XMatrix3x3 m = transform() * im.transform().inverse();
+      XVector3D a = m * XVector3D(0, 0, 1);
+      XVector3D b = m * XVector3D(0, im.image().cols(), 1);
+      XVector3D c = m * XVector3D(im.image().rows(), 0, 1);
+      XVector3D d = m * XVector3D(im.image().rows(), im.image().cols(), 1);
+
+      rect.unite(QRectF(a.x(), a.y(), 1, 1));
+      rect.unite(QRectF(b.x(), b.y(), 1, 1));
+      rect.unite(QRectF(c.x(), c.y(), 1, 1));
+      rect.unite(QRectF(d.x(), d.y(), 1, 1));
+      }
+
     void setSize(const QRectF& rect)
       {
-      translation() += XVector3D(rect.x(), rect.y(), 0.0f);
+      setTranslation(translation() + XVector3D(rect.x(), rect.y(), 0.0f));
       image().resize(rect.width(), rect.height());
       }
 
     Vec sampleFrom(const XMatrix3x3 &rootMat, const XVector3D &pt) const
       {
-      XMatrix3x3 world = rootMat;
-      world.col(2) += pt;
+      XVector3D mappedPt = transform() * rootMat.inverse() * pt;
+
+      if(mappedPt.x() < 0.0f || mappedPt.y() < 0.0f ||
+         mappedPt.x() > image().rows() || mappedPt.y() > image().cols())
+        {
+        return Vec::Zero();
+        }
+
+      return image()(mappedPt.x(), mappedPt.y());
       }
 
   private:
@@ -295,6 +317,7 @@ template <typename T> struct Utils
     {
     static const InitFunction iFns[] =
       {
+      0,     // NoOp
       0,     // Load
       unite, // Add
       takeA, // AddConst
@@ -311,6 +334,7 @@ template <typename T> struct Utils
 
     static const MathsFunction fFns[] =
       {
+      0,    // NoOp
       0,    // Load
       add,  // Add
       0,    // AddConst
@@ -338,11 +362,12 @@ template <typename T> struct Utils
     }
   };
 
-void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels)
+void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &m)
   {
   ReferenceMathsEngineResult *ret = new ReferenceMathsEngineResult;
   ret->_type = type;
   ret->_channels = channels;
+  ret->_transform = m;
 
   xAssert(channels <= 4);
 
@@ -407,6 +432,7 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
 
   static const xuint8 expectedInputs[] =
   {
+    0, // NoOp
     0, // Load
     2, // Add
     1, // AddConst

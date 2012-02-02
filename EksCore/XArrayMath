@@ -41,7 +41,7 @@ public:
     Float
     };
 
-  void load(DataType, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels);
+  void load(DataType, void* data, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &);
 
   void add(const XMathsOperation &, const XMathsOperation &);
   void add(const XMathsOperation &, const XVector4D &);
@@ -77,7 +77,7 @@ private:
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels) = 0;
+  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &) = 0;
   virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onInputDirty(const XMathsOperation *, void **userData) = 0;
@@ -89,7 +89,7 @@ public:
 
 class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
   {
-  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels);
+  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &);
   virtual void onOperationDirty(const XMathsOperation *, void **userData);
   virtual void onValueDirty(const XMathsOperation *, void **userData);
   virtual void onInputDirty(const XMathsOperation *, void **userData);
