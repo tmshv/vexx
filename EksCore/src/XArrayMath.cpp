@@ -208,6 +208,39 @@ template <typename T> struct Defs
   {
   typedef Eigen::Matrix <T, 4, 1> Vec;
   typedef Eigen::Array <Vec, Eigen::Dynamic, Eigen::Dynamic> Array;
+
+  struct ImageRef
+    {
+    ImageRef(XMatrix3x3& tr, Array& im) : _transform(&tr), _image(&im) { }
+    ImageRef() : _transform(0), _image(0) { }
+
+    XMatrix3x3& transform() { return *_transform; }
+    Array& image() { return *_image; }
+
+    const XMatrix3x3& transform() const { return *_transform; }
+    const Array& image() const { return *_image; }
+
+    XVector3D &xAxis() { return transform().col(0); }
+    XVector3D &yAxis() { return transform().col(1); }
+    XVector3D &translation() { return transform().col(2); }
+
+    void expandToFit(const ImageRef &, QRectF& rect);
+    void setSize(const QRectF& rect)
+      {
+      translation() += XVector3D(rect.x(), rect.y(), 0.0f);
+      image().resize(rect.width(), rect.height());
+      }
+
+    Vec sampleFrom(const XMatrix3x3 &rootMat, const XVector3D &pt) const
+      {
+      XMatrix3x3 world = rootMat;
+      world.col(2) += pt;
+      }
+
+  private:
+    XMatrix3x3 *_transform;
+    Array *_image;
+    };
   };
 
 struct ReferenceMathsEngineResult
@@ -218,34 +251,47 @@ struct ReferenceMathsEngineResult
 
   Defs<float>::Array _floats;
   Defs<xuint32>::Array _ints;
-
-  QRect rect() const
-    {
-    }
   };
 
 template <typename T> struct Utils
   {
   typedef typename Defs<T>::Array Array;
   typedef typename Defs<T>::Vec Vec;
-  typedef void (*InitFunction)(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b);
-  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b);
+  typedef typename Defs<T>::ImageRef ImageRef;
+  typedef void (*InitFunction)(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b);
+  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b);
 
-  static void unite(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+  static void unite(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
+    xAssert(a);
+    xAssert(b);
+
+    arr.transform() = a->transform();
+
+    QRectF r;
+    arr.expandToFit(*a, r);
+    arr.expandToFit(*b, r);
+
+    arr.setSize(r);
     }
 
-  static void takeA(const XMathsOperation*, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+  static void takeA(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
-    mat = a->_transform;
-    arr.resize(a->rows(), a->cols());
+    xAssert(a);
+    arr.transform() = a->transform();
+    arr.image().resize(a->image().rows(), a->image().cols());
     }
 
-  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b)
     {
+    xAssert(a);
+    xAssert(b);
+
+    arr = Vec::Zero();
+    arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
     }
 
-  static void doOperation(const XMathsOperation* o, XMatrix3x3& mat, Array &arr, const ReferenceMathsEngineResult *a, const ReferenceMathsEngineResult *b)
+  static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
     static const InitFunction iFns[] =
       {
@@ -259,8 +305,9 @@ template <typename T> struct Utils
       unite  // Splice
       };
 
+    xAssert(o->operation() < sizeof(iFns)/sizeof(iFns[0]));
     xAssert(iFns[o->operation()]);
-    iFns[o->operation()](o, mat, arr, a, b);
+    iFns[o->operation()](o, arr, a, b);
 
     static const MathsFunction fFns[] =
       {
@@ -274,17 +321,18 @@ template <typename T> struct Utils
       0     // Splice
       };
 
+    xAssert(o->operation() < sizeof(fFns)/sizeof(fFns[0]));
     MathsFunction fn = fFns[o->operation()];
     xAssert(fn);
 
-    for(int y = 0; y < arr.cols(); ++y)
+    for(int y = 0; y < arr.image().cols(); ++y)
       {
-      for(int x = 0; x < arr.rows(); ++x)
+      for(int x = 0; x < arr.image().rows(); ++x)
         {
         XVector3D pt(x, y, 1.0);
 
-        Vec& v = arr(x, y);
-        fn(pt, o, mat, v, a, b);
+        Vec& v = arr.image()(x, y);
+        fn(pt, o, arr.transform(), v, a, b);
         }
       }
     }
@@ -370,14 +418,14 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   };
 
   xuint8 expInputs = expectedInputs[o->operation()];
-  const ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
+  ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
   if(expInputs >= 1 && !a)
     {
     xAssertFail();
     return;
     }
 
-  const ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
+  ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
   if(expInputs >= 2 && !b)
     {
     xAssertFail();
@@ -390,11 +438,37 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   res->_type = a->_type;
   if(a->_type == XMathsOperation::Float)
     {
-    Utils<float>::doOperation(o, res->_transform, res->_floats, a, b);
+    Utils<float>::ImageRef aIm;
+    if(a)
+      {
+      aIm = Utils<float>::ImageRef(a->_transform, a->_floats);
+      }
+
+    Utils<float>::ImageRef bIm;
+    if(b)
+      {
+      bIm = Utils<float>::ImageRef(b->_transform, b->_floats);
+      }
+
+    Utils<float>::ImageRef im(res->_transform, res->_floats);
+    Utils<float>::doOperation(o, im, &aIm, &bIm);
     }
   else if(a->_type == XMathsOperation::Byte)
     {
-    Utils<xuint32>::doOperation(o, res->_transform, res->_ints, a, b);
+    Utils<xuint32>::ImageRef aIm;
+    if(a)
+      {
+      aIm = Utils<xuint32>::ImageRef(a->_transform, a->_ints);
+      }
+
+    Utils<xuint32>::ImageRef bIm;
+    if(b)
+      {
+      bIm = Utils<xuint32>::ImageRef(b->_transform, b->_ints);
+      }
+
+    Utils<xuint32>::ImageRef im(res->_transform, res->_ints);
+    Utils<xuint32>::doOperation(o, im, &aIm, &bIm);
     }
   }
 
