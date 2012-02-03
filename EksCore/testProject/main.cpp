@@ -38,13 +38,18 @@ int main()
   XMathsOperation add;
   add.add(arr, arr2);
 
-  /*XMathsOperation convolve;
-  float convData[] = { 0.25, 0.5, 0.25 };
+  XMatrix3x3 centeringOffset = XMatrix3x3::Identity();
+  tr1.col(2) = XVector3D(-1, -1, 1);
+
+  XMathsOperation convolve;
+  float convData[] = { 0.05f, 0.25f, 0.05f,
+                      0.25f, 0.5f, 0.25f,
+                      0.05f, 0.25f, 0.05f };
   XMathsOperation conv;
-  conv.load(XMathsOperation::Float, convData, 1, sizeof(convData)/sizeof(convData[0]), 1);
+  conv.load(XMathsOperation::Float, convData, 3, 3, 1, centeringOffset);
   convolve.convolve(add, conv);
 
-  XMathsOperation shuffle;
+  /*XMathsOperation shuffle;
   xuint32 mask;
   mask |= 1;
   mask |= 0 << 8;
@@ -55,7 +60,7 @@ int main()
   XMathsOperation mul;
   mul.multiply(shuffle, arr);*/
 
-  XMathsResult res(add);
+  XMathsResult res(convolve);
   float* data = (float*)res.data();
   xsize w = res.dataWidth();
   xsize h = res.dataHeight();
