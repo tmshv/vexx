@@ -286,15 +286,23 @@ template <typename T> struct Utils
     xAssert(a);
     arr.transform() = a->transform();
     arr.image().resize(a->image().rows(), a->image().cols());
-    }
+  }
 
   static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b)
-    {
+  {
     xAssert(a);
     xAssert(b);
 
     arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
-    }
+  }
+
+  static void convolve(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b)
+  {
+    xAssert(a);
+    xAssert(b);
+
+    arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
+  }
 
   static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
@@ -317,15 +325,15 @@ template <typename T> struct Utils
 
     static const MathsFunction fFns[] =
       {
-      0,    // NoOp
-      0,    // Load
-      add,  // Add
-      0,    // AddConst
-      0,    // Multiply
-      0,    // MultiplyConst
-      0,    // Convolve
-      0,    // Shuffle
-      0     // Splice
+      0,        // NoOp
+      0,        // Load
+      add,      // Add
+      0,        // AddConst
+      0,        // Multiply
+      0,        // MultiplyConst
+      convolve, // Convolve
+      0,        // Shuffle
+      0         // Splice
       };
 
     xAssert(o->operation() < sizeof(fFns)/sizeof(fFns[0]));
