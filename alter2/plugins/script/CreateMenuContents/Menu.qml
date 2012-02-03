@@ -37,11 +37,11 @@ Rectangle {
 
     if((holder.x + holder.width) < br.x)
       {
-      holder.width = br.x// + holder.x;
+      holder.width = Math.max(holder.width, br.x); // + holder.x;
       }
     if((holder.y + holder.height) < br.y)
       {
-      holder.height = br.y// + holder.y;
+      holder.height = Math.max(holder.height, br.y); // + holder.y;
       }
     }
 
@@ -228,6 +228,7 @@ Rectangle {
               }
             }
           onExited: subMenu.stop();
+          onClicked: // trigger menu: subMenu.start(1);
           }
 
         Column {
