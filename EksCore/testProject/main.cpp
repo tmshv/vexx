@@ -2,30 +2,38 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "XArrayMath"
-
+#include "QString"
 
 int main()
   {
   XMathsEngine::setEngine(new XReferenceMathsEngine);
 
   XMatrix3x3 tr1 = XMatrix3x3::Identity();
-  tr1.col(2) = XVector3D(1, 1, 0);
+  tr1.col(2) = XVector3D(1, 1, 1);
   
   XMatrix3x3 tr2 = XMatrix3x3::Identity();
-  tr2.col(2) = XVector3D(3, 3, 0);
+  tr2.col(0) = XVector3D(1, 1, 0).normalized();
+  tr2.col(1) = XVector3D(1, -1, 0).normalized();
+  tr2.col(2) = XVector3D(0, 0, 1);
   
   
-  float arrData[] = { 1, 1, 1,
-                      1, 1, 1,
-                      1, 1, 1 };
+  float arrData[] = { 1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1,};
   XMathsOperation arr;
-  arr.load(XMathsOperation::Float, arrData, 3, 3, 1, tr1);
+  arr.load(XMathsOperation::Float, arrData, 6, 6, 1, tr1);
 
-  float arrData2[] = { 2, 2, 2,
-                       2, 2, 2, 
-                       2, 2, 2 };
+  float arrData2[] = { 2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2,};
   XMathsOperation arr2;
-  arr2.load(XMathsOperation::Float, arrData2, 3, 3, 1, tr2);
+  arr2.load(XMathsOperation::Float, arrData2, 6, 6, 1, tr2);
 
   XMathsOperation add;
   add.add(arr, arr2);
@@ -49,12 +57,21 @@ int main()
 
   XMathsResult res(add);
   float* data = (float*)res.data();
-  xsize length = res.dataWidth();
+  xsize w = res.dataWidth();
+  xsize h = res.dataHeight();
+  xsize channels = res.dataChannels();
 
-  for(xsize i=0; i < length; ++i)
+  QString out;
+  for(xsize y=0; y < h; ++y)
     {
-    qDebug() << data[i];
+    for(xsize x=0; x < w; ++x)
+      {
+      out += QString::number(data[x*channels + y*w*channels]) + " ";
+      }
+
+    out += '\n';
     }
+  qDebug() << out;
   }
 
 /*

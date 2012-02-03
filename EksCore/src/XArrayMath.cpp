@@ -15,28 +15,9 @@ void XMathsEngine::setEngine(XMathsEngine *e)
   g_engine = e;
   }
 
-XMathsResult::XMathsResult(const XMathsOperation &)
+XMathsResult::XMathsResult(const XMathsOperation &o)
   {
-  }
-
-XMathsOperation::DataType XMathsResult::dataType() const
-  {
-  return XMathsOperation::Float;
-  }
-
-xuint8 *XMathsResult::data() const
-  {
-  return 0;
-  }
-
-xsize XMathsResult::dataWidth() const
-  {
-  return 0;
-  }
-
-xsize XMathsResult::dataHeight() const
-  {
-  return 0;
+  XMathsEngine::engine()->evaluateData(&o, o.userData(), &_dataType, &_data, &_dataWidth, &_dataHeight, &_dataChannels, &_transform);
   }
 
 XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
@@ -71,7 +52,10 @@ void XMathsOperation::removeUser(XMathsOperation *o) const
     }
 
   xAssert(i);
-  prev->_nextUser = i->_nextUser;
+  if(prev)
+    {
+    prev->_nextUser = i->_nextUser;
+    }
   i->_nextUser = 0;
   }
 
@@ -223,35 +207,35 @@ template <typename T> struct Defs
 
     XVector3D xAxis() { return transform().col(0); }
     XVector3D yAxis() { return transform().col(1); }
-    XVector3D translation() { return transform().col(2); }
-    void setTranslation(const XVector3D &in) { transform().col(2) = in; }
+    XVector2D translation() { return transform().col(2).block<2, 1>(0, 0); }
+    void setTranslation(const XVector2D &in) { transform().col(2).block<2, 1>(0, 0) = in; }
 
     void expandToFit(const ImageRef &im, QRectF& rect)
       {
-      XMatrix3x3 m = transform() * im.transform().inverse();
+      XMatrix3x3 m = im.transform() * transform().inverse();
       XVector3D a = m * XVector3D(0, 0, 1);
       XVector3D b = m * XVector3D(0, im.image().cols(), 1);
       XVector3D c = m * XVector3D(im.image().rows(), 0, 1);
       XVector3D d = m * XVector3D(im.image().rows(), im.image().cols(), 1);
 
-      rect.unite(QRectF(a.x(), a.y(), 1, 1));
-      rect.unite(QRectF(b.x(), b.y(), 1, 1));
-      rect.unite(QRectF(c.x(), c.y(), 1, 1));
-      rect.unite(QRectF(d.x(), d.y(), 1, 1));
+      rect = rect.unite(QRectF(a.x(), a.y(), 1, 1));
+      rect = rect.unite(QRectF(b.x(), b.y()-1, 1, 1));
+      rect = rect.unite(QRectF(c.x()-1, c.y(), 1, 1));
+      rect = rect.unite(QRectF(d.x()-1, d.y()-1, 1, 1));
       }
 
     void setSize(const QRectF& rect)
       {
-      setTranslation(translation() + XVector3D(rect.x(), rect.y(), 0.0f));
+      setTranslation(translation() + XVector2D(rect.x(), rect.y()));
       image().resize(rect.width(), rect.height());
       }
 
     Vec sampleFrom(const XMatrix3x3 &rootMat, const XVector3D &pt) const
       {
-      XVector3D mappedPt = transform() * rootMat.inverse() * pt;
+      XVector3D mappedPt = transform().inverse() * rootMat * pt;
 
       if(mappedPt.x() < 0.0f || mappedPt.y() < 0.0f ||
-         mappedPt.x() > image().rows() || mappedPt.y() > image().cols())
+         mappedPt.x() >= image().rows() || mappedPt.y() >= image().cols())
         {
         return Vec::Zero();
         }
@@ -309,7 +293,6 @@ template <typename T> struct Utils
     xAssert(a);
     xAssert(b);
 
-    arr = Vec::Zero();
     arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
     }
 
@@ -361,6 +344,32 @@ template <typename T> struct Utils
       }
     }
   };
+
+void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *userData, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m)
+  {
+  const ReferenceMathsEngineResult *result = (const ReferenceMathsEngineResult *)userData;
+
+  *type = result->_type;
+  *dataChannels = result->_channels;
+  *m = result->_transform;
+
+  if(result->_type == XMathsOperation::Float)
+    {
+    *data = result->_floats.data();
+    *dataWidth = result->_floats.rows();
+    *dataHeight = result->_floats.cols();
+    }
+  else if(result->_type == XMathsOperation::Byte)
+    {
+    *data = result->_ints.data();
+    *dataWidth = result->_ints.rows();
+    *dataHeight = result->_ints.cols();
+    }
+  else
+    {
+    xAssertFail();
+    }
+  }
 
 void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &m)
   {
@@ -460,7 +469,7 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
 
   xAssert(a);
 
-  res->_channels = a->_channels;
+  res->_channels = 4;//a->_channels;
   res->_type = a->_type;
   if(a->_type == XMathsOperation::Float)
     {
