@@ -12,6 +12,9 @@ ScShiftDatabase::ScShiftDatabase(QScriptEngine *eng) : ScShiftPropertyContainerB
   addMemberFunction("load", load);
   addMemberFunction("save", save);
   initiateGlobalValue<ScShiftDatabase>("SDatabase", "SEntity");
+
+  QScriptValue dbTypes = eng->globalObject().property("dbTypes");
+  prototype().setProperty("types", dbTypes);
   }
 
 ScShiftDatabase::~ScShiftDatabase()

@@ -41,7 +41,8 @@ public:
 
   QScriptEngine *engine();
 
-  Q_INVOKABLE void addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData);
+  Q_INVOKABLE QWidget *addQMLWindow(const QString &url, const QVariantMap &qmlData=QVariantMap());
+  Q_INVOKABLE QObject *addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData=QVariantMap());
 
   static QScriptValue call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args);
 

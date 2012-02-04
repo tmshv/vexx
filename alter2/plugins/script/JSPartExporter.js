@@ -123,4 +123,4 @@ var jsFileExporter = {
         }
     };
 
-SPartDocument.registerExporter(jsFileExporter);
+db.types.SPartDocument.registerExporter(jsFileExporter);
