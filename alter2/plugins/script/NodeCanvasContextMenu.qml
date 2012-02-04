@@ -6,6 +6,7 @@ Rectangle {
   width: childrenRect.width+80
   height: childrenRect.height+2
   color: "white"
+  property alias menuContents: menu.menuItems
 
   function focusLost()
     {

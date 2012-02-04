@@ -14,6 +14,17 @@ Rectangle {
   border.color: "#555555"
   radius: 3
   smooth: true
+  property variant menuItems: null
+
+  onMenuItemsChanged:
+    {
+    contentsModel.clear();
+    for (var prop in menuItems)
+      {
+      var data = menuItems[prop];
+      contentsModel.append({"name": prop, "description":data.description, hasSubMenu: data.children !== undefined })
+      }
+    }
 
   function expand()
     {
@@ -128,43 +139,14 @@ Rectangle {
 
     Repeater {
       model: ListModel {
-        ListElement {
-          name: "Bill Smith"
-          description: "555 3264"
-          hasSubMenu: true
-          }
-        ListElement {
-          name: "John Brown"
-          description: "555 8426"
-          hasSubMenu: false
-          }
-        ListElement {
-          name: "Sam Wise"
-          description: "555 0473"
-          hasSubMenu: false
-          }
-        ListElement {
-          name: "Sam Wise"
-          description: "555 0473"
-          hasSubMenu: true
-          }
-        ListElement {
-          name: "Sam Wise"
-          description: "555 0473"
-          hasSubMenu: false
-          }
-        ListElement {
-          name: "Sam Wise"
-          description: "555 0473"
-          hasSubMenu: true
-          }
+        id: contentsModel
         }
 
       delegate: Rectangle {
         id: item
         border.width: 1
         border.color: "#333333"
-        width: parent.width
+        width: parent ? parent.width : 0
         height: column.height
 
         states: [
@@ -191,29 +173,43 @@ Rectangle {
           }
         ]
 
+        function triggerSubMenu() {
+          if(subMenuItem)
+            {
+            subMenuItem.state = "Done";
+            subMenuItem = null;
+            }
+
+          var component = Qt.createComponent("Menu.qml");
+          var object = component.createObject(item);
+
+          var i = 0;
+          var data = null;
+          for (var prop in menuItems)
+            {
+            if(i === index)
+              {
+              data = menuItems[prop].children;
+              }
+            ++i;
+            }
+
+          object.menuItems = data;
+          object.title = "";
+          object.x = (function(){ return item.x + item.width + 1; });
+          object.y = -padding - 40;
+          object.z = 2;
+          object.state = "Shown";
+          object.expand();
+
+
+          subMenuItem = object;
+        }
+
         Timer {
           id: subMenu
           interval: 250
-          onTriggered: {
-            if(subMenuItem)
-              {
-              subMenuItem.state = "Done";
-              subMenuItem = null;
-              }
-
-            var component = Qt.createComponent("Menu.qml");
-            var object = component.createObject(item);
-
-            object.title = "";
-            object.x = (function(){ return item.x + item.width + 1; });
-            object.y = -padding - 40;
-            object.z = 2;
-            object.state = "Shown";
-            object.expand();
-
-
-            subMenuItem = object;
-          }
+          onTriggered: triggerSubMenu()
         }
 
         MouseArea
@@ -228,7 +224,28 @@ Rectangle {
               }
             }
           onExited: subMenu.stop();
-          onClicked: // trigger menu: subMenu.start(1);
+          onClicked: {
+            if(hasSubMenu)
+              {
+              triggerSubMenu()
+              }
+
+            var request = null;
+            var data = null;
+            var i = 0;
+            for (var prop in menuItems)
+              {
+              if(i === index)
+                {
+                request = menuItems[prop].request;
+                data = menuItems[prop].requestData;
+                }
+              ++i;
+              }
+
+            print(data);
+            external.emitRequest(request, data);
+            }
           }
 
         Column {

@@ -1,5 +1,6 @@
 #include "scdeclarativesurface.h"
 #include "sdatabasemodel.h"
+#include "QGraphicsObject"
 #include "QDeclarativeContext"
 
 ScDeclarativeWindow::ScDeclarativeWindow(const QString &s, SDatabaseModel *model, const QVariantMap &data)
@@ -41,11 +42,11 @@ ScDeclarativeWindow::ScDeclarativeWindow(const QString &s, SDatabaseModel *model
     setFocusPolicy(Qt::StrongFocus);
     }
 
-  /*QGraphicsObject *root = rootObject();
+  QGraphicsObject *root = rootObject();
   foreach(const QString &s, data.keys())
     {
     root->setProperty(s.toLatin1().constData(), data.value(s));
-    }*/
+    }
   }
 
 QVariantMap ScDeclarativeWindow::mapTo(QWidget *w, const float x, const float y) const
