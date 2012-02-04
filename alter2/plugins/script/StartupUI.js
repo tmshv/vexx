@@ -1,5 +1,5 @@
 var groups = [
-  db.types.GCCamera,
+  db.types.GCPerspectiveCamera,
   db.types.GCShader
 ]
 
