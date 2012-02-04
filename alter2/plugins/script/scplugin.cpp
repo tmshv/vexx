@@ -128,6 +128,7 @@ void ScPlugin::load()
   APlugin<SPlugin> db(this, "db");
   xAssert(db.isValid());
 
+  _engine->globalObject().setProperty("dbTypes", _engine->newObject());
   _types = new ScEmbeddedTypes(_engine);
 
   registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));

@@ -99,7 +99,7 @@ db.addType({
 
   */
 
-SProperty.cancelBlock = function(fn)
+db.types.SProperty.cancelBlock = function(fn)
   {
   this.beginBlock();
   try

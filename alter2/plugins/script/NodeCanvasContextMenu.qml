@@ -5,7 +5,7 @@ Rectangle {
   id: holder
   width: childrenRect.width+80
   height: childrenRect.height+2
-  color: "white"
+  color: "transparent"
   property alias menuContents: menu.menuItems
 
   function focusLost()
@@ -36,6 +36,5 @@ Rectangle {
 
   Menu {
     id: menu
-    title: "Create..."
   }
 }

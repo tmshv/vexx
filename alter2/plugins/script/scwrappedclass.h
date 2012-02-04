@@ -34,7 +34,8 @@ public:
 
   template <typename U> void initiateGlobalValue(const QString &name, const QString &parent="")
     {
-    QScriptValue globalObject = engine()->globalObject();
+    QScriptValue globalObject = engine()->globalObject().property("dbTypes");
+    xAssert(globalObject.isObject());
     _constructor = engine()->newFunction(blank, _prototype);
     _constructor.setData(qScriptValueFromValue(engine(), static_cast<U*>(this)));
 
@@ -106,7 +107,7 @@ public:
 
   static U *getWrappedClass(QScriptEngine *eng, const QString &name)
     {
-    QScriptValue ctor = eng->globalObject().property(name);
+    QScriptValue ctor = eng->globalObject().property("dbTypes").property(name);
     return qscriptvalue_cast<U*>(ctor.data());
     }
   };

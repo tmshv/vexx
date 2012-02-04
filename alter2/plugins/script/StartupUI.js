@@ -1,26 +1,26 @@
+var groups = [
+  db.types.GCCamera,
+  db.types.GCShader
+]
+
 function doContextMenu(window, x, y)
   {
+  var typesData = { };
+  for(var i = 0; i < groups.length; ++i)
+    {
+    var type = groups[i];
+    typesData[type.typeName] = {
+      description: "Some Type",
+      request: "create",
+      requestData: [ type.typeName ]
+      }
+    }
+
   var menuContents =
     {
-    "abc": {
-      description: "Wow, this is cool",
-      request: "gogo",
-      requestData: [ "C" ]
-      },
-    "def": {
-      description: "Wow, this is cool too",
-      children: {
-        "stub1": {
-          description: "1",
-          request: "gogo1",
-          requestData: [ "A" ]
-          },
-        "stub2": {
-          description: "2",
-          request: "gogo2",
-          requestData: [ "B" ]
-          }
-        }
+    "Create": {
+      description: "Add new nodes",
+      children: typesData
       }
     }
 
@@ -33,18 +33,10 @@ function doContextMenu(window, x, y)
       assert(this[name]);
       this[name].apply(this, argsIn);
       },
-    gogo: function(data)
-          {
-            print("A", data);
-          },
-    gogo1: function(data)
-          {
-            print("B", data);
-          },
-    gogo2: function(data)
-          {
-            print("C", data);
-          }
+    create: function(data)
+      {
+      db.addChild(data, "New Entity");
+      }
     }
   contextMenu.surface.emitRequest.connect(contextMenu, contextMenu.passIn);
   var mapped = window.mapTo(null, x, y);

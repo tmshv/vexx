@@ -49,11 +49,13 @@ void ScEmbeddedTypes::ensureTypeHierarchyAdded(const SPropertyInformation *p)
 
 void ScEmbeddedTypes::typeAdded(const SPropertyInformation *p)
   {
-  QScriptValue g = _engine->globalObject();
+  QScriptValue g = _engine->globalObject().property("dbTypes");
+  xAssert(g.isObject());
   if(!g.property(p->typeName()).isValid())
     {
     QScriptValue v = _engine->newObject();
     v.setProperty("typeName", p->typeName());
+    v.setProperty("isEntity", p->inheritsFromType<SEntity>() != 0);
 
     const SPropertyInformation *parentInfo = p->parentTypeInformation();
     if(parentInfo)
@@ -96,7 +98,7 @@ QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
 
   QScriptValue v = _types->engine()->newObject(classType, _types->engine()->newVariant(qVariantFromValue(prop)));
 
-  QScriptValue proto = _types->engine()->globalObject().property(prop->typeInformation()->typeName());
+  QScriptValue proto = _types->engine()->globalObject().property("dbTypes").property(prop->typeInformation()->typeName());
   xAssert(proto.isObject());
   v.setPrototype(proto);
   return v;

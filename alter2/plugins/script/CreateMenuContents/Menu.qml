@@ -99,8 +99,8 @@ Rectangle {
       from: "*"; to: "Done"
       SequentialAnimation {
         ParallelAnimation {
-          PropertyAnimation { property: "opacity"; easing.type: Easing.OutCubic; duration: 700 }
-          PropertyAnimation { property: "height"; easing.type: Easing.OutBounce; duration: 1500 }
+          PropertyAnimation { property: "opacity"; easing.type: Easing.OutCubic; duration: 70 }
+          PropertyAnimation { property: "height"; easing.type: Easing.OutBounce; duration: 150 }
           }
 
         ScriptAction {
@@ -112,8 +112,8 @@ Rectangle {
       },
     Transition {
       from: "*"; to: "*"
-      PropertyAnimation { property: "opacity"; easing.type: Easing.OutCubic; duration: 700 }
-      PropertyAnimation { property: "height"; easing.type: Easing.OutBounce; duration: 1500 }
+      PropertyAnimation { property: "opacity"; easing.type: Easing.OutCubic; duration: 70 }
+      PropertyAnimation { property: "height"; easing.type: Easing.OutBounce; duration: 150 }
       }
     ]
 
@@ -197,7 +197,7 @@ Rectangle {
           object.menuItems = data;
           object.title = "";
           object.x = (function(){ return item.x + item.width + 1; });
-          object.y = -padding - 40;
+          object.y = -padding;
           object.z = 2;
           object.state = "Shown";
           object.expand();
@@ -228,6 +228,7 @@ Rectangle {
             if(hasSubMenu)
               {
               triggerSubMenu()
+              return;
               }
 
             var request = null;
@@ -243,8 +244,8 @@ Rectangle {
               ++i;
               }
 
-            print(data);
             external.emitRequest(request, data);
+            external.destroyWindow();
             }
           }
 
