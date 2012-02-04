@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tang", "Tang.vcxproj", "{8E70261D-487D-38B9-A25D-B78985D18DC0}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tang", "Tang.vcproj", "{8E70261D-487D-38B9-A25D-B78985D18DC0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testProject", "..\EksCore\testProject\testProject.vcxproj", "{46371031-FAD4-3D66-A3E8-202EED005CB5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testProject", "..\EksCore\testProject\testProject.vcproj", "{46371031-FAD4-3D66-A3E8-202EED005CB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
