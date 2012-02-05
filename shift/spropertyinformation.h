@@ -14,6 +14,31 @@ class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
 
+namespace ShiftTypePacker
+{
+inline QVariant pack(void)
+  {
+  return QVariant();
+  }
+inline QVariant pack(bool b)
+  {
+  return QVariant(b);
+  }
+inline QVariant pack(int i)
+  {
+  return QVariant(i);
+  }
+inline void unpack(const QVariant &i, bool *success, QString& out)
+  {
+  *success = true;
+  out =i.toString();
+  }
+inline void unpack(const QVariant &i, bool *success, int &in)
+  {
+  in = i.toInt(success);
+  }
+}
+
 namespace std
 {
   template <typename T> class initializer_list;
@@ -138,6 +163,19 @@ public:
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
+  enum
+    {
+    MaxWrappedArguments = 1
+    };
+  typedef QVariant (*WrappedFunction)(SProperty *p, QVariant *v, xuint32 argCount, bool *success, QString *errorString);
+  struct WrappedMember
+    {
+    QString memberName;
+    xuint32 expectedArguments;
+    WrappedFunction function;
+    };
+  typedef XHash<QString, WrappedMember> MemberHash;
+
 XProperties:
   XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
   XProperty(SaveFunction, save, setSave);
@@ -159,6 +197,7 @@ XProperties:
   XProperty(xsize, instanceInformationSize, setInstanceInformationSize);
 
   XRORefProperty(DataHash, data);
+  XRORefProperty(MemberHash, wrappedMembers);
 
   XROProperty(xsize, instances);
 
@@ -261,6 +300,97 @@ public:
   template <typename T> void addStaticInterface(T *) const;
 
   template <typename T> static const SPropertyInformation *findStaticTypeInformation(const char *);
+
+  template <typename Class, void (Class::*Member)()>
+  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *, xuint32 argCount, bool *success, QString *error)
+    {
+    xAssert(argCount == 0);
+
+    (cls->*Member)();
+    return QVariant();
+    }
+
+  template <typename Ret, typename Class, Ret (Class::*Member)()>
+  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *, xuint32 argCount, bool *success, QString *error)
+    {
+    xAssert(argCount == 0);
+
+    return ShiftTypePacker::pack((cls->*Member)());
+    }
+
+  template <typename Class, typename T1, void (Class::*Member)(T1)>
+  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *args, xuint32 argCount, bool *success, QString *error)
+    {
+    xAssert(argCount == 1);
+
+    T1 t1;
+    ShiftTypePacker::unpack(args[0], success, t1);
+    if(!success)
+      {
+      return QVariant();
+      }
+
+    (cls->*Member)(t1);
+    return QVariant();
+    }
+
+  template <typename Ret, typename Class, typename T1, Ret (Class::*Member)(T1)>
+  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *args, xuint32 argCount, bool *success, QString *error)
+    {
+    xAssert(argCount == 1);
+    T1 t1;
+    ShiftTypePacker::unpack(args[0], success, t1);
+    if(!success)
+      {
+      *error = "Could not extract argument 0, incorrect input type.";
+      return QVariant();
+      }
+
+
+    return ShiftTypePacker::pack((cls->*Member)(t1));
+    }
+
+  template <typename Ret, typename Class, Ret (Class::*Member)()>
+  void addAPIMemberFunction(const QString &str)
+    {
+    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
+
+    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Ret, Class, Member>;
+    WrappedFunction wFn = (WrappedFunction)tFn;
+    addAPIMemberFunction(str, wFn, 0);
+    }
+
+  template <typename Class, void (Class::*Member)()>
+  void addAPIMemberFunction(const QString &str)
+    {
+    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
+
+    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Class, Member>;
+    WrappedFunction wFn = (WrappedFunction)tFn;
+    addAPIMemberFunction(str, wFn, 0);
+    }
+
+  template <typename Ret, typename Class, typename T1, Ret (Class::*Member)(T1)>
+  void addAPIMemberFunction(const QString &str)
+    {
+    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
+
+    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Ret, Class, T1, Member>;
+    WrappedFunction wFn = (WrappedFunction)tFn;
+    addAPIMemberFunction(str, wFn, 1);
+    }
+
+  template <typename Class, typename T1, void (Class::*Member)(T1)>
+  void addAPIMemberFunction(const QString &str)
+    {
+    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
+
+    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Class, T1, Member>;
+    WrappedFunction wFn = (WrappedFunction)tFn;
+    addAPIMemberFunction(str, wFn, 1);
+    }
+
+  void addAPIMemberFunction(const QString &name, WrappedFunction, xuint32 expectedArguments);
 
   X_ALIGNED_OPERATOR_NEW
 

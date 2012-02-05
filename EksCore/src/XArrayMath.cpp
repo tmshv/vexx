@@ -22,6 +22,7 @@ XMathsResult::XMathsResult(const XMathsOperation &o)
 
 XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
   {
+  xAssert(XMathsEngine::engine());
   _operation = NoOp;
   }
 

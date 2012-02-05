@@ -1,6 +1,5 @@
 var groups = [
-  db.types.GCPerspectiveCamera,
-  db.types.GCShader
+  db.types.MCImage
 ]
 
 function doContextMenu(window, x, y)
@@ -35,7 +34,7 @@ function doContextMenu(window, x, y)
       },
     create: function(data)
       {
-      db.addChild(data, "New Entity");
+      db.addChild(data, data);
       }
     }
   contextMenu.surface.emitRequest.connect(contextMenu, contextMenu.passIn);

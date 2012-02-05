@@ -5,6 +5,8 @@
 #include "aabstractplugin.h"
 #include "sappdatabase.h"
 
+class XMathsEngine;
+
 class SHIFTALTER_EXPORT SPlugin : public AAbstractPlugin
   {
   Q_OBJECT
@@ -94,6 +96,7 @@ private:
   virtual void unload();
 
   SAppDatabase *_db;
+  XMathsEngine *_mathsEngine;
   };
 
 #endif // SPLUGIN_H

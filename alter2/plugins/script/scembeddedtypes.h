@@ -5,7 +5,6 @@
 #include "scshiftpropertycontainer.h"
 #include "scshiftentity.h"
 #include "scshiftdatabase.h"
-#include "scshiftfloatarrayproperty.h"
 #include "styperegistry.h"
 
 class QScriptEngine;
@@ -29,7 +28,6 @@ private:
   ScShiftPropertyContainer _propertyContainer;
   ScShiftEntity _entity;
   ScShiftDatabase _database;
-  ScShiftFloatArrayProperty _floatArrayProperty;
 
   static ScEmbeddedTypes *_types;
   };

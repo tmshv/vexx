@@ -12,8 +12,7 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
     _property(eng),
     _propertyContainer(eng),
     _entity(eng),
-    _database(eng),
-    _floatArrayProperty(eng)
+    _database(eng)
   {
   xAssert(_types == 0);
   _types = this;
@@ -22,7 +21,6 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
   SPropertyContainer::staticTypeInformation()->addStaticInterface(&_propertyContainer);
   SEntity::staticTypeInformation()->addStaticInterface(&_entity);
   SDatabase::staticTypeInformation()->addStaticInterface(&_database);
-  SFloatArrayProperty::staticTypeInformation()->addStaticInterface(&_floatArrayProperty);
 
   foreach(const SPropertyInformation *p, STypeRegistry::types())
     {
