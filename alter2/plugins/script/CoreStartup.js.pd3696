@@ -118,5 +118,5 @@ script.include("JSPartExporter.js");
 script.includeFolder("jsEntities");
 
 var image = db.addChild("MCImage");
-image.filename.setValue("C:\\Users\\Jorj\\Pictures\\Finding Dinner in the Alleys of Kyoto.jpg");
+image.filename.setValue("C:\\Users\\Jorj\\Pictures\\1239646106_the+the+hindu+mist.jpg");
 image.output.saveResultToFile("C:\\Users\\Jorj\\Desktop\\a.png");

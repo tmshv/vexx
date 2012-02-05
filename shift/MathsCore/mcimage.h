@@ -11,7 +11,7 @@ class MCImage : public MCSource
 public:
   MCImage();
 
-  BoolProperty premultiplied;
+  BoolProperty premultiply;
   StringProperty filename;
 
 private:

@@ -8,7 +8,7 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCIma
   MCMathsOperation::ComputeLock l(&image->output);
   if(imInput.isNull())
     {
-    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, XMatrix3x3::Identity());
+    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XMatrix3x3::Identity());
     }
 
   XMatrix3x3 transform = XMatrix3x3::Identity();
@@ -18,7 +18,7 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCIma
   if(imInput.hasAlphaChannel())
     {
     channels = 4;
-    if(image->premultiplied())
+    if(image->premultiply())
       {
       imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
       }
@@ -29,30 +29,34 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCIma
     }
   else
     {
-    if(image->premultiplied())
+    if(image->premultiply())
       {
       imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
       }
     else
       {
-      imInput.convertToFormat(QImage::Format_RGB888);
+      imInput.convertToFormat(QImage::Format_RGB32);
       useShuffle = false;
       }
     }
 
+  imInput.fill(Qt::red);
   const uchar *bits = imInput.bits();
   xAssert(bits);
 
+// todo: argb 
+
+  xsize stride = imInput.bytesPerLine()/imInput.width();
   if(!useShuffle)
     {
-    l.data()->load(XMathsOperation::Byte, (void*)bits, imInput.width(), imInput.height(), channels, transform);
+    l.data()->load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
     }
   else
     {
-    xuint32 shuffleMask = XMathsOperation::shuffleMask(1, 0, 2, 3);
+    xuint32 shuffleMask = XMathsOperation::shuffleMask(1, 2, 3, 0);
 
     xAssert(channels == 4);
-    image->_preOperation.load(XMathsOperation::Byte, (void*)bits, imInput.width(), imInput.height(), channels, transform);
+    image->_preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
     l.data()->shuffle(image->_preOperation, shuffleMask);
     }
   }
@@ -66,7 +70,7 @@ SPropertyInformation *MCImage::createTypeInformation()
   MCMathsOperation::InstanceInformation *outputInst = info->child(&MCImage::output);
   outputInst->setCompute(computeImageOutput);
 
-  BoolProperty::InstanceInformation *preMultInst = info->add(&MCImage::premultiplied, "premultiplied");
+  BoolProperty::InstanceInformation *preMultInst = info->add(&MCImage::premultiply, "premultiply");
   preMultInst->setAffects(outputInst);
 
   StringProperty::InstanceInformation *filenameInst = info->add(&MCImage::filename, "filename");

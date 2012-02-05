@@ -16,13 +16,14 @@ bool MCMathsOperation::saveResultToFile(QString filename)
   {
   XMathsResult result(value());
 
-  if(result.dataType() != XMathsOperation::Byte)
+  if(result.dataType() != XMathsOperation::UnsignedInt)
     {
     xAssertFail();
     return false;
     }
 
-  uchar* data = (uchar*)result.data();
+  xuint32* data = (xuint32*)result.data();
+  xsize stride = result.dataStride();
   xsize w = result.dataWidth();
   xsize h = result.dataHeight();
   xsize channels = result.dataChannels();
@@ -33,23 +34,31 @@ bool MCMathsOperation::saveResultToFile(QString filename)
     fmt = QImage::Format_ARGB32;
     }
 
+  if(!data)
+    {
+    xAssertFail();
+    return false;
+    }
+
   QImage im(w, h, fmt);
   uchar *bits = im.bits();
   for(xuint32 y = 0; y < h; ++y)
     {
-    uchar *scanline = bits + im.bytesPerLine();
-    data += w*channels;
+    uchar *scanline = bits + y * im.bytesPerLine();
+    xAssert(im.bytesPerLine()/w == channels);
     for(xuint32 x = 0; x < w; ++x)
       {
+      xuint8 id = 0;
       if(channels == 4)
         {
-        scanline[0] = data[3];
+        scanline[id++] = data[3];
         }
 
-      scanline[1] = data[0];
-      scanline[2] = data[1];
-      scanline[3] = data[2];
+      scanline[id++] = data[0];
+      scanline[id++] = data[1];
+      scanline[id++] = data[2];
       scanline += channels;
+      data = (xuint32*)((xuint8*)data + stride);
       }
     }
 
