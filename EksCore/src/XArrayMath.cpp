@@ -227,12 +227,12 @@ template <typename T> struct Defs
     void setSize(const QRectF& rect)
       {
       setTranslation(translation() + XVector2D(rect.x(), rect.y()));
-      image().resize(rect.width(), rect.height());
+      image().resize(rect.width()+1.0f, rect.height()+1.0f);
       }
 
-    Vec sampleFrom(const XMatrix3x3 &rootMat, const XVector3D &pt) const
+    Vec sampleFrom(const XMatrix3x3 &mapping, const XVector3D &pt) const
       {
-      XVector3D mappedPt = transform().inverse() * rootMat * pt;
+      XVector3D mappedPt = mapping * pt;
 
       if(mappedPt.x() < 0.0f || mappedPt.y() < 0.0f ||
          mappedPt.x() >= image().rows() || mappedPt.y() >= image().cols())
@@ -241,6 +241,17 @@ template <typename T> struct Defs
         }
 
       return image()(mappedPt.x(), mappedPt.y());
+      }
+
+    Vec sampleFrom(const XVector3D &pt) const
+      {
+      if(pt.x() < 0.0f || pt.y() < 0.0f ||
+         pt.x() >= image().rows() || pt.y() >= image().cols())
+        {
+        return Vec::Zero();
+        }
+
+      return image()(pt.x(), pt.y());
       }
 
   private:
@@ -265,7 +276,7 @@ template <typename T> struct Utils
   typedef typename Defs<T>::Vec Vec;
   typedef typename Defs<T>::ImageRef ImageRef;
   typedef void (*InitFunction)(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b);
-  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b);
+  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b);
 
   static void unite(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
@@ -288,20 +299,34 @@ template <typename T> struct Utils
     arr.image().resize(a->image().rows(), a->image().cols());
   }
 
-  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b)
+  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
   {
     xAssert(a);
     xAssert(b);
 
-    arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
+    arr = a->sampleFrom(mapA, pt) + b->sampleFrom(mapB, pt);
   }
 
-  static void convolve(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const ImageRef *a, const ImageRef *b)
+  static void convolve(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b)
   {
     xAssert(a);
     xAssert(b);
 
-    arr = a->sampleFrom(mat, pt) + b->sampleFrom(mat, pt);
+    xAssert(mapA.isIdentity());
+
+    arr = Vec::Zero();
+    for(xsize y = 0, h = b->image().cols(); y < h; ++y)
+      {
+      for(xsize x = 0, w = b->image().rows(); x < w; ++x)
+        {
+        XVector3D samplePt = pt + b->transform() * XVector3D(x, y, 1.0f);
+
+        Vec::Scalar factor = b->image()(x, y)(0);
+        Vec comp = a->sampleFrom(samplePt);
+
+        arr += comp * factor;
+        }
+      }
   }
 
   static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
@@ -322,6 +347,18 @@ template <typename T> struct Utils
     xAssert(o->operation() < sizeof(iFns)/sizeof(iFns[0]));
     xAssert(iFns[o->operation()]);
     iFns[o->operation()](o, arr, a, b);
+
+    XMatrix3x3 mapAToBase;
+    XMatrix3x3 mapBToBase;
+
+    if(a)
+      {
+      mapAToBase = a->transform().inverse() * arr.transform();
+      }
+    if(b)
+      {
+      mapBToBase = b->transform().inverse() * arr.transform();
+      }
 
     static const MathsFunction fFns[] =
       {
@@ -347,7 +384,7 @@ template <typename T> struct Utils
         XVector3D pt(x, y, 1.0);
 
         Vec& v = arr.image()(x, y);
-        fn(pt, o, arr.transform(), v, a, b);
+        fn(pt, o, arr.transform(), v, mapAToBase, a, mapBToBase, b);
         }
       }
     }

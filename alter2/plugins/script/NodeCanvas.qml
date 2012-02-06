@@ -379,7 +379,7 @@ Rectangle
     property bool translating: false
     property bool selecting: false
 
-    acceptedButtons: Qt.LeftButton|Qt.MiddleButton;
+    acceptedButtons: Qt.LeftButton|Qt.MiddleButton|Qt.RightButton;
     anchors.fill: parent
     onDoubleClicked: {
       nodecanvas.setRootToParent()
@@ -414,6 +414,13 @@ Rectangle
     onPressed: {
       lastClickX = mouse.x;
       lastClickY = mouse.y;
+
+      if(mouse.button === Qt.RightButton)
+        {
+        external.emitRequest("contextMenu", [ mouse.x, mouse.y ]);
+        mouse.accepted = true;
+        return;
+        }
 
       if(((mouse.modifiers & Qt.AltModifier) !== 0 && mouse.button === Qt.LeftButton))
         {
