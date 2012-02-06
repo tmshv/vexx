@@ -133,7 +133,7 @@ Rectangle {
 
         var x = gc.x - lastX;
         var y = gc.y - lastY;
-        if(x != 0 && y != 0)
+        if(x !== 0 || y !== 0)
           {
           header.dragged(x,   y);
           }

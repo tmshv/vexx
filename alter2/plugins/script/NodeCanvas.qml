@@ -28,6 +28,8 @@ Rectangle
 
   function drag(item, x, y)
     {
+    x /= display.scale;
+    y /= display.scale;
     if(!item.selected)
       {
       item.setPosition(item.x + x, item.y + y);
@@ -327,7 +329,16 @@ Rectangle
 
   function moveCreatingConnection(x, y)
     {
-    var pos = display.mapFromItem(destroyOnConnectionComplete, x, y);
+    var pos = { };
+    if(destroyOnConnectionComplete)
+      {
+      pos = display.mapFromItem(destroyOnConnectionComplete, x, y);
+      }
+    else
+      {
+      pos = display.mapFromItem(null, x, y);
+      }
+
     currentInputDragging.lastPoint.x = pos.x;
     currentInputDragging.lastPoint.y = pos.y;
     }
