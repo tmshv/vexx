@@ -15,9 +15,9 @@ void XMathsEngine::setEngine(XMathsEngine *e)
   g_engine = e;
   }
 
-XMathsResult::XMathsResult(const XMathsOperation &o)
+XMathsResult::XMathsResult(const XMathsOperation &o, QRectF sampleRect, xuint32 invSampleDensity)
   {
-  XMathsEngine::engine()->evaluateData(&o, o.userData(), &_dataType, &_data, &_dataWidth, &_dataHeight, &_dataChannels, &_transform);
+  XMathsEngine::engine()->evaluateData(&o, o.userData(), sampleRect, invSampleDensity, &_dataType, &_data, &_dataWidth, &_dataHeight, &_dataChannels, &_transform);
   }
 
 XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
@@ -459,7 +459,7 @@ template <typename T> struct Utils
     }
   };
 
-void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *userData, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m)
+void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *userData, QRectF, xuint32, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m)
   {
   const ReferenceMathsEngineResult *result = (const ReferenceMathsEngineResult *)userData;
 

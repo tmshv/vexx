@@ -3,6 +3,7 @@
 
 #include "XMatrix3x3"
 #include "XVector4D"
+#include "QRectF"
 #include "XProperty"
 
 class EKSCORE_EXPORT XMathsOperation
@@ -83,7 +84,7 @@ private:
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void evaluateData(const XMathsOperation *, const void *userData, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m) = 0;
+  virtual void evaluateData(const XMathsOperation *, const void *userData, QRectF sampleRect, xuint32 invSampleDensity, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m) = 0;
   virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &) = 0;
   virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
@@ -96,7 +97,7 @@ public:
 
 class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
   {
-  virtual void evaluateData(const XMathsOperation *, const void *userData, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m);
+  virtual void evaluateData(const XMathsOperation *, const void *userData, QRectF sampleRect, xuint32 invSampleDensity, XMathsOperation::DataType *type, const void **data, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m);
   virtual void *loadData(XMathsOperation::DataType type, void* data, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &);
   virtual void onOperationDirty(const XMathsOperation *, void **userData);
   virtual void onValueDirty(const XMathsOperation *, void **userData);
@@ -115,7 +116,7 @@ XProperties:
   XRORefProperty(XMatrix3x3, transform);
 
 public:
-  XMathsResult(const XMathsOperation &);
+  XMathsResult(const XMathsOperation &, QRectF sampleRect=QRectF(), xuint32 invSampleDensity=1);
 
 private:
   XMathsResult(const XMathsResult &);
