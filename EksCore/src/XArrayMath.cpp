@@ -298,42 +298,42 @@ template <typename T> struct Utils
     xAssert(a);
     arr.transform() = a->transform();
     arr.image().resize(a->image().rows(), a->image().cols());
-  }
+    }
 
   static void add(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
-  {
+    {
     xAssert(a);
     xAssert(b);
 
     arr = a->sampleFrom(mapA, pt) + b->sampleFrom(mapB, pt);
-  }
+    }
 
   static void addConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-  {
+    {
     xAssert(a);
     xAssert(mat.isApprox(a->transform()));
 
     arr = a->image()(pt.x(), pt.y()) + o->vectorData().cast<T>();
-  }
+    }
 
   static void multiply(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
-  {
+    {
     xAssert(a);
     xAssert(b);
 
     arr = a->sampleFrom(mapA, pt).cwiseProduct(b->sampleFrom(mapB, pt));
-  }
+    }
 
   static void multiplyConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-  {
+    {
     xAssert(a);
     xAssert(mat.isApprox(a->transform()));
 
     arr = a->image()(pt.x(), pt.y()).cwiseProduct(o->vectorData().cast<T>());
-  }
+    }
 
   static void shuffle(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-  {
+    {
     xAssert(a);
     xAssert(mat.isApprox(a->transform()));
 
@@ -343,16 +343,27 @@ template <typename T> struct Utils
 
     const Vec &in = a->image()(pt.x(), pt.y());
 
-    const T &c0 = in(components[0]);
-    const T &c1 = in(components[1]);
-    const T &c2 = in(components[2]);
-    const T &c3 = in(components[3]);
-
-    arr = Vec(c0, c1, c2, c3);
-  }
+    xuint32 chan = 4;
+    for(xuint32 i = 0; i < chan; ++i)
+      {
+      xuint8 comp = components[i];
+      if(comp < chan)
+        {
+        arr(i) = in(comp);
+        }
+      else if(comp == XMathsOperation::ShuffleOne)
+        {
+        arr(i) = 1;
+        }
+      else // if(comp == XMathsOperation::ShuffleZero)
+        {
+        arr(i) = 0;
+        }
+      }
+    }
 
   static void convolve(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b)
-  {
+    {
     xAssert(a);
     xAssert(b);
 
@@ -371,12 +382,12 @@ template <typename T> struct Utils
         arr += comp * factor;
         }
       }
-  }
+    }
 
   static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
     static const xuint8 expectedInputs[] =
-    {
+      {
       0, // NoOp
       0, // Load
       2, // Add
@@ -386,7 +397,7 @@ template <typename T> struct Utils
       2, // Convolve
       1, // Shuffle
       2  // Splice
-    };
+      };
 
     static const InitFunction iFns[] =
       {
@@ -591,19 +602,23 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   else if(a->_type == XMathsOperation::UnsignedInt)
     {
     Utils<xuint32>::ImageRef aIm;
+    Utils<xuint32>::ImageRef *aImP = 0;
     if(a)
       {
       aIm = Utils<xuint32>::ImageRef(a->_transform, a->_ints);
+      aImP = &aIm;
       }
 
     Utils<xuint32>::ImageRef bIm;
+    Utils<xuint32>::ImageRef *bImP = 0;
     if(b)
       {
       bIm = Utils<xuint32>::ImageRef(b->_transform, b->_ints);
+      bImP = &bIm;
       }
 
     Utils<xuint32>::ImageRef im(res->_transform, res->_ints);
-    Utils<xuint32>::doOperation(o, im, &aIm, &bIm);
+    Utils<xuint32>::doOperation(o, im, aImP, bImP);
     }
   }
 

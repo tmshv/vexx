@@ -40,25 +40,14 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCIma
       }
     }
 
-  imInput.fill(Qt::red);
   const uchar *bits = imInput.bits();
   xAssert(bits);
 
-// todo: argb 
-
   xsize stride = imInput.bytesPerLine()/imInput.width();
-  if(!useShuffle)
-    {
-    l.data()->load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
-    }
-  else
-    {
-    xuint32 shuffleMask = XMathsOperation::shuffleMask(1, 2, 3, 0);
+  xuint32 shuffleMask = XMathsOperation::shuffleMask(2, 1, 0, 3);
 
-    xAssert(channels == 4);
-    image->_preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
-    l.data()->shuffle(image->_preOperation, shuffleMask);
-    }
+  image->_preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
+  l.data()->shuffle(image->_preOperation, shuffleMask);
   }
 
 S_IMPLEMENT_PROPERTY(MCImage)

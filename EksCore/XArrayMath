@@ -65,6 +65,12 @@ public:
   void multiply(const XMathsOperation &, const XMathsOperation &);
   void multiply(const XMathsOperation &, const XVector4D &);
 
+  enum ShuffleSpecialTypes
+    {
+    ShuffleOne = 255,
+    ShuffleZero = 254,
+    };
+
   void convolve(const XMathsOperation &, const XMathsOperation &);
   void shuffle(const XMathsOperation &, xuint32 mask);
   void splice(const XMathsOperation &, const XMathsOperation &, xuint32 mask);

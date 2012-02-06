@@ -42,22 +42,20 @@ bool MCMathsOperation::saveResultToFile(QString filename)
 
   QImage im(w, h, fmt);
   uchar *bits = im.bits();
+  xAssert(im.bytesPerLine()/w == 4);
   for(xuint32 y = 0; y < h; ++y)
     {
-    uchar *scanline = bits + y * im.bytesPerLine();
-    xAssert(im.bytesPerLine()/w == channels);
+    QRgb *scanline = (QRgb*)(bits + y * im.bytesPerLine());
     for(xuint32 x = 0; x < w; ++x)
       {
-      xuint8 id = 0;
+      xuint32 alpha = 255;
       if(channels == 4)
         {
-        scanline[id++] = data[3];
+        alpha = data[3];
         }
 
-      scanline[id++] = data[0];
-      scanline[id++] = data[1];
-      scanline[id++] = data[2];
-      scanline += channels;
+      *scanline = qRgba(data[0], data[1], data[2], alpha);
+      scanline++;
       data = (xuint32*)((xuint8*)data + stride);
       }
     }
