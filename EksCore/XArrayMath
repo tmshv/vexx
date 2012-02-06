@@ -55,6 +55,12 @@ public:
 
   void transform(const XMathsOperation &, const XMatrix3x3 &);
 
+  static void shuffleComponents(xuint32 comp, xuint8 out[4])
+    {
+    xuint32 *outInt = (xuint32*)out;
+    *outInt = comp;
+    }
+
 private:
   XMathsOperation(const XMathsOperation &);
   XMathsOperation& operator=(const XMathsOperation &);

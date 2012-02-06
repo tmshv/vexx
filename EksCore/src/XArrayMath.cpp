@@ -278,7 +278,7 @@ template <typename T> struct Utils
   typedef void (*InitFunction)(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b);
   typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b);
 
-  static void unite(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
+  static void unite(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
     xAssert(a);
     xAssert(b);
@@ -292,14 +292,14 @@ template <typename T> struct Utils
     arr.setSize(r);
     }
 
-  static void takeA(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *b)
+  static void takeA(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *)
     {
     xAssert(a);
     arr.transform() = a->transform();
     arr.image().resize(a->image().rows(), a->image().cols());
   }
 
-  static void add(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
+  static void add(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
   {
     xAssert(a);
     xAssert(b);
@@ -307,7 +307,50 @@ template <typename T> struct Utils
     arr = a->sampleFrom(mapA, pt) + b->sampleFrom(mapB, pt);
   }
 
-  static void convolve(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b)
+  static void addConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
+  {
+    xAssert(a);
+    xAssert(mat.isApprox(a->transform()));
+
+    arr = a->image()(pt.x(), pt.y()) + o->vectorData().cast<T>();
+  }
+
+  static void multiply(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
+  {
+    xAssert(a);
+    xAssert(b);
+
+    arr = a->sampleFrom(mapA, pt).cwiseProduct(b->sampleFrom(mapB, pt));
+  }
+
+  static void multiplyConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
+  {
+    xAssert(a);
+    xAssert(mat.isApprox(a->transform()));
+
+    arr = a->image()(pt.x(), pt.y()).cwiseProduct(o->vectorData().cast<T>());
+  }
+
+  static void shuffle(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
+  {
+    xAssert(a);
+    xAssert(mat.isApprox(a->transform()));
+
+    xuint32 compoundComponents = o->integerData();
+    xuint8 components[4];
+    XMathsOperation::shuffleComponents(compoundComponents, components);
+
+    const Vec &in = a->image()(pt.x(), pt.y());
+
+    const T &c0 = in(components[0]);
+    const T &c1 = in(components[1]);
+    const T &c2 = in(components[2]);
+    const T &c3 = in(components[3]);
+
+    arr = Vec(c0, c1, c2, c3);
+  }
+
+  static void convolve(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b)
   {
     xAssert(a);
     xAssert(b);
@@ -331,6 +374,19 @@ template <typename T> struct Utils
 
   static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
     {
+    static const xuint8 expectedInputs[] =
+    {
+      0, // NoOp
+      0, // Load
+      2, // Add
+      1, // AddConst
+      2, // Multiply
+      1, // MultiplyConst
+      2, // Convolve
+      1, // Shuffle
+      2  // Splice
+    };
+
     static const InitFunction iFns[] =
       {
       0,     // NoOp
@@ -343,6 +399,32 @@ template <typename T> struct Utils
       takeA, // Shuffle
       unite  // Splice
       };
+
+    static const MathsFunction fFns[] =
+      {
+      0,               // NoOp
+      0,               // Load
+      add,             // Add
+      addConst,        // AddConst
+      multiply,        // Multiply
+      multiplyConst,   // MultiplyConst
+      convolve,        // Convolve
+      shuffle,         // Shuffle
+      0                // Splice
+      };
+
+    xuint8 expInputs = expectedInputs[o->operation()];
+    if(expInputs >= 1 && !a)
+      {
+      xAssertFail();
+      return;
+      }
+
+    if(expInputs >= 2 && !b)
+      {
+      xAssertFail();
+      return;
+      }
 
     xAssert(o->operation() < sizeof(iFns)/sizeof(iFns[0]));
     xAssert(iFns[o->operation()]);
@@ -359,19 +441,6 @@ template <typename T> struct Utils
       {
       mapBToBase = b->transform().inverse() * arr.transform();
       }
-
-    static const MathsFunction fFns[] =
-      {
-      0,        // NoOp
-      0,        // Load
-      add,      // Add
-      0,        // AddConst
-      0,        // Multiply
-      0,        // MultiplyConst
-      convolve, // Convolve
-      0,        // Shuffle
-      0         // Splice
-      };
 
     xAssert(o->operation() < sizeof(fFns)/sizeof(fFns[0]));
     MathsFunction fn = fFns[o->operation()];
@@ -484,33 +553,8 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
     return;
     }
 
-  static const xuint8 expectedInputs[] =
-  {
-    0, // NoOp
-    0, // Load
-    2, // Add
-    1, // AddConst
-    2, // Multiply
-    1, // MultiplyConst
-    2, // Convolve
-    1, // Shuffle
-    2  // Splice
-  };
-
-  xuint8 expInputs = expectedInputs[o->operation()];
   ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
-  if(expInputs >= 1 && !a)
-    {
-    xAssertFail();
-    return;
-    }
-
   ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
-  if(expInputs >= 2 && !b)
-    {
-    xAssertFail();
-    return;
-    }
 
   xAssert(a);
 
