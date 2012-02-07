@@ -260,7 +260,7 @@ QScriptValue ScShiftProperty::typeInformation(QScriptContext *ctx, QScriptEngine
   if(prop && *prop)
     {
     const SPropertyInformation *info = (*prop)->typeInformation();
-    QScriptValue value = eng->globalObject().property(info->typeName());
+    QScriptValue value = eng->globalObject().property("dbTypes").property(info->typeName());
 
     if(!value.isObject())
       {

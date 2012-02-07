@@ -35,7 +35,7 @@ void ScEmbeddedTypes::ensureTypeHierarchyAdded(const SPropertyInformation *p)
   const SPropertyInformation *parent = p->parentTypeInformation();
   if(parent)
     {
-    QScriptValue g = _engine->globalObject();
+    QScriptValue g = _engine->globalObject().property("dbTypes");
     if(!g.property(parent->typeName()).isValid())
       {
       ensureTypeHierarchyAdded(parent);
