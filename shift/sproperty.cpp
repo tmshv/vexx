@@ -326,7 +326,8 @@ SProperty *SProperty::loadProperty(SPropertyContainer *parent, SLoader &l)
         }
       }
 
-    initialiser.affects = new xsize[numAffects];
+    initialiser.affects = new xsize[numAffects+1];
+    initialiser.affects[numAffects] = 0;
     const SPropertyInformation *parentType = parent->typeInformation();
 
     int num = 0;

@@ -41,12 +41,19 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCIma
     }
 
   const uchar *bits = imInput.bits();
-  xAssert(bits);
 
-  xsize stride = imInput.bytesPerLine()/imInput.width();
+  if(bits)
+    {
+    xsize stride = imInput.bytesPerLine()/imInput.width();
+
+    image->_preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
+    }
+  else
+    {
+    image->_preOperation.load(XMathsOperation::None, 0, 0, 0, 0, channels, transform);
+    }
+
   xuint32 shuffleMask = XMathsOperation::shuffleMask(2, 1, 0, 3);
-
-  image->_preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
   l.data()->shuffle(image->_preOperation, shuffleMask);
   }
 

@@ -493,10 +493,6 @@ void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *us
     *dataHeight = result->_ints.cols();
     *stride = sizeof(Defs<xuint32>::Array::Scalar);
     }
-  else
-    {
-    xAssertFail();
-    }
   }
 
 void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &m)

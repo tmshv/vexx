@@ -26,7 +26,6 @@ HEADERS += GCGlobal.h \
     3D/GCGeometry.h \
     3D/GCCamera.h \
     3D/GCRenderable.h \
-    3D/Renderable/GCGrid.h \
     3D/GCScene.h \
     3D/GCViewport.h \
     3D/GCShadingGroup.h \
@@ -39,7 +38,8 @@ HEADERS += GCGlobal.h \
     3D/Manipulators/GCTranslateManipulator.h \
     3D/Shaders/GCStandardSurface.h \
     3D/GCShaderDataBindings.h \
-    3D/Renderable/GCSphere.h
+    3D/Renderable/GCSphere.h \
+    3D/Renderable/GCPlane.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
 
@@ -60,7 +60,6 @@ SOURCES += \
     3D/GCGeometry.cpp \
     3D/GCCamera.cpp \
     3D/GCRenderable.cpp \
-    3D/Renderable/GCGrid.cpp \
     3D/GCScene.cpp \
     3D/GCViewport.cpp \
     3D/GCShadingGroup.cpp \
@@ -73,7 +72,8 @@ SOURCES += \
     3D/Manipulators/GCTranslateManipulator.cpp \
     3D/Shaders/GCStandardSurface.cpp \
     3D/GCShaderDataBindings.cpp \
-    3D/Renderable/GCSphere.cpp
+    3D/Renderable/GCSphere.cpp \
+    3D/Renderable/GCPlane.cpp
 
 
 

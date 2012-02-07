@@ -16,6 +16,7 @@
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
+#include "3D/Renderable/GCPlane.h"
 #include "object.h"
 
 Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeScene")), UISurface("Viewport", this, UISurface::Dock)
@@ -60,7 +61,9 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   GCCuboid *cube = msc->addChild<GCCuboid>("Cube");
   transform->geometry.setPointed(&cube->geometry);
-  transform2->geometry.setPointed(&cube->geometry);
+
+  GCPlane *plane = msc->addChild<GCPlane>("Plane");
+  transform2->geometry.setPointed(&plane->geometry);
 
   vp->source.setPointed(msc);
   }

@@ -36,7 +36,7 @@ void SViewport::resizeGL( int w, int h )
 
   if(_viewport.isValid())
     {
-    GCViewport *vp = _viewport->uncheckedCastTo<GCViewport>();
+    GCViewport *vp = viewport();
     vp->x = 0;
     vp->y = 0;
     vp->width = w;
@@ -47,9 +47,11 @@ void SViewport::resizeGL( int w, int h )
 void SViewport::paintGL()
   {
   _renderer.clear();
-  const GCRenderable* renderable = _viewport->uncheckedCastTo<GCViewport>()->source();
-  if(renderable)
+  const GCRenderable* renderable = viewport()->source();
+  if(!renderable)
     {
-    renderable->render(&_renderer);
+    qWarning() << "No renderable";
+    return;
     }
+  renderable->render(&_renderer);
   }

@@ -16,6 +16,12 @@ bool MCMathsOperation::saveResultToFile(QString filename)
   {
   XMathsResult result(value());
 
+  if(result.dataType() == XMathsOperation::None)
+    {
+    qWarning() << "Saving invalid operation";
+    return false;
+    }
+
   if(result.dataType() != XMathsOperation::UnsignedInt)
     {
     xAssertFail();

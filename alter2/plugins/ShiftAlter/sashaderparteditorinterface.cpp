@@ -30,8 +30,6 @@ public:
 
     GCViewport *vp = viewport();
 
-    GCScreenRenderTarget* op = vp->addChild<GCScreenRenderTarget>("Output");
-
     GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
     vp->x.connect(&cam->viewportX);
     vp->y.connect(&cam->viewportY);
@@ -59,7 +57,7 @@ public:
     GCSphere *shape = vp->addChild<GCSphere>("Sphere");
     transform->geometry.setPointed(&shape->geometry);
 
-    op->source.setPointed(msc);
+    vp->source.setPointed(msc);
     }
 
   virtual void paintGL()
