@@ -22,6 +22,10 @@ void computePlane(const SPropertyInstanceInformation *, GCPlane *plane)
   GCGeometryAttribute *normals = geo.attribute("normals");
   SVector3ArrayProperty *normalData = normals->attributeData<SVector3ArrayProperty>();
 
+  geo.addAttribute<SVector2ArrayProperty>("uvSet1");
+  GCGeometryAttribute *uvs = geo.attribute("uvSet1");
+  SVector2ArrayProperty *uvData = uvs->attributeData<SVector2ArrayProperty>();
+
   xuint32 polys[] = { 4 };
   geo.addPolygons(polys, 1);
 
@@ -32,6 +36,14 @@ void computePlane(const SPropertyInstanceInformation *, GCPlane *plane)
         XVector3D(-x,-y,0),
         XVector3D(x,-y,0);
   vertexData->setData(arr);
+
+  SVector2ArrayProperty::EigenArray uvArray;
+  uvArray.resize(4,1);
+  uvArray << XVector2D(1,1),
+        XVector2D(0,1),
+        XVector2D(0,0),
+        XVector2D(1,0);
+  uvData->setData(uvArray);
 
   SVector3ArrayProperty::EigenArray norm;
   norm.resize(1,1);
@@ -45,6 +57,10 @@ void computePlane(const SPropertyInstanceInformation *, GCPlane *plane)
   // norm
   xuint32 normIdx[] = { 0, 0, 0, 0 };
   normals->setPolygon(0, normIdx, 4);
+
+  // uv
+  xuint32 uv[] = { 0, 1, 2, 3 };
+  uvs->setPolygon(0, uv, 4);
   }
 
 SPropertyInformation *GCPlane::createTypeInformation()

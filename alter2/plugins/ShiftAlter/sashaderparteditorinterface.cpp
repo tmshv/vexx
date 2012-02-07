@@ -8,6 +8,7 @@
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
 #include "3D/Renderable/GCSphere.h"
+#include "3D/Renderable/GCPlane.h"
 #include "saviewport.h"
 #include "QVBoxLayout"
 #include "QTextEdit"
@@ -54,7 +55,7 @@ public:
     group->geometry.addPointer(transform);
 
 
-    GCSphere *shape = vp->addChild<GCSphere>("Sphere");
+    GCPlane *shape = vp->addChild<GCPlane>("Sphere");
     transform->geometry.setPointed(&shape->geometry);
 
     vp->source.setPointed(msc);

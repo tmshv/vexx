@@ -116,7 +116,3 @@ db.types.SProperty.cancelBlock = function(fn)
 
 script.include("JSPartExporter.js");
 script.includeFolder("jsEntities");
-
-var image = db.addChild("MCImage");
-image.filename.setValue("C:\\Users\\Jorj\\Pictures\\Finding Dinner in the Alleys of Kyoto.jpg");
-image.output.saveResultToFile("C:\\Users\\Jorj\\Desktop\\a.png");
