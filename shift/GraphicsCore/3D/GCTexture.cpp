@@ -12,9 +12,7 @@ SPropertyInformation *GCTexture::createTypeInformation()
 
 GCTexture::GCTexture()
   {
-  QImage im(5, 5, QImage::Format_ARGB32_Premultiplied);
-
-  im.fill(Qt::red);
+  QImage im("C:\\Users\\Public\\Pictures\\Sample Pictures\\Koala.jpg");
 
   _texture.load(im, XTexture::None);
   }
