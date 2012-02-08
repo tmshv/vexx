@@ -1,13 +1,20 @@
 #include "syimagenode.h"
 #include "QImage"
 
-S_ENTITY_DEFINITION(SyImageNode, SyNode)
-  S_COMPUTE_GROUP(computeInputs)
-    S_AFFECTS(output)
-  S_COMPUTE_GROUP_END()
-  S_COMPUTABLE_PROPERTY_DEFINITION(StringProperty, filename, 0, computeInputs, "")
-  S_COMPUTABLE_PROPERTY_DEFINITION(SyImageOutput, output, computeImage, 0)
-S_ENTITY_END_DEFINITION(SyImageNode, SyNode)
+S_IMPLEMENT_PROPERTY(SyImageNode)
+
+SPropertyInformation *SyImageNode::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyImageNode>("SyImageNode");
+
+  SyImageOutput::InstanceInformation *outputInst = info->add(&SyImageNode::output, "output");
+  outputInst->setCompute(computeImage);
+
+  StringProperty::InstanceInformation *filenameInst = info->add(&SyImageNode::filename, "filename");
+  filenameInst->setAffects(outputInst);
+
+  return info;
+  }
 
 SyImageNode::SyImageNode()
   {

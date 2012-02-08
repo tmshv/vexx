@@ -1,8 +1,16 @@
 #include "syimageinput.h"
 
-S_PROPERTY_CONTAINER_DEFINITION(SyImageInput, SyImageBase)
-S_PROPERTY_CONTAINER_END_DEFINITION(SyImageInput, SyImageBase, saveContainer, loadContainer)
+S_IMPLEMENT_PROPERTY(SyImageInput)
+
+SPropertyInformation *SyImageInput::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyImageInput>("SyImageInput");
+
+  //info.
+
+  return info;
+  }
 
 SyImageInput::SyImageInput()
-{
-}
+  {
+  }

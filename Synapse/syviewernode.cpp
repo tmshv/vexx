@@ -1,12 +1,19 @@
 #include "syviewernode.h"
 
-S_ENTITY_DEFINITION(SyViewerNode, SEntity)
-  S_COMPUTE_GROUP(computeInputs)
-    S_AFFECTS(preview)
-  S_COMPUTE_GROUP_END()
-  S_COMPUTABLE_PROPERTY_DEFINITION(SyImageInput, input, 0, computeInputs)
-  S_COMPUTABLE_PROPERTY_DEFINITION(GCQImage, preview, computePreview, 0, QImage())
-S_ENTITY_END_DEFINITION(SyViewerNode, SEntity)
+S_IMPLEMENT_PROPERTY(SyViewerNode)
+
+SPropertyInformation *SyViewerNode::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyViewerNode>("SyViewerNode");
+
+  GCTexture::InstanceInformation *previewInst = info->add(&SyViewerNode::preview, "preview");
+  previewInst->setCompute(computePreview);
+
+  SyImageInput::InstanceInformation *inputInst = info->add(&SyViewerNode::input, "input");
+  inputInst->setAffects(previewInst);
+
+  return info;
+  }
 
 SyViewerNode::SyViewerNode()
   {
@@ -16,5 +23,5 @@ void SyViewerNode::computePreview(const SPropertyInstanceInformation *info, SPro
   {
   SyViewerNode *viewer = cont->uncheckedCastTo<SyViewerNode>();
 
-  viewer->preview = viewer->input.asQImage();
+  //viewer->preview viewer->input.asQImage();
   }

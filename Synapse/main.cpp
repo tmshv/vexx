@@ -9,27 +9,12 @@
 
 int main(int argc, char *argv[])
   {
-  ACore app( argc, argv );
+  ACore app("vexx.googlecode.com", "Synapse2.0", argc, argv);
 
   app.addDirectory(ACore::rootPath());
 
   app.load("script");
-
-  // this will work in debug only...
-  app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
-
-  APlugin<SPlugin> shift(app, "db");
-  if(shift.isValid())
-  {
-    shift->db().addType<SyImageNode>();
-    shift->db().addType<SyViewerNode>();
-
-    APlugin<UIPlugin> ui(app, "ui");
-    if(ui.isValid())
-    {
-      ui->addSurface(new SyPreviewViewer(&shift->db()));
-    }
-  }
+  app.load("synapsecore");
 
   APlugin<ScPlugin> script(app, "script");
   if(script.isValid())
@@ -40,6 +25,21 @@ int main(int argc, char *argv[])
     script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
   }
 
+  // this will work in debug only...
+  app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
+
+  APlugin<SPlugin> shift(app, "db");
+  if(shift.isValid())
+  {
+    STypeRegistry::addType(SyImageNode::staticTypeInformation());
+    STypeRegistry::addType(SyViewerNode::staticTypeInformation());
+
+    APlugin<UIPlugin> ui(app, "ui");
+    if(ui.isValid())
+    {
+      ui->addSurface(new SyPreviewViewer(&shift->db()));
+    }
+  }
 
   return app.execute();
   }

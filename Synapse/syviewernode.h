@@ -3,7 +3,7 @@
 
 #include "sentity.h"
 #include "syimageinput.h"
-#include "GCQImage.h"
+#include "3D/GCTexture.h"
 
 class SyViewerNode : public SEntity
   {
@@ -12,7 +12,7 @@ public:
   SyViewerNode();
 
   SyImageInput input;
-  GCQImage preview;
+  GCTexture preview;
 
 private:
   static void computePreview(const SPropertyInstanceInformation *info, SPropertyContainer *cont);

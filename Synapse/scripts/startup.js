@@ -2,6 +2,8 @@ assert(script.loadPlugin("synapsecore"));
 
 script.includeFolder("./nodes");
 
+ui.show();
+
 //db.addChild("SyImageNode", "Image");
 //db.addChild("SyImageNode", "Image2");
 //db.addChild("Add", "Add");

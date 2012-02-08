@@ -13,8 +13,6 @@ class SYNAPSECORE_EXPORT SyImageBase : public SPropertyContainer
 public:
   SyImageBase();
 
-  SFloatArrayProperty image;
-
   void loadQImage(const QImage &);
   QImage asQImage() const;
   };

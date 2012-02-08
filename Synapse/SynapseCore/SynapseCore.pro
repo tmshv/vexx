@@ -8,7 +8,6 @@ TARGET = SynapseCore
 TEMPLATE = lib
 
 DEFINES += SYNAPSECORE_BUILD
-QMAKE_CXXFLAGS += -Wall
 
 SOURCES += syplugin.cpp \
     synode.cpp \

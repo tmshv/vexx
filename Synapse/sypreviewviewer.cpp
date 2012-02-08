@@ -28,5 +28,5 @@ void SyPreviewViewer::paint(xuint32 pass, XAbstractCanvas *c, const XAbstractRen
   xAssert(ptr);
 
   SyViewerNode *viewerNode(slIt->entity()->castTo<SyViewerNode>());
-  ptr->drawImage(0, 0, viewerNode->preview());
+  //ptr->drawImage(0, 0, viewerNode->preview());
   }

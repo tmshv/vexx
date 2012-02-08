@@ -1,9 +1,16 @@
 #include "syimagebase.h"
 #include "QImage"
 
-S_PROPERTY_CONTAINER_DEFINITION(SyImageBase, SPropertyContainer)
-    S_PROPERTY_DEFINITION(SFloatArrayProperty, image)
-S_PROPERTY_CONTAINER_END_DEFINITION(SyImageBase, SPropertyContainer, saveContainer, loadContainer)
+S_IMPLEMENT_PROPERTY(SyImageBase)
+
+SPropertyInformation *SyImageBase::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyImageBase>("SyImageBase");
+
+  //info.
+
+  return info;
+  }
 
 SyImageBase::SyImageBase()
   {
@@ -12,7 +19,7 @@ SyImageBase::SyImageBase()
 void SyImageBase::loadQImage(const QImage &imageIn)
   {
   SProfileFunction
-  int width = imageIn.width();
+  /*int width = imageIn.width();
   int height = imageIn.height();
 
   XVector<float> data;
@@ -32,12 +39,12 @@ void SyImageBase::loadQImage(const QImage &imageIn)
 
   image.set(width, height, data);
 
-  postSet();
+  postSet();*/
   }
 
 QImage SyImageBase::asQImage() const
   {
-  preGet();
+  /*preGet();
   int width = image.width();
   int height = image.height();
 
@@ -56,5 +63,6 @@ QImage SyImageBase::asQImage() const
       pixel += bytesPerPixel;
       }
     }
-  return im;
+  return im;*/
+  return QImage();
   }
