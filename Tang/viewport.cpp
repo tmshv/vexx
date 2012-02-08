@@ -16,6 +16,7 @@
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
+#include "3D/GCTexture.h"
 #include "3D/Renderable/GCPlane.h"
 #include "object.h"
 
@@ -49,7 +50,12 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   const SPropertyInformation *flatSurfaceInfo = STypeRegistry::findType("FlatSurface");
   SProperty *shader2 = msc->addChild(flatSurfaceInfo, "Shader");
-  group2->shader.setPointed(shader2->uncheckedCastTo<GCShader>());
+  GCShader *shaderS = shader2->uncheckedCastTo<GCShader>();
+  group2->shader.setPointed(shaderS);
+
+  GCTexture *t = msc->addChild<GCTexture>("Texture");
+  shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(t);
+
 
   XTransform tr = XTransform::Identity();
   tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);

@@ -20,7 +20,7 @@
               "__T":"GCFragmentShaderComponent",
               "name":"Frag",
               "dynamic":"1",
-              "__V":"varying vec2 uv;\nuniform vec4 ambient;\nuniform vec4 diffuse;\n\nvoid main(void)\n  {\n  gl_FragColor = vec4(uv, 0.0, 1.0);\n  }\n"
+              "__V":"varying vec2 uv;\nuniform vec4 ambient;\nuniform vec4 diffuse;\nuniform sampler2D texture;\n\nvoid main(void)\n  {\n  gl_FragColor = texture2D(texture, uv);\n  }\n"
             }
           ]
         },
@@ -41,6 +41,11 @@
               "input":"..\/..\/children\/Frag"
             }
           ]
+        },
+        {
+          "__T":"GCTexturePointer",
+          "name":"texture",
+          "dynamic":"1"
         }
       ]
     }

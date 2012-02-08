@@ -23,6 +23,8 @@
 #include "3D/GCShaderDataBindings.h"
 #include "3D/GCShadingGroup.h"
 
+#include "3D/GCTexture.h"
+
 #include "3D/Shaders/GCStandardSurface.h"
 
 #include "3D/Manipulators/GCManipulator.h"
@@ -46,6 +48,8 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCGeometryTransform::staticTypeInformation());
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
+
+  STypeRegistry::addType(GCTexture::staticTypeInformation());
 
 
   STypeRegistry::addType(GCViewableTransform::staticTypeInformation());
@@ -83,4 +87,5 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCTranslateManipulator::staticTypeInformation());
 
   ColourProperty::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::Vector4);
+  GCTexturePointer::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::TextureRef);
   }

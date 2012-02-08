@@ -390,7 +390,6 @@ QScriptValue ScShiftProperty::valueString(QScriptContext *ctx, QScriptEngine *e)
     SProperty *prop = *propPtr;
     if(prop->inheritsFromType<SPropertyContainer>())
       {
-      ctx->throwError(QScriptContext::SyntaxError, "Can't pack the value for type " + prop->typeInformation()->typeName() + " in SProperty.value(...);");
       return QScriptValue();
       }
 
@@ -402,7 +401,7 @@ QScriptValue ScShiftProperty::valueString(QScriptContext *ctx, QScriptEngine *e)
       }
     else
       {
-      ctx->throwError(QScriptContext::SyntaxError, "Unable to retrieve value from property.");
+      return QScriptValue();
       }
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");
