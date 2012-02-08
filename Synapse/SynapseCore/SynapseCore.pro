@@ -13,14 +13,16 @@ SOURCES += syplugin.cpp \
     synode.cpp \
     syimagebase.cpp \
     syimageinput.cpp \
-    syimageoutput.cpp
+    syimageoutput.cpp \
+    sydocument.cpp
 
 HEADERS += syplugin.h \
     syglobal.h \
     synode.h \
     syimagebase.h \
     syimageinput.h \
-    syimageoutput.h
+    syimageoutput.h \
+    sydocument.h
 
 INCLUDEPATH += ../../EksCore ../../Shift ../../alter2 ../../alter2/plugins/ShiftAlter
 
