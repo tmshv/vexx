@@ -921,9 +921,10 @@ void XGLShaderVariable::setValue( const QMatrix4x4 &value )
 void XGLShaderVariable::setValue( const XTexture &value )
   {
   clear();
+  bindShader();
   _texture = new XTexture( value );
-  _texture->prepareInternal( abstractShader()->renderer() );
-  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, static_cast<XGLTexture*>(_texture->internal())->_id) GLE;
+  _texture->prepareInternal( abstractShader()->renderer() ) GLE;
+  GL_SHADER_VARIABLE_PARENT->shader.setUniformValue( _location, (int)static_cast<XGLTexture*>(_texture->internal())->_id) GLE;
   }
 
 void XGLShaderVariable::setValueArray( const XVector<int> &values )

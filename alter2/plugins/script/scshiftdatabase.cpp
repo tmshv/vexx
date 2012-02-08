@@ -471,7 +471,7 @@ QScriptValue ScShiftDatabase::addType(QScriptContext *ctx, QScriptEngine *engine
   QScriptValue prototype = typeObject.property("prototype");
   if(prototype.isObject())
     {
-    QScriptValue g = engine->globalObject();
+    QScriptValue g = engine->globalObject().property("dbTypes");
     QScriptValue parentObj = g.property(parent->typeName());
     xAssert(parentObj.isObject());
     if(parentObj.isObject())

@@ -8,6 +8,7 @@
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
 #include "3D/Renderable/GCSphere.h"
+#include "3D/Renderable/GCPlane.h"
 #include "saviewport.h"
 #include "QVBoxLayout"
 #include "QTextEdit"
@@ -29,8 +30,6 @@ public:
     xAssert(sha);
 
     GCViewport *vp = viewport();
-
-    GCScreenRenderTarget* op = vp->addChild<GCScreenRenderTarget>("Output");
 
     GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
     vp->x.connect(&cam->viewportX);
@@ -56,10 +55,10 @@ public:
     group->geometry.addPointer(transform);
 
 
-    GCSphere *shape = vp->addChild<GCSphere>("Sphere");
+    GCPlane *shape = vp->addChild<GCPlane>("Sphere");
     transform->geometry.setPointed(&shape->geometry);
 
-    op->source.setPointed(msc);
+    vp->source.setPointed(msc);
     }
 
   virtual void paintGL()

@@ -16,6 +16,8 @@
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/Renderable/GCCuboid.h"
+#include "3D/GCTexture.h"
+#include "3D/Renderable/GCPlane.h"
 #include "object.h"
 
 Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeScene")), UISurface("Viewport", this, UISurface::Dock)
@@ -38,11 +40,22 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   setController(msc);
 
   GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
+  GCShadingGroup *group2 = msc->addChild<GCShadingGroup>("Groups");
   msc->shadingGroups.addPointer(group);
+  msc->shadingGroups.addPointer(group2);
 
   const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
   SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
   group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
+
+  const SPropertyInformation *flatSurfaceInfo = STypeRegistry::findType("FlatSurface");
+  SProperty *shader2 = msc->addChild(flatSurfaceInfo, "Shader");
+  GCShader *shaderS = shader2->uncheckedCastTo<GCShader>();
+  group2->shader.setPointed(shaderS);
+
+  GCTexture *t = msc->addChild<GCTexture>("Texture");
+  shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(t);
+
 
   XTransform tr = XTransform::Identity();
   tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
@@ -55,12 +68,14 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   tr.translation() = XVector3D(-1.0f, 0.0f, 0.0f);
 
   GCGeometryTransform *transform2 = msc->addChild<GCGeometryTransform>("Transform");
-  group->geometry.addPointer(transform2);
+  group2->geometry.addPointer(transform2);
   transform2->transform = tr;
 
   GCCuboid *cube = msc->addChild<GCCuboid>("Cube");
   transform->geometry.setPointed(&cube->geometry);
-  transform2->geometry.setPointed(&cube->geometry);
+
+  GCPlane *plane = msc->addChild<GCPlane>("Plane");
+  transform2->geometry.setPointed(&plane->geometry);
 
   vp->source.setPointed(msc);
   }

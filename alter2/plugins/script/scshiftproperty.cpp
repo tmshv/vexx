@@ -6,7 +6,113 @@
 #include "sadocument.h"
 #include "scplugin.h"
 
-ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
+ScShiftPropertyBase::ScShiftPropertyBase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
+  {
+  }
+
+QScriptClass::QueryFlags ScShiftPropertyBase::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *)
+  {
+  ScProfileFunction
+  SProperty *prop = (*unpackValue(object))->uncheckedCastTo<SProperty>();
+  if (!prop)
+    {
+    xAssertFail();
+    return 0;
+    }
+
+  const SPropertyInformation *i = prop->typeInformation();
+  if(i->wrappedMembers().contains(name))
+    {
+    return flags;
+    }
+  return 0;
+  }
+
+QScriptValue ScShiftPropertyBase::memberFunction(QScriptContext *c, QScriptEngine *e)
+  {
+  QScriptValue thisObject = c->callee();
+  xAssert(thisObject.isFunction());
+  QScriptValue thisObjectData = thisObject.data();
+
+  double thisPropDbl = thisObjectData.property("thisProp").toNumber();
+
+  SProperty *thisProp = *reinterpret_cast<SProperty **>(&thisPropDbl);
+  xAssert(thisProp);
+
+  double memberDbl = thisObjectData.property("thisFunction").toNumber();
+  const SPropertyInformation::WrappedMember *member = *reinterpret_cast<const SPropertyInformation::WrappedMember **>(&memberDbl);
+  xAssert(member);
+
+  if(member->expectedArguments != c->argumentCount())
+    {
+    c->throwError(QScriptContext::SyntaxError, "Incorrect argument count to SProperty." + member->memberName +  "(...), expected " + QString::number(member->expectedArguments));
+    return QScriptValue();
+    }
+  QVariant wrappedArgs[SPropertyInformation::MaxWrappedArguments];
+
+  for(xuint32 i = 0; i < member->expectedArguments; ++i)
+    {
+    wrappedArgs[i] = c->argument(i).toVariant();
+    }
+
+  bool success = true;
+  QString errorString;
+  QVariant ret = member->function(thisProp, wrappedArgs, member->expectedArguments, &success, &errorString);
+
+  if(!success)
+    {
+    c->throwError(QScriptContext::SyntaxError, errorString + " in SProperty." + member->memberName +  "(...)");
+    return QScriptValue();
+    }
+
+  if(ret.isNull())
+    {
+    return QScriptValue();
+    }
+  return e->newVariant(ret);
+  }
+
+QScriptValue ScShiftPropertyBase::property(const QScriptValue &object, const QScriptString &name, uint)
+  {
+  ScProfileFunction
+  SProperty *prop = (*unpackValue(object))->uncheckedCastTo<SProperty>();
+  if (!prop)
+    {
+    xAssertFail();
+    return 0;
+    }
+
+  const SPropertyInformation *i = prop->typeInformation();
+  xAssert(i->wrappedMembers().contains(name));
+
+  const SPropertyInformation::WrappedMember *mem = &i->wrappedMembers().find(name).value();
+
+  QScriptValue v = engine()->newFunction(memberFunction);
+
+  QScriptValue data = engine()->newObject();
+  double propDbl = *reinterpret_cast<double *>(&prop);
+  double fnDbl = *reinterpret_cast<const double *>(&mem);
+
+  data.setProperty("thisProp", propDbl);
+  data.setProperty("thisFunction", fnDbl);
+
+  v.setData(data);
+
+  return v;
+  }
+
+void ScShiftPropertyBase::setProperty(QScriptValue &, const QScriptString &, uint, const QScriptValue &)
+  {
+  // dont do anything, but dont let users overwrite our properties.
+  }
+
+QScriptValue::PropertyFlags ScShiftPropertyBase::propertyFlags(const QScriptValue &, const QScriptString &, uint)
+  {
+  return QScriptValue::Undeletable;
+  }
+
+
+ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScShiftPropertyBase(eng)
   {
   addMemberProperty("typeInformation", typeInformation, QScriptValue::PropertyGetter);
   addMemberProperty("input", input, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
@@ -154,7 +260,7 @@ QScriptValue ScShiftProperty::typeInformation(QScriptContext *ctx, QScriptEngine
   if(prop && *prop)
     {
     const SPropertyInformation *info = (*prop)->typeInformation();
-    QScriptValue value = eng->globalObject().property(info->typeName());
+    QScriptValue value = eng->globalObject().property("dbTypes").property(info->typeName());
 
     if(!value.isObject())
       {
@@ -284,7 +390,6 @@ QScriptValue ScShiftProperty::valueString(QScriptContext *ctx, QScriptEngine *e)
     SProperty *prop = *propPtr;
     if(prop->inheritsFromType<SPropertyContainer>())
       {
-      ctx->throwError(QScriptContext::SyntaxError, "Can't pack the value for type " + prop->typeInformation()->typeName() + " in SProperty.value(...);");
       return QScriptValue();
       }
 
@@ -296,7 +401,7 @@ QScriptValue ScShiftProperty::valueString(QScriptContext *ctx, QScriptEngine *e)
       }
     else
       {
-      ctx->throwError(QScriptContext::SyntaxError, "Unable to retrieve value from property.");
+      return QScriptValue();
       }
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.value(...);");

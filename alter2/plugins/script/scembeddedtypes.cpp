@@ -12,8 +12,7 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
     _property(eng),
     _propertyContainer(eng),
     _entity(eng),
-    _database(eng),
-    _floatArrayProperty(eng)
+    _database(eng)
   {
   xAssert(_types == 0);
   _types = this;
@@ -22,7 +21,6 @@ ScEmbeddedTypes::ScEmbeddedTypes(QScriptEngine *eng) :
   SPropertyContainer::staticTypeInformation()->addStaticInterface(&_propertyContainer);
   SEntity::staticTypeInformation()->addStaticInterface(&_entity);
   SDatabase::staticTypeInformation()->addStaticInterface(&_database);
-  SFloatArrayProperty::staticTypeInformation()->addStaticInterface(&_floatArrayProperty);
 
   foreach(const SPropertyInformation *p, STypeRegistry::types())
     {
@@ -37,7 +35,7 @@ void ScEmbeddedTypes::ensureTypeHierarchyAdded(const SPropertyInformation *p)
   const SPropertyInformation *parent = p->parentTypeInformation();
   if(parent)
     {
-    QScriptValue g = _engine->globalObject();
+    QScriptValue g = _engine->globalObject().property("dbTypes");
     if(!g.property(parent->typeName()).isValid())
       {
       ensureTypeHierarchyAdded(parent);

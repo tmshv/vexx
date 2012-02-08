@@ -13,7 +13,9 @@
 #include "saparteditor.h"
 #include "sashaderparteditorinterface.h"
 #include "acore.h"
+#include "mathscore.h"
 #include "GraphicsCore.h"
+#include "XArrayMath"
 
 ALTER_PLUGIN(SPlugin);
 
@@ -40,6 +42,10 @@ void SPlugin::load()
   STypeRegistry::addType(SDocument::staticTypeInformation());
   STypeRegistry::addType(SPartDocument::staticTypeInformation());
 
+  _mathsEngine = new XReferenceMathsEngine;
+  XMathsEngine::setEngine(_mathsEngine);
+
+  initiateMathsCore();
   initiateGraphicsCore();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
@@ -93,4 +99,7 @@ void SPlugin::unload()
   _db = 0;
   SProcessManager::terminate();
   STypeRegistry::terminate();
+
+  XMathsEngine::setEngine(0);
+  delete _mathsEngine;
   }

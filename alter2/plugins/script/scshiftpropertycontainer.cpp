@@ -2,7 +2,7 @@
 #include "spropertycontainer.h"
 #include "scembeddedtypes.h"
 
-ScShiftPropertyContainerBase::ScShiftPropertyContainerBase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
+ScShiftPropertyContainerBase::ScShiftPropertyContainerBase(QScriptEngine *eng) : ScShiftPropertyBase(eng)
   {
   }
 
@@ -12,6 +12,13 @@ ScShiftPropertyContainerBase::~ScShiftPropertyContainerBase()
 
 QScriptClass::QueryFlags ScShiftPropertyContainerBase::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id)
   {
+  QScriptClass::QueryFlags fOut = ScShiftPropertyBase::queryProperty(object, name, flags, id);
+  if(fOut)
+    {
+    *id = (uint)-2;
+    return fOut;
+    }
+
   ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
   if (!prop)
@@ -41,6 +48,11 @@ QScriptClass::QueryFlags ScShiftPropertyContainerBase::queryProperty(const QScri
 
 QScriptValue ScShiftPropertyContainerBase::property(const QScriptValue &object, const QScriptString &name, uint id)
   {
+  if(id == (uint)-2)
+    {
+    return ScShiftPropertyBase::property(object, name, 0);
+    }
+
   ScProfileFunction
   SPropertyContainer *prop = (*unpackValue(object))->uncheckedCastTo<SPropertyContainer>();
   if (!prop)
@@ -61,14 +73,19 @@ QScriptValue ScShiftPropertyContainerBase::property(const QScriptValue &object, 
   return QScriptValue();
   }
 
-void ScShiftPropertyContainerBase::setProperty(QScriptValue &, const QScriptString &, uint, const QScriptValue &)
+void ScShiftPropertyContainerBase::setProperty(QScriptValue &v, const QScriptString &s, uint id, const QScriptValue &val)
   {
+  if(id == (uint)-1)
+    {
+    ScShiftPropertyBase::setProperty(v, s, id, val);
+    return;
+    }
   // dont do anything, but dont let users overwrite our properties.
   }
 
-QScriptValue::PropertyFlags ScShiftPropertyContainerBase::propertyFlags(const QScriptValue &, const QScriptString &, uint)
+QScriptValue::PropertyFlags ScShiftPropertyContainerBase::propertyFlags(const QScriptValue &v, const QScriptString &s, uint id)
   {
-  return QScriptValue::Undeletable;
+  return ScShiftPropertyBase::propertyFlags(v, s, id);
   }
 
 

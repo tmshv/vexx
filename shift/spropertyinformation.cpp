@@ -530,3 +530,12 @@ void SPropertyInformation::dereference() const
   {
   --((SPropertyInformation*)this)->_instances;
   }
+
+void SPropertyInformation::addAPIMemberFunction(const QString &s, WrappedFunction fn, xuint32 expectedArguments)
+  {
+  WrappedMember m;
+  m.memberName = s;
+  m.expectedArguments = expectedArguments;
+  m.function = fn;
+  _wrappedMembers.insert(s, m);
+  }

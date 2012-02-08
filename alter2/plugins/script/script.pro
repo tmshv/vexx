@@ -27,9 +27,8 @@ SOURCES += scplugin.cpp \
     scshiftpropertycontainer.cpp \
     scshiftentity.cpp \
     scshiftdatabase.cpp \
-    scshiftfloatarrayproperty.cpp \
     scio.cpp \
-    QMLExtensions\scpath.cpp \
+    QMLExtensions/scpath.cpp \
     QMLExtensions/scellipse.cpp \
     QMLExtensions/scbrush.cpp \
     QMLExtensions/scnodedisplay.cpp \
@@ -49,9 +48,8 @@ HEADERS += scplugin.h \
     scshiftpropertycontainer.h \
     scshiftentity.h \
     scshiftdatabase.h \
-    scshiftfloatarrayproperty.h \
     scio.h \
-    QMLExtensions\scpath.h \
+    QMLExtensions/scpath.h \
     QMLExtensions/scellipse.h \
     QMLExtensions/scbrush.h \
     QMLExtensions/scnodedisplay.h \

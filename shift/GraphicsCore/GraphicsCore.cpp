@@ -10,19 +10,20 @@
 
 #include "3D/Renderable/GCCuboid.h"
 #include "3D/Renderable/GCSphere.h"
+#include "3D/Renderable/GCPlane.h"
 
 #include "3D/GCCamera.h"
 #include "3D/GCTransform.h"
 #include "3D/GCRenderable.h"
 #include "3D/GCScene.h"
 
-#include "3D/Renderable/GCGrid.h"
-
 #include "3D/GCViewport.h"
 
 #include "3D/GCShader.h"
 #include "3D/GCShaderDataBindings.h"
 #include "3D/GCShadingGroup.h"
+
+#include "3D/GCTexture.h"
 
 #include "3D/Shaders/GCStandardSurface.h"
 
@@ -48,6 +49,8 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
 
+  STypeRegistry::addType(GCTexture::staticTypeInformation());
+
 
   STypeRegistry::addType(GCViewableTransform::staticTypeInformation());
   STypeRegistry::addType(GCCamera::staticTypeInformation());
@@ -59,7 +62,6 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCTextureRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCViewport::staticTypeInformation());
 
-  STypeRegistry::addType(GCGrid::staticTypeInformation());
   STypeRegistry::addType(GCScene::staticTypeInformation());
   STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
 
@@ -72,6 +74,7 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCCuboid::staticTypeInformation());
   STypeRegistry::addType(GCSphere::staticTypeInformation());
+  STypeRegistry::addType(GCPlane::staticTypeInformation());
 
   STypeRegistry::addType(GCStandardSurface::staticTypeInformation());
 
@@ -84,4 +87,5 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCTranslateManipulator::staticTypeInformation());
 
   ColourProperty::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::Vector4);
+  GCTexturePointer::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::TextureRef);
   }

@@ -4,7 +4,21 @@
 #include "scwrappedclass.h"
 class SProperty;
 
-class ScShiftProperty : public ScWrappedClass<SProperty *>
+class ScShiftPropertyBase : public ScWrappedClass<SProperty *>
+  {
+public:
+  ScShiftPropertyBase(QScriptEngine *engine);
+
+  virtual QueryFlags queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *id);
+  virtual QScriptValue property(const QScriptValue &object, const QScriptString &name, uint id);
+  virtual void setProperty(QScriptValue &object, const QScriptString &name, uint id, const QScriptValue &value);
+  virtual QScriptValue::PropertyFlags propertyFlags(const QScriptValue &object, const QScriptString &name, uint id);
+
+private:
+  static QScriptValue memberFunction(QScriptContext *, QScriptEngine *);
+  };
+
+class ScShiftProperty : public ScShiftPropertyBase
   {
 public:
   ScShiftProperty(QScriptEngine *engine);

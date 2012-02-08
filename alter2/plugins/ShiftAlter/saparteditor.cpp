@@ -308,7 +308,12 @@ void SPartEditor::rebuildPropertyProperties(QWidget *widget, void *prop)
 
       partInterface()->typeSubParameter(this, part(), prop, i, name, w);
       xAssert(!name.isEmpty());
-      xAssert(w);
+
+      if(!w)
+        {
+        qWarning() << "Couldn't create sub parameter widget for" << name;
+        continue;
+        }
 
       layout->addRow(name, w);
       }

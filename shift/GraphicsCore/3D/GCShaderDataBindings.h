@@ -11,6 +11,13 @@ public:
   Vector4();
   virtual void bindData(XShader *, const SProperty *) const;
   };
+
+class TextureRef : public GCShaderBindableData
+  {
+public:
+  TextureRef();
+  virtual void bindData(XShader *, const SProperty *) const;
+  };
 }
 
 #endif // GCSHADERDATABINDINGS_H
