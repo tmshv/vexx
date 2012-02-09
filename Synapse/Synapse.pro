@@ -8,9 +8,9 @@ TARGET = Synapse
 
 TEMPLATE = app
 
-INCLUDEPATH += ../Alter2 ../EksCore ../Eks3D/include ../Shift/GraphicsCore ../Alter2/plugins/script ../Alter2/plugins/ShiftAlter ../shift/ SynapseCore/ ../Alter2/plugins/UI
+INCLUDEPATH += ../Alter2 ../EksCore ../Eks3D/include ../Shift/GraphicsCore ../Shift/MathsCore ../Alter2/plugins/script ../Alter2/plugins/ShiftAlter ../shift/ SynapseCore/ ../Alter2/plugins/UI
 
-LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lShiftGraphicsCore -lSynapseCore -lUI -lEks3D
+LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lShiftGraphicsCore -lShiftMathsCore -lSynapseCore -lUI -lEks3D
 
 SOURCES += main.cpp \
     syimagenode.cpp \

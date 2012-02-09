@@ -7,7 +7,8 @@ SPropertyInformation *SyImageBase::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SyImageBase>("SyImageBase");
 
-  //info.
+  info->add(&SyImageBase::time, "time");
+  info->add(&SyImageBase::operation, "operation");
 
   return info;
   }
@@ -16,30 +17,58 @@ SyImageBase::SyImageBase()
   {
   }
 
-void SyImageBase::loadQImage(const QImage &imageIn)
+void SyImageBase::loadQImage(const QImage &imInput, bool premult)
   {
   SProfileFunction
-  /*int width = imageIn.width();
-  int height = imageIn.height();
 
-  XVector<float> data;
-  data.resize(width * height);
-
-  xsize bytesPerPixel = imageIn.depth()/8;
-  const quint8 *pixel = imageIn.bits();
-  for(int i = 0; i < height; ++i )
+  MCMathsOperation::ComputeLock l(&operation);
+  if(imInput.isNull())
     {
-    xsize rowPos = i * width;
-    for(int j = 0; j < width; ++j)
+    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XMatrix3x3::Identity());
+    }
+
+  XMatrix3x3 transform = XMatrix3x3::Identity();
+
+  xsize channels = 3;
+  if(imInput.hasAlphaChannel())
+    {
+    channels = 4;
+    if(premult)
       {
-      data[rowPos+j] = (float)*pixel/255.0f;
-      pixel += bytesPerPixel;
+      imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+      }
+    else
+      {
+      imInput.convertToFormat(QImage::Format_ARGB32);
+      }
+    }
+  else
+    {
+    if(premult)
+      {
+      imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+      }
+    else
+      {
+      imInput.convertToFormat(QImage::Format_RGB32);
       }
     }
 
-  image.set(width, height, data);
+  const uchar *bits = imInput.bits();
 
-  postSet();*/
+  if(bits)
+    {
+    xsize stride = imInput.bytesPerLine()/imInput.width();
+
+    _preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
+    }
+  else
+    {
+    _preOperation.load(XMathsOperation::None, 0, 0, 0, 0, channels, transform);
+    }
+
+  xuint32 shuffleMask = XMathsOperation::shuffleMask(2, 1, 0, 3);
+  l.data()->shuffle(_preOperation, shuffleMask);
   }
 
 QImage SyImageBase::asQImage() const

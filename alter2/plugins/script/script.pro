@@ -78,7 +78,8 @@ OTHER_FILES += \
     NodeCanvasContents/PathHolder.qml \
     NodeCanvasContents/PathItem.qml \
     NodeCanvasContextMenu.qml \
-    CreateMenuContents/Menu.qml
+    CreateMenuContents/Menu.qml \
+    NodeCanvasContents/Properties.qml
 
 
 

@@ -7,11 +7,14 @@ SPropertyInformation *SyImageNode::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SyImageNode>("SyImageNode");
 
-  SyImageOutput::InstanceInformation *outputInst = info->add(&SyImageNode::output, "output");
+  SyImageOutput::InstanceInformation *outputInst = info->child(&SyImageNode::output);
   outputInst->setCompute(computeImage);
 
   StringProperty::InstanceInformation *filenameInst = info->add(&SyImageNode::filename, "filename");
   filenameInst->setAffects(outputInst);
+
+  BoolProperty::InstanceInformation *premultiplyInst = info->add(&SyImageNode::premultiply, "premultiply");
+  premultiplyInst->setAffects(outputInst);
 
   return info;
   }
@@ -20,8 +23,7 @@ SyImageNode::SyImageNode()
   {
   }
 
-void SyImageNode::computeImage(const SPropertyInstanceInformation *, SPropertyContainer* node)
+void SyImageNode::computeImage(const SPropertyInstanceInformation *, SyImageNode* im)
   {
-  SyImageNode* syImage = node->castTo<SyImageNode>();
-  syImage->output.loadQImage(QImage(syImage->filename.value()));
+  im->output.loadQImage(QImage(im->filename()), im->premultiply());
   }

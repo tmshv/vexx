@@ -5,7 +5,7 @@
 #include "sbaseproperties.h"
 #include "XArrayMath"
 
-class MCMathsOperation : public SProperty
+class MATHSCORE_EXPORT MCMathsOperation : public SProperty
   {
   S_PROPERTY(MCMathsOperation, SProperty, 0)
 XProperties:

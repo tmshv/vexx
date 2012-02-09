@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
   APlugin<SPlugin> shift(app, "db");
   if(shift.isValid())
   {
+    STypeRegistry::addType(SySourceNode::staticTypeInformation());
     STypeRegistry::addType(SyImageNode::staticTypeInformation());
     STypeRegistry::addType(SyViewerNode::staticTypeInformation());
 

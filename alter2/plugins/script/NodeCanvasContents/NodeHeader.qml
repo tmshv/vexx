@@ -10,6 +10,7 @@ Rectangle {
 
   signal click()
   signal clickReleased()
+  signal rightClick()
   signal enter()
   signal createConnection(variant item, string mode, real x, real y)
   signal dragged(real x, real y)
@@ -95,17 +96,25 @@ Rectangle {
 
     anchors.fill: parent
     preventStealing: true
+    acceptedButtons: Qt.LeftButton|Qt.RightButton
 
     onPressed: {
       mouse.accepted = false;
       if(mouse.modifiers === 0)
         {
         mouse.accepted = true;
-        click();
-        dragging = true
-        var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-        lastX = gc.x
-        lastY = gc.y
+        if(mouse.button === Qt.LeftButton)
+          {
+          click();
+          dragging = true
+          var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+          lastX = gc.x
+          lastY = gc.y
+          }
+        else if(mouse.button == Qt.RightButton)
+          {
+          rightClick();
+          }
         }
       }
 
