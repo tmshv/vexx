@@ -46,10 +46,13 @@ QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent) const
   SProperty *child = ent->firstChild();
   while(child)
     {
-    QWidget *widget = createControlWidget(child);
-    if(widget)
+    if(child->instanceInformation()->mode() == SPropertyInstanceInformation::UserSettable)
       {
-      layout->addRow(child->name(), widget);
+      QWidget *widget = createControlWidget(child);
+      if(widget)
+        {
+        layout->addRow(child->name(), widget);
+        }
       }
     child = child->nextSibling();
     }

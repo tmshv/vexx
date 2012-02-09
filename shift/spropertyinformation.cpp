@@ -280,7 +280,8 @@ QString g_modeStrings[] = {
   /* Input         */ "input",
   /* Output        */ "output",
   /* Computed      */ "computed",
-  /* Computed      */ "internalcomputed"
+  /* InternalComputed */ "internalcomputed",
+  /* UserSettable  */ "usersettable"
 };
 
 const QString &SPropertyInstanceInformation::modeString() const

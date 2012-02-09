@@ -69,6 +69,7 @@ public:
     Output,
     Computed,
     InternalComputed,
+    UserSettable,
 
     NumberOfModes,
 
