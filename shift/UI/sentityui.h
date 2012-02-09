@@ -30,7 +30,7 @@ public:
     };
 
   SEntityUI(xuint32 options = 0);
-  QWidget *createControlWidget(SEntity *ent, QWidget *parent=0) const;
+  QWidget *createControlWidget(SEntity *ent, QWidget *parent=0, bool *anyWidgets=0) const;
   QWidget *createControlWidget(SProperty *property, QWidget *parent=0) const;
   bool canCreateWidget(SProperty *prop) const;
 

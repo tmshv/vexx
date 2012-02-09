@@ -74,7 +74,8 @@ void ScNodeItem::setPosition(float x, float y)
 QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, QColor labelColour, float expectedWidth, float expectedHeight)
   {
   SEntityUI ui;
-  QWidget *widg = ui.createControlWidget(property()->entity(), 0);
+  bool added = false;
+  QWidget *widg = ui.createControlWidget(property()->entity(), 0, &added);
 
   QPalette pal = widg->palette();
   pal.setColor(QPalette::Background, Qt::transparent);
@@ -100,6 +101,7 @@ QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, QColor
   QVariantMap r;
   r["width"] = s.width();
   r["height"] = s.height();
+  r["anyControls"] = added;
   return r;
   }
 

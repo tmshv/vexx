@@ -38,7 +38,7 @@ xuint64 SEntityUI::widgetType(const SProperty *p) const
   return X_UINT64_SENTINEL;
   }
 
-QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent) const
+QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent, bool *added) const
   {
   QWidget *canvas(new QWidget(parent));
   QFormLayout *layout(new QFormLayout(canvas));
@@ -52,6 +52,10 @@ QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent) const
       if(widget)
         {
         layout->addRow(child->name(), widget);
+        if(added)
+          {
+          *added = true;
+          }
         }
       }
     child = child->nextSibling();

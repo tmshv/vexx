@@ -6,6 +6,36 @@ ui.show();
 
 var mainDocument = db.addChild(db.types.SyDocument, "MainDocument");
 
+var blacklistedTypes =
+  [
+  "SySourceNode"
+  ];
+
+function addType(name)
+  {
+  var type = db.types[name];
+  if(type.inheritsFrom(db.types.SyNode))
+    {
+    if(blacklistedTypes.indexOf(type.typeName) === -1)
+      {
+      userCreatableEntities.push(type);
+      }
+    }
+  }
+
+function removeType(name)
+  {
+  var type = db.types[name];
+  }
+
+script.typeAdded.connect(addType);
+script.typeRemoved.connect(addType);
+
+for(var a in db.types)
+  {
+  addType(a);
+  }
+
 //db.addChild("SyImageNode", "Image");
 //db.addChild("SyImageNode", "Image2");
 //db.addChild("Add", "Add");

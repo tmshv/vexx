@@ -69,10 +69,13 @@ void ScEmbeddedTypes::typeAdded(const SPropertyInformation *p)
 
     g.setProperty(p->typeName(), v);
     }
+
+  emit typeAdded(p->typeName());
   }
 
-void ScEmbeddedTypes::typeRemoved(const SPropertyInformation *)
+void ScEmbeddedTypes::typeRemoved(const SPropertyInformation *p)
   {
+  emit typeRemoved(p->typeName());
   }
 
 ScEmbeddedTypes::~ScEmbeddedTypes()

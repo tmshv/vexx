@@ -4,6 +4,7 @@
 #include "scglobal.h"
 #include "aabstractplugin.h"
 
+#include "styperegistry.h"
 class ScCoreObject;
 class QScriptEngine;
 class QScriptValue;
@@ -19,6 +20,7 @@ class SDatabaseModel;
 class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
   {
   Q_OBJECT
+
 public:
   ScPlugin();
   ~ScPlugin();
@@ -53,6 +55,9 @@ public:
 
 signals:
   void debuggingStateChanged(bool enabled);
+
+  void typeAdded(QString type);
+  void typeRemoved(QString type);
 
 public slots:
   void enableDebugging(bool enable=true);

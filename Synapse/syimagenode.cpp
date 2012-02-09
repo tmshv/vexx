@@ -11,9 +11,11 @@ SPropertyInformation *SyImageNode::createTypeInformation()
   outputInst->setCompute(computeImage);
 
   StringProperty::InstanceInformation *filenameInst = info->add(&SyImageNode::filename, "filename");
+  filenameInst->setMode(SPropertyInstanceInformation::UserSettable);
   filenameInst->setAffects(outputInst);
 
   BoolProperty::InstanceInformation *premultiplyInst = info->add(&SyImageNode::premultiply, "premultiply");
+  premultiplyInst->setMode(SPropertyInstanceInformation::UserSettable);
   premultiplyInst->setAffects(outputInst);
 
   return info;

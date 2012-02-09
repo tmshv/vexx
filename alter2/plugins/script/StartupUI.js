@@ -1,13 +1,11 @@
-var groups = [
-  db.types.MCImage
-]
+var userCreatableEntities = [ ];
 
 function doContextMenu(window, x, y, path)
   {
   var typesData = { };
-  for(var i = 0; i < groups.length; ++i)
+  for(var i = 0; i < userCreatableEntities.length; ++i)
     {
-    var type = groups[i];
+    var type = userCreatableEntities[i];
     typesData[type.typeName] = {
       description: "Some Type",
       request: "create",
