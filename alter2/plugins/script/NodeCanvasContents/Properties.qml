@@ -10,7 +10,7 @@ Rectangle {
   color: "#282828"
 
   Component.onCompleted: {
-    var actualSize = nodeItem.createPropertiesSection(properties, width, height);
+    var actualSize = nodeItem.createPropertiesSection(properties, "white", width, height);
 
     width = actualSize.width;
     height = actualSize.height;

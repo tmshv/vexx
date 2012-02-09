@@ -71,13 +71,14 @@ void ScNodeItem::setPosition(float x, float y)
   positionChanged();
   }
 
-QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, float expectedWidth, float expectedHeight)
+QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, QColor labelColour, float expectedWidth, float expectedHeight)
   {
   SEntityUI ui;
   QWidget *widg = ui.createControlWidget(property()->entity(), 0);
 
   QPalette pal = widg->palette();
   pal.setColor(QPalette::Background, Qt::transparent);
+  pal.setColor(QPalette::WindowText, labelColour);
   widg->setPalette(pal);
 
   QRect geo = widg->geometry();
@@ -95,8 +96,6 @@ QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, float 
   proxy->setWidget(widg);
 
   QSizeF s = proxy->size();
-
-  qDebug() << s;
 
   QVariantMap r;
   r["width"] = s.width();
