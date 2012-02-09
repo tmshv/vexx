@@ -4,6 +4,8 @@ script.includeFolder("./nodes");
 
 ui.show();
 
+var mainDocument = db.addChild(db.types.SyDocument, "MainDocument");
+
 //db.addChild("SyImageNode", "Image");
 //db.addChild("SyImageNode", "Image2");
 //db.addChild("Add", "Add");

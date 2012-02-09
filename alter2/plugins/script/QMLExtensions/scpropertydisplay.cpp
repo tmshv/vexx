@@ -183,7 +183,8 @@ void ScPropertyDisplay::addProperty(SProperty *e)
   {
   xAssert(e);
 
-  if(e->instanceInformation()->mode() == SPropertyInstanceInformation::Internal)
+  if(e->instanceInformation()->mode() == SPropertyInstanceInformation::Internal ||
+     e->instanceInformation()->mode() == SPropertyInstanceInformation::InternalComputed)
     {
     return;
     }

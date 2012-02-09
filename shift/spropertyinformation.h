@@ -68,6 +68,7 @@ public:
     Input,
     Output,
     Computed,
+    InternalComputed,
 
     NumberOfModes,
 

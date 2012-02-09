@@ -2,6 +2,7 @@
 #define SYDOCUMENT_H
 
 #include "sadocument.h"
+#include "syimageinput.h"
 
 class SyDocument : public SDocument
   {
@@ -9,6 +10,8 @@ class SyDocument : public SDocument
 
 public:
   SyDocument();
+
+  SyImageInput input;
 
   virtual QWidget *createEditor();
   };

@@ -279,7 +279,8 @@ QString g_modeStrings[] = {
   /* InternalInput */ "internalinput",
   /* Input         */ "input",
   /* Output        */ "output",
-  /* Computed      */ "computed"
+  /* Computed      */ "computed",
+  /* Computed      */ "internalcomputed"
 };
 
 const QString &SPropertyInstanceInformation::modeString() const
@@ -290,10 +291,23 @@ const QString &SPropertyInstanceInformation::modeString() const
 
 void SPropertyInstanceInformation::setMode(Mode m)
   {
-  xAssert(!_compute);
-  if(!_compute)
+  if(_compute)
     {
-    _mode = m;
+    if(m == Internal)
+      {
+      _mode = InternalComputed;
+      }
+    else
+      {
+      xAssertFail();
+      }
+    }
+  else
+    {
+    if(!_compute)
+      {
+      _mode = m;
+      }
     }
   }
 

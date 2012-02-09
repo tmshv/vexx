@@ -428,7 +428,8 @@ Rectangle
 
       if(mouse.button === Qt.RightButton)
         {
-        external.emitRequest("contextMenu", [ mouse.x, mouse.y ]);
+        var path =
+        external.emitRequest("contextMenu", [ mouse.x, mouse.y, display.path ]);
         mouse.accepted = true;
         return;
         }

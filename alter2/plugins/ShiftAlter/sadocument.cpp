@@ -15,15 +15,22 @@ SPropertyInformation *SDocument::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SDocument>("SDocument");
 
-  info->add(&SDocument::transientData, "transientData");
+  SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
+  transientInst->setMode(SPropertyInstanceInformation::Internal);
 
-  info->add(&SDocument::filename, "filename");
+  StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
+  filenameInst->setMode(SPropertyInstanceInformation::Internal);
+
 
   UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
   rev->setCompute(incrementRevision);
+  rev->setMode(SPropertyInstanceInformation::Internal);
+
 
   PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
   fCS->setAffects(rev);
+  fCS->setMode(SPropertyInstanceInformation::Internal);
+
 
   info->addInheritedInterface<SDocument, SHandler>();
 

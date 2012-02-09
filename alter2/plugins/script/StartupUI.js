@@ -2,7 +2,7 @@ var groups = [
   db.types.MCImage
 ]
 
-function doContextMenu(window, x, y)
+function doContextMenu(window, x, y, path)
   {
   var typesData = { };
   for(var i = 0; i < groups.length; ++i)
@@ -34,7 +34,17 @@ function doContextMenu(window, x, y)
       },
     create: function(data)
       {
-      db.addChild(data, data);
+      var parent = db;
+      for(var i = 1; i < path.length; ++i)
+        {
+        parent = parent.children[path[i]];
+        if(!parent)
+          {
+          throw "Couldn't find parent " + path[i] + "to create child under";
+          }
+        }
+
+      parent.addChild(data, data);
       }
     }
   contextMenu.surface.emitRequest.connect(contextMenu, contextMenu.passIn);
@@ -53,9 +63,9 @@ setupDebugSurface = function()
       assert(this[name]);
       this[name].apply(this, argsIn);
       },
-    contextMenu: function(x, y)
+    contextMenu: function(x, y, path)
       {
-      doContextMenu(this.surface, x, y);
+      doContextMenu(this.surface, x, y, path);
       }
     }
   surfaceManager.surface.emitRequest.connect(surfaceManager, surfaceManager.passIn);
