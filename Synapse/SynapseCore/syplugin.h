@@ -12,6 +12,8 @@ public:
   SynapseCorePlugin();
 
   virtual void load();
+
+
   };
 
 #endif // SYNAPSECORE_PLUGIN_H

@@ -134,6 +134,12 @@ void UIPlugin::unload()
   delete _priv;
   }
 
+void UIPlugin::addDock(QString name, QWidget *w)
+  {
+  UISurface *surf = new UISurface(name, w, UISurface::Dock);
+  addSurface(surf);
+  }
+
 void UIPlugin::addSurface(UISurface *surface)
   {
   if(!_priv->_surfaces.contains(surface))

@@ -9,17 +9,24 @@
 #include "QTimer"
 #include "XScene.h"
 
-SViewport::SViewport(GCViewport *viewpoint) : _viewport(viewpoint)
+SViewport::SViewport(GCViewport *viewpoint)
   {
   _timer = new QTimer;
   connect(_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
   _timer->start( 40 );
 
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+  setViewport(viewpoint);
   }
 
 SViewport::~SViewport()
   {
+  }
+
+void SViewport::setViewport(GCViewport *vp)
+  {
+  _viewport = vp;
   }
 
 void SViewport::initializeGL()
@@ -47,7 +54,14 @@ void SViewport::resizeGL( int w, int h )
 void SViewport::paintGL()
   {
   _renderer.clear();
-  const GCRenderable* renderable = viewport()->source();
+  const GCViewport *vp = viewport();
+  if(!vp)
+    {
+    qWarning() << "No viewport";
+    return;
+    }
+
+  const GCRenderable* renderable = vp->source();
   if(!renderable)
     {
     qWarning() << "No renderable";

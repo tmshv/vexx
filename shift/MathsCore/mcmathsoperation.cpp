@@ -67,5 +67,6 @@ bool MCMathsOperation::saveResultToFile(QString filename)
     }
 
   im.save(filename);
+  return true;
   }
 

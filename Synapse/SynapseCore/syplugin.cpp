@@ -7,7 +7,6 @@
 #include "syimagebase.h"
 #include "syimageinput.h"
 #include "syimageoutput.h"
-#include "sydocument.h"
 
 ALTER_PLUGIN(SynapseCorePlugin);
 
@@ -26,7 +25,5 @@ void SynapseCorePlugin::load()
     STypeRegistry::addType(SyImageBase::staticTypeInformation());
     STypeRegistry::addType(SyImageInput::staticTypeInformation());
     STypeRegistry::addType(SyImageOutput::staticTypeInformation());
-
-    STypeRegistry::addType(SyDocument::staticTypeInformation());
     }
   }

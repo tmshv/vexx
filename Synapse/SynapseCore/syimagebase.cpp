@@ -7,9 +7,6 @@ SPropertyInformation *SyImageBase::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SyImageBase>("SyImageBase");
 
-  info->add(&SyImageBase::time, "time");
-  info->add(&SyImageBase::operation, "operation");
-
   return info;
   }
 
@@ -21,7 +18,7 @@ void SyImageBase::loadQImage(const QImage &imInput, bool premult)
   {
   SProfileFunction
 
-  MCMathsOperation::ComputeLock l(&operation);
+  MCMathsOperation::ComputeLock l(this);
   if(imInput.isNull())
     {
     l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XMatrix3x3::Identity());

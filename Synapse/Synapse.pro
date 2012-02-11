@@ -5,26 +5,33 @@
 #-------------------------------------------------
 
 TARGET = Synapse
-
 TEMPLATE = app
+QT += opengl
 
-INCLUDEPATH += ../Alter2 ../EksCore ../Eks3D/include ../Shift/GraphicsCore ../Shift/MathsCore ../Alter2/plugins/script ../Alter2/plugins/ShiftAlter ../shift/ SynapseCore/ ../Alter2/plugins/UI
 
-LIBS += -L../bin -lalter -lEksCore -lscript -lShiftAlter -lshift -lShiftGraphicsCore -lShiftMathsCore -lSynapseCore -lUI -lEks3D
+include("../EksCore/GeneralOptions.pri")
+
+INCLUDEPATH += $$ROOT/Alter2 $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore $$ROOT/Alter2/plugins/script $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/shift/ SynapseCore/ $$ROOT/Alter2/plugins/UI
+
+LIBS += -lalter -lEksCore -lscript -lShiftAlter -lshift -lShiftGraphicsCore -lShiftMathsCore -lSynapseCore -lUI -lEks3D
 
 SOURCES += main.cpp \
     syimagenode.cpp \
-    sypreviewviewer.cpp \
-    syviewernode.cpp \
-    synodecanvas.cpp
-
-DESTDIR = ../bin
+    synodecanvas.cpp \
+    sydocument.cpp \
+    sypreviewviewport.cpp \
+    syinterface.cpp \
+    syviewer.cpp \
+    syimagetexture.cpp
 
 OTHER_FILES += scripts/startup.js \
     scripts/nodes/add.js
 
 HEADERS += \
     syimagenode.h \
-    sypreviewviewer.h \
-    syviewernode.h \
-    synodecanvas.h
+    synodecanvas.h \
+    sydocument.h \
+    sypreviewviewport.h \
+    syinterface.h \
+    syviewer.h \
+    syimagetexture.h

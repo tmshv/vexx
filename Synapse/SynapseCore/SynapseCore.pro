@@ -14,7 +14,6 @@ SOURCES += syplugin.cpp \
     syimagebase.cpp \
     syimageinput.cpp \
     syimageoutput.cpp \
-    sydocument.cpp \
     sysourcenode.cpp
 
 HEADERS += syplugin.h \
@@ -23,8 +22,7 @@ HEADERS += syplugin.h \
     syimagebase.h \
     syimageinput.h \
     syimageoutput.h \
-    sydocument.h \
-    sysourcenode.h
+    sydocument.h
 
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore $$ROOT/alter2 $$ROOT/alter2/plugins/ShiftAlter
 

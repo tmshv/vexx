@@ -8,15 +8,12 @@
 
 class QImage;
 
-class SYNAPSECORE_EXPORT SyImageBase : public SPropertyContainer
+class SYNAPSECORE_EXPORT SyImageBase : public MCMathsOperation
   {
-  S_PROPERTY_CONTAINER(SyImageBase, SPropertyContainer, 0);
+  S_PROPERTY(SyImageBase, MCMathsOperation, 0);
 
 public:
   SyImageBase();
-
-  FloatProperty time;
-  MCMathsOperation operation;
 
   void loadQImage(const QImage &, bool premult);
   QImage asQImage() const;

@@ -31,7 +31,7 @@ void TextureRef::bindData(XShader *s, const SProperty *p) const
 
   if(c->input())
     {
-    v->setValue(c->pointed()->texture());
+    v->setValue(c->pointed()->value());
     }
   }
 

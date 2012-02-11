@@ -1,0 +1,13 @@
+#ifndef SYVIEWERSURFACE_H
+#define SYVIEWERSURFACE_H
+
+#include "UISurface.h"
+#include "saviewport.h"
+
+class SyViewerSurface : public SViewport, public UISurface
+  {
+public:
+  SyViewerSurface();
+  };
+
+#endif // SYVIEWERSURFACE_H

@@ -3,9 +3,11 @@
 #include "ScPlugin.h"
 #include "splugin.h"
 #include "syimagenode.h"
-#include "syviewernode.h"
+#include "syimagetexture.h"
 #include "UIPlugin.h"
-#include "sypreviewviewer.h"
+#include "sypreviewviewport.h"
+#include "sydocument.h"
+#include "syinterface.h"
 
 int main(int argc, char *argv[])
   {
@@ -16,11 +18,24 @@ int main(int argc, char *argv[])
   app.load("script");
   app.load("synapsecore");
 
+  APlugin<SPlugin> shift(app, "db");
+  if(shift.isValid())
+  {
+    STypeRegistry::addType(SySourceNode::staticTypeInformation());
+    STypeRegistry::addType(SyImageNode::staticTypeInformation());
+    STypeRegistry::addType(SyPreviewViewport::staticTypeInformation());
+    STypeRegistry::addType(SyImageTexture::staticTypeInformation());
+    STypeRegistry::addType(SyDocument::staticTypeInformation());
+  }
+
+  SyInterface synapseInterface;
   APlugin<ScPlugin> script(app, "script");
   if(script.isValid())
   {
     // more like this in release...
     // script->includeFolder(app.rootPath() + "/scripts/");
+
+    script->registerScriptGlobal("synapse", &synapseInterface);
 
     script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
   }
@@ -28,19 +43,6 @@ int main(int argc, char *argv[])
   // this will work in debug only...
   app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
 
-  APlugin<SPlugin> shift(app, "db");
-  if(shift.isValid())
-  {
-    STypeRegistry::addType(SySourceNode::staticTypeInformation());
-    STypeRegistry::addType(SyImageNode::staticTypeInformation());
-    STypeRegistry::addType(SyViewerNode::staticTypeInformation());
-
-    APlugin<UIPlugin> ui(app, "ui");
-    if(ui.isValid())
-    {
-      ui->addSurface(new SyPreviewViewer(&shift->db()));
-    }
-  }
 
   return app.execute();
   }

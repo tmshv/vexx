@@ -24,6 +24,13 @@ SPropertyInformation *StringProperty::createTypeInformation()
   return SPropertyInformation::create<StringProperty>("StringProperty");
   }
 
+S_IMPLEMENT_PROPERTY(FilenameProperty)
+
+SPropertyInformation *FilenameProperty::createTypeInformation()
+  {
+  return SPropertyInformation::create<FilenameProperty>("FilenameProperty");
+  }
+
 void BoolProperty::assignProperty(const SProperty *f, SProperty *t)
   {
   BoolProperty *to = t->uncheckedCastTo<BoolProperty>();

@@ -350,6 +350,21 @@ void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation
   _affects[1] = 0;
   }
 
+void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation **info, xsize size)
+  {
+  xAssert(!_affects);
+  xAssert(info);
+
+  _affects = new xsize[size+1];
+
+  for(xsize i = 0; i < size; ++i)
+    {
+    _affects[i] = info[i]->location();
+    }
+
+  _affects[size] = 0;
+  }
+
 void SPropertyInstanceInformation::setAffects(xsize *affects)
   {
   xAssert(!_affects);

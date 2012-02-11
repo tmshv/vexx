@@ -47,18 +47,18 @@ public:
     return _value;
     }
 
-  static void saveProperty(const SProperty *p, SSaver &l )
+  static void saveProperty(const SProperty *, SSaver &)
     {
     xAssertFail();
     }
 
-  static SProperty *loadProperty(SPropertyContainer *parent, SLoader &l)
+  static SProperty *loadProperty(SPropertyContainer *, SLoader &)
     {
     xAssertFail();
     return 0;
     }
 
-  static bool shouldSavePropertyValue(const SProperty *p)
+  static bool shouldSavePropertyValue(const SProperty *)
     {
     return false;
     }

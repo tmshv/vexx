@@ -1,10 +1,15 @@
 assert(script.loadPlugin("synapsecore"));
 
+var viewer = synapse.createViewer();
+ui.addDock("Preview", viewer);
+
 script.includeFolder("./nodes");
 
-ui.show();
-
 var mainDocument = db.addChild(db.types.SyDocument, "MainDocument");
+
+viewer.setInput(mainDocument.input);
+
+ui.show();
 
 var blacklistedTypes =
   [
