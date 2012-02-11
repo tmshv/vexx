@@ -55,6 +55,16 @@ ScNodeItem *ScNodeDisplay::nodeAt(int i)
   return 0;
   }
 
+ScNodeItem *ScNodeDisplay::inputItem()
+  {
+  return _inputItem;
+  }
+
+ScNodeItem *ScNodeDisplay::outputItem()
+  {
+  return _outputItem;
+  }
+
 void ScNodeDisplay::onTreeChange(const SChange *c)
   {
   if(!_rootIndex)
@@ -353,7 +363,6 @@ ScNodeItem *ScNodeDisplay::addNode(QDeclarativeComponent *c, SEntity *e, Mode m)
     return 0;
     }
 
-  _nodes << node;
   node->setParentItem(this);
 
   QString mode;
@@ -364,6 +373,10 @@ ScNodeItem *ScNodeDisplay::addNode(QDeclarativeComponent *c, SEntity *e, Mode m)
   else if(m == Output)
     {
     mode = "output";
+    }
+  else
+    {
+    _nodes << node;
     }
   node->setEntity(e, mode);
 

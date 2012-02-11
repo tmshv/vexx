@@ -6,9 +6,9 @@
 #include "sentityweakpointer.h"
 #include "sobserver.h"
 #include "sdatabasemodel.h"
+#include "scnodeitem.h"
 
 class ScPropertyItem;
-class ScNodeItem;
 class ScConnectorItem;
 
 class ScNodeDisplay : public QDeclarativeItem, STreeObserver, SConnectionObserver
@@ -21,6 +21,9 @@ class ScNodeDisplay : public QDeclarativeItem, STreeObserver, SConnectionObserve
   Q_PROPERTY(QObject *model READ model WRITE setModel)
   Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
   Q_PROPERTY(QModelIndex topRootIndex READ topRootIndex WRITE setTopRootIndex NOTIFY topRootIndexChanged)
+
+  Q_PROPERTY(QDeclarativeItem *inputItem READ inputItem CONSTANT)
+  Q_PROPERTY(QDeclarativeItem *outputItem READ outputItem CONSTANT)
 
   Q_PROPERTY(QStringList path READ path NOTIFY pathChanged)
 
@@ -36,6 +39,8 @@ public:
 
   int count() const;
   Q_INVOKABLE ScNodeItem *nodeAt(int i);
+  ScNodeItem *inputItem();
+  ScNodeItem *outputItem();
 
   Q_INVOKABLE void setRootToParent(int cound);
   Q_INVOKABLE void setRootIndex(QObject *);

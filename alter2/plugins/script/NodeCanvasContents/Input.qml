@@ -16,7 +16,7 @@ ConnectorItem {
       if(mouse.modifiers === 0)
         {
         var hit = path.intersect(mouse.x, mouse.y, .0);
-        if(hit > 0.0 && hit < 1.0)
+        if(hit > 0.0 && hit < 2.0)
           {
           mouse.accepted = true;
           var mode = "input";
