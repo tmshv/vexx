@@ -57,6 +57,7 @@ public:
     Float
     };
 
+  void copy(const XMathsOperation &op);
   void load(DataType, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &);
 
   void add(const XMathsOperation &, const XMathsOperation &);

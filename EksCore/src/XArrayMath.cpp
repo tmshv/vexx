@@ -121,6 +121,11 @@ void XMathsOperation::setValueDirty()
   XMathsEngine::engine()->onValueDirty(this, &_userData);
   }
 
+void XMathsOperation::copy(const XMathsOperation &a)
+  {
+  add(a, XVector4D::Zero());
+  }
+
 void XMathsOperation::load(DataType t, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &m)
   {
   setInput(&_inputA, 0);
@@ -580,7 +585,10 @@ void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **us
   ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
   ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
 
-  xAssert(a);
+  if(!a)
+    {
+    return;
+    }
 
   res->_channels = 4;//a->_channels;
   res->_type = a->_type;

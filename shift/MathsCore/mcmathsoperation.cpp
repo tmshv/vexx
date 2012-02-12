@@ -12,9 +12,13 @@ SPropertyInformation *MCMathsOperation::createTypeInformation()
   return info;
   }
 
-void MCMathsOperation::assignProperty(const SProperty *, SProperty *)
+void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
   {
-  xAssertFail();
+  MCMathsOperation *to = t->uncheckedCastTo<MCMathsOperation>();
+  const MCMathsOperation *from = f->uncheckedCastTo<MCMathsOperation>();
+
+  MCMathsOperation::ComputeLock l(to);
+  l.data()->copy(from->value());
   }
 
 QImage MCMathsOperation::asQImage() const
