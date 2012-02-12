@@ -12,20 +12,25 @@ SPropertyInformation *MCMathsOperation::createTypeInformation()
   return info;
   }
 
-bool MCMathsOperation::saveResultToFile(QString filename)
+void MCMathsOperation::assignProperty(const SProperty *, SProperty *)
+  {
+  xAssertFail();
+  }
+
+QImage MCMathsOperation::asQImage() const
   {
   XMathsResult result(value());
 
   if(result.dataType() == XMathsOperation::None)
     {
     qWarning() << "Saving invalid operation";
-    return false;
+    return QImage();
     }
 
   if(result.dataType() != XMathsOperation::UnsignedInt)
     {
     xAssertFail();
-    return false;
+    return QImage();
     }
 
   xuint32* data = (xuint32*)result.data();
@@ -43,7 +48,7 @@ bool MCMathsOperation::saveResultToFile(QString filename)
   if(!data)
     {
     xAssertFail();
-    return false;
+    return QImage();
     }
 
   QImage im(w, h, fmt);
@@ -66,6 +71,12 @@ bool MCMathsOperation::saveResultToFile(QString filename)
       }
     }
 
+  return im;
+  }
+
+bool MCMathsOperation::saveResultToFile(QString filename)
+  {
+  QImage im = asQImage();
   im.save(filename);
   return true;
   }

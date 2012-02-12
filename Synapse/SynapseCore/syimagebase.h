@@ -16,7 +16,6 @@ public:
   SyImageBase();
 
   void loadQImage(const QImage &, bool premult);
-  QImage asQImage() const;
 
 private:
   XMathsOperation _preOperation;

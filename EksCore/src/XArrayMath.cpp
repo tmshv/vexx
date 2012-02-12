@@ -475,6 +475,12 @@ void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *us
   {
   const ReferenceMathsEngineResult *result = (const ReferenceMathsEngineResult *)userData;
 
+  if(!result)
+    {
+    *type = XMathsOperation::None;
+    return;
+    }
+
   *type = result->_type;
   *dataChannels = result->_channels;
   *m = result->_transform;

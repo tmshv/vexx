@@ -89,6 +89,9 @@ void SProcessManager::preCompute(const SPropertyInstanceInformation *info, SProp
   {
   xAssert(g_manager);
 
+
+  return;
+
     {
     QMutexLocker l(&g_manager->criticalLock);
     if(g_manager->spareWorkers.size() == 0)

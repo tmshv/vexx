@@ -27,7 +27,6 @@ float ScPath::intersect(float xIn, float yIn, float tol) const
     XVector2D delta = vec.normalized();
 
     float projectedLength = delta.dot(offset);
-    qDebug() << "Path hit?" << projectedLength / vec.norm();
     return projectedLength / vec.norm();
     }
 

@@ -49,6 +49,7 @@ void SyPreviewViewport::setupViewport(const SyImageInput *input, XAbstractCanvas
 
   SyImageTexture *t = msc->addChild<SyImageTexture>("Texture");
   shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(&t->texture);
+  input->connect(&t->input);
 
 
   XTransform tr = XTransform::Identity();

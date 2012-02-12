@@ -67,28 +67,3 @@ void SyImageBase::loadQImage(const QImage &imInput, bool premult)
   xuint32 shuffleMask = XMathsOperation::shuffleMask(2, 1, 0, 3);
   l.data()->shuffle(_preOperation, shuffleMask);
   }
-
-QImage SyImageBase::asQImage() const
-  {
-  /*preGet();
-  int width = image.width();
-  int height = image.height();
-
-  QImage im(width, height, QImage::Format_ARGB32);
-  im.fill(qRgba(0,0,0,255));
-
-  xsize bytesPerPixel = im.depth()/8;
-  quint8 *pixel = im.bits();
-  const float *constData = image.get();
-  for(int i = 0; i < height; ++i )
-    {
-    int rowPos = i*width;
-    for(int j = 0; j < width; ++j)
-      {
-      pixel[0] = constData[rowPos+j] * 255.0f;
-      pixel += bytesPerPixel;
-      }
-    }
-  return im;*/
-  return QImage();
-  }
