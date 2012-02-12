@@ -13,7 +13,7 @@ public:
   SyImageNode();
 
   BoolProperty premultiply;
-  StringProperty filename;
+  FilenameProperty filename;
 
 private:
   static void computeImage( const SPropertyInstanceInformation *, SyImageNode * );

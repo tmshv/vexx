@@ -10,7 +10,7 @@ SPropertyInformation *SyImageNode::createTypeInformation()
   SyImageOutput::InstanceInformation *outputInst = info->child(&SyImageNode::output);
   outputInst->setCompute(computeImage);
 
-  StringProperty::InstanceInformation *filenameInst = info->add(&SyImageNode::filename, "filename");
+  FilenameProperty::InstanceInformation *filenameInst = info->add(&SyImageNode::filename, "filename");
   filenameInst->setMode(SPropertyInstanceInformation::UserSettable);
   filenameInst->setAffects(outputInst);
 

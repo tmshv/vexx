@@ -30,7 +30,13 @@ public:
   SUIBase(SProperty *p) : _isAlreadySetting(false), _value(p->castTo<T>()), _dirty(false)
     {
     xAssert(_value);
+    _value->entity()->addDirtyObserver(this);
     }
+  ~SUIBase()
+    {
+    _value->entity()->removeDirtyObserver(this);
+    }
+
   T *propertyValue() {return _value;}
   virtual void syncGUI() = 0;
 
