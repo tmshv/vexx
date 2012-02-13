@@ -3,6 +3,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "QRect"
+#include "XAllocatorBase"
 
 XMathsEngine *g_engine = 0;
 XMathsEngine *XMathsEngine::engine()
@@ -217,6 +218,61 @@ void XMathsOperation::splice(const XMathsOperation &a, const XMathsOperation &b,
   setOperation(Splice);
   setValue(mask);
   }
+
+
+struct OperationQueue
+  {
+  typedef void (*Operation)(const XMathsOperation* o, Vec &arr, const Vec &a, const Vec &b);
+
+  OperationQueue(XAllocatorBase *all)
+    {
+    _allocator = all;
+    }
+
+  static OperationQueue* create(XAllocatorBase *all, xsize count)
+    {
+    void *ptr = all->alloc(sizeof(OperationQueue) + (sizeof(Operation*)*(count-1)));
+    return new(ptr) OperationQueue(all);
+    }
+
+  static void destroy(OperationQueue *q)
+    {
+    q->_allocator.free(q);
+    }
+
+  static xsize buildQueueSize(XMathsOperation *op)
+    {
+    XMathsOperation *a = op->inputA();
+    XMathsOperation *b = op->inputB();
+
+    xsize count = 1;
+    if(a)
+      {
+      count += buildQueueSize(a);
+      }
+
+    if(b)
+      {
+      count += buildQueueSize(b);
+      }
+
+    return count;
+    }
+
+  static OperationQueue *buildQueue(XMathsOperation *op)
+    {
+    xsize operationSize = buildQueueSize(op);
+
+    OperationQueue *q = create(operationSize);
+
+    return q;
+    }
+
+  XAllocatorBase _allocator;
+  Operation *_operation[1];
+  };
+
+#if 0
 
 template <typename T> struct Defs
   {
@@ -670,3 +726,5 @@ void XReferenceMathsEngine::onCleanUp(const XMathsOperation *, void **userData)
   ReferenceMathsEngineResult *&res = *(ReferenceMathsEngineResult**)userData;
   delete res;
   }
+
+#endif
