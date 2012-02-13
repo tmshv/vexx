@@ -320,13 +320,12 @@ struct OperationQueue
 	
   void runQueue(XVector2D sampleStart, float scaleFactor, Array &arr)
     {
-	Vec writePoints[3];
+	Vec writePoints//;//3];
 	
 	for(xsize y = 0, h = arr.cols(); y < h; ++y)
 	  {
 	  for(xsize x = 0, w = arr.rows(); x < w; ++x)
 	    {
-		xuint8 writeIndex[3] = { 0, 1, 2 };
 		
 		for(each function)
 		  {
