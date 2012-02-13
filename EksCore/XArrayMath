@@ -58,7 +58,7 @@ public:
     };
 
   void copy(const XMathsOperation &op);
-  void load(DataType, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &);
+  void load(DataType, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XVectorI2D &);
 
   void add(const XMathsOperation &, const XMathsOperation &);
   void add(const XMathsOperation &, const XVector4D &);
@@ -116,13 +116,14 @@ private:
 
   mutable XMathsOperation *_user;
   mutable XMathsOperation *_nextUser;
+  friend class XMathsResult;
   };
 
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void evaluateData(const XMathsOperation *, const void *userData, QRectF sampleRect, xuint32 invSampleDensity, XMathsOperation::DataType *type, const void **data, xsize *dataStride, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m) = 0;
-  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &) = 0;
+  virtual void evaluateData(const XMathsOperation *, const void *userData, XVectorI2D sampleOffset, xuint32 invSampleDensity, XMathsOperation::DataType type, void *data) = 0;
+  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XVectorI2D &) = 0;
   virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onInputDirty(const XMathsOperation *, void **userData) = 0;
@@ -134,8 +135,21 @@ public:
 
 class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
   {
-  virtual void evaluateData(const XMathsOperation *, const void *userData, QRectF sampleRect, xuint32 invSampleDensity, XMathsOperation::DataType *type, const void **data, xsize *dataStride, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m);
-  virtual void *loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &);
+  virtual void evaluateData(const XMathsOperation *,
+                            void **userData,
+                            const XVectorI2D& sampleOffset,
+                            xuint32 invSampleDensity,
+                            XMathsOperation::DataType type,
+                            void *data);
+
+  virtual void *loadData(XMathsOperation::DataType type,
+                         void* data,
+                         xsize stride,
+                         xsize width,
+                         xsize height,
+                         xuint8 channels,
+                         const XVectorI2D &);
+
   virtual void onOperationDirty(const XMathsOperation *, void **userData);
   virtual void onValueDirty(const XMathsOperation *, void **userData);
   virtual void onInputDirty(const XMathsOperation *, void **userData);
@@ -154,7 +168,7 @@ XProperties:
   XRORefProperty(XMatrix3x3, transform);
 
 public:
-  XMathsResult(const XMathsOperation &, QRectF sampleRect=QRectF(), xuint32 invSampleDensity=1);
+  XMathsResult(const XMathsOperation &, XVectorI2D tl, xuint32 invSampleDensity, XMathsOperation::DataType type, void *arr);
 
 private:
   XMathsResult(const XMathsResult &);

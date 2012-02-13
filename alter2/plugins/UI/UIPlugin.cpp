@@ -106,14 +106,14 @@ void UIPlugin::load()
     if(core()->isDebugUIEnabled())
       {
       addSurface(new UIDatabaseDebugSurface(&db));
-      addSurface(new UIGraphDebugSurface(&db));
-      }
+      // UNUSED, QML. addSurface(new UIGraphDebugSurface(&db));
+      addSurface(new UIEventLoggerSurface());
 
 #ifdef X_PROFILING_ENABLED
-    addSurface(new UIProfilerSurface);
+      addSurface(new UIProfilerSurface);
 #endif
+      }
 
-    addSurface(new UIEventLoggerSurface());
     }
   }
 

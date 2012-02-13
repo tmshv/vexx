@@ -14,6 +14,10 @@ typedef Eigen::Matrix<xReal, 2, 1> XVector2D;
 typedef Eigen::Matrix<xReal, 3, 1> XVector3D;
 typedef Eigen::Matrix<xReal, 4, 1> XVector4D;
 
+typedef Eigen::Matrix<xint32, 2, 1> XVectorI2D;
+typedef Eigen::Matrix<xint32, 3, 1> XVectorI3D;
+typedef Eigen::Matrix<xint32, 4, 1> XVectorI4D;
+
 typedef XList<XVector2D> XVector2DList;
 typedef XList<XVector3D> XVector3DList;
 typedef XList<XVector4D> XVector4DList;
