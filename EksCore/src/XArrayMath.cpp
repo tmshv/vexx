@@ -222,17 +222,24 @@ void XMathsOperation::splice(const XMathsOperation &a, const XMathsOperation &b,
 
 struct OperationQueue
   {
-  typedef void (*Operation)(const XMathsOperation* o, Vec &arr, const Vec &a, const Vec &b);
-
-  OperationQueue(XAllocatorBase *all)
+  typedef void (*OperationFunction)(const XMathsOperation* o, Vec &arr, const Vec &a, const Vec &b);
+  struct Operation
+    {
+	OperationFunction _function;
+	const XMathsOperation *op;
+    }
+  
+  
+  OperationQueue(XAllocatorBase *all, xsize s)
     {
     _allocator = all;
+	_size = s;
     }
 
   static OperationQueue* create(XAllocatorBase *all, xsize count)
     {
     void *ptr = all->alloc(sizeof(OperationQueue) + (sizeof(Operation*)*(count-1)));
-    return new(ptr) OperationQueue(all);
+    return new(ptr) OperationQueue(all, count);
     }
 
   static void destroy(OperationQueue *q)
@@ -240,10 +247,10 @@ struct OperationQueue
     q->_allocator.free(q);
     }
 
-  static xsize buildQueueSize(XMathsOperation *op)
+  static xsize buildQueueSize(const XMathsOperation *op)
     {
-    XMathsOperation *a = op->inputA();
-    XMathsOperation *b = op->inputB();
+    const XMathsOperation *a = op->inputA();
+    const XMathsOperation *b = op->inputB();
 
     xsize count = 1;
     if(a)
@@ -259,17 +266,80 @@ struct OperationQueue
     return count;
     }
 
-  static OperationQueue *buildQueue(XMathsOperation *op)
+  static
+
+  static OperationQueue *buildQueue(const XMathsOperation *op)
     {
     xsize operationSize = buildQueueSize(op);
 
     OperationQueue *q = create(operationSize);
 
+	buildQueue(op, operationSize-1);
+	
     return q;
     }
 
+  void selectOperation(Operation &opData, const XMathsOperation *op)
+    {
+    const XMathsOperation *a = op->inputA();
+    const XMathsOperation *b = op->inputB();
+	
+	uint8 mode = kFastMethod;
+	if(a && b)
+      {
+	  ### images shouldnt have transforms, just offsets.
+	  ##' transform is an operation type
+	  
+	  if(a.offset != b.offset)
+	    {
+		mode = kLongMethod;
+	    }
+	  }
+	  
+	opData.function = g_sampleFunctions[op->operation][mode];
+	opData.operation = op;
+    }
+	
+  xsize buildQueue(XMathsOperation *op, xsize writePoint)
+    {
+    const XMathsOperation *a = op->inputA();
+    const XMathsOperation *b = op->inputB();
+	xsize inputsWritePoint = writePoint-1;
+	if(b)
+	  {
+	  inputsWritePoint = buildQueue(b, inputsWritePoint);
+	  }
+	if(a)
+	  {
+	  inputsWritePoint = buildQueue(a, inputsWritePoint);
+	  }
+	  
+	selectOperation(_operation[writePoint], op);
+	return inputsWritePoint;
+    }
+	
+  void runQueue(XVector2D sampleStart, float scaleFactor, Array &arr)
+    {
+	Vec writePoints[3];
+	
+	for(xsize y = 0, h = arr.cols(); y < h; ++y)
+	  {
+	  for(xsize x = 0, w = arr.rows(); x < w; ++x)
+	    {
+		xuint8 writeIndex[3] = { 0, 1, 2 };
+		
+		for(each function)
+		  {
+		  runFunction(writeTo [0], read from [1], read from [2]);
+		  writeIndex[0] = writeIndex
+		  }
+	    }
+      }
+    }
+	
   XAllocatorBase _allocator;
-  Operation *_operation[1];
+  xsize _size;
+  Operation _operation[1];
   };
 
 #if 0
