@@ -109,16 +109,37 @@ void XMathsOperation::setValue(xuint32 v)
 void XMathsOperation::setInputDirty()
   {
   XMathsEngine::engine()->onInputDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setInputDirty();
+    dep = dep->_nextUser;
+    }
   }
 
 void XMathsOperation::setOperationDirty()
   {
   XMathsEngine::engine()->onOperationDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setOperationDirty();
+    dep = dep->_nextUser;
+    }
   }
 
 void XMathsOperation::setValueDirty()
   {
   XMathsEngine::engine()->onValueDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setValueDirty();
+    dep = dep->_nextUser;
+    }
   }
 
 void XMathsOperation::copy(const XMathsOperation &a)
@@ -133,6 +154,8 @@ void XMathsOperation::load(DataType t, void* data, xsize stride, xsize dataWidth
 
   setOperation(Load);
   _userData = XMathsEngine::engine()->loadData(t, data, stride, dataWidth, dataHeight, dataChannels, m);
+  setInputDirty();
+  setValueDirty();
   }
 
 void XMathsOperation::add(const XMathsOperation &a, const XMathsOperation &b)
