@@ -21,10 +21,10 @@ void SyImageBase::loadQImage(const QImage &imInput, bool premult)
   MCMathsOperation::ComputeLock l(this);
   if(imInput.isNull())
     {
-    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XMatrix3x3::Identity());
+    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XVectorI2D::Zero());
     }
 
-  XMatrix3x3 transform = XMatrix3x3::Identity();
+  XVectorI2D transform = XVectorI2D::Zero();
 
   xsize channels = 3;
   if(imInput.hasAlphaChannel())

@@ -32,7 +32,7 @@ SyImageTexture::SyImageTexture()
   {
   }
 
-void SyImageTexture::computeTexture(const SPropertyInstanceInformation *info, SyImageTexture *cont)
+void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
   {
   GCTexture::ComputeLock l(&cont->texture);
   QImage im = cont->input.asQImage();

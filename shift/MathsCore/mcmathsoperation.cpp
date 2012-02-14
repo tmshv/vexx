@@ -23,37 +23,13 @@ void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
 
 QImage MCMathsOperation::asQImage() const
   {
-  XMathsResult result(value());
+  Eigen::Array<Eigen::Matrix<xint8, 4, 1>, Eigen::Dynamic, Eigen::Dynamic> arr(100, 100);
+  XMathsResult result(value(), XVectorI2D::Zero(), 1, XMathsOperation::Byte, &arr);
 
-  if(result.dataType() == XMathsOperation::None)
-    {
-    qWarning() << "Saving invalid operation";
-    return QImage();
-    }
+  QImage::Format fmt = QImage::Format_ARGB32;
 
-  if(result.dataType() != XMathsOperation::UnsignedInt)
-    {
-    xAssertFail();
-    return QImage();
-    }
-
-  xuint32* data = (xuint32*)result.data();
-  xsize stride = result.dataStride();
-  xsize w = result.dataWidth();
-  xsize h = result.dataHeight();
-  xsize channels = result.dataChannels();
-
-  QImage::Format fmt = QImage::Format_RGB888;
-  if(channels == 4)
-    {
-    fmt = QImage::Format_ARGB32;
-    }
-
-  if(!data)
-    {
-    xAssertFail();
-    return QImage();
-    }
+  xuint32 w = arr.rows();
+  xuint32 h = arr.cols();
 
   QImage im(w, h, fmt);
   uchar *bits = im.bits();
@@ -64,14 +40,15 @@ QImage MCMathsOperation::asQImage() const
     for(xuint32 x = 0; x < w; ++x)
       {
       xuint32 alpha = 255;
-      if(channels == 4)
+      /*if(channels == 4)
         {
         alpha = data[3];
-        }
+        }*/
 
-      *scanline = qRgba(data[0], data[1], data[2], alpha);
+      const Eigen::Matrix<xint8, 4, 1> &data = arr(x, y);
+
+      *scanline = qRgba(data(0), data(1), data(2), alpha);
       scanline++;
-      data = (xuint32*)((xuint8*)data + stride);
       }
     }
 

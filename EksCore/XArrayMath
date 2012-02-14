@@ -122,7 +122,7 @@ private:
 class EKSCORE_EXPORT XMathsEngine
   {
 public:
-  virtual void evaluateData(const XMathsOperation *, const void *userData, XVectorI2D sampleOffset, xuint32 invSampleDensity, XMathsOperation::DataType type, void *data) = 0;
+  virtual void evaluateData(const XMathsOperation *, void **userData, const XVectorI2D &sampleOffset, xuint32 invSampleDensity, XMathsOperation::DataType type, void *data) = 0;
   virtual void *loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XVectorI2D &) = 0;
   virtual void onOperationDirty(const XMathsOperation *, void **userData) = 0;
   virtual void onValueDirty(const XMathsOperation *, void **userData) = 0;
@@ -137,7 +137,7 @@ class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
   {
   virtual void evaluateData(const XMathsOperation *,
                             void **userData,
-                            const XVectorI2D& sampleOffset,
+                            const XVectorI2D &sampleOffset,
                             xuint32 invSampleDensity,
                             XMathsOperation::DataType type,
                             void *data);
@@ -158,15 +158,6 @@ class EKSCORE_EXPORT XReferenceMathsEngine : public XMathsEngine
 
 class EKSCORE_EXPORT XMathsResult
   {
-XProperties:
-  XROProperty(XMathsOperation::DataType, dataType);
-  XROProperty(const void *, data);
-  XROProperty(xsize, dataStride);
-  XROProperty(xsize, dataWidth);
-  XROProperty(xsize, dataHeight);
-  XROProperty(xsize, dataChannels);
-  XRORefProperty(XMatrix3x3, transform);
-
 public:
   XMathsResult(const XMathsOperation &, XVectorI2D tl, xuint32 invSampleDensity, XMathsOperation::DataType type, void *arr);
 
