@@ -154,9 +154,9 @@ void XMathsOperation::load(DataType t, void* data, xsize stride, xsize dataWidth
   setInput(&_inputB, 0);
 
   setOperation(Load);
-  _userData = XMathsEngine::engine()->loadData(t, data, stride, dataWidth, dataHeight, dataChannels, m);
   setInputDirty();
   setValueDirty();
+  _userData = XMathsEngine::engine()->loadData(t, data, stride, dataWidth, dataHeight, dataChannels, m);
   }
 
 void XMathsOperation::add(const XMathsOperation &a, const XMathsOperation &b)
@@ -219,45 +219,96 @@ void XMathsOperation::splice(const XMathsOperation &a, const XMathsOperation &b,
   setValue(mask);
   }
 
-template <typename T> struct OperationQueue
+template <typename T> struct TypeAccessorsBase
   {
   typedef typename Eigen::Matrix <T, 4, 1> Vec;
   typedef typename Eigen::Array <Vec, Eigen::Dynamic, Eigen::Dynamic> Array;
+  };
+
+template <typename T> struct TypeAccessors
+  {
+  };
+
+template <> struct TypeAccessors <float> : public TypeAccessorsBase<float>
+  {
+  static float white() { return 1.0f; }
+  static float black() { return 0.0f; }
+  };
+
+template <> struct TypeAccessors <xuint8> : public TypeAccessorsBase<xuint8>
+  {
+  static xuint8 white() { return 255; }
+  static xuint8 black() { return 0; }
+  };
+
+template <typename T> struct OperationQueue
+  {
+  typedef typename TypeAccessors<T> Type;
+  typedef typename Type::Vec Vec;
+  typedef typename Type::Array Array;
 
   typedef void (*OperationFunction)(const XVectorI2D&, const XMathsOperation* o, Vec &arr, const Vec &);
 
   static void nullOp(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec&)
     {
     arr = Vec::Zero();
-  }
+    }
 
   static void load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
     {
     const void *u = o->userData();
     const QueueHolder *h = (const QueueHolder *)u;
+    xAssert(h->_imageData);
 
     if(h->_type == XMathsOperation::Float)
       {
-      const ImageData<float> *imData = (const ImageData<float> *)h;
+      const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
       XVectorI2D sampleAt = pt - imData->_offset;
       arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
       }
     else if(h->_type == XMathsOperation::Byte)
       {
-      const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h;
+      const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
       XVectorI2D sampleAt = pt - imData->_offset;
       arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
       }
     }
 
-  static void add(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec& b)
+  static void add(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec& b)
     {
     arr = arr + b;
     }
 
-  static void addConst(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
+  static void addConst(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
     {
     arr = arr + o->vectorData().cast<T>();
+    }
+
+  static void shuffle(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
+    {
+    xuint8 comp[4];
+    XMathsOperation::shuffleComponents(o->integerData(), comp);
+
+    Vec in = arr;
+
+    for(xsize i = 0; i < 4; ++i)
+      {
+      if(comp[i] >= 4)
+        {
+        if(comp[i] == XMathsOperation::ShuffleOne)
+          {
+          arr(i) = Type::white();
+          }
+        else
+          {
+          arr(i) = Type::black();
+          }
+        }
+      else
+        {
+        arr(i) = in(comp[i]);
+        }
+      }
     }
 
   struct Operation
@@ -337,7 +388,7 @@ template <typename T> struct OperationQueue
       0,        // Multiply,
       0,        // MultiplyConst,
       0,        // Convolve,
-      0,        // Shuffle,
+      shuffle,  // Shuffle,
       0,        // Splice
     };
 
@@ -389,6 +440,38 @@ template <typename T> struct OperationQueue
       }
     }
 
+  static void loadData(void **input,
+                       const void *data,
+                       xsize stride,
+                       xsize width,
+                       xsize height,
+                       xsize channels,
+                       const XVectorI2D &m)
+    {
+    ImageData<T> *&image = *(ImageData<T>**)input;
+    if(!image)
+      {
+      image = new ImageData<T>;
+      }
+    image->_offset = m;
+
+    T *dataPtr = (T*)data;
+    image->_data.resize(width, height);
+
+    Type::Vec wP(Type::white(),Type::white(), Type::white(), Type::white());
+
+    for(int y = 0; y < image->_data.cols(); ++y)
+      {
+      for(int x = 0; x < image->_data.rows(); ++x)
+        {
+        Type::Vec& v = image->_data(x, y);
+        v = wP;
+        memcpy(v.data(), dataPtr, sizeof(T)*channels);
+        dataPtr += stride;
+        }
+      }
+    }
+
   xsize _storageLocationCount;
   XAllocatorBase *_allocator;
   xsize _size;
@@ -426,6 +509,7 @@ struct QueueHolder
         OperationQueue<xuint8> *data = (OperationQueue<xuint8> *)_queue;
         OperationQueue<xuint8>::destroy(data);
         }
+      _queue = 0;
       }
     }
 
@@ -443,6 +527,7 @@ struct QueueHolder
         ImageData<xuint8> *imData = (ImageData<xuint8> *)_imageData;
         delete imData;
         }
+      _imageData = 0;
       }
     }
 
@@ -513,51 +598,11 @@ void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type,
   xAssert(stride);
   if(type == XMathsOperation::Float)
     {
-    ImageData<float> *&image = *(ImageData<float>**)&ret->_imageData;
-    if(!image)
-      {
-      image = new ImageData<float>;
-      }
-    image->_offset = m;
-
-    float *dataPtr = (float*)data;
-    image->_data.resize(width, height);
-
-    for(int y = 0; y < image->_data.cols(); ++y)
-      {
-      for(int x = 0; x < image->_data.rows(); ++x)
-        {
-        XVector4D& v = image->_data(x, y);
-        memcpy(v.data(), dataPtr, sizeof(float)*channels);
-        dataPtr += stride;
-        }
-      }
+    OperationQueue<float>::loadData(&ret->_imageData, data, stride, width, height, channels, m);
     }
   else if(type == XMathsOperation::Byte)
     {
-    ImageData<xuint8> *&image = *(ImageData<xuint8>**)&ret->_imageData;
-    if(!image)
-      {
-      image = new ImageData<xuint8>;
-      }
-    image->_offset = m;
-
-    ret->_type = XMathsOperation::Byte;
-    xuint8 *dataPtr = (xuint8*)data;
-    image->_data.resize(width, height);
-
-    for(int y = 0; y < image->_data.cols(); ++y)
-      {
-      for(int x = 0; x < image->_data.rows(); ++x)
-        {
-        ImageData<xuint8>::Vec& v = image->_data(x, y);
-        for(int w = 0; w < channels; ++w)
-          {
-          v(w) = dataPtr[w];
-          }
-        dataPtr += stride;
-        }
-      }
+    OperationQueue<xuint8>::loadData(&ret->_imageData, data, stride, width, height, channels, m);
     }
   else
     {
