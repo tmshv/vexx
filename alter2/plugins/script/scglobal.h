@@ -12,8 +12,8 @@
 #endif
 
 #define ScriptProfileScope 502
-#define ScProfileFunction XProfileFunction(ScriptProfileScope)
-#define ScProfileScopedBlock(mess) XProfileScopedBlock(ScriptProfileScope, mess)
+#define ScProfileFunction XProfileFunctionBase(ScriptProfileScope)
+#define ScProfileScopedBlock(mess) XProfileScopedBlockBase(ScriptProfileScope, mess)
 
 S_DEFINE_INTERFACE_TYPE(ScriptInterface, 100)
 

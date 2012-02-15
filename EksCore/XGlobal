@@ -76,4 +76,8 @@ inline void xNoop() { }
 
 #define X_ARRAY_COUNT(x) (sizeof(x)/sizeof(x[0]))
 
+#define XProfileScope 1
+#define XProfileFunction XProfileFunctionBase(XProfileScope)
+#define XProfileFunctionScopedBlock(mess) XProfileScopedBlockBase(XProfileScope, mess)
+
 #endif // XGLOBAL_H

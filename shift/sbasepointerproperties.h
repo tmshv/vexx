@@ -89,6 +89,16 @@ public:
     }
   };
 
+class SPointerComputeLock
+  {
+public:
+  SPointerComputeLock(Pointer *p) : _p(p) { }
+  ~SPointerComputeLock() { _p->pointed(); }
+
+private:
+  Pointer *_p;
+  };
+
 #define S_TYPED_POINTER_TYPE(name, type) \
   class name : public TypedPointer<type> { \
     S_PROPERTY(name, Pointer, 0); }; \

@@ -273,6 +273,7 @@ public: class InstanceInformation : public SPODProperty<type, name>::InstanceInf
     { public: \
     InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
   enum { Type = typeID }; \
+  typedef type PODType; \
   S_PROPERTY(name, SProperty, 0); \
   name(); \
   name &operator=(const type &in) { \

@@ -3,6 +3,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "QRect"
+#include "XProfiler"
 #include "XAllocatorBase"
 
 XMathsEngine *g_engine = 0;
@@ -256,6 +257,7 @@ template <typename T> struct OperationQueue
 
   static void load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
     {
+    XProfileFunction
     const void *u = o->userData();
     const QueueHolder *h = (const QueueHolder *)u;
 
@@ -265,6 +267,10 @@ template <typename T> struct OperationQueue
         {
         const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
         XVectorI2D sampleAt = pt - imData->_offset;
+
+        sampleAt.x() = xMin(sampleAt.rows(), xMax(sampleAt.x(), 0));
+        sampleAt.y() = xMin(sampleAt.cols(), xMax(sampleAt.y(), 0));
+
         arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
         }
       else if(h->_type == XMathsOperation::Byte)
@@ -278,16 +284,19 @@ template <typename T> struct OperationQueue
 
   static void add(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec& b)
     {
+    XProfileFunction
     arr = arr + b;
     }
 
   static void addConst(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
     {
+    XProfileFunction
     arr = arr + o->vectorData().cast<T>();
     }
 
   static void shuffle(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
     {
+    XProfileFunction
     xuint8 comp[4];
     XMathsOperation::shuffleComponents(o->integerData(), comp);
 
@@ -360,6 +369,7 @@ template <typename T> struct OperationQueue
 
   static OperationQueue *buildQueue(const XMathsOperation *op, XAllocatorBase *all)
     {
+    XProfileFunction
     xsize operationSize = buildQueueSize(op);
 
     OperationQueue<T> *q = create(all, operationSize);
@@ -423,6 +433,7 @@ template <typename T> struct OperationQueue
 
   void runQueue(XVectorI2D sampleStart, xuint32 invSampleFreq, Array &arr)
     {
+    XProfileFunction
     xAssert(_storageLocationCount > 0);
     Vec *writePoints = new Vec[_storageLocationCount];
 

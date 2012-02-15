@@ -13,7 +13,7 @@ public:
   static void assignProperty(const SProperty *, SProperty *);
 
   bool saveResultToFile(QString filename);
-  QImage asQImage() const;
+  QImage asQImage(const XVectorI2D &pt, xuint32 w, xuint32 h) const;
   };
 
 #endif // MCMATHSOPERATION_H

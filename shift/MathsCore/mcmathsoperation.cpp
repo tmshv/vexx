@@ -14,6 +14,7 @@ SPropertyInformation *MCMathsOperation::createTypeInformation()
 
 void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
   {
+  MCProfileFunction
   MCMathsOperation *to = t->uncheckedCastTo<MCMathsOperation>();
   const MCMathsOperation *from = f->uncheckedCastTo<MCMathsOperation>();
 
@@ -21,15 +22,13 @@ void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
   l.data()->copy(from->value());
   }
 
-QImage MCMathsOperation::asQImage() const
+QImage MCMathsOperation::asQImage(const XVectorI2D &pt, xuint32 w, xuint32 h) const
   {
-  Eigen::Array<Eigen::Matrix<xint8, 4, 1>, Eigen::Dynamic, Eigen::Dynamic> arr(100, 100);
-  XMathsResult result(value(), XVectorI2D::Zero(), 1, XMathsOperation::Byte, &arr);
+  MCProfileFunction
+  Eigen::Array<Eigen::Matrix<xint8, 4, 1>, Eigen::Dynamic, Eigen::Dynamic> arr(w, h);
+  XMathsResult result(value(), pt, 1, XMathsOperation::Byte, &arr);
 
   QImage::Format fmt = QImage::Format_ARGB32;
-
-  xuint32 w = arr.rows();
-  xuint32 h = arr.cols();
 
   QImage im(w, h, fmt);
   uchar *bits = im.bits();
@@ -56,9 +55,9 @@ QImage MCMathsOperation::asQImage() const
   }
 
 bool MCMathsOperation::saveResultToFile(QString filename)
-  {
+  {/*
   QImage im = asQImage();
-  im.save(filename);
+  im.save(filename);*/
   return true;
   }
 

@@ -6,8 +6,8 @@
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-#define SDataModelProfileFunction XProfileFunction(ShiftDataModelProfileScope)
-#define SDataModelProfileScopedBlock(mess) XProfileScopedBlock(ShiftDataModelProfileScope, mess)
+#define SDataModelProfileFunction XProfileFunctionBase(ShiftDataModelProfileScope)
+#define SDataModelProfileScopedBlock(mess) XProfileScopedBlockBase(ShiftDataModelProfileScope, mess)
 
 SDatabaseDelegate::SDatabaseDelegate(QObject *parent) : QItemDelegate(parent), _currentWidget(0)
   {

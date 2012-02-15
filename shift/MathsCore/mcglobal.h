@@ -10,9 +10,8 @@
 # define MATHSCORE_EXPORT X_DECL_IMPORT
 #endif
 
-
-#define MCProfileScope 1090
-#define MCProfileFunction XProfileFunction(MCProfileScope)
-#define MCProfileFunctionScopedBlock(mess) XProfileScopedBlock(MCProfileScope, mess)
+#define MCProfileScope 1091
+#define MCProfileFunction XProfileFunctionBase(MCProfileScope)
+#define MCProfileFunctionScopedBlock(mess) XProfileScopedBlockBase(MCProfileScope, mess)
 
 #endif // MCGLOBAL_H
