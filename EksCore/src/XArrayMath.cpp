@@ -258,19 +258,21 @@ template <typename T> struct OperationQueue
     {
     const void *u = o->userData();
     const QueueHolder *h = (const QueueHolder *)u;
-    xAssert(h->_imageData);
 
-    if(h->_type == XMathsOperation::Float)
+    if(h->_imageData)
       {
-      const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
-      XVectorI2D sampleAt = pt - imData->_offset;
-      arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
-      }
-    else if(h->_type == XMathsOperation::Byte)
-      {
-      const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
-      XVectorI2D sampleAt = pt - imData->_offset;
-      arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
+      if(h->_type == XMathsOperation::Float)
+        {
+        const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
+        XVectorI2D sampleAt = pt - imData->_offset;
+        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
+        }
+      else if(h->_type == XMathsOperation::Byte)
+        {
+        const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
+        XVectorI2D sampleAt = pt - imData->_offset;
+        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
+        }
       }
     }
 
