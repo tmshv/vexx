@@ -45,7 +45,8 @@
         {
           "__T":"GCTexturePointer",
           "name":"texture",
-          "dynamic":"1"
+          "dynamic":"1",
+          "affects":"runtimeShader"
         }
       ]
     }

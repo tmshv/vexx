@@ -20,7 +20,10 @@ db.addType({
     },
     {
       "name": "texture",
-      "type": "GCTexturePointer"
+      "type": "GCTexturePointer",
+      "affects": [
+        "runtimeShader"
+      ]
     },
     {
       "name": "Vert",

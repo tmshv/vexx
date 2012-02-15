@@ -15,6 +15,7 @@
 #include "QFileDialog"
 #include "QHBoxLayout"
 
+#include "sentityweakpointer.h"
 #include "sproperty.h"
 #include "XProperty"
 
@@ -30,11 +31,16 @@ public:
   SUIBase(SProperty *p) : _isAlreadySetting(false), _value(p->castTo<T>()), _dirty(false)
     {
     xAssert(_value);
-    _value->entity()->addDirtyObserver(this);
+    _entity = _value->entity();
+    xAssert(_entity);
+    _entity->addDirtyObserver(this);
     }
   ~SUIBase()
     {
-    _value->entity()->removeDirtyObserver(this);
+    if(_entity)
+      {
+      _entity->removeDirtyObserver(this);
+      }
     }
 
   T *propertyValue() {return _value;}
@@ -51,7 +57,7 @@ private:
   virtual void actOnChanges()
     {
     SProfileFunction
-    if(_dirty)
+    if(_dirty && !_isAlreadySetting)
       {
       _isAlreadySetting = true;
       syncGUI();
@@ -60,6 +66,7 @@ private:
       }
     }
   T *_value;
+  SEntityWeakPointer _entity;
   bool _dirty;
   };
 
