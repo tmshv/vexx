@@ -27,8 +27,13 @@ public:
   UnsignedIntProperty imageHeight;
 
 private:
+  void queueThreadedUpdate();
+
   static void computeTransform(const SPropertyInstanceInformation *, SyImageTexture *cont);
   static void computeTexture(const SPropertyInstanceInformation *info, SyImageTexture *cont);
+
+  class EvalThread;
+  EvalThread* _loadThread;
   };
 
 #endif // SYIMAGETEXTURE_H

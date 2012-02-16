@@ -1,4 +1,6 @@
 #include "syimagetexture.h"
+#include "QThread"
+#include "QPainter"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
 
@@ -48,7 +50,7 @@ SPropertyInformation *SyImageTexture::createTypeInformation()
   return info;
   }
 
-SyImageTexture::SyImageTexture()
+SyImageTexture::SyImageTexture() : _loadThread(0)
   {
   }
 
@@ -104,10 +106,94 @@ void SyImageTexture::computeTransform(const SPropertyInstanceInformation *, SyIm
     }
   }
 
+class SyImageTexture::EvalThread : public QThread
+  {
+XProperties:
+  XProperty(SyImageTexture *, texture, setTexture);
+
+public:
+  EvalThread(SyImageTexture *i) : _texture(i), _do(false)
+    {
+    }
+
+  void reset()
+    {
+    QMutexLocker l(&_lock);
+    _do = true;
+    }
+
+  virtual void run()
+    {
+    bool stateEnabled = _texture->database()->stateStorageEnabled();
+    _texture->database()->setStateStorageEnabled(false);
+
+    GCTexture::ComputeLock cL(&_texture->texture);
+
+    do
+    {
+      QImage im;
+      xuint32 w;
+      xuint32 h;
+        {
+        QMutexLocker l(&_lock);
+        _do = false;
+
+        w = _texture->imageWidth();
+        h = _texture->imageHeight();
+        if(im.width() != w || im.height() != h)
+          {
+          im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
+          }
+        im = cL.data()->texture();
+        }
+
+      static const xsize segSize = 64;
+      xsize itW  = (w / segSize) + 1;
+      xsize itH = (h / segSize) + 1;
+
+      QImage tmp(segSize, segSize, QImage::Format_ARGB32_Premultiplied);
+      XVectorI2D start = _texture->imageOffset().cast<xint32>();
+      for(xsize y = 0; y < itH; ++y)
+        {
+        for(xsize x = 0; x < itW; ++x)
+          {
+          //tmp = _texture.input.asQImage(start + XVectorI2D(segSize*x, segSize*y), segSize, segSize);
+          tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
+
+          QPainter p(&im);
+
+          p.drawImage(x*segSize, y*segSize, tmp);
+
+          cL.data()->load(im);
+          QThread::msleep(100);
+          }
+        }
+      } while(_do == true);
+
+    _texture->database()->setStateStorageEnabled(stateEnabled);
+    }
+
+private:
+  QMutex _lock;
+  bool _do;
+  };
+
+void SyImageTexture::queueThreadedUpdate()
+  {
+  if(!_loadThread)
+    {
+    _loadThread = new EvalThread(this);
+    }
+
+  _loadThread->reset();
+
+  if(!_loadThread->isRunning())
+    {
+    _loadThread->start();
+    }
+  }
+
 void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
   {
-  GCTexture::ComputeLock l(&cont->texture);
-  QImage im = cont->input.asQImage(cont->imageOffset().cast<xint32>(), cont->imageWidth(), cont->imageHeight());
-
-  l.data()->load(im, XTexture::None);
+  cont->queueThreadedUpdate();
   }

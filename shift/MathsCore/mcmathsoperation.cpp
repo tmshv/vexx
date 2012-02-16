@@ -22,11 +22,11 @@ void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
   l.data()->copy(from->value());
   }
 
-QImage MCMathsOperation::asQImage(const XVectorI2D &pt, xuint32 w, xuint32 h) const
+QImage MCMathsOperation::asQImage(const XVectorI2D &pt, xuint32 scale, xuint32 w, xuint32 h) const
   {
   MCProfileFunction
   Eigen::Array<Eigen::Matrix<xint8, 4, 1>, Eigen::Dynamic, Eigen::Dynamic> arr(w, h);
-  XMathsResult result(value(), pt, 1, XMathsOperation::Byte, &arr);
+  XMathsResult result(value(), pt, scale, XMathsOperation::Byte, &arr);
 
   QImage::Format fmt = QImage::Format_ARGB32;
 
