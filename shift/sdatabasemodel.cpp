@@ -536,9 +536,9 @@ QVariant SDatabaseModel::headerData(int section, Qt::Orientation orientation, in
 
 Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
-  xAssert(!_currentTreeChange);
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
+  xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);
   if(prop && index.column() < 2)
     {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;

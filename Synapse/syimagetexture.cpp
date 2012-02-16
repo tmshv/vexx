@@ -127,29 +127,35 @@ public:
     bool stateEnabled = _texture->database()->stateStorageEnabled();
     _texture->database()->setStateStorageEnabled(false);
 
-    GCTexture::ComputeLock cL(&_texture->texture);
-
+    qDebug() << "Run Thread";
     do
     {
+      qDebug() << "Start job";
       QImage im;
       xuint32 w;
       xuint32 h;
+      
+      im = _texture->texture().texture();
         {
         QMutexLocker l(&_lock);
         _do = false;
 
         w = _texture->imageWidth();
         h = _texture->imageHeight();
+
         if(im.width() != w || im.height() != h)
           {
           im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
           }
-        im = cL.data()->texture();
         }
 
       static const xsize segSize = 64;
       xsize itW  = (w / segSize) + 1;
       xsize itH = (h / segSize) + 1;
+
+
+      qDebug() << "Dims:" << w << h;
+      qDebug() << "Segs:" << itW << itH;
 
       QImage tmp(segSize, segSize, QImage::Format_ARGB32_Premultiplied);
       XVectorI2D start = _texture->imageOffset().cast<xint32>();
@@ -157,6 +163,8 @@ public:
         {
         for(xsize x = 0; x < itW; ++x)
           {
+          GCTexture::ComputeLock cL(&_texture->texture);
+
           //tmp = _texture.input.asQImage(start + XVectorI2D(segSize*x, segSize*y), segSize, segSize);
           tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
 
@@ -165,9 +173,11 @@ public:
           p.drawImage(x*segSize, y*segSize, tmp);
 
           cL.data()->load(im);
+          _texture->postSet();
           QThread::msleep(100);
           }
         }
+      qDebug() << "job complete" << _do;
       } while(_do == true);
 
     _texture->database()->setStateStorageEnabled(stateEnabled);
@@ -195,5 +205,6 @@ void SyImageTexture::queueThreadedUpdate()
 
 void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
   {
+  qDebug() << "Eval Texture";
   cont->queueThreadedUpdate();
   }

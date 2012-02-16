@@ -73,7 +73,7 @@ ScSurface::ScSurface(ScPlugin *plugin) : UISurface("Script", new QWidget(), UISu
 
   _log = new QTextEdit(widget());
   g_oldHandler = qInstallMsgHandler(logHandler);
-  connect(this, SIGNAL(threadSafeLogSignal(QtMsgType, QString)), this, SLOT(appendToLog(QtMsgType, QString)));
+  connect(this, SIGNAL(threadSafeLogSignal(int, QString)), this, SLOT(appendToLog(int, QString)), Qt::AutoConnection);
   splitter->addWidget(_log);
   _log->setReadOnly(true);
 
@@ -128,12 +128,12 @@ void ScSurface::executeDebugged()
   _plugin->enableDebugging(debugged);
   }
 
-void ScSurface::threadSafeLog(QtMsgType t, const QString &message)
+void ScSurface::threadSafeLog(int t, const QString &message)
   {
   emit threadSafeLogSignal(t, message);
   }
 
-void ScSurface::appendToLog(QtMsgType t, const QString &message)
+void ScSurface::appendToLog(int t, const QString &message)
   {
   QString finalMessage = message + "\n";
 

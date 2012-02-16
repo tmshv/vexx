@@ -20,6 +20,7 @@ private slots:
   void disconnectInput();
   void disconnectOutput();
   void copyPath();
+  void swapDirty();
   void saveProperty();
   void loadProperty();
 
