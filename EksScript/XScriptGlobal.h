@@ -1,0 +1,5 @@
+#ifndef XSCRIPTGLOBAL_H
+#define XSCRIPTGLOBAL_H
+
+
+#endif // XSCRIPTGLOBAL_H
