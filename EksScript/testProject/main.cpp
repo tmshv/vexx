@@ -7,6 +7,17 @@ using namespace v8;
 class SomeClass
 {
 public:
+
+  int getNonStatic()
+  {
+    return nonStatic;
+  }
+
+  void setNonStatic(const int &inA)
+  {
+    nonStatic = inA;
+  }
+
   static int getA()
   {
     return a;
@@ -17,6 +28,7 @@ public:
     a = inA;
   }
 
+  int nonStatic;
   static int a;
 };
 
@@ -103,6 +115,24 @@ void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *g
   tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)wrap.get, (v8::AccessorSetter)wrap.set, data);
 }
 
+Handle<Value> GetPointX(Local<String> property,
+                        const AccessorInfo &info)
+{
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+  int value = static_cast<SomeClass*>(ptr)->getNonStatic();
+  return Integer::New(value);
+}
+
+void SetPointX(Local<String> property, Local<Value> value,
+               const AccessorInfo& info)
+{
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+  static_cast<SomeClass*>(ptr)->setNonStatic(value->Int32Value());
+}
 
 int main(int argc, char* argv[])
 {
@@ -110,6 +140,12 @@ int main(int argc, char* argv[])
   HandleScope handle_scope;
 
   Handle<ObjectTemplate> global_templ = ObjectTemplate::New();
+
+  Handle<ObjectTemplate> point_templ = ObjectTemplate::New();
+  point_templ->SetAccessor(String::New("x"), GetPointX, SetPointX);
+  point_templ->SetInternalFieldCount(1);
+
+
 
   TypeWrapper::wrapType<int>();
   addAccessor(global_templ, "a", QMetaTypeId2<int>::qt_metatype_id(), SomeClass::getA, SomeClass::setA);
@@ -121,14 +157,29 @@ int main(int argc, char* argv[])
   // running the hello world script.
   Context::Scope context_scope(context);
 
+  SomeClass c;
+  Local<Object> obj = point_templ->NewInstance();
+  obj->SetInternalField(0, External::New(&c));
+
+  Handle<String> propName = String::New("someClass");
+  context->Global()->Set(propName, obj);
+
   // Create a string containing the JavaScript source code.
-  Handle<String> source = String::New("a = 5; 'Hello' + a.toString();");
+  Handle<String> source = String::New("a = 5; someClass.x = 1; 'Hello' + a.toString() + someClass.x.toString();");
 
   // Compile the source code.
   Handle<Script> script = Script::Compile(source);
 
+  TryCatch trycatch;
   // Run the script to get the result.
   Handle<Value> result = script->Run();
+
+  if (result.IsEmpty()) {  
+    Handle<Value> exception = trycatch.Exception();
+    String::AsciiValue exception_str(exception);
+    printf("Exception: %s\n", *exception_str);
+    // ...
+  }
 
   // Dispose the persistent context.
   context.Dispose();
