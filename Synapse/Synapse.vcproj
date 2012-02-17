@@ -75,10 +75,10 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
-				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmaind.lib ..//bin/\alter.lib ..//bin/\EksCore.lib ..//bin/\script.lib ..//bin/\ShiftAlter.lib ..//bin/\shift.lib ..//bin/\ShiftGraphicsCore.lib ..//bin/\ShiftMathsCore.lib ..//bin/\SynapseCore.lib ..//bin/\UI.lib ..//bin/\Eks3D.lib $(QTDIR)\lib\QtOpenGLd4.lib $(QTDIR)\lib\QtGuid4.lib $(QTDIR)\lib\QtCored4.lib"
+				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib qtmaind.lib ..//bin/\alter.lib ..//bin/\EksCore.lib ..//bin/\script.lib ..//bin/\ShiftAlter.lib ..//bin/\shift.lib ..//bin/\ShiftGraphicsCore.lib ..//bin/\ShiftMathsCore.lib ..//bin/\SynapseCore.lib ..//bin/\UI.lib ..//bin/\Eks3D.lib QtOpenGLd4.lib QtGuid4.lib QtCored4.lib"
 				OutputFile="$(OutDir)\Synapse.exe"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(QTDIR)\lib,c:\QtSDK\Desktop\Qt\4.8.0\msvc2008\lib,C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(QTDIR)\lib&quot;;C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=""
 				SubSystem="2"
@@ -166,11 +166,11 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
-				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmain.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\alter.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\EksCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\script.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftAlter.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\shift.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftGraphicsCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftMathsCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\SynapseCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\UI.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\Eks3D.lib $(QTDIR)\lib\QtOpenGL4.lib $(QTDIR)\lib\QtGui4.lib $(QTDIR)\lib\QtCore4.lib"
+				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib qtmain.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\alter.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\EksCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\script.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftAlter.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\shift.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftGraphicsCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\ShiftMathsCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\SynapseCore.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\UI.lib C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/\Eks3D.lib QtOpenGL4.lib QtGui4.lib QtCore4.lib"
 				OutputFile="$(OutDir)\Synapse.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(QTDIR)\lib,c:\QtSDK\Desktop\Qt\4.8.0\msvc2008\lib,C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;$(QTDIR)\lib&quot;;C:/Users/Jorj/CodeVexxLocal/EksCore/..//bin/"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="2"
@@ -248,14 +248,80 @@
 			<File
 				RelativePath="sydocument.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="syimagenode.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="syimagetexture.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Moc&apos;ing syimagetexture.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DSYNAPSE_BUILD -DQT_DLL -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MathsCore&quot; &quot;-I.\..\Alter2\plugins\script&quot; &quot;-I.\..\Alter2\plugins\ShiftAlter&quot; &quot;-I.\..\shift&quot; &quot;-I.\SynapseCore&quot; &quot;-I.\..\Alter2\plugins\UI&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.0\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Moc&apos;ing syimagetexture.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;  -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DSYNAPSE_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\Alter2&quot; &quot;-I.\..\EksCore&quot; &quot;-I.\..\Eks3D\include&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MathsCore&quot; &quot;-I.\..\Alter2\plugins\script&quot; &quot;-I.\..\Alter2\plugins\ShiftAlter&quot; &quot;-I.\..\shift&quot; &quot;-I.\SynapseCore&quot; &quot;-I.\..\Alter2\plugins\UI&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.0\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="syinterface.h"
@@ -286,10 +352,54 @@
 			<File
 				RelativePath="synodecanvas.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="sypreviewviewport.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Build Step"
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="syviewer.h"
@@ -329,6 +439,18 @@
 				SourceControlFiles="false"
 				>
 				<File
+					RelativePath=".\Debug\moc_syimagetexture.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\Debug\moc_syinterface.cpp"
 					>
 					<FileConfiguration
@@ -359,6 +481,18 @@
 				SourceControlFiles="false"
 				>
 				<File
+					RelativePath=".\Release\moc_syimagetexture.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\Release\moc_syinterface.cpp"
 					>
 					<FileConfiguration
@@ -386,10 +520,6 @@
 		</Filter>
 	</Files>
 	<Globals>
-		<Global
-			Name="QtVersion Win32"
-			Value="4.8.0"
-		/>
 		<Global
 			Name="RccDir"
 			Value=".\GeneratedFiles"

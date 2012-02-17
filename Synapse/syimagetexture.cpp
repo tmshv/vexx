@@ -1,5 +1,4 @@
 #include "syimagetexture.h"
-#include "QThread"
 #include "QPainter"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
@@ -106,93 +105,12 @@ void SyImageTexture::computeTransform(const SPropertyInstanceInformation *, SyIm
     }
   }
 
-class SyImageTexture::EvalThread : public QThread
-  {
-XProperties:
-  XProperty(SyImageTexture *, texture, setTexture);
-
-public:
-  EvalThread(SyImageTexture *i) : _texture(i), _do(false)
-    {
-    }
-
-  void reset()
-    {
-    QMutexLocker l(&_lock);
-    _do = true;
-    }
-
-  virtual void run()
-    {
-    bool stateEnabled = _texture->database()->stateStorageEnabled();
-    _texture->database()->setStateStorageEnabled(false);
-
-    qDebug() << "Run Thread";
-    do
-    {
-      qDebug() << "Start job";
-      QImage im;
-      xuint32 w;
-      xuint32 h;
-      
-      im = _texture->texture().texture();
-        {
-        QMutexLocker l(&_lock);
-        _do = false;
-
-        w = _texture->imageWidth();
-        h = _texture->imageHeight();
-
-        if(im.width() != w || im.height() != h)
-          {
-          im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
-          }
-        }
-
-      static const xsize segSize = 64;
-      xsize itW  = (w / segSize) + 1;
-      xsize itH = (h / segSize) + 1;
-
-
-      qDebug() << "Dims:" << w << h;
-      qDebug() << "Segs:" << itW << itH;
-
-      QImage tmp(segSize, segSize, QImage::Format_ARGB32_Premultiplied);
-      XVectorI2D start = _texture->imageOffset().cast<xint32>();
-      for(xsize y = 0; y < itH; ++y)
-        {
-        for(xsize x = 0; x < itW; ++x)
-          {
-          GCTexture::ComputeLock cL(&_texture->texture);
-
-          //tmp = _texture.input.asQImage(start + XVectorI2D(segSize*x, segSize*y), segSize, segSize);
-          tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
-
-          QPainter p(&im);
-
-          p.drawImage(x*segSize, y*segSize, tmp);
-
-          cL.data()->load(im);
-          _texture->postSet();
-          QThread::msleep(100);
-          }
-        }
-      qDebug() << "job complete" << _do;
-      } while(_do == true);
-
-    _texture->database()->setStateStorageEnabled(stateEnabled);
-    }
-
-private:
-  QMutex _lock;
-  bool _do;
-  };
-
 void SyImageTexture::queueThreadedUpdate()
   {
   if(!_loadThread)
     {
     _loadThread = new EvalThread(this);
+    QObject::connect(_loadThread, SIGNAL(segmentFinished(int x, int y, QImage im)), this, SLOT(loadIntoTexture(int x, int y, QImage tex)), Qt::QueuedConnection);
     }
 
   _loadThread->reset();
@@ -203,8 +121,70 @@ void SyImageTexture::queueThreadedUpdate()
     }
   }
 
+void SyImageTexture::loadIntoTexture(int x, int y, QImage tex)
+  {  
+  /*
+  bool stateEnabled = _texture->database()->stateStorageEnabled();
+  _texture->database()->setStateStorageEnabled(false);
+  GCTexture::ComputeLock cL(&texture);
+  QPainter p(&tex);
+
+  p.drawImage(x, y, tex);
+
+  cL.data()->load(im);
+  if(!texture.isDirty())
+    {
+    texture.postSet();
+    }
+
+  _texture->database()->setStateStorageEnabled(stateEnabled);
+  */
+  }
+
 void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
   {
   qDebug() << "Eval Texture";
   cont->queueThreadedUpdate();
   }
+
+void SyImageTexture::EvalThread::run()
+{
+  qDebug() << "Run Thread";
+  do
+  {
+    qDebug() << "Start job";
+    xuint32 w;
+    xuint32 h;
+
+    {
+      QMutexLocker l(&_lock);
+      _do = false;
+
+      w = _texture->imageWidth();
+      h = _texture->imageHeight();
+    }
+
+    static const xsize segSize = 64;
+    xsize itW  = (w / segSize) + 1;
+    xsize itH = (h / segSize) + 1;
+
+
+    qDebug() << "Dims:" << w << h;
+    qDebug() << "Segs:" << itW << itH;
+
+    QImage tmp(segSize, segSize, QImage::Format_ARGB32_Premultiplied);
+    XVectorI2D start = _texture->imageOffset().cast<xint32>();
+    for(xsize y = 0; y < itH; ++y)
+    {
+      for(xsize x = 0; x < itW; ++x)
+      {
+        //tmp = _texture.input.asQImage(start + XVectorI2D(segSize*x, segSize*y), segSize, segSize);
+        tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
+
+        emit segmentFinished(x*segSize, y*segSize, tmp);
+        QThread::msleep(100);
+      }
+    }
+    qDebug() << "job complete" << _do;
+  } while(_do == true);
+}
