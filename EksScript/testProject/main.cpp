@@ -53,7 +53,7 @@ struct WrappedStaticProperty
   void *set;
 
   template <typename T>
-  static Handle<Value> Getter(Local<String>, const AccessorInfo& info)
+  static Handle<Value> StaticGetter(Local<String>, const AccessorInfo& info)
   {
     Local<Value> v = info.Data();
     WrappedStaticProperty *p = (WrappedStaticProperty *)External::Unwrap(v);
@@ -67,7 +67,7 @@ struct WrappedStaticProperty
   }
 
   template <typename T>
-  static void Setter(Local<String>, Local<Value> value, const AccessorInfo& info)
+  static void StaticSetter(Local<String>, Local<Value> value, const AccessorInfo& info)
   {
     Local<Value> v = info.Data();
     WrappedStaticProperty *p = (WrappedStaticProperty *)External::Unwrap(v);
@@ -79,17 +79,56 @@ struct WrappedStaticProperty
   }
 };
 
+struct WrappedProperty
+{
+  void *get[2];
+  void *set[2];
+
+  template <typename CLASS, typename T>
+  static Handle<Value> GetHelper(Local<String>, const AccessorInfo& info)
+  {
+    Local<Value> v = info.Data();
+    WrappedProperty *p = (WrappedProperty *)External::Unwrap(v);
+
+    Local<Object> self = info.Holder();
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+    void* ptr = wrap->Value();
+
+    typedef T (CLASS::*GET)();
+    GET g = *(GET*)p->get;
+
+    T val = (static_cast<CLASS*>(ptr)->*g)();
+    return Pack<T>(val);
+  }
+
+  template <typename CLASS, typename T>
+  static void SetHelper(Local<String>, Local<Value> value, const AccessorInfo& info)
+  {
+    Local<Value> v = info.Data();
+    WrappedProperty *p = (WrappedProperty *)External::Unwrap(v);
+
+    Local<Object> self = info.Holder();
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+    void* ptr = wrap->Value();
+
+    typedef void (CLASS::*SET)(const T &);
+    SET s = *(SET*)p->set;
+
+    (static_cast<CLASS*>(ptr)->*s)(Unpack<T>(value));
+  }
+};
+
 class TypeWrapper
 {
 public:
-  void *get;
-  void *set;
+  void *staticGet;
+  void *staticSet;
 
   template <typename T> static void wrapType()
   {
-    v8::AccessorGetter g = WrappedStaticProperty::Getter<T>;
-    v8::AccessorSetter s = WrappedStaticProperty::Setter<T>;
-    TypeWrapper t = { (void*)g, (void*)s };
+    v8::AccessorGetter sG = WrappedStaticProperty::StaticGetter<T>;
+    v8::AccessorSetter sS = WrappedStaticProperty::StaticSetter<T>;
+    TypeWrapper t = { (void*)sG, (void*)sS };
     _wrappedTypes.insert(QMetaTypeId2<int>::qt_metatype_id(), t);
       
   }
@@ -103,7 +142,7 @@ public:
 };
 QHash<int, TypeWrapper> TypeWrapper::_wrappedTypes;
 
-void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *get, void *set)
+void addStaticAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *get, void *set)
 {
   WrappedStaticProperty* wrappedData = new WrappedStaticProperty;
   wrappedData->get = get;
@@ -112,10 +151,37 @@ void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *g
   Handle<Value> data = External::Wrap(wrappedData);
 
   const TypeWrapper wrap = TypeWrapper::findType(id);
-  tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)wrap.get, (v8::AccessorSetter)wrap.set, data);
+  tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)wrap.staticGet, (v8::AccessorSetter)wrap.staticSet, data);
 }
 
-Handle<Value> GetPointX(Local<String> property,
+void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *get, void *set, void *gMem[2], void *sMem[2])
+{
+  WrappedProperty* wrappedData = new WrappedProperty;
+  memcpy(wrappedData->get, gMem, sizeof(void*)*2);
+  memcpy(wrappedData->set, sMem, sizeof(void*)*2);
+
+  Handle<Value> data = External::Wrap(wrappedData);
+
+  tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)get, (v8::AccessorSetter)set, data);
+}
+
+template <typename T, class CLASS, typename GETFUNC, typename SETFUNC>
+void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, GETFUNC g,  SETFUNC s)
+{
+  _ASSERT(sizeof(g) <= (sizeof(void *)*2));
+  _ASSERT(sizeof(s) <= (sizeof(void *)*2));
+  v8::AccessorGetter getNoClass = WrappedProperty::GetHelper<CLASS, T>;
+  v8::AccessorSetter setNoClass = WrappedProperty::SetHelper<CLASS, T>;
+
+  void *gV[2];
+  void *sV[2];
+  memcpy(gV, &g, sizeof(void*)*2);
+  memcpy(sV, &s, sizeof(void*)*2);
+
+  addAccessor(tmpl, name, 0, getNoClass, setNoClass, gV, sV);
+}
+
+Handle<Value> GetPointX(Local<String>,
                         const AccessorInfo &info)
 {
   Local<Object> self = info.Holder();
@@ -125,7 +191,7 @@ Handle<Value> GetPointX(Local<String> property,
   return Integer::New(value);
 }
 
-void SetPointX(Local<String> property, Local<Value> value,
+void SetPointX(Local<String>, Local<Value> value,
                const AccessorInfo& info)
 {
   Local<Object> self = info.Holder();
@@ -134,7 +200,7 @@ void SetPointX(Local<String> property, Local<Value> value,
   static_cast<SomeClass*>(ptr)->setNonStatic(value->Int32Value());
 }
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
   // Create a stack-allocated handle scope.
   HandleScope handle_scope;
@@ -145,10 +211,9 @@ int main(int argc, char* argv[])
   point_templ->SetAccessor(String::New("x"), GetPointX, SetPointX);
   point_templ->SetInternalFieldCount(1);
 
-
-
   TypeWrapper::wrapType<int>();
-  addAccessor(global_templ, "a", QMetaTypeId2<int>::qt_metatype_id(), SomeClass::getA, SomeClass::setA);
+  addStaticAccessor(point_templ, "a", QMetaTypeId2<int>::qt_metatype_id(), SomeClass::getA, SomeClass::setA);
+  addAccessor<int, SomeClass>(point_templ, "x", &SomeClass::getNonStatic, &SomeClass::setNonStatic);
 
   // Create a new context.
   Persistent<Context> context = Context::New(NULL, global_templ);
@@ -165,7 +230,7 @@ int main(int argc, char* argv[])
   context->Global()->Set(propName, obj);
 
   // Create a string containing the JavaScript source code.
-  Handle<String> source = String::New("a = 5; someClass.x = 1; 'Hello' + a.toString() + someClass.x.toString();");
+  Handle<String> source = String::New("someClass.a = 5; someClass.x = 1; 'Hello' + someClass.a.toString() + someClass.x.toString();");
 
   // Compile the source code.
   Handle<Script> script = Script::Compile(source);
