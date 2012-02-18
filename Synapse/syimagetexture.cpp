@@ -109,8 +109,9 @@ void SyImageTexture::queueThreadedUpdate()
   {
   if(!_loadThread)
     {
+    _localWorker = new LocalWorker(this);
     _loadThread = new EvalThread(this);
-    QObject::connect(_loadThread, SIGNAL(segmentFinished(int x, int y, QImage im)), this, SLOT(loadIntoTexture(int x, int y, QImage tex)), Qt::QueuedConnection);
+    QObject::connect(_loadThread, SIGNAL(segmentFinished(int, int, QImage)), _localWorker, SLOT(loadIntoTexture(int, int, QImage)), Qt::QueuedConnection);
     }
 
   _loadThread->reset();
@@ -121,24 +122,33 @@ void SyImageTexture::queueThreadedUpdate()
     }
   }
 
-void SyImageTexture::loadIntoTexture(int x, int y, QImage tex)
-  {  
-  /*
+void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
+  {   
   bool stateEnabled = _texture->database()->stateStorageEnabled();
   _texture->database()->setStateStorageEnabled(false);
-  GCTexture::ComputeLock cL(&texture);
-  QPainter p(&tex);
+  GCTexture::ComputeLock cL(&_texture->texture);
+  QImage im = _texture->texture().texture();
+
+  xuint32 w = _texture->imageWidth();
+  xuint32 h = _texture->imageHeight();
+  if(im.width() != w || im.height() != h)
+    {
+    im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
+    }
+
+  QPainter p(&im);
 
   p.drawImage(x, y, tex);
+  p.drawText(x, y, QString::number(x + y));
 
   cL.data()->load(im);
-  if(!texture.isDirty())
+  if(!_texture->texture.isDirty())
     {
-    texture.postSet();
+    _texture->texture.postSet();
     }
 
   _texture->database()->setStateStorageEnabled(stateEnabled);
-  */
+  
   }
 
 void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
@@ -182,7 +192,8 @@ void SyImageTexture::EvalThread::run()
         tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
 
         emit segmentFinished(x*segSize, y*segSize, tmp);
-        QThread::msleep(100);
+        //QThread::wait(100);
+        yieldCurrentThread();
       }
     }
     qDebug() << "job complete" << _do;
