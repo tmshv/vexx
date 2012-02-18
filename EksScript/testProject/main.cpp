@@ -4,16 +4,21 @@
 
 using namespace v8;
 
+#ifndef Q_CC_MSVC
+# error not setup for non msvc, needs solid testing in member pointers
+#endif
+
 class SomeClass
 {
 public:
+  virtual ~SomeClass() {}
 
-  int getNonStatic()
+  virtual int getNonStatic()
   {
     return nonStatic;
   }
 
-  void setNonStatic(const int &inA)
+  virtual void setNonStatic(const int &inA)
   {
     nonStatic = inA;
   }
@@ -84,9 +89,13 @@ struct WrappedProperty
   void *get[2];
   void *set[2];
 
-  template <typename CLASS, typename T>
-  static Handle<Value> GetHelper(Local<String>, const AccessorInfo& info)
+  template <typename T>
+  static Handle<Value> Getter(Local<String>, const AccessorInfo& info)
   {
+    class CLASS
+    {
+    };
+
     Local<Value> v = info.Data();
     WrappedProperty *p = (WrappedProperty *)External::Unwrap(v);
 
@@ -101,9 +110,13 @@ struct WrappedProperty
     return Pack<T>(val);
   }
 
-  template <typename CLASS, typename T>
-  static void SetHelper(Local<String>, Local<Value> value, const AccessorInfo& info)
+  template <typename T>
+  static void Setter(Local<String>, Local<Value> value, const AccessorInfo& info)
   {
+    class CLASS
+    {
+    };
+
     Local<Value> v = info.Data();
     WrappedProperty *p = (WrappedProperty *)External::Unwrap(v);
 
@@ -123,13 +136,17 @@ class TypeWrapper
 public:
   void *staticGet;
   void *staticSet;
+  void *get;
+  void *set;
 
-  template <typename T> static void wrapType()
+  template <typename T> static void wrap()
   {
     v8::AccessorGetter sG = WrappedStaticProperty::StaticGetter<T>;
     v8::AccessorSetter sS = WrappedStaticProperty::StaticSetter<T>;
-    TypeWrapper t = { (void*)sG, (void*)sS };
-    _wrappedTypes.insert(QMetaTypeId2<int>::qt_metatype_id(), t);
+    v8::AccessorGetter g = WrappedProperty::Getter<T>;
+    v8::AccessorSetter s = WrappedProperty::Setter<T>;
+    TypeWrapper t = { (void*)sG, (void*)sS, g, s };
+    _wrappedTypes.insert(QMetaTypeId2<T>::qt_metatype_id(), t);
       
   }
   static const TypeWrapper findType(int i)
@@ -154,51 +171,26 @@ void addStaticAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, v
   tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)wrap.staticGet, (v8::AccessorSetter)wrap.staticSet, data);
 }
 
-void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, void *get, void *set, void *gMem[2], void *sMem[2])
-{
-  WrappedProperty* wrappedData = new WrappedProperty;
-  memcpy(wrappedData->get, gMem, sizeof(void*)*2);
-  memcpy(wrappedData->set, sMem, sizeof(void*)*2);
-
-  Handle<Value> data = External::Wrap(wrappedData);
-
-  tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)get, (v8::AccessorSetter)set, data);
-}
-
-template <typename T, class CLASS, typename GETFUNC, typename SETFUNC>
-void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, GETFUNC g,  SETFUNC s)
+template <typename GETFUNC, typename SETFUNC>
+void addAccessor(Handle<ObjectTemplate>& tmpl, const char *name, int id, GETFUNC g,  SETFUNC s)
 {
   _ASSERT(sizeof(g) <= (sizeof(void *)*2));
   _ASSERT(sizeof(s) <= (sizeof(void *)*2));
-  v8::AccessorGetter getNoClass = WrappedProperty::GetHelper<CLASS, T>;
-  v8::AccessorSetter setNoClass = WrappedProperty::SetHelper<CLASS, T>;
 
-  void *gV[2];
-  void *sV[2];
-  memcpy(gV, &g, sizeof(void*)*2);
-  memcpy(sV, &s, sizeof(void*)*2);
+  WrappedProperty* wrappedData = new WrappedProperty;
+  memcpy(wrappedData->get, &g, sizeof(void*)*2);
+  memcpy(wrappedData->set, &s, sizeof(void*)*2);
 
-  addAccessor(tmpl, name, 0, getNoClass, setNoClass, gV, sV);
+  Handle<Value> data = External::Wrap(wrappedData);
+
+  const TypeWrapper wrap = TypeWrapper::findType(id);
+  tmpl->SetAccessor(String::New(name), (v8::AccessorGetter)wrap.get, (v8::AccessorSetter)wrap.set, data);
 }
 
-Handle<Value> GetPointX(Local<String>,
-                        const AccessorInfo &info)
+class Interface
 {
-  Local<Object> self = info.Holder();
-  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-  void* ptr = wrap->Value();
-  int value = static_cast<SomeClass*>(ptr)->getNonStatic();
-  return Integer::New(value);
-}
 
-void SetPointX(Local<String>, Local<Value> value,
-               const AccessorInfo& info)
-{
-  Local<Object> self = info.Holder();
-  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-  void* ptr = wrap->Value();
-  static_cast<SomeClass*>(ptr)->setNonStatic(value->Int32Value());
-}
+};
 
 int main(int, char*[])
 {
@@ -207,13 +199,16 @@ int main(int, char*[])
 
   Handle<ObjectTemplate> global_templ = ObjectTemplate::New();
 
+  Interface someTempl;
+  someTempl.addStaticProperty<int>("a", SomeClass::getA, SomeClass::setA); 
+  someTempl.addProperty<int>("a", &SomeClass::getNonStatic, &SomeClass::setNonStatic); 
+
   Handle<ObjectTemplate> point_templ = ObjectTemplate::New();
-  point_templ->SetAccessor(String::New("x"), GetPointX, SetPointX);
   point_templ->SetInternalFieldCount(1);
 
-  TypeWrapper::wrapType<int>();
-  addStaticAccessor(point_templ, "a", QMetaTypeId2<int>::qt_metatype_id(), SomeClass::getA, SomeClass::setA);
-  addAccessor<int, SomeClass>(point_templ, "x", &SomeClass::getNonStatic, &SomeClass::setNonStatic);
+  TypeWrapper::wrap<int>();
+  addStaticAccessor(point_templ, "a", qMetaTypeId<int>(), SomeClass::getA, SomeClass::setA);
+  addAccessor(point_templ, "x", qMetaTypeId<int>(), &SomeClass::getNonStatic, &SomeClass::setNonStatic);
 
   // Create a new context.
   Persistent<Context> context = Context::New(NULL, global_templ);
