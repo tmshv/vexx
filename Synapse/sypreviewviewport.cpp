@@ -18,7 +18,7 @@ SyPreviewViewport::SyPreviewViewport()
   {
   }
 
-void SyPreviewViewport::setupViewport(const SyImageInput *input, XAbstractCanvasController **controller)
+void SyPreviewViewport::setupViewport(const SyImageInput *input, QObject *rInf, const char *slot, XAbstractCanvasController **controller)
   {
   GCPerspectiveCamera* cam = addChild<GCPerspectiveCamera>("Camera");
   cam->setRotateEnabled(false);
@@ -52,6 +52,7 @@ void SyPreviewViewport::setupViewport(const SyImageInput *input, XAbstractCanvas
   shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(&t->texture);
   input->connect(&t->input);
   cam->connect(&t->viewer);
+  t->setup(rInf, slot);
 
 
   GCGeometryTransform *transform2 = msc->addChild<GCGeometryTransform>("Transform");

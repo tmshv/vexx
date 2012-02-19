@@ -172,7 +172,7 @@ public:
       {
       update();
       }
-  }
+    }
   void update() const;
   void updateParent() const;
 

@@ -19,7 +19,7 @@ class SyPreviewViewport : public GCViewport
 public:
   SyPreviewViewport();
 
-  void setupViewport(const SyImageInput *, XAbstractCanvasController **controller = 0);
+  void setupViewport(const SyImageInput *, QObject *, const char *, XAbstractCanvasController **controller = 0);
   };
 
 #endif // SYPREVIEWVIEWPORT_H

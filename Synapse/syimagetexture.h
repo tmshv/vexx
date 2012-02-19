@@ -27,11 +27,14 @@ public:
   UnsignedIntProperty imageWidth;
   UnsignedIntProperty imageHeight;
 
+  void setup(QObject *inf, const char *);
+
+  static void postChildSet(SPropertyContainer *, SProperty *);
+
 private:
   void queueThreadedUpdate();
 
   static void computeTransform(const SPropertyInstanceInformation *, SyImageTexture *cont);
-  static void computeTexture(const SPropertyInstanceInformation *info, SyImageTexture *cont);
 
   class EvalThread;
   class LocalWorker;
@@ -45,6 +48,9 @@ class SyImageTexture::LocalWorker : public QObject
 public:
   LocalWorker(SyImageTexture* t) : _texture(t) { }
   
+signals:
+  void textureUpdated();
+
 private slots:
   void loadIntoTexture(int x, int y, QImage tex);
 

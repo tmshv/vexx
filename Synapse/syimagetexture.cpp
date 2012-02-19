@@ -1,4 +1,5 @@
 #include "syimagetexture.h"
+#include "sprocessmanager.h"
 #include "QPainter"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
@@ -7,8 +8,7 @@ SPropertyInformation *SyImageTexture::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<SyImageTexture>("SyImageTexture");
 
-  GCTexture::InstanceInformation *textureInst = info->add(&SyImageTexture::texture, "texture");
-  textureInst->setCompute(computeTexture);
+  info->add(&SyImageTexture::texture, "texture");
 
   TransformProperty::InstanceInformation *transformInst = info->add(&SyImageTexture::transform, "transform");
   transformInst->setCompute(computeTransform);
@@ -21,18 +21,14 @@ SPropertyInformation *SyImageTexture::createTypeInformation()
 
   UnsignedIntProperty::InstanceInformation *imWidthInst = info->add(&SyImageTexture::imageWidth, "imageWidth");
   imWidthInst->setCompute(computeTransform);
-  imWidthInst->setAffects(textureInst);
 
   UnsignedIntProperty::InstanceInformation *imHeightInst = info->add(&SyImageTexture::imageHeight, "imageHeight");
   imHeightInst->setCompute(computeTransform);
-  imHeightInst->setAffects(textureInst);
 
   Vector2DProperty::InstanceInformation *imOffsetInst = info->add(&SyImageTexture::imageOffset, "imageOffset");
   imOffsetInst->setCompute(computeTransform);
-  imOffsetInst->setAffects(textureInst);
 
-  SyImageInput::InstanceInformation *inputInst = info->add(&SyImageTexture::input, "input");
-  inputInst->setAffects(textureInst);
+  info->add(&SyImageTexture::input, "input");
 
   GCViewableTransformPointer::InstanceInformation *viewerInst = info->add(&SyImageTexture::viewer, "viewer");
 
@@ -105,14 +101,17 @@ void SyImageTexture::computeTransform(const SPropertyInstanceInformation *, SyIm
     }
   }
 
+void SyImageTexture::setup(QObject *inf, const char *c)
+  {
+  _localWorker = new LocalWorker(this);
+  _loadThread = new EvalThread(this);
+  QObject::connect(_loadThread, SIGNAL(segmentFinished(int, int, QImage)), _localWorker, SLOT(loadIntoTexture(int, int, QImage)), Qt::QueuedConnection);
+  QObject::connect(_localWorker, SIGNAL(textureUpdated()), inf, c);
+  }
+
 void SyImageTexture::queueThreadedUpdate()
   {
-  if(!_loadThread)
-    {
-    _localWorker = new LocalWorker(this);
-    _loadThread = new EvalThread(this);
-    QObject::connect(_loadThread, SIGNAL(segmentFinished(int, int, QImage)), _localWorker, SLOT(loadIntoTexture(int, int, QImage)), Qt::QueuedConnection);
-    }
+  xAssert(_loadThread && _localWorker);
 
   _loadThread->reset();
 
@@ -122,39 +121,51 @@ void SyImageTexture::queueThreadedUpdate()
     }
   }
 
-void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
-  {   
-  bool stateEnabled = _texture->database()->stateStorageEnabled();
-  _texture->database()->setStateStorageEnabled(false);
-  GCTexture::ComputeLock cL(&_texture->texture);
-  QImage im = _texture->texture().texture();
+void SyImageTexture::postChildSet(SPropertyContainer *c, SProperty *prop)
+  {
+  SEntity::postChildSet(c, prop);
+  SyImageTexture* tex = c->uncheckedCastTo<SyImageTexture>();
 
-  xuint32 w = _texture->imageWidth();
-  xuint32 h = _texture->imageHeight();
-  if(im.width() != w || im.height() != h)
+  if(SProcessManager::isMainThread() &&
+    (prop == &tex->input ||
+     prop == &tex->imageWidth ||
+     prop == &tex->imageHeight ||
+     prop == &tex->imageOffset))
     {
-    im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
+    tex->queueThreadedUpdate();
     }
-
-  QPainter p(&im);
-
-  p.drawImage(x, y, tex);
-  p.drawText(x, y, QString::number(x + y));
-
-  cL.data()->load(im);
-  if(!_texture->texture.isDirty())
-    {
-    _texture->texture.postSet();
-    }
-
-  _texture->database()->setStateStorageEnabled(stateEnabled);
-  
   }
 
-void SyImageTexture::computeTexture(const SPropertyInstanceInformation *, SyImageTexture *cont)
-  {
-  qDebug() << "Eval Texture";
-  cont->queueThreadedUpdate();
+void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
+  {   
+    { 
+    bool stateEnabled = _texture->database()->stateStorageEnabled();
+    _texture->database()->setStateStorageEnabled(false);
+    GCTexture::ComputeLock cL(&_texture->texture);
+    QImage im = _texture->texture().texture();
+
+    xuint32 w = _texture->imageWidth();
+    xuint32 h = _texture->imageHeight();
+    if(im.width() != w || im.height() != h)
+      {
+      im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
+      }
+
+    QPainter p(&im);
+
+    p.drawImage(x, y, tex);
+    p.drawText(x, y, QString::number(x + y));
+
+    cL.data()->load(im);
+    if(!_texture->texture.isDirty())
+      {
+      _texture->texture.postSet();
+      }
+
+    _texture->database()->setStateStorageEnabled(stateEnabled);
+    }
+
+  emit textureUpdated();
   }
 
 void SyImageTexture::EvalThread::run()

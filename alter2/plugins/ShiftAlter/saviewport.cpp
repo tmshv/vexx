@@ -12,8 +12,8 @@
 SViewport::SViewport(GCViewport *viewpoint)
   {
   _timer = new QTimer;
-  connect(_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
-  _timer->start( 40 );
+  //connect(_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
+  //_timer->start( 40 );
 
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 

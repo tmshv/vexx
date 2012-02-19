@@ -42,6 +42,7 @@ private:
   void clean() const;
   mutable XAbstractTexture *_internal;
   mutable XRenderer *_renderer;
+  mutable QMutex _lock;
   };
 
 class EKS3D_EXPORT XAbstractTexture : public XRendererType
