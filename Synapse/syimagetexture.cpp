@@ -1,6 +1,7 @@
 #include "syimagetexture.h"
 #include "sprocessmanager.h"
 #include "QPainter"
+#include "XGLRenderer.h"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
 
@@ -113,11 +114,22 @@ void SyImageTexture::queueThreadedUpdate()
   {
   xAssert(_loadThread && _localWorker);
 
-  _loadThread->reset();
+  /*_loadThread->reset();
 
   if(!_loadThread->isRunning())
     {
     _loadThread->start();
+    }*/
+  
+  static bool i = 0;
+  if(!i)
+    {
+    i = 1;
+
+    for(int i = 0; i < 100; ++i)
+      {
+      _localWorker->loadIntoTexture(0,0,QImage());
+      }
     }
   }
 
@@ -139,30 +151,33 @@ void SyImageTexture::postChildSet(SPropertyContainer *c, SProperty *prop)
 void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
   {   
     { 
-    bool stateEnabled = _texture->database()->stateStorageEnabled();
-    _texture->database()->setStateStorageEnabled(false);
+    //bool stateEnabled = _texture->database()->stateStorageEnabled();
+    //_texture->database()->setStateStorageEnabled(false);
     GCTexture::ComputeLock cL(&_texture->texture);
     QImage im = _texture->texture().texture();
 
-    xuint32 w = _texture->imageWidth();
-    xuint32 h = _texture->imageHeight();
+    xuint32 w = 1;//_texture->imageWidth();
+    xuint32 h = 1;//_texture->imageHeight();
     if(im.width() != w || im.height() != h)
       {
       im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
       }
 
-    QPainter p(&im);
+    /*QPainter p(&im);
 
     p.drawImage(x, y, tex);
-    p.drawText(x, y, QString::number(x + y));
+    p.drawText(x, y, QString::number(x + y));*/
+
+    static XGLRenderer *r = new XGLRenderer;
 
     cL.data()->load(im);
-    if(!_texture->texture.isDirty())
+    cL.data()->prepareInternal(r);
+    /*if(!_texture->texture.isDirty())
       {
       _texture->texture.postSet();
-      }
+      }*/
 
-    _texture->database()->setStateStorageEnabled(stateEnabled);
+    //_texture->database()->setStateStorageEnabled(stateEnabled);
     }
 
   emit textureUpdated();

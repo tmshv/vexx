@@ -51,7 +51,7 @@ public:
 signals:
   void textureUpdated();
 
-private slots:
+public slots:
   void loadIntoTexture(int x, int y, QImage tex);
 
 private:
