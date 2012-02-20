@@ -24,6 +24,7 @@ void SyViewer::setInput(SProperty *vp)
 
   XAbstractCanvasController *cntrl = 0;
   SyPreviewViewport *viewport = db->addChild<SyPreviewViewport>("");
+  _vp = viewport;
   viewport->setupViewport(input, this, SLOT(updateGL()), &cntrl);
   setViewport(viewport);
   setController(cntrl);
