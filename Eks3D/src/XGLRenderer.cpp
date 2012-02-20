@@ -238,7 +238,7 @@ private:
 //----------------------------------------------------------------------------------------------------------------------
 
 
-XGLRenderer::XGLRenderer() : _currentShader( 0 ), _currentFramebuffer(0)
+XGLRenderer::XGLRenderer() : _currentShader( 0 ), _currentFramebuffer(0), _context(0)
   {
   m_ids.reserve(8);
   }

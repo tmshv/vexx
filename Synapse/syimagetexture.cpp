@@ -2,6 +2,7 @@
 #include "sprocessmanager.h"
 #include "QPainter"
 #include "XGLRenderer.h"
+#include "QGLContext"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
 
@@ -168,14 +169,26 @@ void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
     p.drawImage(x, y, tex);
     p.drawText(x, y, QString::number(x + y));*/
 
-    static XGLRenderer *r = new XGLRenderer;
+    /*static XGLRenderer *r = 0;
+    static XShader *s = 0;
+    if(!r)
+      {
+      r = new XGLRenderer;
+      r->setContext(new QGLContext(QGLFormat::defaultFormat()));
+      s = new XShader;
+      }
+
+    s->getVariable("abs")->setValue(*cL.data());
 
     cL.data()->load(im);
     cL.data()->prepareInternal(r);
-    /*if(!_texture->texture.isDirty())
+    s->prepareInternal(r);*/
+
+    cL.data()->load(im);
+    if(!_texture->texture.isDirty())
       {
       _texture->texture.postSet();
-      }*/
+      }
 
     //_texture->database()->setStateStorageEnabled(stateEnabled);
     }
