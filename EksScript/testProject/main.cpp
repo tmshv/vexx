@@ -173,6 +173,20 @@ public: // external
     _template->SetNamedPropertyHandler(WrappedPropertyMap::GetHelper, WrappedPropertyMap::SetHelper, 0, 0, 0, data);
   }
 
+  void addPropertyArray(WrappedPropertyMap::Getter g, WrappedPropertyMap::Setter s=0, WrappedPropertyMap::StaticGetter sG=0, , WrappedPropertyMap::StaticGetter sS=0)
+  {
+    WrappedPropertyMap* wrappedData = new WrappedPropertyMap;
+    wrappedData->get = g;
+    wrappedData->set = s;
+    wrappedData->staticGet = sG;
+    wrappedData->staticSet = sS;
+    addMember(wrappedData);
+
+    v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
+
+    _template->SetIndexedPropertyHandler(WrappedPropertyArray::GetHelper, WrappedPropertyArray::SetHelper, 0, 0, 0, data);
+  }
+
   template <typename T>
   void addStaticProperty(const char *name, void *get, void *set)
   {
