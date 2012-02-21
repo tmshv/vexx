@@ -3,6 +3,7 @@
 #include "QPainter"
 #include "XGLRenderer.h"
 #include "QGLContext"
+#include "QThread"
 
 S_IMPLEMENT_PROPERTY(SyImageTexture)
 
@@ -47,7 +48,7 @@ SPropertyInformation *SyImageTexture::createTypeInformation()
   return info;
   }
 
-SyImageTexture::SyImageTexture() : _loadThread(0)
+SyImageTexture::SyImageTexture() : _thread(0), _localWorker(0), _evaluator(0), _revision(0)
   {
   }
 
@@ -105,32 +106,55 @@ void SyImageTexture::computeTransform(const SPropertyInstanceInformation *, SyIm
 
 void SyImageTexture::setup(QObject *inf, const char *c)
   {
+  _thread = new QThread();
   _localWorker = new LocalWorker(this);
-  _loadThread = new EvalThread(this);
-  QObject::connect(_loadThread, SIGNAL(segmentFinished(int, int, QImage)), _localWorker, SLOT(loadIntoTexture(int, int, QImage)), Qt::QueuedConnection);
+  _evaluator = new EvalObject(this);
+
+  _evaluator->moveToThread(_thread);
+
+  QObject::connect(_evaluator, SIGNAL(segmentFinished(int, int, QImage)), _localWorker, SLOT(loadIntoTexture(int, int, QImage)), Qt::QueuedConnection);
+  QObject::connect(_localWorker, SIGNAL(updateSegment(int,int,int,int,int,int,int,int)), _evaluator, SLOT(updateSegment(int,int,int,int,int,int,int,int)), Qt::QueuedConnection);
+
   QObject::connect(_localWorker, SIGNAL(textureUpdated()), inf, c);
   }
 
 void SyImageTexture::queueThreadedUpdate()
   {
-  xAssert(_loadThread && _localWorker);
+  xAssert(_thread);
+  xAssert(_evaluator)
+  xAssert(_localWorker);
 
-  /*_loadThread->reset();
-
-  if(!_loadThread->isRunning())
+  if(!_thread->isRunning())
     {
-    _loadThread->start();
-    }*/
-  
-  static bool i = 0;
-  if(!i)
-    {
-    i = 1;
+    _thread->start();
+    _thread->setPriority(QThread::IdlePriority);
+    }
 
-    for(int i = 0; i < 100; ++i)
+  static bool queueing = false;
+  if(!queueing)
+    {
       {
-      _localWorker->loadIntoTexture(0,0,QImage());
+      QMutexLocker l(&_lock);
+      _revision++;
       }
+    queueing = true;
+
+    xuint32 w = imageWidth();
+    xuint32 h = imageHeight();
+
+    static const xsize segSize = 64;
+    xsize itW  = (w / segSize) + 1;
+    xsize itH = (h / segSize) + 1;
+
+    xsize s = itH * itW;
+    XVectorI2D start = imageOffset().cast<xint32>();
+    for(xsize i = 0; i < s; ++i)
+      {
+      xsize x = i % itW;
+      xsize y = i / itW;
+      _localWorker->emitUpdateSegment(_revision, x*segSize, y*segSize, start.x() + (x*segSize), start.y() + (y*segSize), 1, segSize, segSize);
+      }
+    queueing = false;
     }
   }
 
@@ -151,38 +175,22 @@ void SyImageTexture::postChildSet(SPropertyContainer *c, SProperty *prop)
 
 void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
   {   
-    { 
-    //bool stateEnabled = _texture->database()->stateStorageEnabled();
-    //_texture->database()->setStateStorageEnabled(false);
+    {
+    bool stateEnabled = _texture->database()->stateStorageEnabled();
+    _texture->database()->setStateStorageEnabled(false);
     GCTexture::ComputeLock cL(&_texture->texture);
     QImage im = _texture->texture().texture();
 
-    xuint32 w = 1;//_texture->imageWidth();
-    xuint32 h = 1;//_texture->imageHeight();
+    xuint32 w = _texture->imageWidth();
+    xuint32 h = _texture->imageHeight();
     if(im.width() != w || im.height() != h)
       {
       im = QImage(w, h, QImage::Format_ARGB32_Premultiplied);
       }
 
-    /*QPainter p(&im);
+    QPainter p(&im);
 
     p.drawImage(x, y, tex);
-    p.drawText(x, y, QString::number(x + y));*/
-
-    /*static XGLRenderer *r = 0;
-    static XShader *s = 0;
-    if(!r)
-      {
-      r = new XGLRenderer;
-      r->setContext(new QGLContext(QGLFormat::defaultFormat()));
-      s = new XShader;
-      }
-
-    s->getVariable("abs")->setValue(*cL.data());
-
-    cL.data()->load(im);
-    cL.data()->prepareInternal(r);
-    s->prepareInternal(r);*/
 
     cL.data()->load(im);
     if(!_texture->texture.isDirty())
@@ -190,51 +198,24 @@ void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
       _texture->texture.postSet();
       }
 
-    //_texture->database()->setStateStorageEnabled(stateEnabled);
+    _texture->database()->setStateStorageEnabled(stateEnabled);
     }
 
   emit textureUpdated();
   }
 
-void SyImageTexture::EvalThread::run()
-{
-  qDebug() << "Run Thread";
-  do
+void SyImageTexture::EvalObject::updateSegment(int rev, int x, int y, int renderX, int renderY, int renderScale, int w, int h)
   {
-    qDebug() << "Start job";
-    xuint32 w;
-    xuint32 h;
-
     {
-      QMutexLocker l(&_lock);
-      _do = false;
-
-      w = _texture->imageWidth();
-      h = _texture->imageHeight();
-    }
-
-    static const xsize segSize = 64;
-    xsize itW  = (w / segSize) + 1;
-    xsize itH = (h / segSize) + 1;
-
-
-    qDebug() << "Dims:" << w << h;
-    qDebug() << "Segs:" << itW << itH;
-
-    QImage tmp(segSize, segSize, QImage::Format_ARGB32_Premultiplied);
-    XVectorI2D start = _texture->imageOffset().cast<xint32>();
-    for(xsize y = 0; y < itH; ++y)
-    {
-      for(xsize x = 0; x < itW; ++x)
+    QMutexLocker l(&_texture->_lock);
+    if(rev != _texture->_revision)
       {
-        //tmp = _texture.input.asQImage(start + XVectorI2D(segSize*x, segSize*y), segSize, segSize);
-        tmp.fill(QColor(rand()%255, rand()%255, rand()%255));
-
-        emit segmentFinished(x*segSize, y*segSize, tmp);
-        //QThread::wait(100);
-        yieldCurrentThread();
+      return;
       }
     }
-    qDebug() << "job complete" << _do;
-  } while(_do == true);
-}
+
+  QImage tmp = _texture->input.asQImage(XVectorI2D(renderX, renderY), 1, w, h);
+
+  emit segmentFinished(x, y, tmp);
+  QThread::yieldCurrentThread();
+  }

@@ -6,7 +6,7 @@
 #include "GCBaseProperties.h"
 #include "3D/GCCamera.h"
 #include "3D/GCTexture.h"
-#include "QThread"
+#include "QObject"
 
 class SyImageTexture : public SEntity
   {
@@ -36,10 +36,15 @@ private:
 
   static void computeTransform(const SPropertyInstanceInformation *, SyImageTexture *cont);
 
-  class EvalThread;
+  QMutex _lock;
+  int _revision;
+
+  class EvalObject;
+  friend class EvalObject;
   class LocalWorker;
-  EvalThread* _loadThread;
-  LocalWorker* _localWorker;
+  QThread *_thread;
+  EvalObject *_evaluator;
+  LocalWorker *_localWorker;
   };
 
 class SyImageTexture::LocalWorker : public QObject
@@ -48,8 +53,14 @@ class SyImageTexture::LocalWorker : public QObject
 public:
   LocalWorker(SyImageTexture* t) : _texture(t) { }
   
+  void emitUpdateSegment(int rev, int x, int y, int renderX, int renderY, int renderScale, int w, int h)
+    {
+    emit updateSegment(rev, x, y, renderX, renderY, renderScale, w, h);
+    }
+
 signals:
   void textureUpdated();
+  void updateSegment(int rev, int x, int y, int renderX, int renderY, int renderScale, int w, int h);
 
 public slots:
   void loadIntoTexture(int x, int y, QImage tex);
@@ -58,32 +69,23 @@ private:
   SyImageTexture *_texture;
   };
 
-class SyImageTexture::EvalThread : public QThread
+class SyImageTexture::EvalObject : public QObject
   {
   Q_OBJECT
+
 XProperties:
   XProperty(SyImageTexture *, texture, setTexture);
 
 public:
-  EvalThread(SyImageTexture *i) : _texture(i), _do(false)
+  EvalObject(SyImageTexture *i) : _texture(i)
     {
-    setPriority(QThread::IdlePriority);
     }
 
-  void reset()
-    {
-    QMutexLocker l(&_lock);
-    _do = true;
-    }
-
-  virtual void run();
+public slots:
+  void updateSegment(int rev, int x, int y, int renderX, int renderY, int renderScale, int w, int h);
 
 signals:
   void segmentFinished(int x, int y, QImage im);
-
-private:
-  QMutex _lock;
-  bool _do;
   };
 
 #endif // SYIMAGETEXTURE_H

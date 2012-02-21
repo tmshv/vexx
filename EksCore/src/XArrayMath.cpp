@@ -268,8 +268,8 @@ template <typename T> struct OperationQueue
         const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
         XVectorI2D sampleAt = pt - imData->_offset;
 
-        sampleAt.x() = xMin(sampleAt.rows(), xMax(sampleAt.x(), 0));
-        sampleAt.y() = xMin(sampleAt.cols(), xMax(sampleAt.y(), 0));
+        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
 
         arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
         }
@@ -277,6 +277,10 @@ template <typename T> struct OperationQueue
         {
         const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
         XVectorI2D sampleAt = pt - imData->_offset;
+
+        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
+
         arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
         }
       }
