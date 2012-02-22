@@ -7,6 +7,19 @@
 # error not setup for non msvc, needs solid testing in member pointers
 #endif
 
+template <typename T> unsigned int XTypeId()
+{
+  union
+  {
+    unsigned int (*fn)();
+    unsigned int data;
+  } u;
+
+  u.fn = &XTypeId<T>;
+
+  return u.data;
+}
+
 template <typename T> v8::Handle<v8::Value> Pack(T t);
 template <typename T> T Unpack(v8::Handle<v8::Value>);
 
@@ -18,6 +31,26 @@ template <> v8::Handle<v8::Value> Pack(int i)
 template <> int Unpack(v8::Handle<v8::Value> v)
 {
   return v->Int32Value();
+}
+
+template <> v8::Handle<v8::Value> Pack(QVariant i)
+{
+  switch(i.type())
+  {
+  case QVariant::Int: return Pack(i.toInt());
+  default: return v8::Handle<v8::Value>();
+  }
+
+}
+
+template <> QVariant Unpack(v8::Handle<v8::Value> v)
+{
+  if(v->IsInt32())
+  {
+    return QVariant(Unpack<int>(v));
+  }
+  
+  return QVariant();
 }
 
 class WrappedMember
@@ -34,8 +67,44 @@ struct WrappedPropertyMap : public WrappedMember
 
   static v8::Handle<v8::Value> Getter(v8::Local<v8::String> property, const v8::AccessorInfo& info)
   {
-    (void)property;
-    (void)info;
+    v8::Local<v8::Value> v = info.Data();
+    WrappedPropertyMap *p = (WrappedPropertyMap *)v8::External::Unwrap(v);
+
+    v8::String::AsciiValue propName(property);
+
+    v8::Local<v8::Object> self = info.Holder();
+    if(self->InternalFieldCount() && p->get)
+    {
+      class CLASS
+      {
+      };
+
+      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+      void* ptr = wrap->Value();
+
+      typedef QVariant (CLASS::*GET)(const char *);
+      GET g = *(GET*)p->get;
+
+      QVariant val = (static_cast<CLASS*>(ptr)->*g)(*propName);
+      if(val.isValid())
+      {
+        return Pack(val);
+      }
+    }
+
+    if(p->staticGet)
+    {
+      typedef QVariant (*GET)(const char *);
+      GET g = (GET)p->staticGet;
+
+      QVariant val = g(*propName);
+
+      if(val.isValid())
+      {
+        return Pack(val);
+      }
+    }
+
     return v8::Handle<v8::Value>();
   }
 
@@ -43,6 +112,8 @@ struct WrappedPropertyMap : public WrappedMember
   {
     v8::Local<v8::Value> v = info.Data();
     WrappedPropertyMap *p = (WrappedPropertyMap *)v8::External::Unwrap(v);
+
+    v8::String::AsciiValue propName(property);
 
     v8::Local<v8::Object> self = info.Holder();
     if(self->InternalFieldCount() && p->set)
@@ -54,13 +125,28 @@ struct WrappedPropertyMap : public WrappedMember
       v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
       void* ptr = wrap->Value();
 
-      typedef QVariant (CLASS::*GET)();
-      GET g = *(GET*)p->get;
+      typedef bool (CLASS::*SET)(const char *, const QVariant &);
+      SET s = *(SET*)p->set;
 
-      QVariant val = (static_cast<CLASS*>(ptr)->*g)();
+      bool set = (static_cast<CLASS*>(ptr)->*s)(*propName, Unpack<QVariant>(value));
+      if(set)
+      {
+        return Getter(property, info);
+      }
     }
 
+    if(p->staticSet)
+    {
+      typedef bool (*SET)(const char *, const QVariant &);
+      SET s = (SET)p->staticSet;
 
+      bool set = s(*propName, Unpack<QVariant>(value));
+
+      if(set)
+      {
+        return Getter(property, info);
+      }
+    }
 
     return v8::Handle<v8::Value>();
   }
@@ -91,7 +177,7 @@ struct WrappedStaticProperty : public WrappedMember
     v8::Local<v8::Value> v = info.Data();
     WrappedStaticProperty *p = (WrappedStaticProperty *)v8::External::Unwrap(v);
 
-    typedef void (*SET)(const T &);
+    typedef void (*SET)(T);
     SET g = (SET)p->set;
 
     g(Unpack<T>(value));
@@ -138,10 +224,12 @@ struct WrappedProperty : public WrappedMember
     v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
     void* ptr = wrap->Value();
 
-    typedef void (CLASS::*SET)(const T &);
+    typedef void (CLASS::*SET)(T);
     SET s = *(SET*)p->set;
 
-    (static_cast<CLASS*>(ptr)->*s)(Unpack<T>(value));
+    T val = Unpack<T>(value);
+
+    (static_cast<CLASS*>(ptr)->*s)(val);
   }
 };
 
@@ -160,7 +248,8 @@ public:
     v8::AccessorGetter g = WrappedProperty::Getter<T>;
     v8::AccessorSetter s = WrappedProperty::Setter<T>;
     TypeWrapper t = { (void*)sG, (void*)sS, g, s };
-    _wrappedTypes.insert(QMetaTypeId2<T>::qt_metatype_id(), t);
+
+    _wrappedTypes.insert(XTypeId<T>(), t);
       
   }
   static const TypeWrapper findType(int i)
@@ -181,8 +270,8 @@ public: // external
     _template->SetInternalFieldCount(1);
   }
 
-  template <typename T, typename GETFUNC, typename SETFUNC>
-  void addProperty(const char *name, GETFUNC g,  SETFUNC s)
+  template <typename TGET, typename TSET, typename CLASS>
+  void addProperty(const char *name, TGET (CLASS::*g)(), void (CLASS::*s)(TSET))
   {
     _ASSERT(sizeof(g) <= (sizeof(void *)*2));
     _ASSERT(sizeof(s) <= (sizeof(void *)*2));
@@ -192,7 +281,10 @@ public: // external
     memcpy(get, &g, sizeof(void*)*2);
     memcpy(set, &s, sizeof(void*)*2);
 
-    addProperty(name, qMetaTypeId<T>(), get, set);
+    int getType = XTypeId<TGET>();
+    int setType = XTypeId<TSET>();
+
+    addProperty(name, getType, setType, get, set);
   }
 
   template <typename GETFUNC, typename SETFUNC>
@@ -222,18 +314,25 @@ public: // external
     _template->SetIndexedPropertyHandler(WrappedPropertyArray::GetHelper, WrappedPropertyArray::SetHelper, 0, 0, 0, data);
   }*/
 
-  template <typename T>
-  void addStaticProperty(const char *name, void *get, void *set)
+  template <typename TGET, typename TSET>
+  void addStaticProperty(const char *name, TGET g(), void s(TSET))
   {
-    addStaticProperty(name, qMetaTypeId<T>(), get, set);
+    void *get = g;
+    void *set = s;
+
+    int getType = XTypeId<TGET>();
+    int setType = XTypeId<TSET>();
+
+    addStaticProperty(name, getType, setType, get, set);
   }
+
 
 private: // internal
   void addPropertyMap(void *g[2], void *s[2], void *sG, void *sS)
   {
     WrappedPropertyMap* wrapped = new WrappedPropertyMap;
     memcpy(wrapped->get, g, sizeof(g));
-    memcpy(wrapped->set, g, sizeof(s));
+    memcpy(wrapped->set, s, sizeof(s));
     wrapped->staticGet = sG;
     wrapped->staticSet = sS;
     addMember(wrapped);
@@ -243,7 +342,7 @@ private: // internal
     _template->SetNamedPropertyHandler(WrappedPropertyMap::Getter, WrappedPropertyMap::Setter, 0, 0, 0, data);
   }
 
-  void addStaticProperty(const char *name, int id, void *get, void *set)
+  void addStaticProperty(const char *name, int getId, int setId, void *get, void *set)
   {
     WrappedStaticProperty* wrappedData = new WrappedStaticProperty;
     wrappedData->get = get;
@@ -253,11 +352,12 @@ private: // internal
 
     v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
 
-    const TypeWrapper wrap = TypeWrapper::findType(id);
-    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrap.staticGet, (v8::AccessorSetter)wrap.staticSet, data);
+    const TypeWrapper wrapGet = TypeWrapper::findType(getId);
+    const TypeWrapper wrapSet = TypeWrapper::findType(setId);
+    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrapGet.staticGet, (v8::AccessorSetter)wrapSet.staticSet, data);
   }
 
-  void addProperty(const char *name, int id, void *get[2], void *set[2])
+  void addProperty(const char *name, int getId, int setId, void *get[2], void *set[2])
   {
     WrappedProperty* wrapped = new WrappedProperty;
     memcpy(wrapped->get, get, sizeof(get));
@@ -266,8 +366,9 @@ private: // internal
     addMember(wrapped);
     v8::Handle<v8::Value> data = v8::External::Wrap(wrapped);
 
-    const TypeWrapper wrap = TypeWrapper::findType(id);
-    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrap.get, (v8::AccessorSetter)wrap.set, data);
+    const TypeWrapper wrapGet = TypeWrapper::findType(getId);
+    const TypeWrapper wrapSet = TypeWrapper::findType(setId);
+    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrapGet.get, (v8::AccessorSetter)wrapSet.set, data);
   }
 
 private:
@@ -373,7 +474,11 @@ private:
   };
 
 
-
+class Vector3D
+{
+  float x;
+  //void setX(### const... &'s)
+};
 
 
 class SomeClass
@@ -381,24 +486,52 @@ class SomeClass
 public:
   virtual ~SomeClass() {}
 
-  virtual int getNonStatic()
+  virtual Vector3D getNonStatic()
   {
-    return nonStatic;
+    return v;
   }
 
-  virtual void setNonStatic(int inA)
+  virtual void setNonStatic(const Vector3D &inA)
   {
-    nonStatic = inA;
+    v = inA;
   }
 
-  QVariant getOther(const char *, const QVariant &v)
+  QVariant getOther(const char *name)
   {
-    return nonStatic;
+    if(strcmp(name, "other") == 0)
+    {
+      return other;
+    }
+    return QVariant();
   }
 
-  virtual void setOther(const int &inA)
+  virtual bool setOther(const char *name, const QVariant &inA)
   {
-    nonStatic = inA;
+    if(strcmp(name, "other") == 0)
+    {
+      other = inA.toInt();
+      return true;
+    }
+    return false;
+  }
+
+  static QVariant getOtherStatic(const char *name)
+  {
+    if(strcmp(name, "otherStatic") == 0)
+    {
+      return otherStatic;
+    }
+    return QVariant();
+  }
+
+  static bool setOtherStatic(const char *name, const QVariant &inA)
+  {
+    if(strcmp(name, "otherStatic") == 0)
+    {
+      otherStatic = inA.toInt();
+      return true;
+    }
+    return false;
   }
 
   static int getA()
@@ -412,21 +545,32 @@ public:
   }
 
   int nonStatic;
+  int other;
   static int a;
+  static int otherStatic;
+  Vector3D v;
 };
 int SomeClass::a = 0;
+int SomeClass::otherStatic = 0;
 
 int main(int, char*[])
 {
   Engine engine;
 
   TypeWrapper::wrap<int>();
+  TypeWrapper::wrap<const int &>();
+  TypeWrapper::wrap<Vector3D>();
+  TypeWrapper::wrap<const Vector3D &>();
 
   // build the template
   Interface someTempl;
-  someTempl.addStaticProperty<int>("a", SomeClass::getA, SomeClass::setA); 
-  someTempl.addProperty<int>("a", &SomeClass::getNonStatic, &SomeClass::setNonStatic);
-  someTempl.addPropertyMap(&SomeClass::getOther, &SomeClass::setOther);
+  someTempl.addStaticProperty("x", SomeClass::getA, SomeClass::setA); 
+  someTempl.addProperty("_3D", &SomeClass::getNonStatic, &SomeClass::setNonStatic);
+  //someTempl.addPropertyMap<&SomeClass::getOther, &SomeClass::setOther, SomeClass::getOtherStatic, SomeClass::setOtherStatic>();
+
+  // build the template
+  //Interface vectorTempl;
+  //someTempl.addProperty<QVector3D>("x", &QVector3D::x, &QVector3D::setX);
 
   // Create a new context.
   Context c(&engine);
@@ -439,7 +583,7 @@ int main(int, char*[])
 
   c.set("someClass", obj);
 
-  Script script("someClass.a = 5; someClass.x = 1; 'Hello' + someClass.a.toString() + someClass.x.toString();");
+  Script script("'Hello' + someClass._3D.x");
 
   script.run();
   return 0;
