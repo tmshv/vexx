@@ -27,7 +27,43 @@ class WrappedMember
 
 struct WrappedPropertyMap : public WrappedMember
 {
+  void *get[2];
+  void *set[2];
+  void *staticGet;
+  void *staticSet;
 
+  static v8::Handle<v8::Value> Getter(v8::Local<v8::String> property, const v8::AccessorInfo& info)
+  {
+    (void)property;
+    (void)info;
+    return v8::Handle<v8::Value>();
+  }
+
+  static v8::Handle<v8::Value> Setter(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
+  {
+    v8::Local<v8::Value> v = info.Data();
+    WrappedPropertyMap *p = (WrappedPropertyMap *)v8::External::Unwrap(v);
+
+    v8::Local<v8::Object> self = info.Holder();
+    if(self->InternalFieldCount() && p->set)
+    {
+      class CLASS
+      {
+      };
+
+      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+      void* ptr = wrap->Value();
+
+      typedef QVariant (CLASS::*GET)();
+      GET g = *(GET*)p->get;
+
+      QVariant val = (static_cast<CLASS*>(ptr)->*g)();
+    }
+
+
+
+    return v8::Handle<v8::Value>();
+  }
 };
 
 struct WrappedStaticProperty : public WrappedMember
@@ -41,7 +77,7 @@ struct WrappedStaticProperty : public WrappedMember
     v8::Local<v8::Value> v = info.Data();
     WrappedStaticProperty *p = (WrappedStaticProperty *)v8::External::Unwrap(v);
 
-    typedef T (*GET)() ;
+    typedef T (*GET)();
     GET g = (GET)p->get;
 
     T val = g();
@@ -159,21 +195,20 @@ public: // external
     addProperty(name, qMetaTypeId<T>(), get, set);
   }
 
-  void addPropertyMap(WrappedPropertyMap::Getter g, WrappedPropertyMap::Setter s=0, WrappedPropertyMap::StaticGetter sG=0, , WrappedPropertyMap::StaticGetter sS=0)
+  template <typename GETFUNC, typename SETFUNC>
+  void addPropertyMap(GETFUNC g, SETFUNC s=0, void *sG=0, void *sS=0)
   {
-    WrappedPropertyMap* wrappedData = new WrappedPropertyMap;
-    wrappedData->get = g;
-    wrappedData->set = s;
-    wrappedData->staticGet = sG;
-    wrappedData->staticSet = sS;
-    addMember(wrappedData);
+    _ASSERT(sizeof(g) <= (sizeof(void *)*2));
+    _ASSERT(sizeof(s) <= (sizeof(void *)*2));
+    void *get[2];
+    void *set[2];
+    memcpy(get, &g, sizeof(void*)*2);
+    memcpy(set, &s, sizeof(void*)*2);
 
-    v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
-
-    _template->SetNamedPropertyHandler(WrappedPropertyMap::GetHelper, WrappedPropertyMap::SetHelper, 0, 0, 0, data);
+    addPropertyMap(get, set, sG, sS);
   }
 
-  void addPropertyArray(WrappedPropertyMap::Getter g, WrappedPropertyMap::Setter s=0, WrappedPropertyMap::StaticGetter sG=0, , WrappedPropertyMap::StaticGetter sS=0)
+  /*void addPropertyArray(WrappedPropertyMap::Getter g, WrappedPropertyMap::Setter s=0, WrappedPropertyMap::StaticGetter sG=0, , WrappedPropertyMap::StaticGetter sS=0)
   {
     WrappedPropertyMap* wrappedData = new WrappedPropertyMap;
     wrappedData->get = g;
@@ -185,7 +220,7 @@ public: // external
     v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
 
     _template->SetIndexedPropertyHandler(WrappedPropertyArray::GetHelper, WrappedPropertyArray::SetHelper, 0, 0, 0, data);
-  }
+  }*/
 
   template <typename T>
   void addStaticProperty(const char *name, void *get, void *set)
@@ -194,6 +229,20 @@ public: // external
   }
 
 private: // internal
+  void addPropertyMap(void *g[2], void *s[2], void *sG, void *sS)
+  {
+    WrappedPropertyMap* wrapped = new WrappedPropertyMap;
+    memcpy(wrapped->get, g, sizeof(g));
+    memcpy(wrapped->set, g, sizeof(s));
+    wrapped->staticGet = sG;
+    wrapped->staticSet = sS;
+    addMember(wrapped);
+
+    v8::Handle<v8::Value> data = v8::External::Wrap(wrapped);
+
+    _template->SetNamedPropertyHandler(WrappedPropertyMap::Getter, WrappedPropertyMap::Setter, 0, 0, 0, data);
+  }
+
   void addStaticProperty(const char *name, int id, void *get, void *set)
   {
     WrappedStaticProperty* wrappedData = new WrappedStaticProperty;
@@ -210,7 +259,6 @@ private: // internal
 
   void addProperty(const char *name, int id, void *get[2], void *set[2])
   {
-
     WrappedProperty* wrapped = new WrappedProperty;
     memcpy(wrapped->get, get, sizeof(get));
     memcpy(wrapped->set, set, sizeof(set));
