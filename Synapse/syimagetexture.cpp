@@ -52,6 +52,18 @@ SyImageTexture::SyImageTexture() : _thread(0), _localWorker(0), _evaluator(0), _
   {
   }
 
+SyImageTexture::~SyImageTexture()
+  {
+  _thread->exit();
+  while(_thread->isRunning())
+    {
+    QThread::yieldCurrentThread();
+    }
+
+  delete _localWorker;
+  delete _evaluator;
+  }
+
 void SyImageTexture::computeTransform(const SPropertyInstanceInformation *, SyImageTexture *cont)
   {
   XVector3D lookAxis(0.0f, 0.0f, 1.0f);
@@ -191,6 +203,8 @@ void SyImageTexture::LocalWorker::loadIntoTexture(int x, int y, QImage tex)
     QPainter p(&im);
 
     p.drawImage(x, y, tex);
+    p.setPen(Qt::black);
+    p.drawRect(x,y,1,1);
 
     cL.data()->load(im);
     if(!_texture->texture.isDirty())
@@ -214,7 +228,7 @@ void SyImageTexture::EvalObject::updateSegment(int rev, int x, int y, int render
       }
     }
 
-  QImage tmp = _texture->input.asQImage(XVectorI2D(renderX, renderY), 1, w, h);
+  QImage tmp;// = _texture->input.asQImage(XVectorI2D(renderX, renderY), 1, w, h);
 
   emit segmentFinished(x, y, tmp);
   QThread::yieldCurrentThread();

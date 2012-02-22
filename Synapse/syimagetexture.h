@@ -14,6 +14,7 @@ class SyImageTexture : public SEntity
 
 public:
   SyImageTexture();
+  ~SyImageTexture();
 
   SyImageInput input;
   GCViewableTransformPointer viewer;
