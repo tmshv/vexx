@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include&quot;;.\..\v8;&quot;$(QTDIR)\include\ActiveQt&quot;;.\debug;&quot;$(QTDIR)\mkspecs\default&quot;;.\GeneratedFiles"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\v8&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\debug&quot;;&quot;$(QTDIR)\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;;&quot;.\cvv8&quot;"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TESTPROJECT_BUILD,QT_DLL,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -137,7 +137,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="2"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\v8&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\release&quot;;&quot;$(QTDIR)\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\v8&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\release&quot;;&quot;$(QTDIR)\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;;&quot;.\cvv8&quot;"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TESTPROJECT_BUILD,QT_DLL,QT_NO_DEBUG,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT,NDEBUG"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -210,6 +210,84 @@
 			>
 			<File
 				RelativePath="main.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath=".\cvv8\arguments.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\ClassCreator.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\convert.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\convert_core.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\doxygen_hack.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\invocable.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\invocable_core.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\invocable_generated.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\NativeToJSMap.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\properties.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\signature.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\generator\Signature.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\signature_core.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\signature_generated.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\detail\tmp.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\v8-convert.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\V8Shell.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\cvv8\XTo.hpp"
 				>
 			</File>
 		</Filter>

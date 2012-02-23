@@ -2,386 +2,9 @@
 #include "QMetaType"
 #include "QVariant"
 #include "QHash"
+#include "cvv8/v8-convert.hpp"
 
-#ifndef Q_CC_MSVC
-# error not setup for non msvc, needs solid testing in member pointers
-#endif
-
-template <typename T> unsigned int XTypeId()
-{
-  union
-  {
-    unsigned int (*fn)();
-    unsigned int data;
-  } u;
-
-  u.fn = &XTypeId<T>;
-
-  return u.data;
-}
-
-template <typename T> v8::Handle<v8::Value> Pack(T t);
-template <typename T> T Unpack(v8::Handle<v8::Value>);
-
-template <> v8::Handle<v8::Value> Pack(int i)
-{
-  return v8::Integer::New(i);
-}
-
-template <> int Unpack(v8::Handle<v8::Value> v)
-{
-  return v->Int32Value();
-}
-
-template <> v8::Handle<v8::Value> Pack(QVariant i)
-{
-  switch(i.type())
-  {
-  case QVariant::Int: return Pack(i.toInt());
-  default: return v8::Handle<v8::Value>();
-  }
-
-}
-
-template <> QVariant Unpack(v8::Handle<v8::Value> v)
-{
-  if(v->IsInt32())
-  {
-    return QVariant(Unpack<int>(v));
-  }
-  
-  return QVariant();
-}
-
-class WrappedMember
-{
-
-};
-
-struct WrappedPropertyMap : public WrappedMember
-{
-  void *get[2];
-  void *set[2];
-  void *staticGet;
-  void *staticSet;
-
-  static v8::Handle<v8::Value> Getter(v8::Local<v8::String> property, const v8::AccessorInfo& info)
-  {
-    v8::Local<v8::Value> v = info.Data();
-    WrappedPropertyMap *p = (WrappedPropertyMap *)v8::External::Unwrap(v);
-
-    v8::String::AsciiValue propName(property);
-
-    v8::Local<v8::Object> self = info.Holder();
-    if(self->InternalFieldCount() && p->get)
-    {
-      class CLASS
-      {
-      };
-
-      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-      void* ptr = wrap->Value();
-
-      typedef QVariant (CLASS::*GET)(const char *);
-      GET g = *(GET*)p->get;
-
-      QVariant val = (static_cast<CLASS*>(ptr)->*g)(*propName);
-      if(val.isValid())
-      {
-        return Pack(val);
-      }
-    }
-
-    if(p->staticGet)
-    {
-      typedef QVariant (*GET)(const char *);
-      GET g = (GET)p->staticGet;
-
-      QVariant val = g(*propName);
-
-      if(val.isValid())
-      {
-        return Pack(val);
-      }
-    }
-
-    return v8::Handle<v8::Value>();
-  }
-
-  static v8::Handle<v8::Value> Setter(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
-  {
-    v8::Local<v8::Value> v = info.Data();
-    WrappedPropertyMap *p = (WrappedPropertyMap *)v8::External::Unwrap(v);
-
-    v8::String::AsciiValue propName(property);
-
-    v8::Local<v8::Object> self = info.Holder();
-    if(self->InternalFieldCount() && p->set)
-    {
-      class CLASS
-      {
-      };
-
-      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-      void* ptr = wrap->Value();
-
-      typedef bool (CLASS::*SET)(const char *, const QVariant &);
-      SET s = *(SET*)p->set;
-
-      bool set = (static_cast<CLASS*>(ptr)->*s)(*propName, Unpack<QVariant>(value));
-      if(set)
-      {
-        return Getter(property, info);
-      }
-    }
-
-    if(p->staticSet)
-    {
-      typedef bool (*SET)(const char *, const QVariant &);
-      SET s = (SET)p->staticSet;
-
-      bool set = s(*propName, Unpack<QVariant>(value));
-
-      if(set)
-      {
-        return Getter(property, info);
-      }
-    }
-
-    return v8::Handle<v8::Value>();
-  }
-};
-
-struct WrappedStaticProperty : public WrappedMember
-{
-  void *get;
-  void *set;
-
-  template <typename T>
-  static v8::Handle<v8::Value> StaticGetter(v8::Local<v8::String>, const v8::AccessorInfo& info)
-  {
-    v8::Local<v8::Value> v = info.Data();
-    WrappedStaticProperty *p = (WrappedStaticProperty *)v8::External::Unwrap(v);
-
-    typedef T (*GET)();
-    GET g = (GET)p->get;
-
-    T val = g();
-
-    return Pack<T>(val);
-  }
-
-  template <typename T>
-  static void StaticSetter(v8::Local<v8::String>, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
-  {
-    v8::Local<v8::Value> v = info.Data();
-    WrappedStaticProperty *p = (WrappedStaticProperty *)v8::External::Unwrap(v);
-
-    typedef void (*SET)(T);
-    SET g = (SET)p->set;
-
-    g(Unpack<T>(value));
-  }
-};
-
-struct WrappedProperty : public WrappedMember
-{
-  void *get[2];
-  void *set[2];
-
-  template <typename T>
-  static v8::Handle<v8::Value> Getter(v8::Local<v8::String>, const v8::AccessorInfo& info)
-  {
-    class CLASS
-    {
-    };
-
-    v8::Local<v8::Value> v = info.Data();
-    WrappedProperty *p = (WrappedProperty *)v8::External::Unwrap(v);
-
-    v8::Local<v8::Object> self = info.Holder();
-    v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();
-
-    typedef T (CLASS::*GET)();
-    GET g = *(GET*)p->get;
-
-    T val = (static_cast<CLASS*>(ptr)->*g)();
-    return Pack<T>(val);
-  }
-
-  template <typename T>
-  static void Setter(v8::Local<v8::String>, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
-  {
-    class CLASS
-    {
-    };
-
-    v8::Local<v8::Value> v = info.Data();
-    WrappedProperty *p = (WrappedProperty *)v8::External::Unwrap(v);
-
-    v8::Local<v8::Object> self = info.Holder();
-    v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();
-
-    typedef void (CLASS::*SET)(T);
-    SET s = *(SET*)p->set;
-
-    T val = Unpack<T>(value);
-
-    (static_cast<CLASS*>(ptr)->*s)(val);
-  }
-};
-
-class TypeWrapper
-{
-public:
-  void *staticGet;
-  void *staticSet;
-  void *get;
-  void *set;
-
-  template <typename T> static void wrap()
-  {
-    v8::AccessorGetter sG = WrappedStaticProperty::StaticGetter<T>;
-    v8::AccessorSetter sS = WrappedStaticProperty::StaticSetter<T>;
-    v8::AccessorGetter g = WrappedProperty::Getter<T>;
-    v8::AccessorSetter s = WrappedProperty::Setter<T>;
-    TypeWrapper t = { (void*)sG, (void*)sS, g, s };
-
-    _wrappedTypes.insert(XTypeId<T>(), t);
-      
-  }
-  static const TypeWrapper findType(int i)
-  {
-    _ASSERT(_wrappedTypes.contains(i));
-    return _wrappedTypes[i];
-  }
-
-  static QHash<int, TypeWrapper> _wrappedTypes;
-};
-QHash<int, TypeWrapper> TypeWrapper::_wrappedTypes;
-
-class Interface
-{
-public: // external
-  Interface() : _template(v8::ObjectTemplate::New())
-  {
-    _template->SetInternalFieldCount(1);
-  }
-
-  template <typename TGET, typename TSET, typename CLASS>
-  void addProperty(const char *name, TGET (CLASS::*g)(), void (CLASS::*s)(TSET))
-  {
-    _ASSERT(sizeof(g) <= (sizeof(void *)*2));
-    _ASSERT(sizeof(s) <= (sizeof(void *)*2));
-
-    void *get[2];
-    void *set[2];
-    memcpy(get, &g, sizeof(void*)*2);
-    memcpy(set, &s, sizeof(void*)*2);
-
-    int getType = XTypeId<TGET>();
-    int setType = XTypeId<TSET>();
-
-    addProperty(name, getType, setType, get, set);
-  }
-
-  template <typename GETFUNC, typename SETFUNC>
-  void addPropertyMap(GETFUNC g, SETFUNC s=0, void *sG=0, void *sS=0)
-  {
-    _ASSERT(sizeof(g) <= (sizeof(void *)*2));
-    _ASSERT(sizeof(s) <= (sizeof(void *)*2));
-    void *get[2];
-    void *set[2];
-    memcpy(get, &g, sizeof(void*)*2);
-    memcpy(set, &s, sizeof(void*)*2);
-
-    addPropertyMap(get, set, sG, sS);
-  }
-
-  /*void addPropertyArray(WrappedPropertyMap::Getter g, WrappedPropertyMap::Setter s=0, WrappedPropertyMap::StaticGetter sG=0, , WrappedPropertyMap::StaticGetter sS=0)
-  {
-    WrappedPropertyMap* wrappedData = new WrappedPropertyMap;
-    wrappedData->get = g;
-    wrappedData->set = s;
-    wrappedData->staticGet = sG;
-    wrappedData->staticSet = sS;
-    addMember(wrappedData);
-
-    v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
-
-    _template->SetIndexedPropertyHandler(WrappedPropertyArray::GetHelper, WrappedPropertyArray::SetHelper, 0, 0, 0, data);
-  }*/
-
-  template <typename TGET, typename TSET>
-  void addStaticProperty(const char *name, TGET g(), void s(TSET))
-  {
-    void *get = g;
-    void *set = s;
-
-    int getType = XTypeId<TGET>();
-    int setType = XTypeId<TSET>();
-
-    addStaticProperty(name, getType, setType, get, set);
-  }
-
-
-private: // internal
-  void addPropertyMap(void *g[2], void *s[2], void *sG, void *sS)
-  {
-    WrappedPropertyMap* wrapped = new WrappedPropertyMap;
-    memcpy(wrapped->get, g, sizeof(g));
-    memcpy(wrapped->set, s, sizeof(s));
-    wrapped->staticGet = sG;
-    wrapped->staticSet = sS;
-    addMember(wrapped);
-
-    v8::Handle<v8::Value> data = v8::External::Wrap(wrapped);
-
-    _template->SetNamedPropertyHandler(WrappedPropertyMap::Getter, WrappedPropertyMap::Setter, 0, 0, 0, data);
-  }
-
-  void addStaticProperty(const char *name, int getId, int setId, void *get, void *set)
-  {
-    WrappedStaticProperty* wrappedData = new WrappedStaticProperty;
-    wrappedData->get = get;
-    wrappedData->set = set;
-
-    addMember(wrappedData);
-
-    v8::Handle<v8::Value> data = v8::External::Wrap(wrappedData);
-
-    const TypeWrapper wrapGet = TypeWrapper::findType(getId);
-    const TypeWrapper wrapSet = TypeWrapper::findType(setId);
-    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrapGet.staticGet, (v8::AccessorSetter)wrapSet.staticSet, data);
-  }
-
-  void addProperty(const char *name, int getId, int setId, void *get[2], void *set[2])
-  {
-    WrappedProperty* wrapped = new WrappedProperty;
-    memcpy(wrapped->get, get, sizeof(get));
-    memcpy(wrapped->set, set, sizeof(set));
-
-    addMember(wrapped);
-    v8::Handle<v8::Value> data = v8::External::Wrap(wrapped);
-
-    const TypeWrapper wrapGet = TypeWrapper::findType(getId);
-    const TypeWrapper wrapSet = TypeWrapper::findType(setId);
-    _template->SetAccessor(v8::String::New(name), (v8::AccessorGetter)wrapGet.get, (v8::AccessorSetter)wrapSet.set, data);
-  }
-
-private:
-  void addMember(WrappedMember* )
-    {
-    // keep list and delete them later...
-    }
-
-  v8::Local<v8::ObjectTemplate> _template;
-  friend class Object;
-};
-
-class Object
+/*class Object
   {
 public:
   Object(const Interface* ifc, void *thisPtr)
@@ -392,9 +15,33 @@ public:
   }
 
 private:
-  const Interface *_interface;
+  //const Interface *_interface;
   v8::Local<v8::Object> _object;
   friend class Context;
+  };*/
+
+template <typename T> class Interface
+  {
+public:
+  Interface()
+    {
+    }
+
+  template <typename GETTYPE,
+            typename SETTYPE,
+            typename cvv8::ConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD,
+            typename cvv8::MethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
+  void addProperty(const char *name)
+    {
+    typedef cvv8::ClassCreator<SomeClass> CC;
+    CC& cc(CC::Instance());
+    v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
+
+    v8::AccessorGetter getter = cvv8::ConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    v8::AccessorSetter setter = cvv8::MethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
+
+    proto->SetAccessor(v8::String::New(name), getter, setter);
+    }
   };
 
 class Engine
@@ -426,13 +73,22 @@ public:
     _context.Dispose();
     }
 
-  void set(const char* in, const Object& obj)
+  template <typename T>
+  void addInterface(const Interface<T>&)
+    {
+    typedef cvv8::ClassCreator<T> CC;
+    CC& cc(CC::Instance());
+
+    cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, _context->Global() );
+    }
+
+  /*void set(const char* in, const Object& obj)
     {
       v8::Handle<v8::String> propName = v8::String::New(in);
     _context->Global()->Set(propName, obj._object);
-    }
+    }*/
 
-private:
+//private:
   Engine* _engine;
   v8::Persistent<v8::Context> _context;
   v8::Context::Scope _scope;
@@ -476,6 +132,26 @@ private:
 
 class Vector3D
 {
+public:
+  Vector3D()
+  {
+    x = 0;
+  }
+  Vector3D(float a)
+  {
+    x = a;
+  }
+
+  float getX() const
+  {
+    return x;
+  }
+
+  void setX(float X)
+  {
+    x = X;
+  }
+
   float x;
   //void setX(### const... &'s)
 };
@@ -484,9 +160,13 @@ class Vector3D
 class SomeClass
 {
 public:
+  SomeClass() : v(0)
+  {
+
+  }
   virtual ~SomeClass() {}
 
-  virtual Vector3D getNonStatic()
+  virtual const Vector3D &getNonStatic() const
   {
     return v;
   }
@@ -553,20 +233,216 @@ public:
 int SomeClass::a = 0;
 int SomeClass::otherStatic = 0;
 
+//-----------------------------------
+// Policies used by cv::ClassCreator (it also has others)...
+namespace cvv8 {
+
+  // Optional: used mostly for error reporting purposes but can
+  // also be used to hold the class' JS-side name (which often differs
+  // from its native name).
+  CVV8_TypeName_DECL((SomeClass));
+  // Out-of-line definition of TypeName<MyType>::Value. The declaration
+  // should be visible to any client code which will use the bindings,
+  // but the definition may only be done once (put it in the binding's
+  // implementation file).
+  CVV8_TypeName_IMPL((SomeClass), "SomeClass");
+
+  // The policy which tells ClassCreator how to instantiate and
+  // destroy native objects. This one forwards to one of the
+  // ctors specified in MyType::Ctors.
+  /*typedef Signature<SomeClass (
+    CtorForwarder<SomeClass *()>,
+    CtorForwarder<SomeClass *(char const *)>,
+    CtorForwarder<SomeClass *( int, double )>,
+    CtorForwarder<SomeClass *( v8::Arguments const &)>
+    )> Ctors;
+  template <>
+  class ClassCreator_Factory<SomeClass>
+    : public ClassCreator_Factory_Dispatcher< SomeClass,
+    CtorArityDispatcher<Ctors> >
+  {};*/
+
+  // A JSToNative specialization which makes use of the plumbing
+  // installed by ClassCreator. This is required so that
+  // CastFromJS<MyType>() will work, as the JS/native binding process
+  // requires that we be able to convert (via CastFromJS()) a JS-side
+  // MyType object to a C++-side MyType object (so that we know what
+  // native object to apply a given method/property to).
+  template <>
+  struct JSToNative< SomeClass > : JSToNative_ClassCreator< SomeClass >
+  {};
+
+  
+
+  // There are several other policies not shown here.
+  // e.g. ClassCreator_InternalFields defines the v8-side internal
+  // field layout (it is rarely necessary to customized that, but
+  // it has some obscure uses). We can also hook into the post-construction
+  // and pre-destruction phases to perform custom un/binding work if needed.
+}
+
+//-----------------------------------
+// Policies used by cv::ClassCreator (it also has others)...
+namespace cvv8 {
+
+  // Optional: used mostly for error reporting purposes but can
+  // also be used to hold the class' JS-side name (which often differs
+  // from its native name).
+  CVV8_TypeName_DECL((Vector3D));
+  // Out-of-line definition of TypeName<MyType>::Value. The declaration
+  // should be visible to any client code which will use the bindings,
+  // but the definition may only be done once (put it in the binding's
+  // implementation file).
+  CVV8_TypeName_IMPL((Vector3D), "Vector3D");
+
+  // The policy which tells ClassCreator how to instantiate and
+  // destroy native objects. This one forwards to one of the
+  // ctors specified in MyType::Ctors.
+  /*typedef Signature<SomeClass (
+    CtorForwarder<SomeClass *()>,
+    CtorForwarder<SomeClass *(char const *)>,
+    CtorForwarder<SomeClass *( int, double )>,
+    CtorForwarder<SomeClass *( v8::Arguments const &)>
+    )> Ctors;
+  template <>
+  class ClassCreator_Factory<SomeClass>
+    : public ClassCreator_Factory_Dispatcher< SomeClass,
+    CtorArityDispatcher<Ctors> >
+    {};*/
+
+
+  // A JSToNative specialization which makes use of the plumbing
+  // installed by ClassCreator. This is required so that
+  // CastFromJS<MyType>() will work, as the JS/native binding process
+  // requires that we be able to convert (via CastFromJS()) a JS-side
+  // MyType object to a C++-side MyType object (so that we know what
+  // native object to apply a given method/property to).
+  template <>
+  struct JSToNative< Vector3D > : JSToNative_ClassCreator< Vector3D >
+  {};
+
+  template <> const Vector3D& Match<const Vector3D&, Vector3D*>(Vector3D *in, bool& valid)
+  {
+    if(!in)
+    {
+      valid = false;
+    }
+    return *in;
+  }
+
+  typedef cvv8::Signature<Vector3D (
+    cvv8::CtorForwarder<Vector3D *(float)>,
+    cvv8::CtorForwarder<Vector3D *()>
+    )> Ctors;
+  Vector3D *ClassCreator_Factory<Vector3D>::Create( v8::Persistent<v8::Object> & jsSelf, v8::Arguments const & argv )
+  {
+    typedef cvv8::CtorArityDispatcher<Ctors> Proxy;
+    Vector3D *b = Proxy::Call( argv );
+    if( b )
+    {
+      NativeToJSMap<Vector3D>::Insert( jsSelf, b );
+    }
+    return b;
+  }
+  void ClassCreator_Factory<Vector3D>::Delete( Vector3D * obj )
+  {
+    NativeToJSMap<Vector3D>::Remove( obj );
+    delete obj;
+  }
+
+  template <> struct NativeToJS<Vector3D>
+  {
+    v8::Handle<v8::Value> operator()( Vector3D const * n ) const
+    {
+      Vector3D *out = 0;
+      v8::Handle<v8::Object> obj = ClassCreator<Vector3D>::Instance().NewInstance( 0, 0, out );     
+      *out = *n;
+      return obj;
+    }
+    v8::Handle<v8::Value> operator()( Vector3D const & n ) const
+    {
+      return this->operator()( &n );
+    }
+  };
+
+  // There are several other policies not shown here.
+  // e.g. ClassCreator_InternalFields defines the v8-side internal
+  // field layout (it is rarely necessary to customized that, but
+  // it has some obscure uses). We can also hook into the post-construction
+  // and pre-destruction phases to perform custom un/binding work if needed.
+}
+
+//-----------------------------------
+// Ultra-brief ClassCreator demo. See ConvertDemo.?pp for MUCH more detail.
+void bindSomeClass( v8::Handle<v8::Object> dest )
+{
+  typedef cvv8::ClassCreator<SomeClass> CC;
+
+  CC& cc(CC::Instance());
+
+  if( cc.IsSealed() ) // the binding was already initialized.
+  {
+    cc.AddClassTo( cvv8::TypeName<SomeClass>::Value, dest );
+    return;
+  }
+
+  // Else initialize the bindings...
+  /*cc("destroy", CC::DestroyObjectCallback);
+  cc("func", cvv8::MethodToInCa<SomeClass, int (double), &SomeClass::func>::Call);
+  cc("nonMember", cvv8::FunctionToInCa<void (v8::Arguments const &), non_member_func>::Call );*/
+
+  v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
+
+  proto->SetAccessor(v8::String::New("nonStatic"),
+                      cvv8::ConstMethodToGetter<SomeClass, const Vector3D &(), &SomeClass::getNonStatic>::Get,
+                      cvv8::MethodToSetter<SomeClass, const Vector3D&, &SomeClass::setNonStatic>::Set);
+
+  cc.AddClassTo( cvv8::TypeName<SomeClass>::Value, dest );
+}
+
+//-----------------------------------
+// Ultra-brief ClassCreator demo. See ConvertDemo.?pp for MUCH more detail.
+void bindVector3D( v8::Handle<v8::Object> dest )
+{
+  typedef cvv8::ClassCreator<Vector3D> CC;
+
+  CC& cc(CC::Instance());
+
+  if( cc.IsSealed() ) // the binding was already initialized.
+  {
+    cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, dest );
+    return;
+  }
+  // Else initialize the bindings...
+  /*cc("destroy", CC::DestroyObjectCallback);
+  cc("func", cvv8::MethodToInCa<SomeClass, int (double), &SomeClass::func>::Call);
+  cc("nonMember", cvv8::FunctionToInCa<void (v8::Arguments const &), non_member_func>::Call );*/
+
+  v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
+
+  proto->SetAccessor(v8::String::New("x"),
+    cvv8::ConstMethodToGetter<Vector3D, float(), &Vector3D::getX>::Get,
+    cvv8::MethodToSetter<Vector3D, float, &Vector3D::setX>::Set);
+
+  cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, dest );
+}
+
 int main(int, char*[])
 {
   Engine engine;
 
-  TypeWrapper::wrap<int>();
+/*  TypeWrapper::wrap<int>();
   TypeWrapper::wrap<const int &>();
   TypeWrapper::wrap<Vector3D>();
-  TypeWrapper::wrap<const Vector3D &>();
+  TypeWrapper::wrap<const Vector3D &>();*/
 
   // build the template
-  Interface someTempl;
-  someTempl.addStaticProperty("x", SomeClass::getA, SomeClass::setA); 
-  someTempl.addProperty("_3D", &SomeClass::getNonStatic, &SomeClass::setNonStatic);
+  Interface<SomeClass> someTempl;
+  someTempl.addProperty<const Vector3D &, const Vector3D &, &SomeClass::getNonStatic, &SomeClass::setNonStatic>("nonStatic");
   //someTempl.addPropertyMap<&SomeClass::getOther, &SomeClass::setOther, SomeClass::getOtherStatic, SomeClass::setOtherStatic>();
+
+  Interface<Vector3D> vecTempl;
+  vecTempl.addProperty<float, float, &Vector3D::getX, &Vector3D::setX>("x");
 
   // build the template
   //Interface vectorTempl;
@@ -574,17 +450,31 @@ int main(int, char*[])
 
   // Create a new context.
   Context c(&engine);
+  c.addInterface(someTempl);
+  c.addInterface(vecTempl);
+
+  //bindSomeClass(c._context->Global());
+  //bindVector3D(c._context->Global());
 
   // Enter the created context for compiling and
   // running the hello world script.
 
-  SomeClass wrapable;
-  Object obj(&someTempl, &wrapable);
+  typedef cvv8::ClassCreator<SomeClass> CC;
+  SomeClass *m = NULL;
+  v8::Handle<v8::Object> obj = CC::Instance().NewInstance( 0, NULL, m );
 
-  c.set("someClass", obj);
+  c._context->Global()->Set(v8::String::New("someClass"), obj);
+  //Object obj(&someTempl, &wrapable);
 
-  Script script("'Hello' + someClass._3D.x");
+  //c.set("someClass", obj);
+
+  Script script("someClass.nonStatic = new Vector3D(5);"
+                "someClass.nonStatic.x = 61;"
+                "'Hello' + someClass.nonStatic.x;");
 
   script.run();
+
+  CC::DestroyObject( obj );
+
   return 0;
 }
