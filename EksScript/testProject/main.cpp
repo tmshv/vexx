@@ -44,6 +44,27 @@ public:
     }
   };
 
+class InterfaceObject
+  {
+public:
+  InterfaceObject()
+    {
+    }
+
+  template <typename T>
+  static InterfaceObject newInstance(Interface<T>*, T** m)
+    {
+    typedef cvv8::ClassCreator<T> CC;
+    InterfaceObject ret;
+    ret._object = CC::Instance().NewInstance( 0, NULL, *m );
+    return ret;
+    }
+
+private:
+  v8::Handle<v8::Object> _object;
+  friend class Context;
+  };
+
 class Engine
   {
 public:
@@ -82,13 +103,13 @@ public:
     cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, _context->Global() );
     }
 
-  /*void set(const char* in, const Object& obj)
+  void set(const char* in, const InterfaceObject& obj)
     {
       v8::Handle<v8::String> propName = v8::String::New(in);
     _context->Global()->Set(propName, obj._object);
-    }*/
+    }
 
-//private:
+private:
   Engine* _engine;
   v8::Persistent<v8::Context> _context;
   v8::Context::Scope _scope;
@@ -372,69 +393,9 @@ namespace cvv8 {
   // and pre-destruction phases to perform custom un/binding work if needed.
 }
 
-//-----------------------------------
-// Ultra-brief ClassCreator demo. See ConvertDemo.?pp for MUCH more detail.
-void bindSomeClass( v8::Handle<v8::Object> dest )
-{
-  typedef cvv8::ClassCreator<SomeClass> CC;
-
-  CC& cc(CC::Instance());
-
-  if( cc.IsSealed() ) // the binding was already initialized.
-  {
-    cc.AddClassTo( cvv8::TypeName<SomeClass>::Value, dest );
-    return;
-  }
-
-  // Else initialize the bindings...
-  /*cc("destroy", CC::DestroyObjectCallback);
-  cc("func", cvv8::MethodToInCa<SomeClass, int (double), &SomeClass::func>::Call);
-  cc("nonMember", cvv8::FunctionToInCa<void (v8::Arguments const &), non_member_func>::Call );*/
-
-  v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
-
-  proto->SetAccessor(v8::String::New("nonStatic"),
-                      cvv8::ConstMethodToGetter<SomeClass, const Vector3D &(), &SomeClass::getNonStatic>::Get,
-                      cvv8::MethodToSetter<SomeClass, const Vector3D&, &SomeClass::setNonStatic>::Set);
-
-  cc.AddClassTo( cvv8::TypeName<SomeClass>::Value, dest );
-}
-
-//-----------------------------------
-// Ultra-brief ClassCreator demo. See ConvertDemo.?pp for MUCH more detail.
-void bindVector3D( v8::Handle<v8::Object> dest )
-{
-  typedef cvv8::ClassCreator<Vector3D> CC;
-
-  CC& cc(CC::Instance());
-
-  if( cc.IsSealed() ) // the binding was already initialized.
-  {
-    cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, dest );
-    return;
-  }
-  // Else initialize the bindings...
-  /*cc("destroy", CC::DestroyObjectCallback);
-  cc("func", cvv8::MethodToInCa<SomeClass, int (double), &SomeClass::func>::Call);
-  cc("nonMember", cvv8::FunctionToInCa<void (v8::Arguments const &), non_member_func>::Call );*/
-
-  v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
-
-  proto->SetAccessor(v8::String::New("x"),
-    cvv8::ConstMethodToGetter<Vector3D, float(), &Vector3D::getX>::Get,
-    cvv8::MethodToSetter<Vector3D, float, &Vector3D::setX>::Set);
-
-  cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, dest );
-}
-
 int main(int, char*[])
 {
   Engine engine;
-
-/*  TypeWrapper::wrap<int>();
-  TypeWrapper::wrap<const int &>();
-  TypeWrapper::wrap<Vector3D>();
-  TypeWrapper::wrap<const Vector3D &>();*/
 
   // build the template
   Interface<SomeClass> someTempl;
@@ -444,37 +405,21 @@ int main(int, char*[])
   Interface<Vector3D> vecTempl;
   vecTempl.addProperty<float, float, &Vector3D::getX, &Vector3D::setX>("x");
 
-  // build the template
-  //Interface vectorTempl;
-  //someTempl.addProperty<QVector3D>("x", &QVector3D::x, &QVector3D::setX);
-
   // Create a new context.
   Context c(&engine);
   c.addInterface(someTempl);
   c.addInterface(vecTempl);
 
-  //bindSomeClass(c._context->Global());
-  //bindVector3D(c._context->Global());
-
-  // Enter the created context for compiling and
-  // running the hello world script.
-
-  typedef cvv8::ClassCreator<SomeClass> CC;
   SomeClass *m = NULL;
-  v8::Handle<v8::Object> obj = CC::Instance().NewInstance( 0, NULL, m );
+  InterfaceObject obj = InterfaceObject::newInstance(&someTempl, &m);
 
-  c._context->Global()->Set(v8::String::New("someClass"), obj);
-  //Object obj(&someTempl, &wrapable);
-
-  //c.set("someClass", obj);
+  c.set("someClass", obj);
 
   Script script("someClass.nonStatic = new Vector3D(5);"
                 "someClass.nonStatic.x = 61;"
-                "'Hello' + someClass.nonStatic.x;");
+                "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.x;");
 
   script.run();
-
-  CC::DestroyObject( obj );
 
   return 0;
 }
