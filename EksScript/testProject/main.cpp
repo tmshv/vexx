@@ -4,22 +4,6 @@
 #include "QHash"
 #include "cvv8/v8-convert.hpp"
 
-/*class Object
-  {
-public:
-  Object(const Interface* ifc, void *thisPtr)
-    : _interface(ifc),
-    _object(_interface->_template->NewInstance())
-  {
-    _object->SetInternalField(0, v8::External::New(thisPtr));
-  }
-
-private:
-  //const Interface *_interface;
-  v8::Local<v8::Object> _object;
-  friend class Context;
-  };*/
-
 template <typename T> class Interface
   {
 public:
@@ -33,7 +17,7 @@ public:
             typename cvv8::MethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
   void addProperty(const char *name)
     {
-    typedef cvv8::ClassCreator<SomeClass> CC;
+    typedef cvv8::ClassCreator<T> CC;
     CC& cc(CC::Instance());
     v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
 
@@ -100,7 +84,7 @@ public:
     typedef cvv8::ClassCreator<T> CC;
     CC& cc(CC::Instance());
 
-    cc.AddClassTo( cvv8::TypeName<Vector3D>::Value, _context->Global() );
+    cc.AddClassTo( cvv8::TypeName<T>::Value, _context->Global() );
     }
 
   void set(const char* in, const InterfaceObject& obj)
