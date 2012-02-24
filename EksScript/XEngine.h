@@ -1,12 +1,14 @@
 #ifndef XENGINE_H
 #define XENGINE_H
 
-class XEngine
+#include "XScriptGlobal.h"
+#include "v8.h"
+
+class EKSSCRIPT_EXPORT XEngine
   {
 public:
-  XEngine() : _globalTemplate(v8::ObjectTemplate::New())
-  {
-  }
+  XEngine();
+  ~XEngine();
 
 private:
   v8::HandleScope _scope;

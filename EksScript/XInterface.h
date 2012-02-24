@@ -1,6 +1,13 @@
 #ifndef XINTERFACE_H
 #define XINTERFACE_H
 
+#include "v8.h"
+#include "QMetaType"
+#include "QVariant"
+#include "QHash"
+#include "cvv8/v8-convert.hpp"
+#include "XMacroHelpers"
+
 namespace cvv8
 {
   template <typename T> struct NativeToJSCopyableType

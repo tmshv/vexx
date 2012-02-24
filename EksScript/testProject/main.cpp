@@ -1,15 +1,10 @@
-#include "v8.h"
-#include "QMetaType"
-#include "QVariant"
-#include "QHash"
-#include "cvv8/v8-convert.hpp"
-#include "QRectF"
-#include "XMacroHelpers"
 #include "XInterface.h"
 #include "XInterfaceObject.h"
 #include "XEngine.h"
 #include "XContext.h"
 #include "XScript.h"
+
+#include "QRectF"
 
 class SomeClass
 {
@@ -84,19 +79,16 @@ public:
   static int otherStatic;
   QRectF v;
 };
+
+X_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass)
+X_SCRIPTABLE_TYPE_COPYABLE(QRectF)
+X_SCRIPTABLE_TYPE_COPYABLE(QPointF)
+
+
 int SomeClass::a = 0;
 int SomeClass::otherStatic = 0;
-
-//--------------------------------------------------------------------------
-X_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass)
 X_IMPLEMENT_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass, "SomeClass")
-
-//--------------------------------------------------------------------------
-X_SCRIPTABLE_TYPE_COPYABLE(QRectF)
 X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(QRectF, "Rect")
-
-//--------------------------------------------------------------------------
-X_SCRIPTABLE_TYPE_COPYABLE(QPointF)
 X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(QPointF, "Point")
 
 int main(int, char*[])
@@ -130,15 +122,15 @@ int main(int, char*[])
 
   c.set("someClass", obj);
 
-  XScript script("var r = new Rect();"
-                "r.top = 5;"
-                "r.left = 61;"
-                "someClass.nonStatic = r;"
-                "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y;");
+  XScript script(
+    "var r = new Rect();"
+    "r.top = 5;"
+    "r.left = 61;"
+    "someClass.nonStatic = r;"
+    "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y;"
+    );
 
   script.run();
-
-  v8::V8::LowMemoryNotification();
 
   return 0;
 }

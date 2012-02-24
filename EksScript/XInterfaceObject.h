@@ -1,12 +1,13 @@
 #ifndef XINTERFACEOBJECT_H
 #define XINTERFACEOBJECT_H
 
-class XInterfaceObject
+#include "XScriptGlobal.h"
+#include "XInterface.h"
+
+class EKSSCRIPT_EXPORT XInterfaceObject
   {
 public:
-  XInterfaceObject()
-    {
-    }
+  XInterfaceObject();
 
   template <typename T>
   static XInterfaceObject newInstance(XInterface<T>*, T** m)

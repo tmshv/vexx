@@ -6,13 +6,17 @@
 
 QT       += core
 QT       -= gui
+
 TEMPLATE = app
 TARGET = testProject
 
 include("../../EksCore/GeneralOptions.pri")
-include($$ROOT/EksScript/EksScriptOptions.pri)
 
 SOURCES += main.cpp
 
-LIBS += -lEksCore
+
+debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
+release:LIBS += -L$$ROOT/EksScript/v8/releaselib/
+
+LIBS += -lEksCore -lEksScript -lv8
 INCLUDEPATH += $$ROOT/EksScript/ $$ROOT/EksScript/v8 $$ROOT/EksCore
