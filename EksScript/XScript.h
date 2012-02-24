@@ -2,7 +2,6 @@
 #define XSCRIPT_H
 
 #include "XScriptGlobal.h"
-#include "v8.h"
 
 class EKSSCRIPT_EXPORT XScript
   {
@@ -12,7 +11,7 @@ public:
   void run();
 
 private:
-  v8::Handle<v8::Script> _script;
+  void *_impl[1];
   };
 
 

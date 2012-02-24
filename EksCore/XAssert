@@ -58,9 +58,11 @@ public:
 #if X_ASSERTS_ENABLED
 # define xAssertMessage(condition, message, ...) if(!(condition) && XAssert::currentFireFunction()) { X_CONSTRUCT_ASSERT(condition, message, __VA_ARGS__); if( XAssert::currentFireFunction()(ass) && XAssert::currentBreakFunction() ) { XAssert::currentBreakFunction()(); } }
 # define xVerify xAssert
+# define xCompileTimeAssert(exp) int CTA##__LINE__ [ (exp) ? 1 : -1 ]
 #else
 # define xAssertMessage(condition, message, ...)
 # define xVerify(x, ...) x
+# define xCompileTimeAssert(exp)
 #endif
 
 #define xAssert(condition, ...) xAssertMessage(condition, "", __VA_ARGS__)
@@ -71,5 +73,6 @@ public:
 // xAssert(i > 10, i)
 // xAssertMessage(i > 10, "Oh noes i is too small", i)
 // xAssertMessage(i > 10, "Oh noes (%1, %2, %3) is too small", i, j, k)
+
 
 #endif // XASSERT_H
