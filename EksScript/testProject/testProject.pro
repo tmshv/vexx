@@ -14,4 +14,5 @@ include($$ROOT/EksScript/EksScriptOptions.pri)
 
 SOURCES += main.cpp
 
-INCLUDEPATH += $$ROOT/EksScript/v8
+LIBS += -lEksCore
+INCLUDEPATH += $$ROOT/EksScript/ $$ROOT/EksScript/v8 $$ROOT/EksCore
