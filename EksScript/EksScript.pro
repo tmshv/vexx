@@ -50,7 +50,8 @@ HEADERS += XScriptGlobal.h \
     XScriptTypeInfo.h \
     XConvertToScript.h \
     XConvertFromScript.h \
-    XConvertScriptSTL.h
+    XConvertScriptSTL.h \
+    XConvert.h
 
 debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
 release:LIBS += -L$$ROOT/EksScript/v8/releaselib/

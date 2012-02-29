@@ -2,21 +2,13 @@
 #define XCONVERTTOSCRIPT_H
 
 #include "XAssert"
+#include "XConvert.h"
 #include "XScriptTypeInfo.h"
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
 
 namespace cvv8
 {
-
-template <typename NT> struct NativeToJS
-  {
-  template <typename X>
-  v8::Handle<v8::Value> operator()( X const & ) const;
-
-private:
-  typedef xCompileTimeAssertDef<false> NativeToJSMustBeSpecialized;
-  };
 
 template <typename NT> struct NativeToJS<NT *> : NativeToJS<NT> {};
 template <typename NT> struct NativeToJS<NT const *> : NativeToJS<NT *> {};

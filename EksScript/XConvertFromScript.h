@@ -2,20 +2,13 @@
 #define XCONVERTFROMSCRIPT_H
 
 #include "XAssert"
+#include "XConvert.h"
 #include "XScriptTypeInfo.h"
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
 
 namespace cvv8
 {
-
-template <typename JST> struct JSToNative
-  {
-  typedef typename TypeInfo<JST>::NativeHandle ResultType;
-
-  //! Must be specialized to be useful.
-  ResultType operator()(v8::Handle<v8::Value> const &h) const;
-  };
 
 template <typename JST> struct JSToNative<JST const> : JSToNative<JST> {};
 template <typename JST> struct JSToNative<JST *> : JSToNative<JST> {};
@@ -294,14 +287,14 @@ template <> struct JSToNative<bool>
 
 namespace
 {
-template <typename T> struct UselessConversionType
+template <typename T> struct UselessConversionTypeToNative
   {
   };
 }
 
 template <> struct JSToNative< XIfElse<
     XSameType<unsigned long int,uint64_t>::Value,
-    UselessConversionType<unsigned long>,
+    UselessConversionTypeToNative<unsigned long>,
     unsigned long >::Type >
     : JSToNative<uint64_t>
   {
@@ -309,7 +302,7 @@ template <> struct JSToNative< XIfElse<
 
 template <> struct JSToNative< XIfElse<
     XSameType<long,int64_t>::Value,
-    Detail::UselessConversionType<long>,
+    UselessConversionTypeToNative<long>,
     long >::Type > : JSToNative<int64_t>
   {
   };
