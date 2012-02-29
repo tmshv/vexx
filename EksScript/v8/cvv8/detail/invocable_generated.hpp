@@ -2,15 +2,15 @@
 #if !defined(DOXYGEN)
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<1,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<1,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -26,15 +26,15 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<1,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<1,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -52,15 +52,15 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 1,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -88,15 +88,15 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 1,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -133,15 +133,15 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 1,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -169,15 +169,15 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 1,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -243,7 +243,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,1>
 {
     enum { Arity = 1 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -252,7 +252,7 @@ struct CtorForwarderProxy<Sig,1>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 		
              typedef ArgCaster<A0> AC0;
 		
@@ -266,16 +266,16 @@ struct CtorForwarderProxy<Sig,1>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<2,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<2,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -293,16 +293,16 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<2,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<2,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -322,16 +322,16 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 2,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -361,16 +361,16 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 2,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -409,16 +409,16 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 2,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -448,16 +448,16 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 2,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -525,7 +525,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,2>
 {
     enum { Arity = 2 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -534,8 +534,8 @@ struct CtorForwarderProxy<Sig,2>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -551,17 +551,17 @@ struct CtorForwarderProxy<Sig,2>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<3,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<3,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -581,17 +581,17 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<3,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<3,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -613,17 +613,17 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 3,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -655,17 +655,17 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 3,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -706,17 +706,17 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 3,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -748,17 +748,17 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 3,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -828,7 +828,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,3>
 {
     enum { Arity = 3 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -837,9 +837,9 @@ struct CtorForwarderProxy<Sig,3>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -857,18 +857,18 @@ struct CtorForwarderProxy<Sig,3>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<4,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<4,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -890,18 +890,18 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<4,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<4,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -925,18 +925,18 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 4,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -970,18 +970,18 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 4,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1024,18 +1024,18 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 4,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1069,18 +1069,18 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 4,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1152,7 +1152,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,4>
 {
     enum { Arity = 4 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -1161,10 +1161,10 @@ struct CtorForwarderProxy<Sig,4>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1184,19 +1184,19 @@ struct CtorForwarderProxy<Sig,4>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<5,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<5,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1220,19 +1220,19 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<5,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<5,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1258,19 +1258,19 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 5,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1306,19 +1306,19 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 5,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1363,19 +1363,19 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 5,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1411,19 +1411,19 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 5,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1497,7 +1497,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,5>
 {
     enum { Arity = 5 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -1506,11 +1506,11 @@ struct CtorForwarderProxy<Sig,5>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1532,20 +1532,20 @@ struct CtorForwarderProxy<Sig,5>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<6,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<6,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1571,20 +1571,20 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<6,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<6,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1612,20 +1612,20 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 6,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1663,20 +1663,20 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 6,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1723,20 +1723,20 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 6,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1774,20 +1774,20 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 6,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1863,7 +1863,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,6>
 {
     enum { Arity = 6 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -1872,12 +1872,12 @@ struct CtorForwarderProxy<Sig,6>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1901,21 +1901,21 @@ struct CtorForwarderProxy<Sig,6>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<7,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<7,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1943,21 +1943,21 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<7,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<7,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -1987,21 +1987,21 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 7,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2041,21 +2041,21 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 7,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2104,21 +2104,21 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 7,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2158,21 +2158,21 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 7,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2250,7 +2250,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,7>
 {
     enum { Arity = 7 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -2259,13 +2259,13 @@ struct CtorForwarderProxy<Sig,7>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2291,22 +2291,22 @@ struct CtorForwarderProxy<Sig,7>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<8,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<8,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2336,22 +2336,22 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<8,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<8,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2383,22 +2383,22 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 8,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2440,22 +2440,22 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 8,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2506,22 +2506,22 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 8,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2563,22 +2563,22 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 8,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2658,7 +2658,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,8>
 {
     enum { Arity = 8 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -2667,14 +2667,14 @@ struct CtorForwarderProxy<Sig,8>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2702,23 +2702,23 @@ struct CtorForwarderProxy<Sig,8>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<9,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<9,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2750,23 +2750,23 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<9,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<9,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2800,23 +2800,23 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 9,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2860,23 +2860,23 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 9,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2929,23 +2929,23 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 9,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -2989,23 +2989,23 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 9,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3087,7 +3087,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,9>
 {
     enum { Arity = 9 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -3096,15 +3096,15 @@ struct CtorForwarderProxy<Sig,9>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3134,24 +3134,24 @@ struct CtorForwarderProxy<Sig,9>
 }
 namespace Detail {
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<10,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<10,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3185,24 +3185,24 @@ namespace Detail {
     };
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<10,Sig,UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<10,Sig,UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
+        typedef XFunctionSignature<Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3238,24 +3238,24 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 10,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3301,24 +3301,24 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T, 10,Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
-        typedef MethodSignature<T,Sig> SignatureType;
+        typedef XMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3373,24 +3373,24 @@ namespace Detail {
 }
 namespace Detail {
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T, 10,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3436,24 +3436,24 @@ namespace Detail {
     };
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, 10,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
-        typedef ConstMethodSignature<T,Sig> SignatureType;
+        typedef XConstMethodSignature<T,Sig> SignatureType;
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;
@@ -3537,7 +3537,7 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,10>
 {
     enum { Arity = 10 };
-    typedef typename Signature<Sig>::ReturnType ReturnType;
+    typedef typename XSignature<Sig>::ReturnType ReturnType;
     static ReturnType Call( v8::Arguments const & argv )
     {
         if( argv.Length() < Arity )
@@ -3546,16 +3546,16 @@ struct CtorForwarderProxy<Sig,10>
         }
         else
         {
-            typedef typename sl::At< 0, Signature<Sig> >::Type A0;
-		typedef typename sl::At< 1, Signature<Sig> >::Type A1;
-		typedef typename sl::At< 2, Signature<Sig> >::Type A2;
-		typedef typename sl::At< 3, Signature<Sig> >::Type A3;
-		typedef typename sl::At< 4, Signature<Sig> >::Type A4;
-		typedef typename sl::At< 5, Signature<Sig> >::Type A5;
-		typedef typename sl::At< 6, Signature<Sig> >::Type A6;
-		typedef typename sl::At< 7, Signature<Sig> >::Type A7;
-		typedef typename sl::At< 8, Signature<Sig> >::Type A8;
-		typedef typename sl::At< 9, Signature<Sig> >::Type A9;
+            typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
+    typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
+    typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
+    typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
+    typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
+    typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
+    typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
+    typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
+    typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
+    typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
 		
              typedef ArgCaster<A0> AC0;
 		 typedef ArgCaster<A1> AC1;

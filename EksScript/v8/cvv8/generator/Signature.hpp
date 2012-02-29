@@ -1,3 +1,5 @@
+#if 0
+
 #if !defined(BOOST_PP_IS_ITERATING)
 #  include <boost/preprocessor/repetition.hpp>
 #  include <boost/preprocessor/punctuation/comma_if.hpp>
@@ -70,3 +72,4 @@ struct Signature< RV (T::*)(BOOST_PP_ENUM_PARAMS(n, A)) const >
 };
 
 #endif /* BOOST_PP_IS_ITERATING */
+#endif

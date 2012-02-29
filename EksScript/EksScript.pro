@@ -37,20 +37,26 @@ HEADERS += XScriptGlobal.h \
     v8/cvv8/properties.hpp \
     v8/cvv8/NativeToJSMap.hpp \
     v8/cvv8/invocable.hpp \
-    v8/cvv8/convert.hpp \
     v8/cvv8/ClassCreator.hpp \
     v8/cvv8/arguments.hpp \
-    v8/cvv8/detail/tmp.hpp \
-    v8/cvv8/detail/signature_generated.hpp \
-    v8/cvv8/detail/signature_core.hpp \
     v8/cvv8/detail/invocable_generated.hpp \
     v8/cvv8/detail/invocable_core.hpp \
-    v8/cvv8/detail/doxygen_hack.hpp \
     v8/cvv8/detail/convert_core.hpp \
-    v8/cvv8/generator/Signature.hpp
+    v8/cvv8/generator/Signature.hpp \
+    XSignature.h \
+    XSignatureHelpers.h \
+    XSignatureSpecialisations.h \
+    XTemplateMetaHelpers.h \
+    XScriptTypeInfo.h \
+    XConvertToScript.h \
+    XConvertFromScript.h \
+    XConvertScriptSTL.h
 
 debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
 release:LIBS += -L$$ROOT/EksScript/v8/releaselib/
 
-LIBS += -lv8
+LIBS += -lv8 -lEksCore
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/v8
+
+OTHER_FILES += \
+    License.txt

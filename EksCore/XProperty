@@ -16,8 +16,8 @@
     XReadProperty( type, readName, readName ); \
     XWriteProperty( type, readName, writeName );
 
-#define XROSpecificProperty( type, readName, accessLevel ) \
-    private: \
+#define XROSpecificProperty( type, readName, accessLevel, memberLevel ) \
+    memberLevel: \
     XPropertyMember( type, readName ); \
     accessLevel: \
     XReadProperty( type, readName, readName );
@@ -59,7 +59,7 @@
 #define XGetPropertyMember( name ) _##name
 
 #define XProperty( type, readName, writeName ) XSpecificProperty( type, readName, writeName, public )
-#define XROProperty( type, readName ) XROSpecificProperty( type, readName, public )
+#define XROProperty( type, readName ) XROSpecificProperty( type, readName, public, private )
 #define XWOProperty( type, propName, writeName ) XWOSpecificProperty( type, propName, writeName, public )
 
 #define XRefProperty( type, name ) XRefSpecificProperty( type, name, public )

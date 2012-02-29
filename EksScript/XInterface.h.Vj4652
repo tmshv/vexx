@@ -1,0 +1,581 @@
+#ifndef XINTERFACE_H
+#define XINTERFACE_H
+
+#include "v8.h"
+#include "XMetaType"
+#include "XVariant"
+#include "XHash"
+#include "cvv8/properties.hpp"
+#include "XMacroHelpers"
+
+namespace cvv8
+{
+  template <typename T> struct NativeToJSCopyableType
+  {
+    v8::Handle<v8::Value> operator()( T const * n ) const
+    {
+      T *out = 0;
+      v8::Handle<v8::Object> obj = ClassCreator<T>::Instance().NewInstance( 0, 0, out );
+      *out = *n;
+      return obj;
+    }
+    v8::Handle<v8::Value> operator()( T const & n ) const
+    {
+      return this->operator()( &n );
+    }
+  };
+
+  template <typename T, typename CTORS> class ClassCreatorCopyableFactory
+  {
+  public:
+    typedef T* ReturnType;
+
+    static T *Create(v8::Persistent<v8::Object> & jsSelf, v8::Arguments const & argv)
+    {
+      typedef cvv8::CtorArityDispatcher<CTORS> Proxy;
+      T *b = Proxy::Call(argv);
+      if(b)
+      {
+        NativeToJSMap<T>::Insert(jsSelf, b);
+      }
+      v8::V8::AdjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
+      return b;
+    }
+
+    static void Delete(T *obj)
+    {
+      NativeToJSMap<T>::Remove(obj);
+      delete obj;
+      v8::V8::AdjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
+    }
+  };
+
+  template <typename T> inline const T &PtrMatcher(T *in, bool& valid)
+  {
+    if(!in)
+    {
+      static T o;
+      valid = false;
+      return o;
+    }
+    return *in;
+  }
+
+#define X_SCRIPTABLE_CONSTRUCTOR_DEF(variable, type, n) variable,
+
+#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) cvv8::CtorForwarder<type *(const type &)>, cvv8::CtorForwarder<type *()> )> name;
+
+#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, ...) \
+X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__) \
+template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {};
+
+#define X_SCRIPTABLE_MATCHERS(type) \
+template <> const type& Match<const type&, type*>(type *in, bool& valid) { return PtrMatcher<type>(in, valid); }
+
+#define X_SCRIPTABLE_TYPE_BASE(type)  \
+  namespace cvv8 { \
+  CVV8_TypeName_DECL((type)); \
+  template <> struct JSToNative<type> : JSToNative_ClassCreator<type> {}; \
+  X_SCRIPTABLE_MATCHERS(type) \
+  }
+
+#define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
+  namespace cvv8 { \
+  template <> struct NativeToJS<type> : public NativeToJSCopyableType<type> {}; \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
+  }
+
+#define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
+
+#define X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name) \
+  namespace cvv8 { \
+  CVV8_TypeName_IMPL((type), name); \
+  }
+
+#define X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
+
+#define X_IMPLEMENT_SCRIPTABLE_TYPE_NOT_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
+}
+
+template <typename T> class XInstance
+  {
+public:
+  typedef typename XPlainType<T>::Type Type;
+
+  static XInstance &Instance()
+  {
+      static XInstance bob;
+      return bob;
+  }
+
+  inline v8::Handle<v8::ObjectTemplate> Prototype()
+  {
+      return this->protoTmpl;
+  }
+
+  inline v8::Handle<v8::FunctionTemplate> CtorTemplate()
+  {
+      return this->ctorTmpl;
+  }
+
+  /**
+     Returns this class' constructor template.
+
+     ACHTUNG: after this is called, changes made to the Prototype()
+     object might not have any effect. Thus this should only be
+     called after the prototype object has been fully set up.
+     (i have no idea why v8 behaves this way.)
+
+     After calling this, IsSealed() will return true.
+  */
+  inline v8::Handle<v8::Function> CtorFunction()
+  {
+      // In my experience, if GetFunction() is called BEFORE setting up
+      // the Prototype object, v8 gets very unhappy (class member lookups don't work?).
+      this->isSealed = true;
+      return this->ctorTmpl->GetFunction();
+  }
+
+  inline bool IsSealed() const
+  {
+      return this->isSealed;
+  }
+
+  /**
+     Creates a new instanced of the object via the JS API. It calls
+     ClassCreator_Factory<T>::Create(), passing it argv, to
+     instantiate the object. On success a JS handle to the object is
+     returned (it is owned by v8), and the caller can get the native
+     pointer with:
+
+     @code
+     T * t = CastFromJS<T>(theHandle);
+     @endcode
+  */
+  inline v8::Handle<v8::Object> NewInstance( int argc, v8::Handle<v8::Value> argv[] )
+  {
+      return this->CtorFunction()->NewInstance(argc, argv);
+  }
+
+  /**
+      A convenience form of NewInstance() which returns the JS version
+      of the object and assigns tgt to the native pointer (which will
+      be NULL on error).
+
+      If tgt is NULL when this function returns, or
+      returnedObj.IsEmpty(), then we assume that a v8 exception is
+      propagating, and the caller should return to v8 as soon as
+      possible so the exception can be triggered JS-side (it is not
+      actually triggered until we return to v8).
+
+      The returned object is owned by v8.
+  */
+  v8::Handle<v8::Object> NewInstance( int argc, v8::Handle<v8::Value> argv[], T * & tgt )
+  {
+      v8::Handle<v8::Object> const & obj( this->CtorFunction()->NewInstance(argc, argv) );
+      if( obj.IsEmpty() ) return obj /* assume exception is propagating. */;
+      else
+      {
+          tgt = CastFromJS<T>(obj);
+          if( !tgt ) {
+              Toss(StringBuffer()<<"Internal error: NewInstance() returned a non-empty "
+                  << "Handle but CastFromJS<"<<TypeName<T>::Value<<">() failed. "
+                  << "This is either a serious cvv8 bug or the JSToNative specialization "
+                  << "is not working properly.");
+              return v8::Handle<v8::Object>();
+          }
+          else return obj;
+      }
+  }
+
+  /**
+     Convenience method to add the given property to the
+     prototype. Returns this object, for call chaining.
+
+     CastToJS<ValueT>(val) must be valid or a compile-time
+     error will be triggered.
+  */
+  template <typename ValueT>
+  inline void Set( char const * name, ValueT val )
+  {
+      this->protoTmpl->Set(v8::String::NewSymbol(name), CastToJS(val));
+  }
+  //! Not quite sure why i need this overload, but i do.
+  inline void Set( char const * name, v8::InvocationCallback val )
+  {
+      this->protoTmpl->Set(v8::String::NewSymbol(name), CastToJS(val));
+  }
+  /**
+     Equivalent to Set().
+  */
+  template <typename ValueT>
+  inline void operator()( char const * name, ValueT val )
+  {
+      this->Set(name, val);
+  }
+  /**
+     Overload to avoid an ambiguity.
+  */
+  inline ClassCreator & operator()( char const * name, v8::InvocationCallback val )
+  {
+      return this->Set(name, val);
+  }
+
+  /**
+     Adds CtorFunction() to dest using the given property name.
+     This implicitly "seals" the class (see CtorFunction() for
+     details).
+  */
+  inline void AddClassTo( char const * thisClassName, v8::Handle<v8::Object> const & dest )
+  {
+      dest->Set(v8::String::NewSymbol(thisClassName),
+                this->CtorFunction());
+  }
+
+  /**
+     Destroys the given object by disconnecting its associated
+     native object and calling the native destructor function
+     for it.
+
+     If jo cannot be converted to a T then false is
+     returned. Otherwise the true is returned and the native
+     object referenced by jo is no longer valid (it should not
+     be used by JS code).
+
+     Native functions bound to that object should take care to
+     bail out with an exception once the native pointer is gone,
+     as opposed to blindly stepping on its null/dangling pointer
+     (which _might_ have been re-allocated to a different
+     object, even of a different type, in the mean time).
+  */
+  static bool DestroyObject( v8::Handle<v8::Object> const & jo )
+  {
+      T * t = CastFromJS<T>(jo);
+      if( ! t ) return false;
+      else
+      {
+          v8::Persistent<v8::Object> p( v8::Persistent<v8::Object>::New( jo ) );
+          p.ClearWeak(); // avoid a second call to weak_dtor() via gc!
+          weak_dtor( p, t );
+          return true;
+      }
+  }
+  /**
+     If jv is empty or !jv->IsObject() then false is returned,
+     otherwise it returns the result of
+     DestroyObject(Handle<Object>).
+  */
+  static bool DestroyObject( v8::Handle<v8::Value> const & jv )
+  {
+      return (jv.IsEmpty() || !jv->IsObject())
+          ? false
+          : DestroyObject( v8::Handle<v8::Object>( v8::Object::Cast(*jv) ) );
+  }
+
+  /**
+     A v8::InvocationCallback implementation which calls
+     DestroyObject( argv.This() ).
+
+     It is intended to be used as a "manual destructor" for
+     classes which need it. The canonical examples are
+     Stream.close() and Database.close().
+
+     This function is not called DestroyObject to avoid name
+     collisions during binding using Set(...,DestroyObjectCallback).
+  */
+  static v8::Handle<v8::Value> DestroyObjectCallback( v8::Arguments const & argv )
+  {
+          return DestroyObject(argv.This()) ? v8::True() : v8::False();
+  }
+
+  /**
+      Tells v8 that this bound type inherits ParentType.
+      ParentType _must_ be a class wrapped by ClassCreator.
+      This function throws if
+      ClassCreator<ParentType>::Instance().IsSealed() returns
+      false). We require that the parent class be sealed to
+      avoid accidental mis-use caused by registering a
+      subclass of a class which has not yet been bound (and may
+      may never be bound).
+  */
+  template <typename ParentType>
+  void Inherit()
+  {
+      typedef ClassCreator<ParentType> PT;
+      PT & p(PT::Instance());
+      if( ! p.IsSealed() )
+      {
+          std::ostringstream os;
+          os << "ClassCreator<"
+             << TypeName<ParentType>::Value
+             << "> has not been sealed yet!";
+          throw std::runtime_error(os.str());
+      }
+      this->CtorTemplate()->Inherit( p.CtorTemplate() );
+  }
+
+  /**
+      Simply runs ClassCreator_SetupBindings<T>::Initialize( target ).
+      It is provided here to simplify the client-side interface.
+  */
+  static void SetupBindings( v8::Handle<v8::Object> const & target )
+  {
+      ClassCreator_SetupBindings<T>::Initialize( target );
+  }
+
+private:
+  typedef ClassCreator_InternalFields<T> InternalFields;
+  typedef ClassCreator_WeakWrap<T> WeakWrap;
+  typedef ClassCreator_TypeID<T> TypeID;
+  v8::Persistent<v8::FunctionTemplate> ctorTmpl;
+  v8::Handle<v8::ObjectTemplate> protoTmpl;
+  bool isSealed;
+  typedef ClassCreator_Factory<T> Factory;
+
+  static v8::Handle<v8::Object> FindHolder( v8::Handle<v8::Object> const & jo,
+                                            T const * nh )
+  {
+      if( !nh || jo.IsEmpty() ) return v8::Handle<v8::Object>();
+      v8::Handle<v8::Value> proto(jo);
+      void const * ext = NULL;
+      typedef ClassCreator_SearchPrototypeForThis<T> SPFT;
+      while( !ext && !proto.IsEmpty() && proto->IsObject() )
+      {
+          v8::Local<v8::Object> const & obj( v8::Object::Cast( *proto ) );
+          ext = (obj->InternalFieldCount() != InternalFields::Count)
+              ? NULL
+              : obj->GetPointerFromInternalField( InternalFields::NativeIndex );
+          // FIXME: if InternalFields::TypeIDIndex>=0 then also do a check on that one.
+          /*
+              If !ext, there is no bound pointer. If (ext &&
+              (ext!=nh)) then there is one, but it's not the droid
+              we're looking for. In either case, (possibly) check the
+              prototype...
+          */
+          if( ext == nh ) return obj;
+          else if( !SPFT::Value ) break;
+          else proto = obj->GetPrototype();
+      }
+      return v8::Handle<v8::Object>();
+  }
+
+  static void weak_dtor( v8::Persistent< v8::Value > pv, void *nobj )
+  {
+      using namespace v8;
+      //std::cerr << "Entering weak_dtor<>(native="<<(void const *)nobj<<")\n";
+      Local<Object> jobj( Object::Cast(*pv) );
+      typedef typename JSToNative<T>::ResultType NT;
+      NT native = CastFromJS<T>( pv );
+      if( !native )
+      {
+          /* see: http://code.google.com/p/v8-juice/issues/detail?id=27
+
+          When i call pv.Dispose(), this function is getting called twice,
+          and the second time won't work. i'm going to igore (return w/o
+          side-effects) this for now for the sake of avoiding a crash
+          which i'm seeing only on 64-bit platforms.
+
+          However, even if i return here, v8 is crashing with a
+          !NEAR_DEATH assertion right after the second call is made.
+
+          The extra pair of Dispose()/Clear() calls seems to eliminate that
+          crash, but the fact that this code block is hit AT ALL is a
+          sign of a problem - the dtor shouldn't be called twice!
+          */
+          pv.Dispose();
+          pv.Clear();
+#if 1 /* i believe this problem was fixed. If you are reading this b/c
+   you followed an assert() message, please report this as a bug.
+  */
+          assert( 0 && "weak_dtor() got no native object!");
+#endif
+          return;
+      }
+      else
+      {
+          /**
+             Reminder: the FindHolder() bits are here to
+             assist when the bound native exists somewhere in the
+             prototype chain other than jobj itself. In that case,
+             jobj is valid but we cannot clear out the native handle
+             internal field on it because it has no internal fields
+             (or none that belong to us).
+
+             To fix this properly we have to be able to know
+             _exactly_ which JS object in the prototype chain nh is
+             bound to.
+          */
+          v8::Handle<v8::Object> nholder = FindHolder( jobj, native );
+#if 1 /* reminder: i've never actually seen this error happen, i'm just pedantic about checking... */
+          assert( ! nholder.IsEmpty() );
+          WeakWrap::Unwrap( nholder /*jobj? subtle difference!*/, native );
+          if( nholder.IsEmpty() || (nholder->InternalFieldCount() != InternalFields::Count) )
+          {
+              StringBuffer msg;
+              msg << "SERIOUS INTERNAL ERROR:\n"
+                  << "ClassCreator<T>::weak_dtor() "
+                  << "validated that the JS/Native belong together, but "
+                  << "FindHolder() returned an "
+                  << (nholder.IsEmpty() ? "empty" : "invalid")
+                  << " handle!\n"
+                  << "From JS=@"<<(void const *)nobj
+                  << ", Converted to Native=@"<<(void const *)native
+                  << ", nholder field count="<<nholder->InternalFieldCount()
+                  << ", jobj field count="<<jobj->InternalFieldCount()
+                  << "\nTHIS MAY LEAD TO A CRASH IF THIS JS HANDLE IS USED AGAIN!!!\n"
+                  ;
+              Factory::Delete(native);
+              pv.Dispose(); pv.Clear(); /* see comments below!*/
+              v8::ThrowException(msg.toError());
+              return;
+          }
+          else
+          {
+              nholder->SetInternalField( InternalFields::NativeIndex, Null() );
+              if( 0 <= InternalFields::TypeIDIndex )
+              {
+                  nholder->SetInternalField( InternalFields::TypeIDIndex, Null() );
+              }
+              Factory::Delete(native);
+          }
+#else
+          WeakWrap::Unwrap( nholder, native );
+          nholder->SetInternalField( InternalFields::NativeIndex, Null() );
+          if( 0 <= InternalFields::TypeIDIndex )
+          {
+              nholder->SetInternalField( InternalFields::TypeIDIndex, Null() );
+          }
+          Factory::Delete(native);
+#endif
+      }
+      /*
+        According to the v8 gurus i need to call pv.Dispose()
+        instead of pv.Clear(), but if i do then this dtor is
+        being called twice. If i don't call it, v8 is crashing
+        sometime after this function with a !NEAR_DEATH
+        assertion.
+      */
+      pv.Dispose();
+      pv.Clear();
+  }
+
+  /**
+     Gets installed as the NewInstance() handler for T.
+   */
+  static v8::Handle<v8::Value> ctor_proxy( v8::Arguments const & argv )
+  {
+      using namespace v8;
+      if(ClassCreator_AllowCtorWithoutNew<T>::Value)
+      {
+          /**
+             Allow construction without 'new' by forcing this
+             function to be called in a ctor context...
+          */
+          if (!argv.IsConstructCall())
+          {
+              const int argc = argv.Length();
+              Handle<Function> ctor( Function::Cast(*argv.Callee()));
+              std::vector< Handle<Value> > av(static_cast<size_t>(argc),Undefined());
+              for( int i = 0; i < argc; ++i ) av[i] = argv[i];
+              return ctor->NewInstance( argc, &av[0] );
+          }
+      }
+      else
+      {
+          /**
+             Why have this limitation? If we don't, v8 pukes
+             when the ctor is called, with
+             "v8::Object::SetInternalField() Writing internal
+             field out of bounds".
+          */
+          if (!argv.IsConstructCall())
+          {
+              return Toss("This constructor cannot be called as function!");
+          }
+      }
+      Local<Object> const & jobj( argv.This()
+                                  /*CastToJS<T>(*nobj)
+
+                                  We are not yet far enough
+                                  along in the binding that
+                                  CastToJS() can work. And it
+                                  can't work for the generic
+                                  case, anyway.
+                                  */);
+      if( jobj.IsEmpty() ) return jobj /* assume exception*/;
+      Persistent<Object> self( Persistent<Object>::New(jobj) );
+      T * nobj = NULL;
+      try
+      {
+          WeakWrap::PreWrap( self, argv  );
+          nobj = Factory::Create( self, argv );
+          if( ! nobj )
+          {
+              return CastToJS<std::exception>(std::runtime_error("Native constructor failed."));
+          }
+          WeakWrap::Wrap( self, nobj );
+          self.MakeWeak( nobj, weak_dtor );
+          if( 0 <= InternalFields::TypeIDIndex )
+          {
+              self->SetPointerInInternalField( InternalFields::TypeIDIndex, (void *)TypeID::Value );
+          }
+          self->SetPointerInInternalField( InternalFields::NativeIndex, nobj )
+              /* We do this after the call to Wrap() just in case the Wrap() impl
+                 accidentally writes to this field. In that case we end up
+                 losing the data they stored there. So this is just as evil as
+                 adding the internal field before Wrap(), but only when the
+                 client mis-uses the internal fields.
+              */
+              ;
+      }
+      catch(std::exception const &ex)
+      {
+          WeakWrap::Unwrap( self, nobj );
+          if( nobj ) Factory::Delete( nobj );
+          self.Clear();
+          return Toss(CastToJS(ex));
+      }
+      catch(...)
+      {
+          WeakWrap::Unwrap( self, nobj );
+          if( nobj ) Factory::Delete( nobj );
+          self.Clear();
+          return Toss("Native constructor threw an unknown exception!");
+      }
+      return self;
+  }
+
+  ClassCreator()
+      : ctorTmpl(v8::Persistent<v8::FunctionTemplate>::New( v8::FunctionTemplate::New(ctor_proxy) )),
+        protoTmpl(v8::Persistent<v8::ObjectTemplate>::New( ctorTmpl->PrototypeTemplate() )),
+        isSealed(false)
+  {
+      ctorTmpl->InstanceTemplate()->SetInternalFieldCount(InternalFields::Count);
+  }
+};
+template <typename T> class XInterface
+  {
+public:
+  XInterface()
+    {
+    }
+
+  template <typename GETTYPE,
+            typename SETTYPE,
+            typename XConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD,
+            typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
+  void addProperty(const char *name)
+    {
+    typedef cvv8::ClassCreator<T> CC;
+    CC& cc(CC::Instance());
+    v8::Handle<v8::ObjectTemplate> const &proto(cc.Prototype());
+
+    v8::AccessorGetter getter = cvv8::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    v8::AccessorSetter setter = cvv8::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
+
+    proto->SetAccessor(v8::String::New(name), getter, setter);
+    }
+  };
+
+
+#endif // XINTERFACE_H

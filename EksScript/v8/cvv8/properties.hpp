@@ -21,7 +21,7 @@ namespace cvv8 {
         This class has no implemention - it only exists for 
         documentation purposes.
     */
-    struct AccessorGetterType
+    struct XAccessorGetterType
     {
         /**
             The v8::AccessorGetter() interface.
@@ -40,30 +40,19 @@ namespace cvv8 {
         This class has no useful implemention - it only exists for
         documentation purposes.
     */
-    struct AccessorSetterType
+    struct XAccessorSetterType
     {
         /** The v8::AccessorSetter() interface. */
         static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
     };
 
-    /** @typedef AccessorGetterType Getter
-
-        Convenience typedef, primarily to simplify usage of
-        FunctionTo and friends.
-    */
-    typedef AccessorGetterType Getter;
-
-    /** @typedef AccessorSetterType Setter
-
-        Convenience typedef, primarily to simplify usage of
-        FunctionTo and friends.
-    */
-    typedef AccessorSetterType Setter;
+    typedef XAccessorGetterType Getter;
+    typedef XAccessorSetterType Setter;
 
     /**
         A tag type for use with VarTo, MemberTo, MethodTo, and FunctionTo.
     */
-    struct Accessors : AccessorGetterType, AccessorSetterType {};
+    struct Accessors : XAccessorGetterType, XAccessorSetterType {};
 
     /**
         Wraps a v8:::AccessorGetter into the AccessorGetterType
@@ -72,7 +61,7 @@ namespace cvv8 {
         wrap a custom v8::AccessorGetter in a GetterCatcher.
     */
     template <v8::AccessorGetter G>
-    struct GetterToGetter : AccessorGetterType
+    struct GetterToGetter : XAccessorGetterType
     {
         /** Implements the v8::AccessorGetter() interface. */
         inline static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info)
@@ -225,7 +214,7 @@ namespace cvv8 {
        because a write-only var doesn't make all that much sense (use
        methods for those use cases).
     */
-    struct ThrowingSetter : AccessorSetterType
+    struct ThrowingSetter : XAccessorSetterType
     {
         inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::AccessorInfo &)
         {
@@ -250,7 +239,7 @@ namespace cvv8 {
        If Getter() throws a native exception it is converted to a JS
        exception.
     */
-    template <typename Sig, typename FunctionSignature<Sig>::FunctionType Getter>
+    template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Getter>
     struct FunctionToGetter : AccessorGetterType
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
@@ -283,12 +272,12 @@ namespace cvv8 {
        If Setter() throws a native exception it is converted to a JS
        exception.
     */
-    template <typename Sig, typename FunctionSignature<Sig>::FunctionType Func>
+    template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Func>
     struct FunctionToSetter : AccessorSetterType
     {
         inline static void Set( v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
         {
-            typedef FunctionSignature<Sig> FT;
+            typedef XFunctionSignature<Sig> FT;
             ArgCaster<typename sl::At<0,FT>::Type> ac;
             (*Func)( ac.ToNative( value ) );
         }
@@ -307,8 +296,8 @@ namespace cvv8 {
        arguments (either because it has none or they have
        defaults).
     */
-    template <typename T, typename Sig, typename MethodSignature<T,Sig>::FunctionType Getter>
-    struct MethodToGetter : AccessorGetterType
+    template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Getter>
+    struct XMethodToGetter : XAccessorGetterType
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
@@ -325,8 +314,8 @@ namespace cvv8 {
    /**
        Overload for const native getter functions.
     */
-    template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Getter>
-    struct ConstMethodToGetter : AccessorGetterType
+    template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Getter>
+    struct XConstMethodToGetter : XAccessorGetterType
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
@@ -341,28 +330,8 @@ namespace cvv8 {
         }
     };
 
-    /**
-        Implements v8::AccessorSetter interface to proxy a JS
-        member property through a native member setter function.
-
-        This function can be used as the setter parameter to
-        v8::ObjectTemplate::SetAccessor().
-
-        Sig must be a function-pointer-style type and Getter must
-        be a T member function of that type. The function must be
-        capable of being called with only 1 argument (either
-        because it only accepts 1 or has defaults for the others),
-        and its return value is discarded (not converted to v8)
-        because that's how v8's native setters work.
-
-        Exceptions thrown by the underlying function are
-        translated to JS exceptions.
-        
-        FIXME: code is 100% identical to ConstMethodToSetter except 
-        for FunctionType typedef. Consolidate them in a base class.
-    */
-    template <typename T, typename InputArg, typename MethodSignature<T,void (InputArg)>::FunctionType Setter>
-    struct MethodToSetter : AccessorSetterType
+    template <typename T, typename InputArg, typename XMethodSignature<T,void (InputArg)>::FunctionType Setter>
+    struct XMethodToSetter : XAccessorSetterType
     {
         static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
         {
@@ -377,7 +346,7 @@ namespace cvv8 {
             else
             {
 
-                typedef typename sl::At< 0, Signature<void (TypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
+                typedef typename sl::At< 0, XSignature<void (TypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
                 ArgCaster<ArgT> ac;
                 
                 ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
@@ -398,50 +367,8 @@ namespace cvv8 {
         }
     };
 
-    /**
-        Const-method equivalent of MethodToSetter.
-    
-        FIXME: code is 100% identical to ConstMethodToSetter except 
-        for FunctionType typedef. Consolidate them in a base class.
-    */
-    template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Setter>
-    struct ConstMethodToSetter : AccessorSetterType
-    {
-        static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
-        {
-            typedef typename TypeInfo<T>::Type Type;
-            typedef typename JSToNative<T>::ResultType NativeHandle;
-            NativeHandle self = CastFromJS<NativeHandle>( info.This() );
-            if( ! self )
-            {
-                Toss( StringBuffer() << "Native member property setter '"
-                     << property << "' could not access native This object!" );
-            }
-            else
-            {
-                typedef typename sl::At< 0, Signature<Sig> >::Type ArgT;
-                ArgCaster<ArgT> ac;
-                (self->*Setter)( ac.ToNative( value ) );
-            }
-        }
-    };
-
-
-    /**
-        Similar to FunctionToGetter but uses a functor as a getter.
-        This is rarely useful, since the functor has no direct access
-        to any application state (unless that is static/shared within
-        the Ftor class).
-
-        Ftor must be a functor. Sig must be a signature matching a const
-        Ftor::operator() implementation. CastToJS(Signature<Sig>::ReturnType)
-        must be legal.
-
-        The signature's return type may not be void (this is a getter,
-        and getters don't return void).
-    */
     template <typename Ftor, typename Sig>
-    struct FunctorToGetter
+    struct XFunctorToGetter
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
@@ -450,25 +377,8 @@ namespace cvv8 {
         }
     };
 
-    /**
-        The setter counterpart of FunctorToGetter.
-
-        Ftor must be a functor which accepts 1 arguments.
-        Sig must be a signature matching a Ftor::operator()
-        implementation.
-
-        The return value of Ftor::operator() is not evaluated, so it may be
-        void or any non-convertible type. It is semantically illegal to bind
-        a setter which return resources allocated by the setter, if those
-        resources are passed to the caller. In such a case, each access
-        _will_ leak memory. But nobody returns allocated memory from a
-        setter, right?
-
-        CastFromJS<ArgType1>() must be legal, where ArgType1
-        is sl::At<0, Signature<Sig> >::Type.
-    */
     template <typename Ftor, typename Sig>
-    struct FunctorToSetter
+    struct XFunctorToSetter
     {
         inline static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
         {
@@ -485,11 +395,11 @@ namespace cvv8 {
     */
     template < typename ExceptionT,
                typename SigGetMsg,
-               typename ConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
+               typename XConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
                typename SetterT,
                bool PropagateOtherExceptions = false
     >
-    struct SetterCatcher : AccessorSetterType
+    struct XSetterCatcher : XAccessorSetterType
     {
         static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
         {
@@ -524,8 +434,8 @@ namespace cvv8 {
             typename ConcreteException = std::exception,
             bool PropagateOtherExceptions = !tmp::SameType< std::exception, ConcreteException >::Value
     >
-    struct SetterCatcher_std :
-        SetterCatcher<ConcreteException,
+    struct XSetterCatcher_std :
+        XSetterCatcher<ConcreteException,
                       char const * (),
                       &ConcreteException::what,
                       SetterT,
@@ -540,11 +450,11 @@ namespace cvv8 {
     */
     template < typename ExceptionT,
                typename SigGetMsg,
-               typename ConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
+               typename XConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
                typename GetterT,
                bool PropagateOtherExceptions = false
     >
-    struct GetterCatcher : AccessorGetterType
+    struct XGetterCatcher : XAccessorGetterType
     {
         static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
@@ -579,8 +489,8 @@ namespace cvv8 {
             typename ConcreteException = std::exception,
             bool PropagateOtherExceptions = !tmp::SameType< std::exception, ConcreteException >::Value
     >
-    struct GetterCatcher_std :
-        GetterCatcher<ConcreteException,
+    struct XGetterCatcher_std :
+        XGetterCatcher<ConcreteException,
                       char const * (),
                       &ConcreteException::what,
                       GetterT,
@@ -674,112 +584,6 @@ namespace cvv8 {
         }
     };
 
-#if 0 /* i'm still undecided on the in-class naming conventions here... */
-    /**
-        ClassAccessor provides a slight simplification for cases 
-        where several different members/methods of a given bound 
-        class (T) need to be bound to v8. It wraps the following 
-        classes so that clients can use them one fewer template 
-        parameters:
-        
-        MemberToGetter, MemberToSetter, MethodToGetter, MethodToSetter, 
-        ConstMethodToGetter, ConstMethodToSetter
-        
-        Example:
-        
-        @code
-        typedef ClassAccessor<MyType> CA;
-        v8::AccessorGetter get;
-        
-        get = MemberToGetter<MyType, int, &MyType::anInt>::Get
-        // is equivalent to:
-        get = CA::MemGet<int, &MyType::anInt>::Set
-        @endcode
-        
-        Its only real benefit is saving a bit of typing when several T
-        member/method bindings are made and T's real type name is longer
-        than 'T'. e.g. it gets tedious to repeatedly type
-        MyExceedinglyLongClassName in method/member-binding templates.
-        (Function-local typedefs help.)
-    */
-    template <typename T>
-    struct ClassAccessor
-    {
-        template <typename PropertyType, PropertyType T::*MemVar>
-        struct MemGet : MemberToGetter<T, PropertyType, MemVar> {};
-        template <typename PropertyType, PropertyType T::*MemVar>
-        struct MemSet : MemberToSetter<T, PropertyType, MemVar> {};
-        template <typename Sig, typename MethodSignature<T,Sig>::FunctionType Getter>
-        struct MethGet : MethodToGetter<T,Sig,Getter> {};
-        template <typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Getter>
-        struct CMethGet : ConstMethodToGetter<T,Sig,Getter> {};
-        template <typename Sig, typename MethodSignature<T,Sig>::FunctionType Setter>
-        struct MethSet : MethodToSetter<T,Sig,Setter> {};
-        template <typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Setter>
-        struct CMethSet : ConstMethodToSetter<T,Sig,Setter> {};
-    };
-#endif /* ClassAccessor */
-
 } // namespaces
-/** LICENSE
 
-    This software's source code, including accompanying documentation and
-    demonstration applications, are licensed under the following
-    conditions...
-
-    The author (Stephan G. Beal [http://wanderinghorse.net/home/stephan/])
-    explicitly disclaims copyright in all jurisdictions which recognize
-    such a disclaimer. In such jurisdictions, this software is released
-    into the Public Domain.
-
-    In jurisdictions which do not recognize Public Domain property
-    (e.g. Germany as of 2011), this software is Copyright (c) 2011
-    by Stephan G. Beal, and is released under the terms of the MIT License
-    (see below).
-
-    In jurisdictions which recognize Public Domain property, the user of
-    this software may choose to accept it either as 1) Public Domain, 2)
-    under the conditions of the MIT License (see below), or 3) under the
-    terms of dual Public Domain/MIT License conditions described here, as
-    they choose.
-
-    The MIT License is about as close to Public Domain as a license can
-    get, and is described in clear, concise terms at:
-
-    http://en.wikipedia.org/wiki/MIT_License
-
-    The full text of the MIT License follows:
-
-    --
-    Copyright (c) 2011 Stephan G. Beal (http://wanderinghorse.net/home/stephan/)
-
-    Permission is hereby granted, free of charge, to any person
-    obtaining a copy of this software and associated documentation
-    files (the "Software"), to deal in the Software without
-    restriction, including without limitation the rights to use,
-    copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the
-    Software is furnished to do so, subject to the following
-    conditions:
-
-    The above copyright notice and this permission notice shall be
-    included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
-
-    --END OF MIT LICENSE--
-
-    For purposes of the above license, the term "Software" includes
-    documentation and demonstration source code which accompanies
-    this software. ("Accompanies" = is contained in the Software's
-    primary public source code repository.)
-
-*/
 #endif /* CODE_GOOGLE_COM_P_V8_CONVERT_PROPERTIES_HPP_INCLUDED */

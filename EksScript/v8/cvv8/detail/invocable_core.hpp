@@ -13,7 +13,8 @@ conversion.
 */
 
 #include "convert_core.hpp"
-#include "signature_core.hpp"
+#include "XSignature.h"
+#include "XSignatureSpecialisations.h"
 
 namespace cvv8 {
 
@@ -42,7 +43,7 @@ struct InCaVoid : InCa {};
    (differing only in their return type) with an Arity value of -1.
 */
 template <typename RV>
-struct FunctionSignature< RV (v8::Arguments const &) > : Signature<RV (v8::Arguments const &)>
+struct XFunctionSignature< RV (v8::Arguments const &) > : XSignature<RV (v8::Arguments const &)>
 {
     typedef RV (*FunctionType)(v8::Arguments const &);
 };
@@ -53,7 +54,7 @@ struct FunctionSignature< RV (v8::Arguments const &) > : Signature<RV (v8::Argum
    Arity value of -1.
 */
 template <typename T, typename RV >
-struct MethodSignature< T, RV (v8::Arguments const &) > : Signature< RV (v8::Arguments const &) >
+struct XMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (v8::Arguments const &) >
 {
     typedef T Type;
     typedef RV (T::*FunctionType)(v8::Arguments const &);
@@ -65,7 +66,7 @@ struct MethodSignature< T, RV (v8::Arguments const &) > : Signature< RV (v8::Arg
    of -1.
 */
 template <typename T, typename RV >
-struct ConstMethodSignature< T, RV (v8::Arguments const &) > : Signature< RV (v8::Arguments const &) >
+struct XConstMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (v8::Arguments const &) >
 {
     typedef T Type;
     typedef RV (T::*FunctionType)(v8::Arguments const &) const;
@@ -77,13 +78,13 @@ struct ConstMethodSignature< T, RV (v8::Arguments const &) > : Signature< RV (v8
    type), which uses an Arity value of -1.
 */
 template <typename RV, RV (*FuncPtr)(v8::Arguments const &) >
-struct FunctionPtr<RV (v8::Arguments const &),FuncPtr>
-    : FunctionSignature<RV (v8::Arguments const &)>
+struct XFunctionPtr<RV (v8::Arguments const &),FuncPtr>
+    : XFunctionSignature<RV (v8::Arguments const &)>
 {
     public:
-    typedef FunctionSignature<RV (v8::Arguments const &)> SignatureType;
-    typedef typename SignatureType::ReturnType ReturnType;
-    typedef typename SignatureType::FunctionType FunctionType;
+    typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+    typedef typename XSignatureType::ReturnType ReturnType;
+    typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
      {
          return FuncPtr;
@@ -96,12 +97,12 @@ struct FunctionPtr<RV (v8::Arguments const &),FuncPtr>
    type), which uses an Arity value of -1.
 */
 template <typename T,typename RV, RV (T::*FuncPtr)(v8::Arguments const &) >
-struct MethodPtr<T, RV (T::*)(v8::Arguments const &),FuncPtr>
-    : MethodSignature<T, RV (T::*)(v8::Arguments const &)>
+struct XMethodPtr<T, RV (T::*)(v8::Arguments const &),FuncPtr>
+    : XMethodSignature<T, RV (T::*)(v8::Arguments const &)>
 {
-    typedef MethodSignature<T, RV (T::*)(v8::Arguments const &)> SignatureType;
-    typedef typename SignatureType::ReturnType ReturnType;
-    typedef typename SignatureType::FunctionType FunctionType;
+    typedef XMethodSignature<T, RV (T::*)(v8::Arguments const &)> XSignatureType;
+    typedef typename XSignatureType::ReturnType ReturnType;
+    typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
      {
          return FuncPtr;
@@ -114,12 +115,12 @@ struct MethodPtr<T, RV (T::*)(v8::Arguments const &),FuncPtr>
    type), which uses an Arity value of -1.
 */
 template <typename T,typename RV, RV (T::*FuncPtr)(v8::Arguments const &) const >
-struct ConstMethodPtr<T, RV (T::*)(v8::Arguments const &) const,FuncPtr>
-    : ConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const>
+struct XConstMethodPtr<T, RV (T::*)(v8::Arguments const &) const,FuncPtr>
+    : XConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const>
 {
-    typedef ConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const> SignatureType;
-    typedef typename SignatureType::ReturnType ReturnType;
-    typedef typename SignatureType::FunctionType FunctionType;
+    typedef XConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const> XSignatureType;
+    typedef typename XSignatureType::ReturnType ReturnType;
+    typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
      {
          return FuncPtr;
@@ -161,7 +162,7 @@ namespace Detail {
     specialization of this class.
 */
 template <typename T>
-struct IsUnlockable : tmp::BoolVal<true> {};
+struct IsUnlockable : XBoolVal<true> {};
 template <typename T>
 struct IsUnlockable<T const> : IsUnlockable<T> {};
 template <typename T>
@@ -174,11 +175,11 @@ struct IsUnlockable<T const *> : IsUnlockable<T> {};
 /**
     Explicit instantiation to make damned sure that nobody
     re-sets this one. We rely on these semantics for 
-    handling FunctionSignature like Const/MethodSignature
+    handling XFunctionSignature like Const/XMethodSignature
     in some cases.
 */
 template <>
-struct IsUnlockable<void> : tmp::BoolVal<true> {};
+struct IsUnlockable<void> : XBoolVal<true> {};
 
 /*
     Todo?: find a mechanism to cause certain highly illegal types to 
@@ -187,22 +188,22 @@ struct IsUnlockable<void> : tmp::BoolVal<true> {};
     specialializations.
 */
 template <>
-struct IsUnlockable<void *> : tmp::BoolVal<false> {};
+struct IsUnlockable<void *> : XBoolVal<false> {};
 
 template <>
-struct IsUnlockable<void const *> : tmp::BoolVal<false> {};
+struct IsUnlockable<void const *> : XBoolVal<false> {};
 
 template <typename T>
-struct IsUnlockable< v8::Handle<T> > : tmp::BoolVal<false> {};
+struct IsUnlockable< v8::Handle<T> > : XBoolVal<false> {};
 
 template <typename T>
-struct IsUnlockable< v8::Persistent<T> > : tmp::BoolVal<false> {};
+struct IsUnlockable< v8::Persistent<T> > : XBoolVal<false> {};
 
 template <typename T>
-struct IsUnlockable< v8::Local<T> > : tmp::BoolVal<false> {};
+struct IsUnlockable< v8::Local<T> > : XBoolVal<false> {};
 
 template <>
-struct IsUnlockable<v8::Arguments> : tmp::BoolVal<false> {};
+struct IsUnlockable<v8::Arguments> : XBoolVal<false> {};
 
 /**
     Given a tmp::TypeList-compatible type list, this metafunction's
@@ -212,7 +213,7 @@ struct IsUnlockable<v8::Arguments> : tmp::BoolVal<false> {};
     API an empty list will refer to a function taking no arguments.
 */
 template <typename TList>
-struct TypeListIsUnlockable : tmp::BoolVal<
+struct TypeListIsUnlockable : XBoolVal<
     IsUnlockable<typename TList::Head>::Value && TypeListIsUnlockable<typename TList::Tail>::Value
     >
 {
@@ -220,22 +221,22 @@ struct TypeListIsUnlockable : tmp::BoolVal<
 
 //! End-of-typelist specialization.
 template <>
-struct TypeListIsUnlockable< tmp::NilType > : tmp::BoolVal<true>
+struct TypeListIsUnlockable< XNilType > : XBoolVal<true>
 {};
 /**
-    Given a Signature, this metafunction's Value member
+    Given a XSignature, this metafunction's Value member
     evaluates to true if:
     
     - IsUnlockable<SigTList::ReturnType>::Value is true and...
     
     - IsUnlockable<SigTList::Context>::Value is true (only relavent
-    for Const/MethodSignature, not FunctionSignature) and...
+    for Const/XMethodSignature, not XFunctionSignature) and...
     
     - TypeListIsUnlockable< SigTList >::Value is true.
     
-    If the value is true, the function signature has passed the most 
+    If the value is true, the function XSignature has passed the most
     basic check for whether or not it is legal to use v8::Unlocker 
-    to unlock v8 before calling a function with this signature. Note 
+    to unlock v8 before calling a function with this XSignature. Note
     that this is a best guess, but this code cannot know 
     app-specific conditions which might make this guess invalid. 
     e.g. if a bound function itself uses v8 and does not explicitly 
@@ -252,34 +253,34 @@ struct TypeListIsUnlockable< tmp::NilType > : tmp::BoolVal<true>
     class will cause this metafunction to evaluate to true.
     
     Note that FunctionToInCa, Const/MethodToInCa, etc., are all
-    Signature subclasses, and can be used directly with
+    XSignature subclasses, and can be used directly with
     this template.
     
     Example:
     
     @code
     // This one can be unlocked:
-    typedef FunctionSignature< int (int) > F1;
-    // SignatureIsUnlockable<F1>::Value == true
+    typedef XFunctionSignature< int (int) > F1;
+    // XSignatureIsUnlockable<F1>::Value == true
     
     // This one cannot because it contains a v8 type in the arguments:
-    typedef FunctionSignature< int (v8::Handle<v8::Value>) > F2;
-    // SignatureIsUnlockable<F2>::Value == false
+    typedef XFunctionSignature< int (v8::Handle<v8::Value>) > F2;
+    // XSignatureIsUnlockable<F2>::Value == false
     @endcode
     
     For Const/MethodToInCa types, this check will also fail if
     IsUnlockable< SigTList::Context >::Value is false.
 */
 template <typename SigTList>
-struct SignatureIsUnlockable : tmp::BoolVal<
+struct XSignatureIsUnlockable : XBoolVal<
         IsUnlockable<typename SigTList::Context>::Value &&
         IsUnlockable<typename SigTList::ReturnType>::Value &&
         IsUnlockable<typename SigTList::Head>::Value &&
-        SignatureIsUnlockable<typename SigTList::Tail>::Value
+        XSignatureIsUnlockable<typename SigTList::Tail>::Value
         > {};
 //! End-of-list specialization.
 template <>
-struct SignatureIsUnlockable<tmp::NilType> : tmp::BoolVal<true> {};
+struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
 
 /**
     Internal exception type to allow us to differentiate
@@ -389,27 +390,27 @@ namespace Detail {
 #define ASSERT_UNLOCKV8_IS_FALSE typedef char ThisSpecializationCannotUseV8Unlocker[!UnlockV8 ? 1 : -1]
 /**
     Temporary internal macro to trigger a static assertion if: 
-    UnlockV8 is true and SignatureIsUnlockable<Sig>::Value is false. 
+    UnlockV8 is true and XSignatureIsUnlockable<Sig>::Value is false.
     This is to prohibit that someone accidentally enables locking 
     when using a function type which we know (based on its 
-    signature's types) cannot obey the (un)locking rules.
+    XSignature's types) cannot obey the (un)locking rules.
 */
 #define ASSERT_UNLOCK_SANITY_CHECK typedef char AssertCanEnableUnlock[ \
-    !UnlockV8 ? 1 : (SignatureIsUnlockable< SignatureType >::Value ?  1 : -1) \
+    !UnlockV8 ? 1 : (XSignatureIsUnlockable< XSignatureType >::Value ?  1 : -1) \
     ]
 
     template <int Arity_, typename Sig,
-            bool UnlockV8 = SignatureIsUnlockable< Signature<Sig> >::Value >
-    struct FunctionForwarder DOXYGEN_FWD_DECL_KLUDGE;
+            bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value >
+    struct FunctionForwarder;
     
     template <int Arity, typename RV, bool UnlockV8>
     struct FunctionForwarder<Arity,RV (v8::Arguments const &), UnlockV8>
-        : FunctionSignature<RV (v8::Arguments const &)>
+        : XFunctionSignature<RV (v8::Arguments const &)>
     {
     public:
-        typedef FunctionSignature<RV (v8::Arguments const &)> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
             return (RV) func(argv);
@@ -421,7 +422,7 @@ namespace Detail {
         }
 
         ASSERT_UNLOCKV8_IS_FALSE;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == -1 ? 1 : -1];
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
     };
 
     //! Reminder to self: we really do need this specialization for some cases.
@@ -431,11 +432,11 @@ namespace Detail {
     {};
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarder<0,Sig, UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarder<0,Sig, UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
-        typedef typename SignatureType::ReturnType ReturnType;
-        typedef typename SignatureType::FunctionType FunctionType;
+        typedef XFunctionSignature<Sig> XSignatureType;
+        typedef typename XSignatureType::ReturnType ReturnType;
+        typedef typename XSignatureType::FunctionType FunctionType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -446,18 +447,18 @@ namespace Detail {
             return CastToJS( CallNative( func, argv ) );
         }
         ASSERT_UNLOCK_SANITY_CHECK;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == 0 ? 1 : -1];
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
     };
 
     template <int Arity_, typename Sig,
-                bool UnlockV8 = SignatureIsUnlockable< Signature<Sig> >::Value>
-    struct FunctionForwarderVoid DOXYGEN_FWD_DECL_KLUDGE;
+                bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value>
+    struct FunctionForwarderVoid;
 
     template <typename Sig, bool UnlockV8>
-    struct FunctionForwarderVoid<0,Sig, UnlockV8> : FunctionSignature<Sig>
+    struct FunctionForwarderVoid<0,Sig, UnlockV8> : XFunctionSignature<Sig>
     {
-        typedef FunctionSignature<Sig> SignatureType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XFunctionSignature<Sig> XSignatureType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         typedef Sig FunctionType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & )
         {
@@ -475,17 +476,17 @@ namespace Detail {
             return v8::Undefined();
         }
         ASSERT_UNLOCK_SANITY_CHECK;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == 0 ? 1 : -1];
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
     };
     
     template <int Arity, typename RV, bool UnlockV8>
     struct FunctionForwarderVoid<Arity,RV (v8::Arguments const &), UnlockV8>
-        : FunctionSignature<RV (v8::Arguments const &)>
+        : XFunctionSignature<RV (v8::Arguments const &)>
     {
     public:
-        typedef FunctionSignature<RV (v8::Arguments const &)> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -497,25 +498,25 @@ namespace Detail {
             return v8::Undefined();
         }
         ASSERT_UNLOCKV8_IS_FALSE;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == -1 ? 1 : -1];
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
     };
 
     /**
-        Internal impl for cvv8::ConstMethodForwarder.
+        Internal impl for cvv8::XConstMethodForwarder.
     */
     template <typename T, int Arity_, typename Sig,
-             bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T, Sig> >::Value
+             bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T, Sig> >::Value
      >
-    struct MethodForwarder DOXYGEN_FWD_DECL_KLUDGE;
+    struct XMethodForwarder;
 
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarder<T, 0, Sig, UnlockV8> : MethodSignature<T,Sig>
+    struct XMethodForwarder<T, 0, Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
     public:
-        typedef MethodSignature<T,Sig> SignatureType;
-        typedef typename SignatureType::ReturnType ReturnType;
-        typedef typename SignatureType::FunctionType FunctionType;
+        typedef XMethodSignature<T,Sig> XSignatureType;
+        typedef typename XSignatureType::ReturnType ReturnType;
+        typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename TypeInfo<T>::Type Type;
         static ReturnType CallNative( T & self, FunctionType func, v8::Arguments const & argv )
         {
@@ -549,14 +550,14 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct MethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : MethodSignature<T, RV (v8::Arguments const &)>
+    struct XMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
+        : XMethodSignature<T, RV (v8::Arguments const &)>
     {
     public:
-        typedef MethodSignature<T, RV (v8::Arguments const &)> SignatureType;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == -1 ? 1 : -1];
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T & self, FunctionType func, v8::Arguments const & argv )
         {
             return (self.*func)(argv);
@@ -587,24 +588,24 @@ namespace Detail {
     };
 
     template <typename T, typename RV, bool UnlockV8, int _Arity>
-    struct MethodForwarder<T,_Arity, RV (T::*)(v8::Arguments const &), UnlockV8> :
-            MethodForwarder<T, _Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XMethodForwarder<T,_Arity, RV (T::*)(v8::Arguments const &), UnlockV8> :
+            XMethodForwarder<T, _Arity, RV (v8::Arguments const &), UnlockV8>
     {};
 
     template <typename T, int Arity_, typename Sig,
-        bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T, Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T, Sig> >::Value
     >
-    struct MethodForwarderVoid DOXYGEN_FWD_DECL_KLUDGE;
+    struct XMethodForwarderVoid ;
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct MethodForwarderVoid<T,0,Sig, UnlockV8>
-        : MethodSignature<T,Sig>
+    struct XMethodForwarderVoid<T,0,Sig, UnlockV8>
+        : XMethodSignature<T,Sig>
     {
     public:
-        typedef MethodSignature<T,Sig> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
+        typedef XMethodSignature<T,Sig> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
         typedef T Type;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( Type & self, FunctionType func, v8::Arguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -637,14 +638,14 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct MethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
-        : MethodSignature<T,RV (v8::Arguments const &)>
+    struct XMethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
+        : XMethodSignature<T,RV (v8::Arguments const &)>
     {
     public:
-        typedef MethodSignature<T,RV (v8::Arguments const &)> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
+        typedef XMethodSignature<T,RV (v8::Arguments const &)> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename TypeInfo<T>::Type Type;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( Type & self, FunctionType func, v8::Arguments const & argv )
         {
             return (ReturnType)(self.*func)(argv);
@@ -678,25 +679,25 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct MethodForwarderVoid<T,Arity, RV (T::*)(v8::Arguments const &), UnlockV8>
-        : MethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XMethodForwarderVoid<T,Arity, RV (T::*)(v8::Arguments const &), UnlockV8>
+        : XMethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
     {};
     
     /**
-        Internal impl for cvv8::ConstMethodForwarder.
+        Internal impl for cvv8::XConstMethodForwarder.
     */
     template <typename T, int Arity_, typename Sig,
-            bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T, Sig> >::Value
+            bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T, Sig> >::Value
     >
-    struct ConstMethodForwarder DOXYGEN_FWD_DECL_KLUDGE;
+    struct XConstMethodForwarder ;
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarder<T,0,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarder<T,0,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
     public:
-        typedef ConstMethodSignature<T,Sig> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodSignature<T,Sig> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -728,14 +729,14 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct ConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : ConstMethodSignature<T, RV (v8::Arguments const &)>
+    struct XConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
+        : XConstMethodSignature<T, RV (v8::Arguments const &)>
     {
     public:
-        typedef ConstMethodSignature<T, RV (v8::Arguments const &)> SignatureType;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == -1 ? 1 : -1];
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
             return (ReturnType)(self.*func)(argv);
@@ -766,22 +767,22 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct ConstMethodForwarder<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
-        : ConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XConstMethodForwarder<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
+        : XConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
     {};
 
     template <typename T, int Arity_, typename Sig,
-            bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T, Sig> >::Value
+            bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T, Sig> >::Value
     >
-    struct ConstMethodForwarderVoid DOXYGEN_FWD_DECL_KLUDGE;
+    struct XConstMethodForwarderVoid;
 
     template <typename T, typename Sig, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T,0,Sig, UnlockV8> : ConstMethodSignature<T,Sig>
+    struct XConstMethodForwarderVoid<T,0,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
     public:
-        typedef ConstMethodSignature<T,Sig> SignatureType;
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodSignature<T,Sig> XSignatureType;
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename TypeInfo<T>::Type Type;
         static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & )
         {
@@ -817,14 +818,14 @@ namespace Detail {
     };
     
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : ConstMethodSignature<T, RV (v8::Arguments const &)>
+    struct XConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
+        : XConstMethodSignature<T, RV (v8::Arguments const &)>
     {
     public:
-        typedef ConstMethodSignature<T, RV (v8::Arguments const &)> SignatureType;
-        typedef char AssertArity[ sl::Arity<SignatureType>::Value == -1 ? 1 : -1];
-        typedef typename SignatureType::FunctionType FunctionType;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
+        typedef typename XSignatureType::FunctionType FunctionType;
+        typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename TypeInfo<T>::Type Type;
         static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & argv )
         {
@@ -857,8 +858,8 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct ConstMethodForwarderVoid<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
-    : ConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XConstMethodForwarderVoid<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
+    : XConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
     {};
 
 }
@@ -869,16 +870,16 @@ namespace Detail {
     functions.
 
     Sig must be a function-signature-like argument. e.g. <double (int,double)>,
-    and the members of this class expect functions matching that signature.
+    and the members of this class expect functions matching that XSignature.
 
     If UnlockV8 is true then v8::Unlocker will be used to unlock v8 
     for the duration of the call to Func(). HOWEVER... (the rest of 
     these docs are about the caveats)...
 
-    A UnlockV8 value of SignatureIsUnlockable<Sig>::Value uses a
+    A UnlockV8 value of XSignatureIsUnlockable<Sig>::Value uses a
     reasonably sound heuristic but it cannot predict certain 
     app-dependent conditions which render its guess semantically 
-    invalid. See SignatureIsUnlockable for more information.
+    invalid. See XSignatureIsUnlockable for more information.
 
     It is illegal for UnlockV8 to be true if ANY of the following 
     applies:
@@ -891,17 +892,17 @@ namespace Detail {
 
     - Any of the return or argument types for the function are v8 
     types, e.g. v8::Handle<Anything> or v8::Arguments. 
-    SignatureIsUnlockable<Sig>::Value will evaluate to false 
+    XSignatureIsUnlockable<Sig>::Value will evaluate to false
     if any of the "known bad" types is contained in the function's 
-    signature. If this function is given a true value but
-    SignatureIsUnlockable<Sig>::Value is false then
+    XSignature. If this function is given a true value but
+    XSignatureIsUnlockable<Sig>::Value is false then
     a compile-time assertion will be triggered.
 
-    - Certain callback signatures cannot have unlocking support
+    - Certain callback XSignatures cannot have unlocking support
     enabled because if we unlock then we cannot legally access the data
     we need to convert. These will cause a compile-time assertion
     if UnlockV8 is true. All such bits are incidentally covered by
-    SignatureIsUnlockable's check, so this assertion can
+    XSignatureIsUnlockable's check, so this assertion can
     only happen if the client explicitly sets UnlockV8 to true for
     those few cases.
 
@@ -920,23 +921,23 @@ namespace Detail {
     for the most part).
 */
 template <typename Sig,
-        bool UnlockV8 = SignatureIsUnlockable< Signature<Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value
 >
 struct FunctionForwarder
 {
 private:
-    typedef typename tmp::IfElse< tmp::SameType<void ,typename Signature<Sig>::ReturnType>::Value,
-                                Detail::FunctionForwarderVoid< sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >,
-                                Detail::FunctionForwarder< sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >
+    typedef typename XIfElse< XSameType<void ,typename XSignature<Sig>::ReturnType>::Value,
+                                Detail::FunctionForwarderVoid< sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >,
+                                Detail::FunctionForwarder< sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >
         >::Type
     Proxy;
 public:
-    typedef typename Proxy::SignatureType SignatureType;
+    typedef typename Proxy::SignatureType XSignatureType;
     typedef typename Proxy::ReturnType ReturnType;
     typedef typename Proxy::FunctionType FunctionType;
     /**
        Passes the given arguments to func(), converting them to the appropriate
-       types. If argv.Length() is less than sl::Arity< SignatureType >::Value then
+       types. If argv.Length() is less than sl::Arity< XSignatureType >::Value then
        a JS exception is thrown, with one exception: if the function has "-1 arity"
        (i.e. it is InvocationCallback-like) then argv is passed on to it regardless
        of the value of argv.Length().
@@ -1015,14 +1016,14 @@ namespace Detail {
         Base internal implementation of cvv8::FunctionToInCa.
     */
     template <typename Sig,
-              typename FunctionSignature<Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< FunctionSignature<Sig> >::Value >
-    struct FunctionToInCa : FunctionPtr<Sig,Func>, InCa
+              typename XFunctionSignature<Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XFunctionSignature<Sig> >::Value >
+    struct FunctionToInCa : XFunctionPtr<Sig,Func>, InCa
     {
         
-        typedef FunctionSignature<Sig> SignatureType;
-        typedef FunctionForwarder< sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XFunctionSignature<Sig> XSignatureType;
+        typedef FunctionForwarder< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( v8::Arguments const & argv )
         {
             return (ReturnType)Proxy::CallNative( Func, argv );
@@ -1041,7 +1042,7 @@ namespace Detail {
     };
 
     /** Almost identical to FunctionToInCa, but expressly does not
-        instantiate NativeToJS< Signature<Sig>::ReturnType >, meaning
+        instantiate NativeToJS< XSignature<Sig>::ReturnType >, meaning
         that:
 
         a) it can proxy functions which have non-convertible return types.
@@ -1049,13 +1050,13 @@ namespace Detail {
         b) JS always gets the 'undefined' JS value as the return value.
     */
     template <typename Sig,
-              typename FunctionSignature<Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< FunctionSignature<Sig> >::Value >
-    struct FunctionToInCaVoid : FunctionPtr<Sig,Func>, InCa
+              typename XFunctionSignature<Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XFunctionSignature<Sig> >::Value >
+    struct FunctionToInCaVoid : XFunctionPtr<Sig,Func>, InCa
     {
-        typedef FunctionSignature<Sig> SignatureType;
-        typedef FunctionForwarderVoid< sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XFunctionSignature<Sig> XSignatureType;
+        typedef FunctionForwarderVoid< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( v8::Arguments const & argv )
         {
             return (ReturnType)Proxy::CallNative( Func, argv );
@@ -1070,15 +1071,15 @@ namespace Detail {
     /** Method equivalent to FunctionToInCa. */
     template <typename T,
               typename Sig,
-              typename MethodSignature<T,Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T,Sig> >::Value
+              typename XMethodSignature<T,Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T,Sig> >::Value
               >
-    struct MethodToInCa : MethodPtr<T,Sig, Func>, InCa
+    struct MethodToInCa : XMethodPtr<T,Sig, Func>, InCa
     {
-        typedef MethodPtr<T, Sig, Func> SignatureType;
-        enum { Arity = sl::Arity<SignatureType>::Value };
-        typedef MethodForwarder< T, Arity, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XMethodPtr<T, Sig, Func> XSignatureType;
+        enum { Arity = sl::Arity<XSignatureType>::Value };
+        typedef XMethodForwarder< T, Arity, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T & self, v8::Arguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
@@ -1101,15 +1102,15 @@ namespace Detail {
     /** Method equivalent to FunctionToInCaVoid. */
     template <typename T,
               typename Sig,
-              typename MethodSignature<T,Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T,Sig> >::Value
+              typename XMethodSignature<T,Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T,Sig> >::Value
               >
-    struct MethodToInCaVoid : MethodPtr<T,Sig,Func>, InCa
+    struct MethodToInCaVoid : XMethodPtr<T,Sig,Func>, InCa
     {
-        typedef MethodPtr<T, Sig, Func> SignatureType;
-        enum { Arity = sl::Arity<SignatureType>::Value };
-        typedef MethodForwarderVoid< T, Arity, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XMethodPtr<T, Sig, Func> XSignatureType;
+        enum { Arity = sl::Arity<XSignatureType>::Value };
+        typedef XMethodForwarderVoid< T, Arity, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T & self, v8::Arguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
@@ -1132,14 +1133,14 @@ namespace Detail {
     /** Const method equivalent to MethodToInCa. */
     template <typename T,
               typename Sig,
-              typename ConstMethodSignature<T,Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T,Sig> >::Value
+              typename XConstMethodSignature<T,Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T,Sig> >::Value
               >
-    struct ConstMethodToInCa : ConstMethodPtr<T,Sig, Func>, InCa
+    struct ConstMethodToInCa : XConstMethodPtr<T,Sig, Func>, InCa
     {
-        typedef ConstMethodPtr<T, Sig, Func> SignatureType;
-        typedef ConstMethodForwarder< T, sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
+        typedef XConstMethodForwarder< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, v8::Arguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
@@ -1160,14 +1161,14 @@ namespace Detail {
 
     template <typename T,
               typename Sig,
-              typename ConstMethodSignature<T,Sig>::FunctionType Func,
-              bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T,Sig> >::Value
+              typename XConstMethodSignature<T,Sig>::FunctionType Func,
+              bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T,Sig> >::Value
               >
-    struct ConstMethodToInCaVoid : ConstMethodPtr<T,Sig,Func>, InCa
+    struct ConstMethodToInCaVoid : XConstMethodPtr<T,Sig,Func>, InCa
     {
-        typedef ConstMethodPtr<T, Sig, Func> SignatureType;
-        typedef ConstMethodForwarderVoid< T, sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
-        typedef typename SignatureType::ReturnType ReturnType;
+        typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
+        typedef XConstMethodForwarderVoid< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
+        typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( T const & self, v8::Arguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
@@ -1197,8 +1198,8 @@ namespace Detail {
    A template for converting free (non-member) function pointers
    to v8::InvocationCallback.
 
-   Sig must be a function signature. Func must be a pointer to a function
-   with that signature.
+   Sig must be a function XSignature. Func must be a pointer to a function
+   with that XSignature.
 
    If UnlockV8 is true then v8::Unlocker will be used to unlock v8 
    for the duration of the call to Func(). HOWEVER... see 
@@ -1213,11 +1214,11 @@ namespace Detail {
     @endcode
 */
 template <typename Sig,
-          typename FunctionSignature<Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< Signature<Sig> >::Value
+          typename XFunctionSignature<Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value
           >
 struct FunctionToInCa
-    : tmp::IfElse< tmp::SameType<void ,typename FunctionSignature<Sig>::ReturnType>::Value,
+    : XIfElse< XSameType<void ,typename XFunctionSignature<Sig>::ReturnType>::Value,
                  Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>,
                  Detail::FunctionToInCa< Sig, Func, UnlockV8>
         >::Type
@@ -1226,7 +1227,7 @@ struct FunctionToInCa
 /**
     A variant of FunctionToInCa with the property of NOT invoking the
     conversion of the function's return type from native to JS form. i.e. it
-    does not cause NativeToJS< Signature<Sig>::ReturnType > to be
+    does not cause NativeToJS< XSignature<Sig>::ReturnType > to be
     instantiated. This is useful when such a conversion is not legal because
     CastToJS() won't work on it or, more generally, when you want the JS
     interface to always get the undefined return value.
@@ -1242,8 +1243,8 @@ struct FunctionToInCa
     @endcode
 */
 template <typename Sig,
-          typename FunctionSignature<Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< Signature<Sig> >::Value
+          typename XFunctionSignature<Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value
           >
 struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
 {};
@@ -1262,8 +1263,8 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
 
    T must be some client-specified type which is presumably bound (or
    at least bindable) to JS-side Objects. Sig must be a member
-   function signature for T. Func must be a pointer to a function with
-   that signature.
+   function XSignature for T. Func must be a pointer to a function with
+   that XSignature.
    
    See FunctionForwarder for details about the UnlockV8 parameter.
    
@@ -1277,11 +1278,11 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
     @endcode
 */
 template <typename T, typename Sig,
-          typename MethodSignature<T,Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T,Sig> >::Value
+          typename XMethodSignature<T,Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T,Sig> >::Value
           >
 struct MethodToInCa
-    : tmp::IfElse< tmp::SameType<void ,typename MethodSignature<T,Sig>::ReturnType>::Value,
+    : XIfElse< XSameType<void ,typename XMethodSignature<T,Sig>::ReturnType>::Value,
                  Detail::MethodToInCaVoid<T, Sig, Func, UnlockV8>,
                  Detail::MethodToInCa<T, Sig, Func, UnlockV8>
         >::Type
@@ -1302,8 +1303,8 @@ struct MethodToInCa
 
 */
 template <typename T, typename Sig,
-          typename MethodSignature<T,Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T,Sig> >::Value
+          typename XMethodSignature<T,Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T,Sig> >::Value
           >
 struct MethodToInCaVoid
     : Detail::MethodToInCaVoid<T, Sig, Func, UnlockV8>
@@ -1313,30 +1314,30 @@ struct MethodToInCaVoid
 #if !defined(DOXYGEN)
 namespace Detail {
     template <typename RV, typename Ftor, typename Sig, bool UnlockV8>
-    struct FunctorToInCaSelector : ConstMethodForwarder<Ftor, sl::Arity<Signature<Sig> >::Value, Sig, UnlockV8>
+    struct FunctorToInCaSelector : XConstMethodForwarder<Ftor, sl::Arity<XSignature<Sig> >::Value, Sig, UnlockV8>
     {
     };
     template <typename Ftor, typename Sig, bool UnlockV8>
-    struct FunctorToInCaSelector<void,Ftor,Sig,UnlockV8> : ConstMethodForwarderVoid<Ftor, sl::Arity<Signature<Sig> >::Value, Sig, UnlockV8>
+    struct FunctorToInCaSelector<void,Ftor,Sig,UnlockV8> : XConstMethodForwarderVoid<Ftor, sl::Arity<XSignature<Sig> >::Value, Sig, UnlockV8>
     {};
 }
 #endif
 
 /**
     This class converts a functor to an InvocationCallback. Ftor must
-    be a functor type. Sig must be a signature unambiguously matching 
+    be a functor type. Sig must be a XSignature unambiguously matching
     a Ftor::operator() implementation and Ftor::operator() must be
     const. UnlockV8 is as described for FunctionToInCa.
 */
 template <typename Ftor, typename Sig,
-        bool UnlockV8 = SignatureIsUnlockable< MethodSignature<Ftor,Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<Ftor,Sig> >::Value
         >
 struct FunctorToInCa : InCa
 {
     inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
     {
         typedef Detail::FunctorToInCaSelector<
-            typename Signature<Sig>::ReturnType, Ftor, Sig, UnlockV8
+            typename XSignature<Sig>::ReturnType, Ftor, Sig, UnlockV8
         > Proxy;
         return Proxy::Call( Ftor(), &Ftor::operator(), argv );
     }
@@ -1347,7 +1348,7 @@ struct FunctorToInCa : InCa
     the requirements of the Ftor and Sig types.
 */
 template <typename Ftor, typename Sig,
-        bool UnlockV8 = SignatureIsUnlockable< MethodSignature<Ftor,Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<Ftor,Sig> >::Value
         >
 struct FunctorToInCaVoid : InCa
 {
@@ -1365,7 +1366,7 @@ struct FunctorToInCaVoid : InCa
    
    See FunctionForwarder for details about the UnlockV8 parameter.
    
-   Note that the Sig signature must be suffixed with a const qualifier!
+   Note that the Sig XSignature must be suffixed with a const qualifier!
    
     Example:
 
@@ -1375,14 +1376,14 @@ struct FunctorToInCaVoid : InCa
     @endcode
 
 */
-template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T,Sig> >::Value
+template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T,Sig> >::Value
           >
 struct ConstMethodToInCa
 #if 0 // not working due to an ambiguous Sig<T,...> vs Sig<const T,...>. Kinda weird, since MethodToInCa<const T,...> works.
     : MethodToInCa<const T,Sig,Func,UnlockV8> {};
 #else
-    : tmp::IfElse< tmp::SameType<void ,typename ConstMethodSignature<T, Sig>::ReturnType>::Value,
+    : XIfElse< XSameType<void ,typename XConstMethodSignature<T, Sig>::ReturnType>::Value,
                  Detail::ConstMethodToInCaVoid<T, Sig, Func, UnlockV8>,
                  Detail::ConstMethodToInCa<T, Sig, Func, UnlockV8>
         >::Type
@@ -1392,7 +1393,7 @@ struct ConstMethodToInCa
     See FunctionToInCaVoid - this is identical exception that it
     works on const member functions of T.
    
-    Note that the Sig signature must be suffixed with a const qualifier!
+    Note that the Sig XSignature must be suffixed with a const qualifier!
     
     Example:
 
@@ -1402,8 +1403,8 @@ struct ConstMethodToInCa
     @endcode
 
 */
-template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Func,
-          bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T,Sig> >::Value
+template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Func,
+          bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T,Sig> >::Value
           >
 struct ConstMethodToInCaVoid : Detail::ConstMethodToInCaVoid<T, Sig, Func, UnlockV8>
 {};
@@ -1414,26 +1415,26 @@ struct ConstMethodToInCaVoid : Detail::ConstMethodToInCaVoid<T, Sig, Func, Unloc
 
    Sig must be a function-signature-like argument. e.g. <double
    (int,double)>, and the members of this class expect T member
-   functions matching that signature.
+   functions matching that XSignature.
 */
-template <typename T, typename Sig, bool UnlockV8 = SignatureIsUnlockable< MethodSignature<T,Sig> >::Value>
-struct MethodForwarder
+template <typename T, typename Sig, bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T,Sig> >::Value>
+struct XMethodForwarder
 {
 private:
     typedef typename
-    tmp::IfElse< tmp::SameType<void ,typename MethodSignature<T,Sig>::ReturnType>::Value,
-                 Detail::MethodForwarderVoid< T, sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >,
-                 Detail::MethodForwarder< T, sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >
+    XIfElse< XSameType<void ,typename XMethodSignature<T,Sig>::ReturnType>::Value,
+                 Detail::XMethodForwarderVoid< T, sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >,
+                 Detail::XMethodForwarder< T, sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >
     >::Type
     Proxy;
 public:
-    typedef typename Proxy::SignatureType SignatureType;
+    typedef typename Proxy::SignatureType XSignatureType;
     typedef typename Proxy::FunctionType FunctionType;
     typedef typename Proxy::ReturnType ReturnType;
     /**
        Passes the given arguments to (self.*func)(), converting them 
        to the appropriate types. If argv.Length() is less than 
-       sl::Arity<SignatureType>::Value then a JS exception is 
+       sl::Arity<XSignatureType>::Value then a JS exception is
        thrown, with one exception: if the function has "-1 arity" 
        (i.e. it is InvocationCallback-like) then argv is passed on 
        to it regardless of the value of argv.Length().
@@ -1455,31 +1456,31 @@ public:
 
 
 /**
-   Identical to MethodForwarder, but works on const member methods.
+   Identical to XMethodForwarder, but works on const member methods.
 */
 template <typename T, typename Sig,
-        bool UnlockV8 = SignatureIsUnlockable< ConstMethodSignature<T,Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T,Sig> >::Value
         >
-struct ConstMethodForwarder
+struct XConstMethodForwarder
 #if 1 //?msvc Seems to work.
-: MethodForwarder<T const, Sig, UnlockV8> {};
+: XMethodForwarder<T const, Sig, UnlockV8> {};
 #else
 {
 private:
     typedef typename
-    tmp::IfElse< tmp::SameType<void ,typename ConstMethodSignature<T,Sig>::ReturnType>::Value,
-                 Detail::ConstMethodForwarderVoid< T, sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >,
-                 Detail::ConstMethodForwarder< T, sl::Arity< Signature<Sig> >::Value, Sig, UnlockV8 >
+    XIfElse< XSameType<void ,typename XConstMethodSignature<T,Sig>::ReturnType>::Value,
+                 Detail::XConstMethodForwarderVoid< T, sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >,
+                 Detail::XConstMethodForwarder< T, sl::Arity< XSignature<Sig> >::Value, Sig, UnlockV8 >
     >::Type
     Proxy;
 public:
-    typedef typename Proxy::SignatureType SignatureType;
+    typedef typename Proxy::SignatureType XSignatureType;
     typedef typename Proxy::FunctionType FunctionType;
 
     /**
        Passes the given arguments to (self.*func)(), converting them
        to the appropriate types. If argv.Length() is less than
-       sl::Arity< Signature<Sig> >::Value then a JS exception is thrown, with one
+       sl::Arity< XSignature<Sig> >::Value then a JS exception is thrown, with one
        exception: if the function has "-1 arity" (i.e. it is
        InvocationCallback-like) then argv is passed on to it
        regardless of the value of argv.Length().
@@ -1503,20 +1504,20 @@ public:
 /**
    Tries to forward the given arguments to the given native 
    function. Will fail if argv.Lengt() is not at least 
-   sl::Arity<Signature<Sig>>::Value, throwing a JS exception in that 
+   sl::Arity<XSignature<Sig>>::Value, throwing a JS exception in that
    case _unless_ the function is InvocationCallback-like, in which 
    case argv is passed directly to it regardless of the value of 
    argv.Length().
 */
 template <typename Sig>
-inline typename FunctionSignature<Sig>::ReturnType
+inline typename XFunctionSignature<Sig>::ReturnType
 forwardFunction( Sig func, v8::Arguments const & argv )
 {
-    typedef FunctionSignature<Sig> MSIG;
+    typedef XFunctionSignature<Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
-    enum { Arity = sl::Arity< Signature<Sig> >::Value };
+    enum { Arity = sl::Arity< XSignature<Sig> >::Value };
     typedef typename
-        tmp::IfElse< tmp::SameType<void ,RV>::Value,
+        XIfElse< XSameType<void ,RV>::Value,
         Detail::FunctionForwarderVoid< Arity, Sig >,
         Detail::FunctionForwarder< Arity, Sig >
         >::Type Proxy;
@@ -1529,20 +1530,20 @@ forwardFunction( Sig func, v8::Arguments const & argv )
    as the 'this' pointer.
 */
 template <typename T, typename Sig>
-inline typename MethodSignature<T,Sig>::ReturnType
+inline typename XMethodSignature<T,Sig>::ReturnType
 forwardMethod( T & self,
                Sig func,
-               /* if i do: typename MethodSignature<T,Sig>::FunctionType
+               /* if i do: typename XMethodSignature<T,Sig>::FunctionType
                   then this template is never selected. */
                v8::Arguments const & argv )
 {
-    typedef MethodSignature<T,Sig> MSIG;
+    typedef XMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
     enum { Arity = sl::Arity< MSIG >::Value };
     typedef typename
-        tmp::IfElse< tmp::SameType<void ,RV>::Value,
-                 Detail::MethodForwarderVoid< T, Arity, Sig >,
-                 Detail::MethodForwarder< T, Arity, Sig >
+        XIfElse< XSameType<void ,RV>::Value,
+                 Detail::XMethodForwarderVoid< T, Arity, Sig >,
+                 Detail::XMethodForwarder< T, Arity, Sig >
     >::Type Proxy;
     return (RV)Proxy::CallNative( self, func, argv );
 }
@@ -1555,16 +1556,16 @@ forwardMethod( T & self,
    the T template parameter - it cannot deduce it.
 */
 template <typename T, typename Sig>
-inline typename MethodSignature<T,Sig>::ReturnType
+inline typename XMethodSignature<T,Sig>::ReturnType
 forwardMethod(Sig func, v8::Arguments const & argv )
 {
-    typedef MethodSignature<T,Sig> MSIG;
+    typedef XMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
     enum { Arity = sl::Arity< MSIG >::Value };
     typedef typename
-        tmp::IfElse< tmp::SameType<void ,RV>::Value,
-                 Detail::MethodForwarderVoid< T, Arity, Sig >,
-                 Detail::MethodForwarder< T, Arity, Sig >
+        XIfElse< XSameType<void ,RV>::Value,
+                 Detail::XMethodForwarderVoid< T, Arity, Sig >,
+                 Detail::XMethodForwarder< T, Arity, Sig >
     >::Type Proxy;
     return (RV)Proxy::CallNative( func, argv );
 }
@@ -1576,19 +1577,19 @@ forwardMethod(Sig func, v8::Arguments const & argv )
 
 */
 template <typename T, typename Sig>
-inline typename ConstMethodSignature<T,Sig>::ReturnType
+inline typename XConstMethodSignature<T,Sig>::ReturnType
 forwardConstMethod( T const & self,
-                    //typename ConstMethodSignature<T,Sig>::FunctionType func,
+                    //typename XConstMethodSignature<T,Sig>::FunctionType func,
                     Sig func,
                     v8::Arguments const & argv )
 {
-    typedef ConstMethodSignature<T,Sig> MSIG;
+    typedef XConstMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
     enum { Arity = sl::Arity< MSIG >::Value };
     typedef typename
-        tmp::IfElse< tmp::SameType<void ,RV>::Value,
-                 Detail::ConstMethodForwarderVoid< T, Arity, Sig >,
-                 Detail::ConstMethodForwarder< T, Arity, Sig >
+        XIfElse< XSameType<void ,RV>::Value,
+                 Detail::XConstMethodForwarderVoid< T, Arity, Sig >,
+                 Detail::XConstMethodForwarder< T, Arity, Sig >
     >::Type Proxy;
     return (RV)Proxy::CallNative( self, func, argv );
 }
@@ -1601,16 +1602,16 @@ forwardConstMethod( T const & self,
    the T template parameter - it cannot deduce it.
 */
 template <typename T, typename Sig>
-inline typename ConstMethodSignature<T,Sig>::ReturnType
+inline typename XConstMethodSignature<T,Sig>::ReturnType
 forwardConstMethod(Sig func, v8::Arguments const & argv )
 {
-    typedef ConstMethodSignature<T,Sig> MSIG;
+    typedef XConstMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
     enum { Arity = sl::Arity< MSIG >::Value };
     typedef typename
-        tmp::IfElse< tmp::SameType<void ,RV>::Value,
-                 Detail::ConstMethodForwarderVoid< T, Arity, Sig >,
-                 Detail::ConstMethodForwarder< T, Arity, Sig >
+        XIfElse< XSameType<void ,RV>::Value,
+                 Detail::XConstMethodForwarderVoid< T, Arity, Sig >,
+                 Detail::XConstMethodForwarder< T, Arity, Sig >
     >::Type Proxy;
     return (RV)Proxy::CallNative( func, argv );
 }
@@ -1715,7 +1716,7 @@ struct ArityDispatch : InCa
    b) Take no arguments
    c) Return a type convertible to JS via CastToJS()
 
-   Getter must be a pointer to a function matching that signature.
+   Getter must be a pointer to a function matching that XSignature.
 
    InCaT must be a InCa type. When Call() is called by v8, it will pass
    on the call to InCaT::Call() and catch exceptions as described below.
@@ -1774,7 +1775,7 @@ struct ArityDispatch : InCa
 */
 template < typename ExceptionT,
            typename SigGetMsg,
-           typename ConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
+           typename XConstMethodSignature<ExceptionT,SigGetMsg>::FunctionType Getter,
            typename InCaT,
            bool PropagateOtherExceptions = false
     >
@@ -1798,7 +1799,7 @@ struct InCaCatcher : InCa
             /* reminder to self:  we now have the unusual corner case that
             if Getter() returns a v8::Handle<v8::Value> it will be thrown
             as-is instead of wrapped in an Error object. See the Toss() docs
-            for why that is so. We could use tmp::SameType to alternately
+            for why that is so. We could use XSameType to alternately
             call TossAsError(), but i'm too tired and i honestly don't ever
             expect any exception type to return v8 handles.
             */
@@ -1854,7 +1855,7 @@ struct InCaCatcher : InCa
 template <
         typename InCaT,
         typename ConcreteException = std::exception,
-        bool PropagateOtherExceptions = !tmp::SameType< std::exception, ConcreteException >::Value
+        bool PropagateOtherExceptions = !XSameType< std::exception, ConcreteException >::Value
 >
 struct InCaCatcher_std :
     InCaCatcher<ConcreteException,
@@ -1880,7 +1881,7 @@ namespace Detail {
     };
     //! End-of-list specialization.
     template <>
-    struct OverloadCallHelper<tmp::NilType> : InCa
+    struct OverloadCallHelper<XNilType> : InCa
     {
         inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
         {
@@ -1953,7 +1954,7 @@ struct ArityDispatchList : InCa
    End-of-list specialization.
 */
 template <>
-struct ArityDispatchList<tmp::NilType> : Detail::OverloadCallHelper<tmp::NilType>
+struct ArityDispatchList<XNilType> : Detail::OverloadCallHelper<XNilType>
 {
 };    
 
@@ -1961,9 +1962,9 @@ struct ArityDispatchList<tmp::NilType> : Detail::OverloadCallHelper<tmp::NilType
 namespace Detail {
     //! Internal helper for ToInCa impl.
     template <typename T, typename Sig >
-    struct ToInCaSigSelector : MethodSignature<T,Sig>
+    struct ToInCaSigSelector : XMethodSignature<T,Sig>
     {
-        template < typename MethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
+        template < typename XMethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
         struct Base : cvv8::MethodToInCa<T, Sig, Func, UnlockV8 >
         {
         };
@@ -1971,9 +1972,9 @@ namespace Detail {
     
     //! Internal helper for ToInCa impl.
     template <typename Sig>
-    struct ToInCaSigSelector<void,Sig> : FunctionSignature<Sig>
+    struct ToInCaSigSelector<void,Sig> : XFunctionSignature<Sig>
     {
-        template < typename FunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
+        template < typename XFunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
         struct Base : cvv8::FunctionToInCa<Sig, Func, UnlockV8 >
         {
         };
@@ -1981,9 +1982,9 @@ namespace Detail {
 
     //! Internal helper for ToInCaVoid impl.
     template <typename T, typename Sig >
-    struct ToInCaSigSelectorVoid : MethodSignature<T,Sig>
+    struct ToInCaSigSelectorVoid : XMethodSignature<T,Sig>
     {
-        template < typename MethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
+        template < typename XMethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
         struct Base : cvv8::MethodToInCaVoid<T, Sig, Func, UnlockV8 >
         {
         };
@@ -1991,9 +1992,9 @@ namespace Detail {
 
     //! Internal helper for ToInCaVoid impl.
     template <typename Sig>
-    struct ToInCaSigSelectorVoid<void,Sig> : FunctionSignature<Sig>
+    struct ToInCaSigSelectorVoid<void,Sig> : XFunctionSignature<Sig>
     {
-        template < typename FunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
+        template < typename XFunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
         struct Base : cvv8::FunctionToInCaVoid<Sig, Func, UnlockV8 >
         {
         };
@@ -2029,12 +2030,12 @@ namespace Detail {
     Note the extra 'const' qualification for const method. This is 
     neccessary to be able to portably distinguish the constness 
     (some compilers allow us to add the const as part of the 
-    function signature). Also note that the 'void' 1st parameter for 
+    function XSignature). Also note that the 'void' 1st parameter for
     non-member functions is a bit of a hack.
 */
 template <typename T, typename Sig,
         typename Detail::ToInCaSigSelector<T,Sig>::FunctionType Func,
-        bool UnlockV8 = SignatureIsUnlockable< Detail::ToInCaSigSelector<T,Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< Detail::ToInCaSigSelector<T,Sig> >::Value
         >
 struct ToInCa : Detail::ToInCaSigSelector<T,Sig>::template Base<Func,UnlockV8>
 {
@@ -2047,7 +2048,7 @@ struct ToInCa : Detail::ToInCaSigSelector<T,Sig>::template Base<Func,UnlockV8>
 */
 template <typename T, typename Sig,
         typename Detail::ToInCaSigSelectorVoid<T,Sig>::FunctionType Func,
-        bool UnlockV8 = SignatureIsUnlockable< Detail::ToInCaSigSelector<T,Sig> >::Value
+        bool UnlockV8 = XSignatureIsUnlockable< Detail::ToInCaSigSelector<T,Sig> >::Value
         >
 struct ToInCaVoid : Detail::ToInCaSigSelectorVoid<T,Sig>::template Base<Func,UnlockV8>
 {
@@ -2098,15 +2099,15 @@ struct InCaLikeConstMethod : ConstMethodToInCa< T, RV (v8::Arguments const &), F
 
 #if 0
 //! Don't use. Doesn't yet compile. Trying to consolidate Const/MethodXyz
-template <typename ASig, typename Signature<ASig>::FunctionType Func>
+template <typename ASig, typename XSignature<ASig>::FunctionType Func>
 struct SigToInCa :
-    tmp::IfElse<
-        sl::IsFunction< Signature<ASig> >::Value,
+    XIfElse<
+        sl::IsFunction< XSignature<ASig> >::Value,
         FunctionToInCa< ASig, Func >,
-        typename tmp::IfElse<
-            sl::IsConstMethod< Signature<ASig> >::Value,
-            ConstMethodToInCa< typename tmp::PlainType<typename Signature<ASig>::Context>::Type, ASig, Func >,
-            MethodToInCa< typename Signature<ASig>::Context, ASig, Func >
+        typename XIfElse<
+            sl::IsConstMethod< XSignature<ASig> >::Value,
+            ConstMethodToInCa< typename tmp::PlainType<typename XSignature<ASig>::Context>::Type, ASig, Func >,
+            MethodToInCa< typename XSignature<ASig>::Context, ASig, Func >
         >::Type
     >::Type
 {};
@@ -2172,24 +2173,24 @@ struct NativeToJS_InCa_Base
     }
 };
 
-template <typename Sig, typename FunctionSignature<Sig>::FunctionType Func>
+template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Func>
 struct NativeToJS< FunctionToInCa<Sig, Func> > : NativeToJS_InCa_Base {};
-template <typename Sig, typename FunctionSignature<Sig>::FunctionType Func>
+template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Func>
 struct NativeToJS< FunctionToInCaVoid<Sig, Func> > : NativeToJS_InCa_Base {};
 
-template <typename T, typename Sig, typename MethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< MethodToInCa<T, Sig, Func> > : NativeToJS_InCa_Base {};
-template <typename T, typename Sig, typename MethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< MethodToInCaVoid<T, Sig, Func> > : NativeToJS_InCa_Base {};
 
-template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< ConstMethodToInCa<T, Sig, Func> > : NativeToJS_InCa_Base {};
-template <typename T, typename Sig, typename ConstMethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< ConstMethodToInCaVoid<T, Sig, Func> > : NativeToJS_InCa_Base {};
 
-template <typename T, typename Sig, typename MethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< ToInCa<T, Sig, Func> > : NativeToJS_InCa_Base {};
-template <typename T, typename Sig, typename MethodSignature<T,Sig>::FunctionType Func>
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Func>
 struct NativeToJS< ToInCaVoid<T, Sig, Func> > : NativeToJS_InCa_Base {};
 #endif
 

@@ -13,14 +13,7 @@ public:
 
   void set(const char* in, const XInterfaceObject& obj);
 
-  template <typename T>
-  void addInterface(const XInterface<T>&)
-    {
-    typedef cvv8::ClassCreator<T> CC;
-    CC& cc(CC::Instance());
-
-    cc.AddClassTo( cvv8::TypeName<T>::Value, _context->Global() );
-    }
+  void addInterface(const XInterfaceBase *i);
 
 private:
   XEngine* _engine;

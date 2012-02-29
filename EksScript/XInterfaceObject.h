@@ -10,12 +10,21 @@ public:
   XInterfaceObject();
 
   template <typename T>
-  static XInterfaceObject newInstance(XInterface<T>*, T** m)
+  static XInterfaceObject newInstance(XInterface<T>* i)
     {
-    typedef cvv8::ClassCreator<T> CC;
     XInterfaceObject ret;
-    ret._object = CC::Instance().NewInstance( 0, NULL, *m );
+    ret._object = i->newInstance(0, NULL);
     return ret;
+    }
+
+  template <typename T> T *castTo()
+    {
+    return cvv8::CastFromJS<T>(_object);
+    }
+
+  template <typename T> const T *castTo() const
+    {
+    return cvv8::CastFromJS<T>(_object);
     }
 
 private:
