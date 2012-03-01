@@ -9,12 +9,13 @@ free and member functions to v8::InvocationCallback functions
 so that they can be tied to JS objects. It relies on the
 CastToJS() and CastFromJS() functions to do non-function type
 conversion.
-   
+
 */
 
 #include "convert_core.hpp"
 #include "XSignature.h"
 #include "XSignatureSpecialisations.h"
+#include "XScriptException.h"
 
 namespace cvv8 {
 
@@ -134,7 +135,7 @@ namespace Detail {
         if the boolean value is true or is a no-op if it is false.
     */
     template <bool> struct V8Unlocker {};
-    
+
     /**
         Equivalent to v8::Unlocker.
     */
@@ -142,7 +143,7 @@ namespace Detail {
     struct V8Unlocker<true> : v8::Unlocker
     {
     };
-    
+
 
 }
 #endif
@@ -150,15 +151,15 @@ namespace Detail {
 /**
     A metatemplate which we can use to determine if a given type
     is "safe" to use in conjunction with v8::Unlock.
-    
+
     We optimistically assume that most types are safe and
     add specializations for types we know are not safe, e.g.
     v8::Handle<Anything> and v8::Arguments.
-    
-    Specializations of this type basically make up a collective 
-    "blacklist" of types which we know are not legal to use unless 
-    v8 is locked by our current thread. As new problematic types are 
-    discovered, they can be added to the blacklist by introducing a 
+
+    Specializations of this type basically make up a collective
+    "blacklist" of types which we know are not legal to use unless
+    v8 is locked by our current thread. As new problematic types are
+    discovered, they can be added to the blacklist by introducing a
     specialization of this class.
 */
 template <typename T>
@@ -174,7 +175,7 @@ struct IsUnlockable<T const *> : IsUnlockable<T> {};
 
 /**
     Explicit instantiation to make damned sure that nobody
-    re-sets this one. We rely on these semantics for 
+    re-sets this one. We rely on these semantics for
     handling XFunctionSignature like Const/XMethodSignature
     in some cases.
 */
@@ -182,9 +183,9 @@ template <>
 struct IsUnlockable<void> : XBoolVal<true> {};
 
 /*
-    Todo?: find a mechanism to cause certain highly illegal types to 
-    always trigger an assertion... We could probably do it by 
-    declaring but not definiting JSToNative/NativeToJS 
+    Todo?: find a mechanism to cause certain highly illegal types to
+    always trigger an assertion... We could probably do it by
+    declaring but not definiting JSToNative/NativeToJS
     specialializations.
 */
 template <>
@@ -226,48 +227,48 @@ struct TypeListIsUnlockable< XNilType > : XBoolVal<true>
 /**
     Given a XSignature, this metafunction's Value member
     evaluates to true if:
-    
+
     - IsUnlockable<SigTList::ReturnType>::Value is true and...
-    
+
     - IsUnlockable<SigTList::Context>::Value is true (only relavent
     for Const/XMethodSignature, not XFunctionSignature) and...
-    
+
     - TypeListIsUnlockable< SigTList >::Value is true.
-    
+
     If the value is true, the function XSignature has passed the most
-    basic check for whether or not it is legal to use v8::Unlocker 
+    basic check for whether or not it is legal to use v8::Unlocker
     to unlock v8 before calling a function with this XSignature. Note
-    that this is a best guess, but this code cannot know 
-    app-specific conditions which might make this guess invalid. 
-    e.g. if a bound function itself uses v8 and does not explicitly 
-    acquire a lock then the results are undefined (and will very 
-    possibly trigger an assertion in v8, killing the app). Such 
-    things can and do happen. If you're lucky, you're building 
-    against a debug version of libv8 and its assertion text will 
-    point you directly to the JS code which caused the assertion, 
-    then you can disable unlocking support for that binding.    
+    that this is a best guess, but this code cannot know
+    app-specific conditions which might make this guess invalid.
+    e.g. if a bound function itself uses v8 and does not explicitly
+    acquire a lock then the results are undefined (and will very
+    possibly trigger an assertion in v8, killing the app). Such
+    things can and do happen. If you're lucky, you're building
+    against a debug version of libv8 and its assertion text will
+    point you directly to the JS code which caused the assertion,
+    then you can disable unlocking support for that binding.
 
     If you want to disable unlocking for all bound members of a given
-    class, create an IsUnlockable<T> specialization whos Value 
-    member evaluates to false. Then no functions/methods using that 
+    class, create an IsUnlockable<T> specialization whos Value
+    member evaluates to false. Then no functions/methods using that
     class will cause this metafunction to evaluate to true.
-    
+
     Note that FunctionToInCa, Const/MethodToInCa, etc., are all
     XSignature subclasses, and can be used directly with
     this template.
-    
+
     Example:
-    
+
     @code
     // This one can be unlocked:
     typedef XFunctionSignature< int (int) > F1;
     // XSignatureIsUnlockable<F1>::Value == true
-    
+
     // This one cannot because it contains a v8 type in the arguments:
     typedef XFunctionSignature< int (v8::Handle<v8::Value>) > F2;
     // XSignatureIsUnlockable<F2>::Value == false
     @endcode
-    
+
     For Const/MethodToInCa types, this check will also fail if
     IsUnlockable< SigTList::Context >::Value is false.
 */
@@ -282,33 +283,8 @@ struct XSignatureIsUnlockable : XBoolVal<
 template <>
 struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
 
-/**
-    Internal exception type to allow us to differentiate
-    "no native 'this' pointer found" errors from all other
-    exceptions. It is thrown by the CallNative() functions
-    of various JS-to-Native function forwarders.
-*/
-struct MissingThisException
-{
-protected:
-    StringBuffer msg;
-    template <typename T>
-    void init()
-    {
-        this->msg << "CastFromJS<"<< TypeName<T>::Value
-        << ">() returned NULL. Throwing to avoid "
-        << "dereferencing a NULL pointer!";
-    }
-    MissingThisException() {}
-public:
-    /**
-        Returns the exception message text, which does not change
-        after construction.
-    */
-    StringBuffer const & Buffer() const { return msg; }
-};
 
-   
+
 /**
     This special-case convenience form of Toss() triggers a JS-side
     exception containing an English-language message explaining that
@@ -345,7 +321,7 @@ public:
     possibly other platforms) if we have a default value for TypeName::Value.
     i hope to eventually find a solution which is both cross-platform and
     allows us to invoke TypeName<T>::Value from here.
-*/  
+*/
 template <typename T>
 v8::Handle<v8::Value> TossMissingThis()
 {
@@ -389,10 +365,10 @@ namespace Detail {
 */
 #define ASSERT_UNLOCKV8_IS_FALSE typedef char ThisSpecializationCannotUseV8Unlocker[!UnlockV8 ? 1 : -1]
 /**
-    Temporary internal macro to trigger a static assertion if: 
+    Temporary internal macro to trigger a static assertion if:
     UnlockV8 is true and XSignatureIsUnlockable<Sig>::Value is false.
-    This is to prohibit that someone accidentally enables locking 
-    when using a function type which we know (based on its 
+    This is to prohibit that someone accidentally enables locking
+    when using a function type which we know (based on its
     XSignature's types) cannot obey the (un)locking rules.
 */
 #define ASSERT_UNLOCK_SANITY_CHECK typedef char AssertCanEnableUnlock[ \
@@ -402,7 +378,7 @@ namespace Detail {
     template <int Arity_, typename Sig,
             bool UnlockV8 = XSignatureIsUnlockable< XSignature<Sig> >::Value >
     struct FunctionForwarder;
-    
+
     template <int Arity, typename RV, bool UnlockV8>
     struct FunctionForwarder<Arity,RV (v8::Arguments const &), UnlockV8>
         : XFunctionSignature<RV (v8::Arguments const &)>
@@ -478,7 +454,7 @@ namespace Detail {
         ASSERT_UNLOCK_SANITY_CHECK;
         typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
     };
-    
+
     template <int Arity, typename RV, bool UnlockV8>
     struct FunctionForwarderVoid<Arity,RV (v8::Arguments const &), UnlockV8>
         : XFunctionSignature<RV (v8::Arguments const &)>
@@ -545,7 +521,7 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        
+
         ASSERT_UNLOCK_SANITY_CHECK;
     };
 
@@ -682,7 +658,7 @@ namespace Detail {
     struct XMethodForwarderVoid<T,Arity, RV (T::*)(v8::Arguments const &), UnlockV8>
         : XMethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
     {};
-    
+
     /**
         Internal impl for cvv8::XConstMethodForwarder.
     */
@@ -703,7 +679,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (self.*func)();
         }
-        
+
         static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
         {
             try
@@ -789,7 +765,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)();
         }
-        
+
         static v8::Handle<v8::Value> Call( Type const & self, FunctionType func, v8::Arguments const & argv )
         {
             try
@@ -816,7 +792,7 @@ namespace Detail {
         }
         ASSERT_UNLOCK_SANITY_CHECK;
     };
-    
+
     template <typename T, int Arity, typename RV, bool UnlockV8>
     struct XConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
         : XConstMethodSignature<T, RV (v8::Arguments const &)>
@@ -872,28 +848,28 @@ namespace Detail {
     Sig must be a function-signature-like argument. e.g. <double (int,double)>,
     and the members of this class expect functions matching that XSignature.
 
-    If UnlockV8 is true then v8::Unlocker will be used to unlock v8 
-    for the duration of the call to Func(). HOWEVER... (the rest of 
+    If UnlockV8 is true then v8::Unlocker will be used to unlock v8
+    for the duration of the call to Func(). HOWEVER... (the rest of
     these docs are about the caveats)...
 
     A UnlockV8 value of XSignatureIsUnlockable<Sig>::Value uses a
-    reasonably sound heuristic but it cannot predict certain 
-    app-dependent conditions which render its guess semantically 
+    reasonably sound heuristic but it cannot predict certain
+    app-dependent conditions which render its guess semantically
     invalid. See XSignatureIsUnlockable for more information.
 
-    It is illegal for UnlockV8 to be true if ANY of the following 
+    It is illegal for UnlockV8 to be true if ANY of the following
     applies:
 
-    - The callback itself will "use" v8 but does not explicitly use 
-    v8::Locker. If it uses v8::Locker then it may safely enable 
-    unlocking support. We cannot determine via templates  whether 
-    or not a function "uses" v8 except by guessing based on the 
+    - The callback itself will "use" v8 but does not explicitly use
+    v8::Locker. If it uses v8::Locker then it may safely enable
+    unlocking support. We cannot determine via templates  whether
+    or not a function "uses" v8 except by guessing based on the
     return and arguments types.
 
-    - Any of the return or argument types for the function are v8 
-    types, e.g. v8::Handle<Anything> or v8::Arguments. 
+    - Any of the return or argument types for the function are v8
+    types, e.g. v8::Handle<Anything> or v8::Arguments.
     XSignatureIsUnlockable<Sig>::Value will evaluate to false
-    if any of the "known bad" types is contained in the function's 
+    if any of the "known bad" types is contained in the function's
     XSignature. If this function is given a true value but
     XSignatureIsUnlockable<Sig>::Value is false then
     a compile-time assertion will be triggered.
@@ -906,12 +882,12 @@ namespace Detail {
     only happen if the client explicitly sets UnlockV8 to true for
     those few cases.
 
-    - There might be other, as yet unknown/undocumented, corner cases 
-    where unlocking v8 is semantically illegal at this level of the 
+    - There might be other, as yet unknown/undocumented, corner cases
+    where unlocking v8 is semantically illegal at this level of the
     API.
 
-    Violating any of these leads to undefined behaviour. The library 
-    tries to fail at compile time for invalid combinations when it 
+    Violating any of these leads to undefined behaviour. The library
+    tries to fail at compile time for invalid combinations when it
     can, but (as described aboved) it can be fooled into thinking that
     unlocking is safe.
 
@@ -941,7 +917,7 @@ public:
        a JS exception is thrown, with one exception: if the function has "-1 arity"
        (i.e. it is InvocationCallback-like) then argv is passed on to it regardless
        of the value of argv.Length().
-       
+
        The native return value of the call is returned to the caller.
     */
     static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
@@ -973,7 +949,7 @@ struct CallForwarder
         Implementations must be templates taking Arity arguments in addition
         to the first two. All argument types must legal for use with
         CastToJS().
-    
+
         If either self or func.IsEmpty() then a JS exception must be thrown,
         else implementations must return func->Call(self, N, ARGS), where
         ARGS is an array of v8::Handle<v8::Value> and N is the number of
@@ -1020,7 +996,7 @@ namespace Detail {
               bool UnlockV8 = XSignatureIsUnlockable< XFunctionSignature<Sig> >::Value >
     struct FunctionToInCa : XFunctionPtr<Sig,Func>, InCa
     {
-        
+
         typedef XFunctionSignature<Sig> XSignatureType;
         typedef FunctionForwarder< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
@@ -1201,15 +1177,15 @@ namespace Detail {
    Sig must be a function XSignature. Func must be a pointer to a function
    with that XSignature.
 
-   If UnlockV8 is true then v8::Unlocker will be used to unlock v8 
-   for the duration of the call to Func(). HOWEVER... see 
-   FunctionForwarder for the details/caveats regarding that 
+   If UnlockV8 is true then v8::Unlocker will be used to unlock v8
+   for the duration of the call to Func(). HOWEVER... see
+   FunctionForwarder for the details/caveats regarding that
    parameter.
-   
+
    Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
         FunctionToInCa< int (int), ::putchar>::Call;
     @endcode
 */
@@ -1231,14 +1207,14 @@ struct FunctionToInCa
     instantiated. This is useful when such a conversion is not legal because
     CastToJS() won't work on it or, more generally, when you want the JS
     interface to always get the undefined return value.
-    
+
     Call() always returns v8::Undefined(). CallNative(), however,
     returns the real return type specified by Sig (which may be void).
 
     Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
        FunctionToInCaVoid< int (int), ::putchar>::Call;
     @endcode
 */
@@ -1251,8 +1227,8 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
 
 
 /**
-   A template for converting non-const member function pointers to 
-   v8::InvocationCallback. If T is const qualified then this works 
+   A template for converting non-const member function pointers to
+   v8::InvocationCallback. If T is const qualified then this works
    as for ConstMethodToInCaVoid.
 
    To convert JS objects to native 'this' pointers this API uses
@@ -1265,13 +1241,13 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
    at least bindable) to JS-side Objects. Sig must be a member
    function XSignature for T. Func must be a pointer to a function with
    that XSignature.
-   
+
    See FunctionForwarder for details about the UnlockV8 parameter.
-   
+
     Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
         MethodToInCa<T, int (int), &T::myFunc>::Call;
     // For const methods:
     cb = MethodToInCa<const T, int (int), &T::myFunc>::Call;
@@ -1293,11 +1269,11 @@ struct MethodToInCa
     See FunctionToInCaVoid - this is identical exception that it
     works on member functions of T. If T is const qualified
     then this works as for ConstMethodToInCaVoid.
-    
+
     Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
        MethodToInCaVoid< T, int (int), &T::myFunc>::Call;
     @endcode
 
@@ -1363,15 +1339,15 @@ struct FunctorToInCaVoid : InCa
 
 /**
    Functionally identical to MethodToInCa, but for const member functions.
-   
+
    See FunctionForwarder for details about the UnlockV8 parameter.
-   
+
    Note that the Sig XSignature must be suffixed with a const qualifier!
-   
+
     Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
        ConstMethodToInCa< T, int (int), &T::myFunc>::Call;
     @endcode
 
@@ -1392,13 +1368,13 @@ struct ConstMethodToInCa
 /**
     See FunctionToInCaVoid - this is identical exception that it
     works on const member functions of T.
-   
+
     Note that the Sig XSignature must be suffixed with a const qualifier!
-    
+
     Example:
 
     @code
-    v8::InvocationCallback cb = 
+    v8::InvocationCallback cb =
        ConstMethodToInCaVoid< T, int (int), &T::myFunc>::Call;
     @endcode
 
@@ -1432,11 +1408,11 @@ public:
     typedef typename Proxy::FunctionType FunctionType;
     typedef typename Proxy::ReturnType ReturnType;
     /**
-       Passes the given arguments to (self.*func)(), converting them 
-       to the appropriate types. If argv.Length() is less than 
+       Passes the given arguments to (self.*func)(), converting them
+       to the appropriate types. If argv.Length() is less than
        sl::Arity<XSignatureType>::Value then a JS exception is
-       thrown, with one exception: if the function has "-1 arity" 
-       (i.e. it is InvocationCallback-like) then argv is passed on 
+       thrown, with one exception: if the function has "-1 arity"
+       (i.e. it is InvocationCallback-like) then argv is passed on
        to it regardless of the value of argv.Length().
     */
     inline static v8::Handle<v8::Value> Call( T & self, FunctionType func, v8::Arguments const & argv )
@@ -1502,11 +1478,11 @@ public:
 #endif
 
 /**
-   Tries to forward the given arguments to the given native 
-   function. Will fail if argv.Lengt() is not at least 
+   Tries to forward the given arguments to the given native
+   function. Will fail if argv.Lengt() is not at least
    sl::Arity<XSignature<Sig>>::Value, throwing a JS exception in that
-   case _unless_ the function is InvocationCallback-like, in which 
-   case argv is passed directly to it regardless of the value of 
+   case _unless_ the function is InvocationCallback-like, in which
+   case argv is passed directly to it regardless of the value of
    argv.Length().
 */
 template <typename Sig>
@@ -1570,7 +1546,7 @@ forwardMethod(Sig func, v8::Arguments const & argv )
     return (RV)Proxy::CallNative( func, argv );
 }
 
-    
+
 /**
    Works like forwardMethod(), but forwards to the given const member
    function and treats the given object as the 'this' pointer.
@@ -1668,7 +1644,7 @@ namespace Detail {
    See Call() for more details.
 
    InCaT and Fallback must be InCa classes.
-   
+
    Using this class almost always requires more code than doing the
    equivalent with ArityDispatchList, the exception being when we have only
    one or two overloads.
@@ -1705,7 +1681,7 @@ struct ArityDispatch : InCa
    and translates any native ExceptionT exceptions thrown by that
    function into JS exceptions.
 
-   ExceptionT must be an exception type which is thrown by const 
+   ExceptionT must be an exception type which is thrown by const
    reference (e.g. STL-style) as opposed to by pointer (MFC-style).
 
    SigGetMsg must be a function-signature-style argument describing
@@ -1785,7 +1761,7 @@ struct InCaCatcher : InCa
         Returns ICB(args), converting any exceptions of type (ExceptionT
         const &) or (ExceptionT const *) to JS exceptions. Other exception
         types are handled as described in the class-level documentation.
-    
+
         See the class-level docs for full details.
     */
     static v8::Handle<v8::Value> Call( v8::Arguments const & args )
@@ -1820,12 +1796,12 @@ struct InCaCatcher : InCa
 /**
    Convenience form of InCaCatcher which catches std::exception objects and
    uses their what() method to fetch the error message.
-   
+
    The ConcreteException parameter may be std::exception (the default) or
    any publically derived subclass of std::exception. When using a
    non-default value, one can chain exception catchers to catch most-derived
    types first.
-   
+
    PropagateOtherExceptions determines whether _other_ exception types are
    propagated or not. It defaults to false if ConcreteException is
    std::exception (exactly, not a subtype), else it defaults to true. The
@@ -1846,7 +1822,7 @@ struct InCaCatcher : InCa
     typedef InCaCatcher_std< BCCatch > BaseCatch;
     v8::InvocationCallback cb = BaseCatch::Call;
    @endcode
-   
+
    In the above example any exceptions would be processed in the order:
    logic_error, runtime_error, bad_cast, std::exception, anything else. Notice
    that we took advantage of the PropagateOtherExceptions default value for all
@@ -1885,9 +1861,7 @@ namespace Detail {
     {
         inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
         {
-            return Toss( StringBuffer()
-                        << "End of typelist reached. Argument count="
-                        <<argv.Length() );
+          return Toss( QString("End of typelist reached. Argument count=%1").arg(argv.Length()) );
         }
     };
 }
@@ -1897,21 +1871,21 @@ namespace Detail {
    overloaded native functions from JS, depending on the argument
    count.
 
-   FwdList must be-a TypeList (or interface-compatible type list) 
+   FwdList must be-a TypeList (or interface-compatible type list)
    containing types which have the following function:
 
    static v8::Handle<v8::Value> Call( v8::Arguments const & argv );
 
-   And a static const integer (or enum) value called Arity, 
-   which must specify the expected number of arguments, or be 
-   negative specify that the function accepts any number of 
+   And a static const integer (or enum) value called Arity,
+   which must specify the expected number of arguments, or be
+   negative specify that the function accepts any number of
    arguments.
 
    In other words, all entries in FwdList must implement the
    interface used by most of the InCa-related API.
-   
+
    Example:
-   
+
    @code
    // Overload 3 variants of a member function:
    typedef CVV8_TYPELIST((
@@ -1923,7 +1897,7 @@ namespace Detail {
             // trump any overloads which follow them.
         )) OverloadList;
    typedef ArityDispatchList< OverloadList > MyOverloads;
-   v8::InvocationCallback cb = MyOverloads::Call;     
+   v8::InvocationCallback cb = MyOverloads::Call;
    @endcode
 
    Note that only one line of that code is evaluated at runtime - the rest
@@ -1935,7 +1909,7 @@ struct ArityDispatchList : InCa
     /**
        Tries to dispatch argv to one of the bound functions defined
        in FwdList, based on the number of arguments in argv and
-       the Arity 
+       the Arity
 
        Implements the v8::InvocationCallback interface.
     */
@@ -1956,7 +1930,7 @@ struct ArityDispatchList : InCa
 template <>
 struct ArityDispatchList<XNilType> : Detail::OverloadCallHelper<XNilType>
 {
-};    
+};
 
 #if !defined(DOXYGEN)
 namespace Detail {
@@ -1969,7 +1943,7 @@ namespace Detail {
         {
         };
     };
-    
+
     //! Internal helper for ToInCa impl.
     template <typename Sig>
     struct ToInCaSigSelector<void,Sig> : XFunctionSignature<Sig>
@@ -2004,8 +1978,8 @@ namespace Detail {
 #endif // DOXYGEN
 
 /**
-    A wrapper for MethodToInCa, ConstMethodToInCa, and 
-    FunctionToInCa, which determines which one of those to use based 
+    A wrapper for MethodToInCa, ConstMethodToInCa, and
+    FunctionToInCa, which determines which one of those to use based
     on the type of T and its constness.
 
     For non-member functions, T must be void. For non-const member
@@ -2020,16 +1994,16 @@ namespace Detail {
     typedef ToInCa<MyT, int (int), &MyT::nonConstFunc> NonConstMethod;
     typedef ToInCa<MyT const, void (int), &MyT::constFunc> ConstMethod;
     typedef ToInCa<void, int (char const *), ::puts, true> Func;
-    
+
     v8::InvocationCallback cb;
     cb = NonConstMethod::Call;
     cb = ConstMethod::Call;
     cb = Func::Call;
     @endcode
 
-    Note the extra 'const' qualification for const method. This is 
-    neccessary to be able to portably distinguish the constness 
-    (some compilers allow us to add the const as part of the 
+    Note the extra 'const' qualification for const method. This is
+    neccessary to be able to portably distinguish the constness
+    (some compilers allow us to add the const as part of the
     function XSignature). Also note that the 'void' 1st parameter for
     non-member functions is a bit of a hack.
 */
@@ -2059,12 +2033,12 @@ struct ToInCaVoid : Detail::ToInCaSigSelectorVoid<T,Sig>::template Base<Func,Unl
     A slightly simplified form of FunctionToInCa which is only
     useful for "InvocationCallback-like" functions and requires
     only two arguments:
-    
+
     @code
     // int my_func( v8::Arguments const & );
     typedef InCaLikeFunction< int, my_func > F;
     @endcode
-*/ 
+*/
 template <typename RV, RV (*Func)(v8::Arguments const &)>
 struct InCaLikeFunction : FunctionToInCa< RV (v8::Arguments const &), Func>
 {
@@ -2073,7 +2047,7 @@ struct InCaLikeFunction : FunctionToInCa< RV (v8::Arguments const &), Func>
 /**
     A slightly simplified form of MethodToInCa which is only
     useful for non-const "InvocationCallback-like" methods:
-    
+
     @code
     // Method: int MyType::func( v8::Arguments const & )
     typedef InCaLikeMethod<MyType, int, &MyType::func > F;
@@ -2084,9 +2058,9 @@ struct InCaLikeMethod : MethodToInCa< T, RV (v8::Arguments const &), Func>
 {};
 
 /**
-    A slightly simplified form of ConstMethodToInCa which is only 
+    A slightly simplified form of ConstMethodToInCa which is only
     useful for const "InvocationCallback-like" methods:
-    
+
     @code
     // Method: int MyType::func( v8::Arguments const & ) const
     typedef InCaLikeConstMethod<MyType, int, &MyType::func > F;
@@ -2118,10 +2092,10 @@ struct SigToInCa :
     running client-defined intialization code the _first_ time
     its callback is called from JS. This could be used to run
     library-dependent intialization routines such as lt_dlinit().
-    
+
     InCaT must conform to the InCa interface (i.e., have a static Call()
     function which implements the v8::InvocationCallback interface).
-    
+
     InitFunctor must be default-constructable and have an operator()
     (preferably const) taking no args and returning any type which can be
     ignored (i.e. not dynamically-allocated resources).
@@ -2130,16 +2104,16 @@ template <typename InCaT, typename InitFunctor>
 struct OneTimeInitInCa : InCa
 {
     /**
-        The first time this function is called it runs 
-        InitFunctor()() to execute any client-dependent setup. If 
-        that throws a native exception it is propagated back to the 
-        caller and initialization is considered NOT to have 
-        occurred, meaning the next call to this function will also 
+        The first time this function is called it runs
+        InitFunctor()() to execute any client-dependent setup. If
+        that throws a native exception it is propagated back to the
+        caller and initialization is considered NOT to have
+        occurred, meaning the next call to this function will also
         run InitFunctor()().
 
-        If initialization does not throw, InCaT::Call(argv) is 
-        called and its value is returned. Once initialization 
-        succeeds, it is _not_ triggered on subsequent calls to this 
+        If initialization does not throw, InCaT::Call(argv) is
+        called and its value is returned. Once initialization
+        succeeds, it is _not_ triggered on subsequent calls to this
         function.
 
         Pedantic note: if this class is used in code which is linked

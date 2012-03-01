@@ -7,8 +7,8 @@
 #include "XProperty"
 #include "XVariant"
 #include "XHash"
-#include "cvv8/properties.hpp"
 #include "XMacroHelpers"
+#include "cvv8/properties.hpp"
 #include "cvv8/ClassCreator.hpp"
 
 class EKSSCRIPT_EXPORT XInterfaceBase

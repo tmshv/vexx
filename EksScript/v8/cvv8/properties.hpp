@@ -13,12 +13,12 @@ namespace cvv8 {
 
     /**
         Marker class, primarily for documentation purposes.
-        
+
         This class models the v8::AccessorGetter interface, and
         XyzToGetter classes inherit this type as a sign that they
         implement this interface.
-        
-        This class has no implemention - it only exists for 
+
+        This class has no implemention - it only exists for
         documentation purposes.
     */
     struct XAccessorGetterType
@@ -32,11 +32,11 @@ namespace cvv8 {
 
     /**
         Marker class, primarily for documentation purposes.
-        
+
         This class models the v8::AccessorSetter interface, and
         XyzToSetter classes inherit this type as a sign that they
         implement this interface.
-        
+
         This class has no useful implemention - it only exists for
         documentation purposes.
     */
@@ -112,11 +112,11 @@ namespace cvv8 {
        be NULL.
 
        (*SharedVar = CastFromJS<PropertyType>()) must be legal.
-       
-       Reminder: this is not included in the StaticVarToGetter 
-       template so that we can avoid either the Get or Set 
-       conversion for cases where it is not legal (or not desired). 
-       If they were both in one class, both Get and Set would _have_ 
+
+       Reminder: this is not included in the StaticVarToGetter
+       template so that we can avoid either the Get or Set
+       conversion for cases where it is not legal (or not desired).
+       If they were both in one class, both Get and Set would _have_
        to be legal.
     */
     template <typename PropertyType, PropertyType * const SharedVar>
@@ -198,14 +198,14 @@ namespace cvv8 {
     /**
         A proxy for both MemberToGetter and MemberToSetter, providing both
         Get() and Set() functions.
-        
+
         This should be called MembersToAccessors (plural Members).
     */
     template <typename T, typename PropertyType, PropertyType T::*MemVar>
     struct MemberToAccessors : MemberToGetter<T,PropertyType,MemVar>,
                                MemberToSetter<T,PropertyType,MemVar>
     {};
-    
+
     /**
        An AccessorSetter() implementation which always triggers a JS exception.
        Can be used to enforce "pedantically read-only" variables. Note that
@@ -218,11 +218,7 @@ namespace cvv8 {
     {
         inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::AccessorInfo &)
         {
-             Toss(StringBuffer() <<
-                  "Native member property setter '"
-                  << property
-                  << "' is configured to throw an exception when modifying "
-                  << "this read-only member!");
+          Toss(StringBuffer("Native member property setter '%1' is configured to throw an exception when modifying this read-only member!").arg(toString(property)));
         }
     };
 
@@ -247,7 +243,7 @@ namespace cvv8 {
             return CastToJS( (*Getter)() );
         }
     };
-       
+
     /**
        Implements the v8::AccessorSetter interface to bind a JS
        member property to a native getter function. This function
@@ -348,7 +344,7 @@ namespace cvv8 {
 
                 typedef typename sl::At< 0, XSignature<void (TypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
                 ArgCaster<ArgT> ac;
-                
+
                 ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
 
                 bool valid = true;
@@ -387,7 +383,7 @@ namespace cvv8 {
             Ftor()( ac.ToNative( value ) );
         }
     };
-    
+
     /**
         SetterCatcher is the AccessorSetter equivalent of InCaCatcher, and
         is functionality identical except that its 4th template parameter
@@ -502,9 +498,9 @@ namespace cvv8 {
     /**
         AccessAdder is a convenience class for use when applying several
         (or more) accessor bindings to a prototype object.
-            
+
         Example:
-        
+
         @code
         AccessorAdder acc(myPrototype);
         acc("foo", MemberToGetter<MyType,int,&MyType::anInt>(),
@@ -552,20 +548,20 @@ namespace cvv8 {
             return *this;
         }
         /**
-            Adds GetterT::Get and SetterT::Set as accessors for the 
+            Adds GetterT::Get and SetterT::Set as accessors for the
             given property in the prototype object.
-            
-            GetterT must be-a AccessorGetterType. SetterT must be-a 
-            AccessorSetterType. Note that their values are not used, 
-            but GetterT::Get and SetterT::Set are used 
-            directly. The objects are only passed in to keep the 
-            client from having to specify them as template 
-            parameters (which is clumsy for operator()), as their 
-            types can be deduced. 
-            
+
+            GetterT must be-a AccessorGetterType. SetterT must be-a
+            AccessorSetterType. Note that their values are not used,
+            but GetterT::Get and SetterT::Set are used
+            directly. The objects are only passed in to keep the
+            client from having to specify them as template
+            parameters (which is clumsy for operator()), as their
+            types can be deduced.
+
             The 3rd and higher arguments are as documented (or not!)
             for v8::ObjectTemplate::SetAccessor().
-            
+
             Returns this object, for chaining calls.
         */
         template <typename GetterT, typename SetterT>

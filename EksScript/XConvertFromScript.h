@@ -316,7 +316,7 @@ template <> struct NativeToJS< XIfElse< tmp::SameType<long long int,int64_t>::Va
   };
 #endif
 
-template <typename NT> typename JSToNative<NT>::ResultType CastFromJS(v8::Handle<v8::Value> const &h)
+template <typename NT> typename JSToNative<NT>::ResultType CastFromScript(v8::Handle<v8::Value> const &h)
   {
   typedef JSToNative<NT> F;
   return F()( h );

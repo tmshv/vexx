@@ -163,7 +163,7 @@ static inline v8::Handle<v8::Value> CastToJS(v8::InvocationCallback v)
   return F()( v );
   }
 
-static inline v8::Handle<v8::Value> CastToJS(char *v)
+static inline v8::Handle<v8::Value> CastToScript(char *v)
   {
   typedef NativeToJS<char const *> F;
   return F()( v );

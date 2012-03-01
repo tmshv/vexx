@@ -19,192 +19,6 @@
 
 namespace cvv8
 {
-
-/**
-       A utility class for building up message strings, most notably
-       exception messages, using a mixture of native and JS message
-       data.
-
-       It is used like a std::ostream:
-
-       @code
-       StringBuffer msg;
-       msg << "Could not set property "
-           << "'" << propName
-           <<"' on object " << myJSObject << '!';
-       return v8::ThrowException(msg.toError());
-       // or:
-       return Toss(msg);
-       @endcode
-    */
-class StringBuffer
-  {
-private:
-  std::ostringstream os;
-public:
-  /**
-           Initializes the message stream.
-        */
-  StringBuffer() : os()
-    {
-    }
-  StringBuffer(StringBuffer const & other) : os(other.os.str())
-    {
-    }
-  StringBuffer & operator=(StringBuffer const & other)
-    {
-    this->os.str(other.os.str());
-    return *this;
-    }
-
-  /**
-           Empties out the message buffer. This invalidates any value
-           returned from previous calls to the (char const *)
-           operator.
-        */
-  inline void Clear()
-    {
-    this->os.str("");
-    }
-
-  /**
-           Returns a copy of the current message content.
-        */
-  inline std::string Content() const
-    {
-    return this->os.str();
-    }
-
-  /**
-           Converts the message state to a JS string.
-        */
-  inline operator v8::Handle<v8::Value>() const
-    {
-    return CastToJS<std::string>( this->os.str() );
-    }
-
-  /**
-           Converts the message state to a v8::String (for use
-           with v8::Exception::Error() and friends).
-        */
-  inline operator v8::Handle<v8::String>() const
-    {
-    std::string const & str(this->os.str());
-    char const * cstr = str.c_str();
-    return v8::String::New( cstr ? cstr : "", cstr ? str.size() : 0 );
-    }
-
-  /**
-           Appends to the message using CastFromJS<std::string>(t)
-        */
-  template <typename T>
-  inline StringBuffer & operator<<( v8::Handle<T> const & t )
-    {
-    this->os << CastFromJS<std::string>( t );
-    return *this;
-    }
-  /**
-           Appends to the message using CastFromJS<std::string>(t)
-
-           Reminder to self: if this function is changed to take
-           a const reference instead of a copy, we get overload
-           ambiguity errors in some contexts. See:
-
-           http://code.google.com/p/v8-juice/issues/detail?id=19
-
-           (And thanks to Feng Fillano for reporting and localizing
-           the problem.)
-        */
-  template <typename T>
-  inline StringBuffer & operator<<( v8::Local<T> const t )
-    {
-    this->os << CastFromJS<std::string>( t );
-    return *this;
-    }
-
-  /**
-           Appends t to the message via std::ostream<<.
-        */
-  template <typename T>
-  inline StringBuffer & operator<<( T const t)
-    {
-    this->os << t;
-    return *this;
-    }
-
-  /**
-           Returns this buffer's value wrapped in
-           a JS Error object.
-        */
-  v8::Local<v8::Value> toError() const
-    {
-    return v8::Exception::Error(*this);
-    }
-  };
-
-/** Outputs sb.Content() to os and returns os. */
-inline std::ostream & operator<<( std::ostream & os, StringBuffer const & sb )
-  {
-  return os << sb.Content();
-  }
-
-
-/**
-        Requi
-        "Lexically casts" msg to a string and throws a new JS-side
-        Error. ValT may be any type which can be sent to StringBuffer's
-        ostream operator.
-        
-        The return value is the result of calling
-        v8::ThrowException() (Undefined except in the face of a
-        serious internal error like OOM, i'm told by the v8 devs).
-    */
-template <typename ValT>
-inline v8::Handle<v8::Value> Toss( ValT const & msg )
-  {
-  return v8::ThrowException((StringBuffer() << msg).toError());
-  }
-
-/**
-        Overload to avoid an ambiguity (and it's more efficient than
-        the default impl).
-    */
-inline v8::Handle<v8::Value> Toss( char const * msg )
-  {
-  return v8::ThrowException(v8::Exception::Error(v8::String::New( msg ? msg : "Unspecified error.")));
-  }
-
-/**
-        Eqivalent to v8::ThrowException(err). Note that if err is not an
-        Error object, the JS side will not get an Error object. e.g. if err
-        is-a String then the JS side will see the error as a string.
-
-        The reason this does not convert err to an Error is because the v8
-        API provides no way for us to know if err is already an Error object.
-        This function is primarily intended to be passed the results of
-        CastToJS(std::exception), which generates Error objects.
-    */
-inline v8::Handle<v8::Value> Toss( v8::Handle<v8::Value> const & err )
-  {
-  return v8::ThrowException(err);
-  }
-
-/**
-        Efficiency overload.
-    */
-inline v8::Handle<v8::Value> Toss( StringBuffer const & msg )
-  {
-  return v8::ThrowException(msg.toError());
-  }
-/**
-        Like Toss(Handle<Value>), but converts err to a string and creates an
-        Error object, which is then thrown.
-    */
-inline v8::Handle<v8::Value> TossAsError( v8::Handle<v8::Value> const & err )
-  {
-  return Toss(v8::Exception::Error(err->ToString()));
-  }
-
 /**
        ArgCaster is a thin wrapper around CastFromJS(), and primarily
        exists to give us a way to convert JS values to (char const *)
@@ -217,7 +31,7 @@ inline v8::Handle<v8::Value> TossAsError( v8::Handle<v8::Value> const & err )
        The default implementation is suitable for all cases which
        JSToNative<T> supports, but specializations can handle some of
        the corner cases which JSToNative cannot (e.g. (char const *)).
-       
+
        Added 20091121.
     */
 template <typename T>
@@ -359,9 +173,9 @@ struct CtorForwarderProxy<Sig,-1>
        A utility type to help forward v8::Arguments to native
        constructors. This type is intended to assist in the creation
        of ctor functions for JS-bound C++ classes.
-       
+
        Requirements:
-       
+
        - Sig is "almost" a function-signature-style type, but
        because ctors don't have a return value in the conventional
        sense, we have to use a tiny workaround: Sig should be passed
@@ -398,10 +212,10 @@ struct CtorForwarder : XSignature<Sig>
             If (argv.Length()>=Arity) or Arity is less than 0,
             then the constructor is called with Arity arguments
             (if it >=0) or with 1 v8::Arguments parameter (for Arity<0).
-            
+
             Returns the result of (new Type(...)), transfering ownership
             to the caller.
-            
+
             May propagate native exceptions.
         */
   static ReturnType Call( v8::Arguments const & argv )
@@ -490,9 +304,9 @@ struct CtorFwdDispatchList<T,XNilType>
 
 /**
         Proxies a list of constructors from v8::Arguments.
-        
+
         CtorList must be-a a Signature type in this form:
-        
+
         @code
         typedef Signature<MyType ( // may optionally be (MyType *) - same effect
             CtorForwarder<MyType *()>,
@@ -501,7 +315,7 @@ struct CtorFwdDispatchList<T,XNilType>
             CtorForwarder<MyType *( v8::Arguments const &)>
         )> Ctors;
         @endcode
-        
+
         All entries in the typelist must be interface-compatible with
         CtorForwarder. No two entries should have the same number
         of arguments with one exception: an InvocationCallback-like
@@ -510,11 +324,11 @@ struct CtorFwdDispatchList<T,XNilType>
         the LAST entry because it will always match any argument
         count (and will therefore trump any which (would) come after
         it.
-        
+
         The ctors are dispatched based solely on the argument count,
         not their types. The first one with a matching arity
         is called.
-        
+
         IN THEORY (untested), the factories passed in the list may
         legally return a type publically derived from
         CtorList::ReturnType.
