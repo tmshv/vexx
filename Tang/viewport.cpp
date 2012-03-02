@@ -335,6 +335,25 @@ void computeGeometry(const SPropertyInstanceInformation *, SPropertyContainer *c
           continue;
           }
 
+        // X three point-half missing
+        if(TEST_CASE(FractalGeometry::Region::WYZ|FractalGeometry::Region::WWZ|FractalGeometry::Region::WWW, chosenCase) ||
+           TEST_CASE(FractalGeometry::Region::WYZ|FractalGeometry::Region::XWW|FractalGeometry::Region::WWW, chosenCase) ||
+           TEST_CASE(FractalGeometry::Region::WYZ|FractalGeometry::Region::WYW|FractalGeometry::Region::WWW, chosenCase) ||
+           TEST_CASE(FractalGeometry::Region::WYZ|FractalGeometry::Region::WWZ|FractalGeometry::Region::WYW, chosenCase))
+          {
+      xAssertFail();
+          xuint8 pointA = pointFromCase(chosenCase, 0);
+          xuint8 pointB = pointFromCase(chosenCase, 1);
+          ADD_POINT(pointA, ZAxis);
+          ADD_POINT(pointA, YAxis);
+          ADD_POINT(pointB, YAxis);
+          ADD_POINT(pointB, ZAxis);
+          ADD_INDEX_RING(0,1,2,3);
+
+          normalisedCase.clearFlag(chosenCase);
+          continue;
+          }
+
         // X direction edge missing
         if(TEST_CASE(FractalGeometry::Region::XYZ|FractalGeometry::Region::WYZ, chosenCase) ||
            TEST_CASE(FractalGeometry::Region::XYW|FractalGeometry::Region::WYW, chosenCase) ||
@@ -488,7 +507,7 @@ SPropertyInformation *FractalGeometry::createTypeInformation()
 
   return info;
   }
-  
+
 Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeScene")), UISurface("Viewport", this, UISurface::Dock)
   {
   GCViewport *vp = viewport();
@@ -543,10 +562,11 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   GCCuboid *cube = msc->addChild<GCCuboid>("Cube");
   transform->geometry.setPointed(&cube->geometry);
 
-  FractalGeometry *geo = _db->addChild<FractalGeometry>("FractalGeometry");
+  STypeRegistry::addType(FractalGeometry::staticTypeInformation());
+  FractalGeometry *geo = msc->addChild<FractalGeometry>("FractalGeometry");
   transform2->geometry.setPointed(&geo->geometry);
 
-  op->source.setPointed(scene);
+  vp->source.setPointed(msc);
   }
 
 Viewport::~Viewport()
