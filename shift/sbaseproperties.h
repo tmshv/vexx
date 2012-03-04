@@ -224,11 +224,42 @@ public:
     }
 
   void assign(const T &in);
-
+  
 private:
+  class ComputeChange : public SProperty::DataChange
+    {
+    S_CHANGE(ComputeChange, SProperty::DataChange, DERIVED::TypeId);
+
+  public:
+    ComputeChange(SPODProperty<T, DERIVED> *prop)
+      : SProperty::DataChange(prop)
+      {
+      xAssert(!prop->database()->stateStorageEnabled());
+      }
+
+  private:
+    bool apply()
+      {
+      return true;
+      }
+    bool unApply()
+      {
+      xAssertFail();
+      return true;
+      }
+    bool inform()
+      {
+      if(property()->entity())
+        {
+        property()->entity()->informDirtyObservers(property());
+        }
+      return true;
+      }
+    };
+
   class Change : public ComputeChange
     {
-    S_CHANGE(Change, ComputeChange, DERIVED::Type + 1000);
+    S_CHANGE(Change, ComputeChange, DERIVED::TypeId + 1000);
 
   XProperties:
     XRORefProperty(T, before);
@@ -272,7 +303,7 @@ class EXPORT_MODE name : public SPODProperty<type, name> { \
 public: class InstanceInformation : public SPODProperty<type, name>::InstanceInformation \
     { public: \
     InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
-  enum { Type = typeID }; \
+  enum { TypeId = typeID }; \
   typedef type PODType; \
   S_PROPERTY(name, SProperty, 0); \
   name(); \
@@ -285,11 +316,11 @@ template <> class SPODInterface <type> { public: typedef name Type; \
   static const type& value(const name* s) { return s->value(); } }; \
 S_PROPERTY_INTERFACE(name)
 
-#define IMPLEMENT_POD_PROPERTY(name, type) \
+#define IMPLEMENT_POD_PROPERTY(name) \
   S_IMPLEMENT_PROPERTY(name) \
   void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
     if(data.registerInterfaces) { \
-    info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); } } \
+    info->addStaticInterface(new PODPropertyVariantInterface<name, name::Type>()); } } \
   name::name() { }
 
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);

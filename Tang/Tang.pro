@@ -25,6 +25,8 @@ LIBS += -lEksCore \
     -lscript \
     -lShiftAlter \
     -lShiftGraphicsCore \
+    -lShiftMathsCore \
+    -lShiftMeshCore \
     -lUI
 
 INCLUDEPATH += ../include \
@@ -33,6 +35,7 @@ INCLUDEPATH += ../include \
     $$ROOT/Eks3D/include \
     $$ROOT/Shift \
     $$ROOT/Shift/GraphicsCore \
+    $$ROOT/Shift/MeshCore \
     $$ROOT/Alter2 \
     $$ROOT/EksCore \
     $$ROOT/Alter2/Plugins/UI \
@@ -43,7 +46,6 @@ HEADERS += \
     viewport.h \
     webview.h \
     object.h
-RESOURCES +=
 
 
 

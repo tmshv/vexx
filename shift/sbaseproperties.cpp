@@ -2,20 +2,20 @@
 #include "styperegistry.h"
 #include "sdatabase.h"
 
-IMPLEMENT_POD_PROPERTY(BoolProperty, xuint8);
-IMPLEMENT_POD_PROPERTY(IntProperty, xint32);
-IMPLEMENT_POD_PROPERTY(LongIntProperty, xint64);
-IMPLEMENT_POD_PROPERTY(UnsignedIntProperty, xuint32);
-IMPLEMENT_POD_PROPERTY(LongUnsignedIntProperty, xuint64);
-IMPLEMENT_POD_PROPERTY(FloatProperty, float);
-IMPLEMENT_POD_PROPERTY(DoubleProperty, double);
-IMPLEMENT_POD_PROPERTY(Vector2DProperty, XVector2D);
-IMPLEMENT_POD_PROPERTY(Vector3DProperty, XVector3D);
-IMPLEMENT_POD_PROPERTY(Vector4DProperty, XVector4D);
-IMPLEMENT_POD_PROPERTY(QuaternionProperty, XQuaternion);
-IMPLEMENT_POD_PROPERTY(StringPropertyBase, QString);
-IMPLEMENT_POD_PROPERTY(ColourProperty, XColour);
-IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
+IMPLEMENT_POD_PROPERTY(BoolProperty);
+IMPLEMENT_POD_PROPERTY(IntProperty);
+IMPLEMENT_POD_PROPERTY(LongIntProperty);
+IMPLEMENT_POD_PROPERTY(UnsignedIntProperty);
+IMPLEMENT_POD_PROPERTY(LongUnsignedIntProperty);
+IMPLEMENT_POD_PROPERTY(FloatProperty);
+IMPLEMENT_POD_PROPERTY(DoubleProperty);
+IMPLEMENT_POD_PROPERTY(Vector2DProperty);
+IMPLEMENT_POD_PROPERTY(Vector3DProperty);
+IMPLEMENT_POD_PROPERTY(Vector4DProperty);
+IMPLEMENT_POD_PROPERTY(QuaternionProperty);
+IMPLEMENT_POD_PROPERTY(StringPropertyBase);
+IMPLEMENT_POD_PROPERTY(ColourProperty);
+IMPLEMENT_POD_PROPERTY(ByteArrayProperty);
 
 S_IMPLEMENT_PROPERTY(StringProperty)
 

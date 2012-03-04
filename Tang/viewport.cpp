@@ -18,6 +18,7 @@
 #include "3D/Renderable/GCCuboid.h"
 #include "3D/GCTexture.h"
 #include "3D/Renderable/GCPlane.h"
+#include "MCCube.h"
 #include "object.h"
 
 class FractalGeometry : public SEntity
@@ -559,7 +560,7 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   group2->geometry.addPointer(transform2);
   transform2->transform = tr;
 
-  GCCuboid *cube = msc->addChild<GCCuboid>("Cube");
+  MCCube *cube = msc->addChild<MCCube>("Cube");
   transform->geometry.setPointed(&cube->geometry);
 
   STypeRegistry::addType(FractalGeometry::staticTypeInformation());

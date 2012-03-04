@@ -6,6 +6,7 @@
 #include "Viewport.h"
 #include "webview.h"
 #include "GraphicsCore.h"
+#include "MeshCore.h"
 #include "saparteditor.h"
 
 int main( int argc, char **argv )
@@ -33,6 +34,8 @@ int main( int argc, char **argv )
     {
     return EXIT_FAILURE;
     }
+
+  initiateMeshCore();
 
   SPropertyArray *objectParent = &db->db().children;
 
