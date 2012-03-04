@@ -12,7 +12,4 @@ SPropertyInformation *GCTexture::createTypeInformation()
 
 GCTexture::GCTexture()
   {
-  QImage im("C:\\Users\\Public\\Pictures\\Sample Pictures\\Koala.jpg");
-
-  _texture.load(im, XTexture::None);
   }

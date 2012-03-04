@@ -25,7 +25,7 @@ bool defaultFire(const XAssert &a)
   static bool recursion = false;
   if(recursion || !QCoreApplication::instance() || !dynamic_cast<QApplication*>(QCoreApplication::instance()))
     {
-    // crap. just break;
+    // crap. just break
     return true;
     }
 

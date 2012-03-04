@@ -57,7 +57,7 @@ SPropertyInformation *GCViewableTransform::createTypeInformation()
   return info;
   }
 
-GCViewableTransform::GCViewableTransform()
+GCViewableTransform::GCViewableTransform() : _rotateEnabled(true)
   {
   }
 
@@ -124,7 +124,7 @@ bool GCViewableTransform::unitViewportCoordinates(xuint32 x, xuint32 y, float &x
   {
   x -= viewportX();
   y -= viewportY();
-  if(x < 0 || y < 0 || x >= viewportWidth() || y >= viewportHeight())
+  if(x < 0 || y < 0 || x > viewportWidth() || y > viewportHeight())
     {
     xUnit = 0.0f;
     yUnit = 0.0f;
@@ -202,23 +202,26 @@ void GCViewableTransform::pan(float x, float y)
 
 void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, float y)
   {
-  XTransform t = transform();
-  XTransform v = viewTransform();
+  if(_rotateEnabled)
+    {
+    XTransform t = transform();
+    XTransform v = viewTransform();
 
-  // old translation vector
-  float length = (t.translation() - point).norm();
+    // old translation vector
+    float length = (t.translation() - point).norm();
 
-  Eigen::AngleAxisf xRot(x * -0.005f, upVector());
-  t.prerotate(xRot);
+    Eigen::AngleAxisf xRot(x * -0.005f, upVector());
+    t.prerotate(xRot);
 
-  Eigen::AngleAxisf yRot(y * -0.005f, XVector3D(1.0f, 0.0f, 0.0f));
-  t.rotate(yRot);
+    Eigen::AngleAxisf yRot(y * -0.005f, XVector3D(1.0f, 0.0f, 0.0f));
+    t.rotate(yRot);
 
 
-  XVector3D newLook = t.matrix().col(2).head<3>();
-  t.translation() = point + (newLook * length);
+    XVector3D newLook = t.matrix().col(2).head<3>();
+    t.translation() = point + (newLook * length);
 
-  transform = t;
+    transform = t;
+    }
   }
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCCamera)

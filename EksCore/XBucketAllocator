@@ -329,7 +329,7 @@ public:
     xAssert(_allocator);
     }
 
-  ~XBucketAllocator()
+  virtual ~XBucketAllocator()
     {
     HashType::iterator i = _internal.begin();
     HashType::iterator e = _internal.end();

@@ -3,42 +3,45 @@
 #include "ScPlugin.h"
 #include "splugin.h"
 #include "syimagenode.h"
-#include "syviewernode.h"
+#include "syimagetexture.h"
 #include "UIPlugin.h"
-#include "sypreviewviewer.h"
+#include "sypreviewviewport.h"
+#include "sydocument.h"
+#include "syinterface.h"
 
 int main(int argc, char *argv[])
   {
-  ACore app( argc, argv );
+  ACore app("vexx.googlecode.com", "Synapse2.0", argc, argv);
 
   app.addDirectory(ACore::rootPath());
 
   app.load("script");
-
-  // this will work in debug only...
-  app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
+  app.load("synapsecore");
 
   APlugin<SPlugin> shift(app, "db");
   if(shift.isValid())
   {
-    shift->db().addType<SyImageNode>();
-    shift->db().addType<SyViewerNode>();
-
-    APlugin<UIPlugin> ui(app, "ui");
-    if(ui.isValid())
-    {
-      ui->addSurface(new SyPreviewViewer(&shift->db()));
-    }
+    STypeRegistry::addType(SySourceNode::staticTypeInformation());
+    STypeRegistry::addType(SyImageNode::staticTypeInformation());
+    STypeRegistry::addType(SyPreviewViewport::staticTypeInformation());
+    STypeRegistry::addType(SyImageTexture::staticTypeInformation());
+    STypeRegistry::addType(SyDocument::staticTypeInformation());
   }
 
+  SyInterface synapseInterface;
   APlugin<ScPlugin> script(app, "script");
   if(script.isValid())
   {
     // more like this in release...
     // script->includeFolder(app.rootPath() + "/scripts/");
 
+    script->registerScriptGlobal("synapse", &synapseInterface);
+
     script->includeFolder(app.rootPath() + "/../Synapse/scripts/");
   }
+
+  // this will work in debug only...
+  app.addDirectory(app.rootPath() + "/../Synapse/scripts/");
 
 
   return app.execute();

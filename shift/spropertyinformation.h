@@ -68,6 +68,8 @@ public:
     Input,
     Output,
     Computed,
+    InternalComputed,
+    UserSettable,
 
     NumberOfModes,
 
@@ -116,6 +118,7 @@ public:
 
   void setCompute(ComputeFunction fn);
   void setAffects(const SPropertyInstanceInformation *info);
+  void setAffects(const SPropertyInstanceInformation **info, xsize size);
   void setAffects(xsize *affects);
 
   virtual void setDefaultValue(const QString &) { xAssertFail(); }

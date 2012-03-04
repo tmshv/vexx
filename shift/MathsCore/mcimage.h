@@ -4,7 +4,7 @@
 #include "mcsource.h"
 #include "sbaseproperties.h"
 
-class MCImage : public MCSource
+class MATHSCORE_EXPORT MCImage : public MCSource
   {
   S_ENTITY(MCImage, MCSource, 0);
 

@@ -13,8 +13,8 @@
 
 #define ShiftCoreProfileScope 1043
 #define ShiftDataModelProfileScope 1044
-#define SProfileFunction XProfileFunction(ShiftCoreProfileScope)
-#define SProfileScopedBlock(mess) XProfileScopedBlock(ShiftCoreProfileScope, mess)
+#define SProfileFunction XProfileFunctionBase(ShiftCoreProfileScope)
+#define SProfileScopedBlock(mess) XProfileScopedBlockBase(ShiftCoreProfileScope, mess)
 
 class SEntity;
 class SProperty;

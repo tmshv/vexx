@@ -19,12 +19,11 @@ void SynapseCorePlugin::load()
   APlugin<SPlugin> shift(this, "db");
   if(shift.isValid())
     {
-    SAppDatabase &db = shift->db();
-    initiateGraphicsCore(&db);
+    initiateGraphicsCore();
 
-    db.addType<SyNode>();
-    db.addType<SyImageBase>();
-    db.addType<SyImageInput>();
-    db.addType<SyImageOutput>();
+    STypeRegistry::addType(SyNode::staticTypeInformation());
+    STypeRegistry::addType(SyImageBase::staticTypeInformation());
+    STypeRegistry::addType(SyImageInput::staticTypeInformation());
+    STypeRegistry::addType(SyImageOutput::staticTypeInformation());
     }
   }

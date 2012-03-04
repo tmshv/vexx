@@ -66,6 +66,12 @@ public:
         xAssertFailMessage("Change failed");
         }
       }
+
+    if(_blockLevel == 0)
+      {
+      inform();
+      }
+
     database()->setStateStorageEnabled(oldStateStorageEnabled);
     }
 #else
@@ -86,6 +92,7 @@ public:
       } else { \
         xAssertFailMessage("Change failed"); \
       } } \
+    if(_blockLevel == 0) { inform(); } \
     database()->setStateStorageEnabled(oldStateStorageEnabled); \
     }
 

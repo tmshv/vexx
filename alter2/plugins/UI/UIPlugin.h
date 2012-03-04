@@ -14,6 +14,7 @@ class UI_EXPORT UIPlugin : public AAbstractPlugin
 public:
   UIPlugin();
 
+  Q_INVOKABLE void addDock(QString name, QWidget *w);
   void addSurface(UISurface *surface);
   void removeSurface(QString name);
   void removeSurface(UISurface *s);

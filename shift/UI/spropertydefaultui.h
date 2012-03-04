@@ -3,6 +3,7 @@
 
 #include "sglobal.h"
 #include "QCheckBox"
+#include "QToolButton"
 #include "QSpinBox"
 #include "QLineEdit"
 #include "QTextEdit"
@@ -11,7 +12,10 @@
 #include "XVector3DWidget"
 #include "XColourWidget"
 #include "sbaseproperties.h"
+#include "QFileDialog"
+#include "QHBoxLayout"
 
+#include "sentityweakpointer.h"
 #include "sproperty.h"
 #include "XProperty"
 
@@ -27,7 +31,18 @@ public:
   SUIBase(SProperty *p) : _isAlreadySetting(false), _value(p->castTo<T>()), _dirty(false)
     {
     xAssert(_value);
+    _entity = _value->entity();
+    xAssert(_entity);
+    _entity->addDirtyObserver(this);
     }
+  ~SUIBase()
+    {
+    if(_entity)
+      {
+      _entity->removeDirtyObserver(this);
+      }
+    }
+
   T *propertyValue() {return _value;}
   virtual void syncGUI() = 0;
 
@@ -42,7 +57,7 @@ private:
   virtual void actOnChanges()
     {
     SProfileFunction
-    if(_dirty)
+    if(_dirty && !_isAlreadySetting)
       {
       _isAlreadySetting = true;
       syncGUI();
@@ -51,6 +66,7 @@ private:
       }
     }
   T *_value;
+  SEntityWeakPointer _entity;
   bool _dirty;
   };
 
@@ -257,6 +273,47 @@ private slots:
 
 private:
   void syncGUI() { setColour( propertyValue()->value() ); }
+  };
+
+
+class Filename : public QWidget, private SUIBase<FilenameProperty>
+  {
+  Q_OBJECT
+public:
+  Filename(SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent) : QWidget(parent), SUIBase<FilenameProperty>(prop),
+      _layout( new QHBoxLayout( this ) ), _label( new QLineEdit( this ) ),
+      _button( new QToolButton( this ) )
+    {
+    _layout->setContentsMargins( 0, 0, 0, 0 );
+    _layout->addWidget( _label );
+    _layout->addWidget( _button );
+
+    _label->setReadOnly( TRUE );
+    _label->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    _button->setText( "..." );
+
+    connect( _button, SIGNAL(clicked()), this, SLOT(guiChanged()) );
+    syncGUI();
+    }
+private slots:
+  virtual void guiChanged( )
+    {
+    //QSettings settings;
+    QString file( QFileDialog::getOpenFileName( 0, "Select File for " + propertyValue()->name() ) );
+
+    propertyValue()->assign(file);
+
+    //QFileInfo fileInfo( file );
+    //settings.setValue( "lastDirAccessed", fileInfo.absoluteDir().absolutePath() );
+    }
+  virtual void syncGUI()
+    {
+    _label->setText(propertyValue()->value());
+    }
+private:
+  QHBoxLayout *_layout;
+  QLineEdit *_label;
+  QToolButton *_button;
   };
 
 #if 0

@@ -73,18 +73,40 @@ void PropertyTypeEditor::editType(const QString &t)
   SProperty *parent = property()->parent();
   if(parent && info)
     {
+    class Initialiser : public SPropertyInstanceInformationInitialiser
+      {
+    public:
+      void initialise(SPropertyInstanceInformation *i)
+        {
+        const SPropertyInstanceInformation *oldInfo = oldProp->instanceInformation();
+        const xsize *affects = oldInfo->affects();
+        if(affects && affects[0] != 0)
+          {
+          xAssert(affects[1] == 0);
+          const SPropertyInstanceInformation *info = oldProp->parent()->typeInformation()->child(affects[0]);
+          xAssert(info);
+          i->setAffects(info);
+          }
+        }
+
+      const SProperty *oldProp;
+      };
+
+    Initialiser i;
+    i.oldProp = _property;
+
     SProperty *newProp = 0;
     if(parent->inheritsFromType<SEntity>())
       {
       SEntity *entParent = parent->uncheckedCastTo<SEntity>();
 
-      newProp = entParent->addProperty(info);
+      newProp = entParent->addProperty(info, "", &i);
       }
     else if(parent->inheritsFromType<SPropertyArray>())
       {
       SPropertyArray *arrayParent = parent->uncheckedCastTo<SPropertyArray>();
 
-      newProp = arrayParent->add(info);
+      newProp = arrayParent->add(info, "", &i);
       }
 
     xAssert(newProp);
@@ -171,7 +193,6 @@ void PropertyTypeEditor::editType(const QString &t)
     xAssertFail();
     }
   }
-
 
 SDefaultPartEditorInterface::SDefaultPartEditorInterface() : SPartEditorInterface(true)
   {

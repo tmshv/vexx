@@ -114,5 +114,21 @@ db.types.SProperty.cancelBlock = function(fn)
   this.endBlock(true);
   }
 
+db.types.SProperty.inheritsFrom = function(type)
+  {
+  var parent = this.__proto__;
+  while(parent && parent.typeName)
+    {
+    if(parent === type)
+      {
+      return true;
+      }
+
+    parent = parent.__proto__;
+    }
+
+  return false;
+  }
+
 script.include("JSPartExporter.js");
 script.includeFolder("jsEntities");

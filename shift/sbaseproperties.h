@@ -59,11 +59,89 @@ public:
     }
   };
 
-template <typename T, typename DERIVED> class SPODProperty : public SProperty
+template <typename T, typename DERIVED> class SPODPropertyBase : public SProperty
   {
-XProperties:
+protected:
   XPropertyMember(T, value);
 
+public:
+  class ComputeLock
+    {
+  public:
+    ComputeLock(SPODPropertyBase<T, DERIVED> *ptr) : _ptr(ptr)
+      {
+      xAssert(ptr);
+      _data = &_ptr->_value;
+      }
+    ~ComputeLock()
+      {
+      _ptr->handler()->doChange<ComputeChange>(_ptr);
+      }
+
+    T* data()
+      {
+      return _data;
+      }
+
+  private:
+    SPODPropertyBase<T, DERIVED> *_ptr;
+    T* _data;
+    };
+
+  const T &operator()() const
+    {
+    preGet();
+    return _value;
+    }
+
+  const T &value() const
+    {
+    preGet();
+    return _value;
+    }
+
+  static bool shouldSavePropertyValue(const SProperty *)
+    {
+    return false;
+    }
+
+protected:
+  class ComputeChange : public SProperty::DataChange
+    {
+    S_CHANGE(ComputeChange, SProperty::DataChange, 155);
+
+  public:
+    ComputeChange(SPODPropertyBase<T, DERIVED> *prop)
+      : SProperty::DataChange(prop)
+      {
+      xAssert(!prop->database()->stateStorageEnabled());
+      }
+
+  private:
+    bool apply()
+      {
+      return true;
+      }
+    bool unApply()
+      {
+      xAssertFail();
+      return true;
+      }
+    bool inform()
+      {
+      if(property()->entity())
+        {
+        property()->entity()->informDirtyObservers(property());
+        }
+      return true;
+      }
+    };
+
+  friend class ComputeLock;
+  };
+
+template <typename T, typename DERIVED> class SPODProperty : public SPODPropertyBase<T, DERIVED>
+  {
 public:
   class InstanceInformation : public SProperty::InstanceInformation
     {
@@ -87,29 +165,6 @@ public:
       QTextStream s(&cpyVal);
       s >> _defaultValue;
       }
-    };
-
-  class ComputeLock
-    {
-  public:
-    ComputeLock(SPODProperty<T, DERIVED> *ptr) : _ptr(ptr)
-      {
-      xAssert(ptr);
-      _data = &_ptr->_value;
-      }
-    ~ComputeLock()
-      {
-      _ptr->handler()->doChange<ComputeChange>(_ptr);
-      }
-
-    T* data()
-      {
-      return _data;
-      }
-
-  private:
-    SPODProperty<T, DERIVED> *_ptr;
-    T* _data;
     };
 
   class Lock
@@ -137,20 +192,6 @@ public:
     T* _data;
     T _oldData;
     };
-
-  const T &operator()() const
-    {
-    preGet();
-    return _value;
-    }
-
-  const T &value() const
-    {
-    preGet();
-    return _value;
-    }
-
-  void assign(const T &in);
 
   static void saveProperty(const SProperty *p, SSaver &l )
     {
@@ -182,38 +223,9 @@ public:
     return false;
     }
 
+  void assign(const T &in);
+
 private:
-  class ComputeChange : public SProperty::DataChange
-    {
-    S_CHANGE(ComputeChange, SProperty::DataChange, DERIVED::Type);
-
-  public:
-    ComputeChange(SPODProperty<T, DERIVED> *prop)
-      : SProperty::DataChange(prop)
-      {
-      xAssert(!prop->database()->stateStorageEnabled());
-      }
-
-  private:
-    bool apply()
-      {
-      return true;
-      }
-    bool unApply()
-      {
-      xAssertFail();
-      return true;
-      }
-    bool inform()
-      {
-      if(property()->entity())
-        {
-        property()->entity()->informDirtyObservers(property());
-        }
-      return true;
-      }
-    };
-
   class Change : public ComputeChange
     {
     S_CHANGE(Change, ComputeChange, DERIVED::Type + 1000);
@@ -253,7 +265,6 @@ private:
     };
 
   friend class Lock;
-  friend class ComputeLock;
   };
 
 #define DEFINE_POD_PROPERTY(EXPORT_MODE, name, type, defaultDefault, typeID) \
@@ -262,6 +273,7 @@ public: class InstanceInformation : public SPODProperty<type, name>::InstanceInf
     { public: \
     InstanceInformation() : SPODProperty<type, name>::InstanceInformation(defaultDefault) { } }; \
   enum { Type = typeID }; \
+  typedef type PODType; \
   S_PROPERTY(name, SProperty, 0); \
   name(); \
   name &operator=(const type &in) { \
@@ -318,6 +330,16 @@ public:
     {
     assign(in);
     return *this;
+    }
+  };
+
+class SHIFT_EXPORT FilenameProperty : public StringProperty
+  {
+  S_PROPERTY(StringProperty, StringPropertyBase, 0);
+
+public:
+  FilenameProperty()
+    {
     }
   };
 

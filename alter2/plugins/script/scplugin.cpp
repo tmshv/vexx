@@ -131,6 +131,9 @@ void ScPlugin::load()
   _engine->globalObject().setProperty("dbTypes", _engine->newObject());
   _types = new ScEmbeddedTypes(_engine);
 
+  connect(_types, SIGNAL(typeAdded(QString)), this, SIGNAL(typeAdded(QString)));
+  connect(_types, SIGNAL(typeRemoved(QString)), this, SIGNAL(typeRemoved(QString)));
+
   registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
 
   QScriptValue dbObject = engine()->globalObject().property("db");

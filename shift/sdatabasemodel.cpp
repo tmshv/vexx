@@ -6,8 +6,8 @@
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-#define SDataModelProfileFunction XProfileFunction(ShiftDataModelProfileScope)
-#define SDataModelProfileScopedBlock(mess) XProfileScopedBlock(ShiftDataModelProfileScope, mess)
+#define SDataModelProfileFunction XProfileFunctionBase(ShiftDataModelProfileScope)
+#define SDataModelProfileScopedBlock(mess) XProfileScopedBlockBase(ShiftDataModelProfileScope, mess)
 
 SDatabaseDelegate::SDatabaseDelegate(QObject *parent) : QItemDelegate(parent), _currentWidget(0)
   {
@@ -536,9 +536,9 @@ QVariant SDatabaseModel::headerData(int section, Qt::Orientation orientation, in
 
 Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   {
-  xAssert(!_currentTreeChange);
   SDataModelProfileFunction
   SProperty *prop = (SProperty *)index.internalPointer();
+  xAssert(!_currentTreeChange || _currentTreeChange->property() != prop);
   if(prop && index.column() < 2)
     {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;

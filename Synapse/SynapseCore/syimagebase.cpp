@@ -1,60 +1,69 @@
 #include "syimagebase.h"
 #include "QImage"
 
-S_PROPERTY_CONTAINER_DEFINITION(SyImageBase, SPropertyContainer)
-    S_PROPERTY_DEFINITION(SFloatArrayProperty, image)
-S_PROPERTY_CONTAINER_END_DEFINITION(SyImageBase, SPropertyContainer, saveContainer, loadContainer)
+S_IMPLEMENT_PROPERTY(SyImageBase)
+
+SPropertyInformation *SyImageBase::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyImageBase>("SyImageBase");
+
+  return info;
+  }
 
 SyImageBase::SyImageBase()
   {
   }
 
-void SyImageBase::loadQImage(const QImage &imageIn)
+void SyImageBase::loadQImage(const QImage &imInput, bool premult)
   {
   SProfileFunction
-  int width = imageIn.width();
-  int height = imageIn.height();
 
-  XVector<float> data;
-  data.resize(width * height);
-
-  xsize bytesPerPixel = imageIn.depth()/8;
-  const quint8 *pixel = imageIn.bits();
-  for(int i = 0; i < height; ++i )
+  MCMathsOperation::ComputeLock l(this);
+  if(imInput.isNull())
     {
-    xsize rowPos = i * width;
-    for(int j = 0; j < width; ++j)
+    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XVectorI2D::Zero());
+    }
+
+  XVectorI2D transform = XVectorI2D::Zero();
+
+  xsize channels = 3;
+  if(imInput.hasAlphaChannel())
+    {
+    channels = 4;
+    if(premult)
       {
-      data[rowPos+j] = (float)*pixel/255.0f;
-      pixel += bytesPerPixel;
+      imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+      }
+    else
+      {
+      imInput.convertToFormat(QImage::Format_ARGB32);
+      }
+    }
+  else
+    {
+    if(premult)
+      {
+      imInput.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+      }
+    else
+      {
+      imInput.convertToFormat(QImage::Format_RGB32);
       }
     }
 
-  image.set(width, height, data);
+  const uchar *bits = imInput.bits();
 
-  postSet();
-  }
-
-QImage SyImageBase::asQImage() const
-  {
-  preGet();
-  int width = image.width();
-  int height = image.height();
-
-  QImage im(width, height, QImage::Format_ARGB32);
-  im.fill(qRgba(0,0,0,255));
-
-  xsize bytesPerPixel = im.depth()/8;
-  quint8 *pixel = im.bits();
-  const float *constData = image.get();
-  for(int i = 0; i < height; ++i )
+  if(bits)
     {
-    int rowPos = i*width;
-    for(int j = 0; j < width; ++j)
-      {
-      pixel[0] = constData[rowPos+j] * 255.0f;
-      pixel += bytesPerPixel;
-      }
+    xsize stride = imInput.bytesPerLine()/imInput.width();
+
+    _preOperation.load(XMathsOperation::Byte, (void*)bits, stride, imInput.width(), imInput.height(), channels, transform);
     }
-  return im;
+  else
+    {
+    _preOperation.load(XMathsOperation::None, 0, 0, 0, 0, channels, transform);
+    }
+
+  xuint32 shuffleMask = XMathsOperation::shuffleMask(2, 1, 0, 3);
+  l.data()->shuffle(_preOperation, shuffleMask);
   }

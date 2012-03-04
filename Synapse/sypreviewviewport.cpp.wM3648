@@ -1,0 +1,70 @@
+#include "sypreviewviewport.h"
+#include "sproperty.h"
+#include "syimagetexture.h"
+#include "3D/GCCamera.h"
+#include "3D/GCScene.h"
+#include "3D/Renderable/GCPlane.h"
+
+S_IMPLEMENT_PROPERTY(SyPreviewViewport)
+
+SPropertyInformation *SyPreviewViewport::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyPreviewViewport>("SyPreviewViewport");
+
+  return info;
+  }
+
+SyPreviewViewport::SyPreviewViewport()
+  {
+  }
+
+void SyPreviewViewport::setupViewport(const SyImageInput *input, XAbstractCanvasController **controller)
+  {
+  GCPerspectiveCamera* cam = addChild<GCPerspectiveCamera>("Camera");
+  x.connect(&cam->viewportX);
+  y.connect(&cam->viewportY);
+  width.connect(&cam->viewportWidth);
+  height.connect(&cam->viewportHeight);
+
+  cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
+  cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
+
+  GCManipulatableScene* msc = addChild<GCManipulatableScene>("Scene");
+  cam->projection.connect(&msc->cameraProjection);
+  cam->viewTransform.connect(&msc->cameraTransform);
+  cam->connect(&msc->activeCamera);
+
+  GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
+  GCShadingGroup *group2 = msc->addChild<GCShadingGroup>("Groups");
+  msc->shadingGroups.addPointer(group);
+  msc->shadingGroups.addPointer(group2);
+
+  if(controller)
+    {
+    *controller = msc;
+    }
+
+  const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
+  SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
+  group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
+
+  const SPropertyInformation *flatSurfaceInfo = STypeRegistry::findType("FlatSurface");
+  SProperty *shader2 = msc->addChild(flatSurfaceInfo, "Shader");
+  GCShader *shaderS = shader2->uncheckedCastTo<GCShader>();
+  group2->shader.setPointed(shaderS);
+
+  GCTexture *t = msc->addChild<GCTexture>("Texture");
+  shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(t);
+
+
+  XTransform tr = XTransform::Identity();
+  tr.translation() = XVector3D(-1.0f, 0.0f, 0.0f);
+
+  GCGeometryTransform *transform2 = msc->addChild<GCGeometryTransform>("Transform");
+  group2->geometry.addPointer(transform2);
+  transform2->transform = tr;
+  GCPlane *plane = msc->addChild<GCPlane>("Plane");
+  transform2->geometry.setPointed(&plane->geometry);
+
+  source.setPointed(msc);
+  }

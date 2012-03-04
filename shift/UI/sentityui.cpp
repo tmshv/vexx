@@ -25,6 +25,8 @@ SEntityUI::SEntityUI(xuint32 options)
     setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector2D>() );
     setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector3D>() );
     setUIType(ColourProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Colour>() );
+
+    setUIType(FilenameProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Filename>() );
     }
   }
 
@@ -38,7 +40,7 @@ xuint64 SEntityUI::widgetType(const SProperty *p) const
   return X_UINT64_SENTINEL;
   }
 
-QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent) const
+QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent, bool *added) const
   {
   QWidget *canvas(new QWidget(parent));
   QFormLayout *layout(new QFormLayout(canvas));
@@ -46,10 +48,17 @@ QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent) const
   SProperty *child = ent->firstChild();
   while(child)
     {
-    QWidget *widget = createControlWidget(child);
-    if(widget)
+    if(child->instanceInformation()->mode() == SPropertyInstanceInformation::UserSettable)
       {
-      layout->addRow(child->name(), widget);
+      QWidget *widget = createControlWidget(child);
+      if(widget)
+        {
+        layout->addRow(child->name(), widget);
+        if(added)
+          {
+          *added = true;
+          }
+        }
       }
     child = child->nextSibling();
     }

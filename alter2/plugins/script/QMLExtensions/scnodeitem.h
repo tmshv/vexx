@@ -16,6 +16,8 @@ public:
 
   Q_INVOKABLE void setPosition(float x, float y);
 
+  Q_INVOKABLE QVariantMap createPropertiesSection(QDeclarativeItem *parent, QColor labelColour, float expectedW, float expectedH);
+
   virtual const QString& name() const;
   virtual void setName(const QString& );
 

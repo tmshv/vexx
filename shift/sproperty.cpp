@@ -883,7 +883,7 @@ void SProperty::postSet()
 
 void SProperty::setDirty()
   {
-    SProfileFunction
+  SProfileFunction
   if((!_flags.hasAnyFlags(Dirty|PreGetting)))
   {
     _flags.setFlag(Dirty);

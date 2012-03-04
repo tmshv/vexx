@@ -1,21 +1,22 @@
 #ifndef SYIMAGENODE_H
 #define SYIMAGENODE_H
 
-#include "synode.h"
+#include "sysourcenode.h"
 #include "sbaseproperties.h"
 #include "syimageoutput.h"
 
-class SyImageNode : public SyNode
+class SyImageNode : public SySourceNode
   {
-  S_ENTITY(SyImageNode, SyNode, 0);
+  S_ENTITY(SyImageNode, SySourceNode, 0);
+
 public:
   SyImageNode();
 
-  StringProperty filename;
-  SyImageOutput output;
+  BoolProperty premultiply;
+  FilenameProperty filename;
 
 private:
-  static void computeImage( const SPropertyInstanceInformation *, SPropertyContainer * );
+  static void computeImage( const SPropertyInstanceInformation *, SyImageNode * );
   };
 
 #endif // SYIMAGENODE_H

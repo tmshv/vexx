@@ -19,13 +19,17 @@ public:
 
   GCViewport *viewport()
     {
-    SEntity *e = _viewport.entity();
-    if(e)
+    if(!_viewport.isValid())
       {
-      return e->uncheckedCastTo<GCViewport>();
+      return 0;
       }
-    return 0;
+
+    SEntity *e = _viewport.entity();
+    xAssert(e);
+    return e->uncheckedCastTo<GCViewport>();
     }
+
+  void setViewport(GCViewport *vp);
 
 protected:
   void initializeGL();

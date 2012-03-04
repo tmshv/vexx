@@ -7,24 +7,23 @@
 TARGET = SynapseCore
 TEMPLATE = lib
 
-DEFINES += SYNAPSECORE_BUILD
-QMAKE_CXXFLAGS += -Wall
+include("../../EksCore/GeneralOptions.pri")
 
 SOURCES += syplugin.cpp \
     synode.cpp \
     syimagebase.cpp \
     syimageinput.cpp \
-    syimageoutput.cpp
+    syimageoutput.cpp \
+    sysourcenode.cpp
 
 HEADERS += syplugin.h \
     syglobal.h \
     synode.h \
     syimagebase.h \
     syimageinput.h \
-    syimageoutput.h
+    syimageoutput.h \
+    sydocument.h
 
-INCLUDEPATH += ../../EksCore ../../Shift ../../alter2 ../../alter2/plugins/ShiftAlter
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/Shift $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore $$ROOT/alter2 $$ROOT/alter2/plugins/ShiftAlter
 
-DESTDIR += ../../bin
-
-LIBS += -L../../bin -lshift -lEksCore -lalter -lShiftAlter -lShiftGraphicsCore
+LIBS += -lshift -lEksCore -lalter -lShiftAlter -lShiftGraphicsCore -lShiftMathsCore

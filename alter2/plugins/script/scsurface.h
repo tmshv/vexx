@@ -19,17 +19,17 @@ public:
   ScSurface(ScPlugin *plugin);
   ~ScSurface();
 
-  void threadSafeLog(QtMsgType t, const QString &);
+  void threadSafeLog(int t, const QString &);
 
 public slots:
-  void appendToLog(QtMsgType t, const QString &);
+  void appendToLog(int t, const QString &);
 
 private slots:
   void execute();
   void executeDebugged();
 
 signals:
-  void threadSafeLogSignal(QtMsgType t, const QString &);
+  void threadSafeLogSignal(int t, const QString &);
 
 private:
   QTextEdit *_editor;

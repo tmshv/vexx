@@ -6,8 +6,25 @@
 #include "sadocument.h"
 #include "scplugin.h"
 
+QScriptValue toScriptValue(QScriptEngine *eng, const SProperty *&ba)
+  {
+  xAssertFail();
+  return ScEmbeddedTypes::packValue((SProperty *)ba);
+  }
+
+void fromScriptValue(const QScriptValue &obj, SProperty *&ba)
+  {
+  ba = *qscriptvalue_cast<SProperty **>(obj.data());
+  }
+
 ScShiftPropertyBase::ScShiftPropertyBase(QScriptEngine *eng) : ScWrappedClass<SProperty *>(eng)
   {
+  const int id = qRegisterMetaType<SProperty *>(); // make sure it's registered
+
+  qScriptRegisterMetaType_helper(
+      eng, id, reinterpret_cast<QScriptEngine::MarshalFunction>(toScriptValue),
+      reinterpret_cast<QScriptEngine::DemarshalFunction>(fromScriptValue),
+        QScriptValue());
   }
 
 QScriptClass::QueryFlags ScShiftPropertyBase::queryProperty(const QScriptValue &object, const QScriptString &name, QueryFlags flags, uint *)

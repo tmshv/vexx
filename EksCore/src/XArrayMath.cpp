@@ -3,6 +3,8 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "QRect"
+#include "XProfiler"
+#include "XAllocatorBase"
 
 XMathsEngine *g_engine = 0;
 XMathsEngine *XMathsEngine::engine()
@@ -15,9 +17,9 @@ void XMathsEngine::setEngine(XMathsEngine *e)
   g_engine = e;
   }
 
-XMathsResult::XMathsResult(const XMathsOperation &o, QRectF sampleRect, xuint32 invSampleDensity)
+XMathsResult::XMathsResult(const XMathsOperation &o, XVectorI2D tl, xuint32 invSampleDensity, XMathsOperation::DataType type, void *data)
   {
-  XMathsEngine::engine()->evaluateData(&o, o.userData(), sampleRect, invSampleDensity, &_dataType, &_data, &_dataStride, &_dataWidth, &_dataHeight, &_dataChannels, &_transform);
+  XMathsEngine::engine()->evaluateData(&o, (void**)&o._userData, tl, invSampleDensity, type, data);
   }
 
 XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
@@ -109,24 +111,52 @@ void XMathsOperation::setValue(xuint32 v)
 void XMathsOperation::setInputDirty()
   {
   XMathsEngine::engine()->onInputDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setInputDirty();
+    dep = dep->_nextUser;
+    }
   }
 
 void XMathsOperation::setOperationDirty()
   {
   XMathsEngine::engine()->onOperationDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setOperationDirty();
+    dep = dep->_nextUser;
+    }
   }
 
 void XMathsOperation::setValueDirty()
   {
   XMathsEngine::engine()->onValueDirty(this, &_userData);
+
+  XMathsOperation *dep = _user;
+  while(dep)
+    {
+    dep->setValueDirty();
+    dep = dep->_nextUser;
+    }
   }
 
-void XMathsOperation::load(DataType t, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XMatrix3x3 &m)
+void XMathsOperation::copy(const XMathsOperation &a)
+  {
+  add(a, XVector4D::Zero());
+  }
+
+void XMathsOperation::load(DataType t, void* data, xsize stride, xsize dataWidth, xsize dataHeight, xsize dataChannels, const XVectorI2D &m)
   {
   setInput(&_inputA, 0);
   setInput(&_inputB, 0);
 
   setOperation(Load);
+  setInputDirty();
+  setValueDirty();
   _userData = XMathsEngine::engine()->loadData(t, data, stride, dataWidth, dataHeight, dataChannels, m);
   }
 
@@ -190,437 +220,427 @@ void XMathsOperation::splice(const XMathsOperation &a, const XMathsOperation &b,
   setValue(mask);
   }
 
-template <typename T> struct Defs
+template <typename T> struct TypeAccessorsBase
   {
-  typedef Eigen::Matrix <T, 4, 1> Vec;
-  typedef Eigen::Array <Vec, Eigen::Dynamic, Eigen::Dynamic> Array;
-
-  struct ImageRef
-    {
-    ImageRef(XMatrix3x3& tr, Array& im) : _transform(&tr), _image(&im) { }
-    ImageRef() : _transform(0), _image(0) { }
-
-    XMatrix3x3& transform() { return *_transform; }
-    Array& image() { return *_image; }
-
-    const XMatrix3x3& transform() const { return *_transform; }
-    const Array& image() const { return *_image; }
-
-    XVector3D xAxis() { return transform().col(0); }
-    XVector3D yAxis() { return transform().col(1); }
-    XVector2D translation() { return transform().col(2).block<2, 1>(0, 0); }
-    void setTranslation(const XVector2D &in) { transform().col(2).block<2, 1>(0, 0) = in; }
-
-    void expandToFit(const ImageRef &im, QRectF& rect)
-      {
-      XMatrix3x3 m = im.transform() * transform().inverse();
-      XVector3D a = m * XVector3D(0, 0, 1);
-      XVector3D b = m * XVector3D(0, im.image().cols(), 1);
-      XVector3D c = m * XVector3D(im.image().rows(), 0, 1);
-      XVector3D d = m * XVector3D(im.image().rows(), im.image().cols(), 1);
-
-      rect = rect.unite(QRectF(a.x(), a.y(), 1, 1));
-      rect = rect.unite(QRectF(b.x(), b.y()-1, 1, 1));
-      rect = rect.unite(QRectF(c.x()-1, c.y(), 1, 1));
-      rect = rect.unite(QRectF(d.x()-1, d.y()-1, 1, 1));
-      }
-
-    void setSize(const QRectF& rect)
-      {
-      setTranslation(translation() + XVector2D(rect.x(), rect.y()));
-      image().resize(rect.width()+1.0f, rect.height()+1.0f);
-      }
-
-    Vec sampleFrom(const XMatrix3x3 &mapping, const XVector3D &pt) const
-      {
-      XVector3D mappedPt = mapping * pt;
-
-      if(mappedPt.x() < 0.0f || mappedPt.y() < 0.0f ||
-         mappedPt.x() >= image().rows() || mappedPt.y() >= image().cols())
-        {
-        return Vec::Zero();
-        }
-
-      return image()(mappedPt.x(), mappedPt.y());
-      }
-
-    Vec sampleFrom(const XVector3D &pt) const
-      {
-      if(pt.x() < 0.0f || pt.y() < 0.0f ||
-         pt.x() >= image().rows() || pt.y() >= image().cols())
-        {
-        return Vec::Zero();
-        }
-
-      return image()(pt.x(), pt.y());
-      }
-
-  private:
-    XMatrix3x3 *_transform;
-    Array *_image;
-    };
+  typedef typename Eigen::Matrix <T, 4, 1> Vec;
+  typedef typename Eigen::Array <Vec, Eigen::Dynamic, Eigen::Dynamic> Array;
   };
 
-struct ReferenceMathsEngineResult
+template <typename T> struct TypeAccessors
   {
-  XMathsOperation::DataType _type;
-  xuint8 _channels;
-  XMatrix3x3 _transform;
-
-  Defs<float>::Array _floats;
-  Defs<xuint32>::Array _ints;
   };
 
-template <typename T> struct Utils
+template <> struct TypeAccessors <float> : public TypeAccessorsBase<float>
   {
-  typedef typename Defs<T>::Array Array;
-  typedef typename Defs<T>::Vec Vec;
-  typedef typename Defs<T>::ImageRef ImageRef;
-  typedef void (*InitFunction)(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b);
-  typedef void (*MathsFunction)(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b);
+  static float white() { return 1.0f; }
+  static float black() { return 0.0f; }
+  };
 
-  static void unite(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *b)
+template <> struct TypeAccessors <xuint8> : public TypeAccessorsBase<xuint8>
+  {
+  static xuint8 white() { return 255; }
+  static xuint8 black() { return 0; }
+  };
+
+template <typename T> struct OperationQueue
+  {
+  typedef typename TypeAccessors<T> Type;
+  typedef typename Type::Vec Vec;
+  typedef typename Type::Array Array;
+
+  typedef void (*OperationFunction)(const XVectorI2D&, const XMathsOperation* o, Vec &arr, const Vec &);
+
+  static void nullOp(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec&)
     {
-    xAssert(a);
-    xAssert(b);
-
-    arr.transform() = a->transform();
-
-    QRectF r;
-    arr.expandToFit(*a, r);
-    arr.expandToFit(*b, r);
-
-    arr.setSize(r);
-    }
-
-  static void takeA(const XMathsOperation*, ImageRef &arr, const ImageRef *a, const ImageRef *)
-    {
-    xAssert(a);
-    arr.transform() = a->transform();
-    arr.image().resize(a->image().rows(), a->image().cols());
-    }
-
-  static void add(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
-    {
-    xAssert(a);
-    xAssert(b);
-
-    arr = a->sampleFrom(mapA, pt) + b->sampleFrom(mapB, pt);
-    }
-
-  static void addConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-    {
-    xAssert(a);
-    xAssert(mat.isApprox(a->transform()));
-
-    arr = a->image()(pt.x(), pt.y()) + o->vectorData().cast<T>();
-    }
-
-  static void multiply(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &mapB, const ImageRef *b)
-    {
-    xAssert(a);
-    xAssert(b);
-
-    arr = a->sampleFrom(mapA, pt).cwiseProduct(b->sampleFrom(mapB, pt));
-    }
-
-  static void multiplyConst(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-    {
-    xAssert(a);
-    xAssert(mat.isApprox(a->transform()));
-
-    arr = a->image()(pt.x(), pt.y()).cwiseProduct(o->vectorData().cast<T>());
-    }
-
-  static void shuffle(const XVector3D &pt, const XMathsOperation* o, const XMatrix3x3& mat, Vec &arr, const XMatrix3x3 &, const ImageRef *a, const XMatrix3x3 &, const ImageRef *)
-    {
-    xAssert(a);
-    xAssert(mat.isApprox(a->transform()));
-
-    xuint32 compoundComponents = o->integerData();
-    xuint8 components[4];
-    XMathsOperation::shuffleComponents(compoundComponents, components);
-
-    const Vec &in = a->image()(pt.x(), pt.y());
-
-    xuint32 chan = 4;
-    for(xuint32 i = 0; i < chan; ++i)
-      {
-      xuint8 comp = components[i];
-      if(comp < chan)
-        {
-        arr(i) = in(comp);
-        }
-      else if(comp == XMathsOperation::ShuffleOne)
-        {
-        arr(i) = 1;
-        }
-      else // if(comp == XMathsOperation::ShuffleZero)
-        {
-        arr(i) = 0;
-        }
-      }
-    }
-
-  static void convolve(const XVector3D &pt, const XMathsOperation*, const XMatrix3x3&, Vec &arr, const XMatrix3x3 &mapA, const ImageRef *a, const XMatrix3x3 &, const ImageRef *b)
-    {
-    xAssert(a);
-    xAssert(b);
-
-    xAssert(mapA.isIdentity());
-
     arr = Vec::Zero();
-    for(xsize y = 0, h = b->image().cols(); y < h; ++y)
+    }
+
+  static void load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
+    {
+    XProfileFunction
+    const void *u = o->userData();
+    const QueueHolder *h = (const QueueHolder *)u;
+
+    if(h->_imageData)
       {
-      for(xsize x = 0, w = b->image().rows(); x < w; ++x)
+      if(h->_type == XMathsOperation::Float)
         {
-        XVector3D samplePt = pt + b->transform() * XVector3D(x, y, 1.0f);
+        const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
+        XVectorI2D sampleAt = pt - imData->_offset;
 
-        Vec::Scalar factor = b->image()(x, y)(0);
-        Vec comp = a->sampleFrom(samplePt);
+        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
 
-        arr += comp * factor;
+        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
+        }
+      else if(h->_type == XMathsOperation::Byte)
+        {
+        const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
+        XVectorI2D sampleAt = pt - imData->_offset;
+
+        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
+
+        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
         }
       }
     }
 
-  static void doOperation(const XMathsOperation* o, ImageRef &arr, const ImageRef *a, const ImageRef *b)
+  static void add(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec& b)
     {
-    static const xuint8 expectedInputs[] =
-      {
-      0, // NoOp
-      0, // Load
-      2, // Add
-      1, // AddConst
-      2, // Multiply
-      1, // MultiplyConst
-      2, // Convolve
-      1, // Shuffle
-      2  // Splice
-      };
+    XProfileFunction
+    arr = arr + b;
+    }
 
-    static const InitFunction iFns[] =
-      {
-      0,     // NoOp
-      0,     // Load
-      unite, // Add
-      takeA, // AddConst
-      unite, // Multiply
-      takeA, // MultiplyConst
-      takeA, // Convolve
-      takeA, // Shuffle
-      unite  // Splice
-      };
+  static void addConst(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
+    {
+    XProfileFunction
+    arr = arr + o->vectorData().cast<T>();
+    }
 
-    static const MathsFunction fFns[] =
-      {
-      0,               // NoOp
-      0,               // Load
-      add,             // Add
-      addConst,        // AddConst
-      multiply,        // Multiply
-      multiplyConst,   // MultiplyConst
-      convolve,        // Convolve
-      shuffle,         // Shuffle
-      0                // Splice
-      };
+  static void shuffle(const XVectorI2D&, const XMathsOperation* o, Vec& arr, const Vec&)
+    {
+    XProfileFunction
+    xuint8 comp[4];
+    XMathsOperation::shuffleComponents(o->integerData(), comp);
 
-    xuint8 expInputs = expectedInputs[o->operation()];
-    if(expInputs >= 1 && !a)
+    Vec in = arr;
+
+    for(xsize i = 0; i < 4; ++i)
       {
-      xAssertFail();
-      return;
+      if(comp[i] >= 4)
+        {
+        if(comp[i] == XMathsOperation::ShuffleOne)
+          {
+          arr(i) = Type::white();
+          }
+        else
+          {
+          arr(i) = Type::black();
+          }
+        }
+      else
+        {
+        arr(i) = in(comp[i]);
+        }
       }
+    }
 
-    if(expInputs >= 2 && !b)
-      {
-      xAssertFail();
-      return;
-      }
+  struct Operation
+    {
+    OperationFunction _function;
+    const XMathsOperation *_operation;
+    xsize _writePoint;
+    xsize _inputBPoint;
+    };
 
-    xAssert(o->operation() < sizeof(iFns)/sizeof(iFns[0]));
-    xAssert(iFns[o->operation()]);
-    iFns[o->operation()](o, arr, a, b);
+  OperationQueue(XAllocatorBase *all, xsize s)
+    {
+    _storageLocationCount = 0;
+    _allocator = all;
+    _size = s;
+    }
 
-    XMatrix3x3 mapAToBase;
-    XMatrix3x3 mapBToBase;
+  static OperationQueue* create(XAllocatorBase *all, xsize count)
+    {
+    void *ptr = all->alloc(sizeof(OperationQueue) + (sizeof(Operation)*(count-1)));
+    return new(ptr) OperationQueue(all, count);
+    }
 
+  static void destroy(OperationQueue *q)
+    {
+    q->_allocator->free(q);
+    }
+
+  static xsize buildQueueSize(const XMathsOperation *op)
+    {
+    const XMathsOperation *a = op->inputA();
+    const XMathsOperation *b = op->inputB();
+
+    xsize count = 1;
     if(a)
       {
-      mapAToBase = a->transform().inverse() * arr.transform();
+      count += buildQueueSize(a);
       }
+
     if(b)
       {
-      mapBToBase = b->transform().inverse() * arr.transform();
+      count += buildQueueSize(b);
       }
 
-    xAssert(o->operation() < sizeof(fFns)/sizeof(fFns[0]));
-    MathsFunction fn = fFns[o->operation()];
-    xAssert(fn);
+    return count;
+    }
 
-    for(int y = 0; y < arr.image().cols(); ++y)
+  static OperationQueue *buildQueue(const XMathsOperation *op, XAllocatorBase *all)
+    {
+    XProfileFunction
+    xsize operationSize = buildQueueSize(op);
+
+    OperationQueue<T> *q = create(all, operationSize);
+
+    q->buildQueue(op, operationSize-1, q->_storageLocationCount++);
+
+    return q;
+    }
+
+  void selectOperation(Operation &opData, const XMathsOperation *op, xsize writePoint, xsize inputBPoint)
+    {
+    /*xuint8 mode = kFastMethod;
+    if(a && b)
       {
-      for(int x = 0; x < arr.image().rows(); ++x)
+      if(a.offset != b->offset)
         {
-        XVector3D pt(x, y, 1.0);
+        mode = kLongMethod;
+        }
+      }*/
 
-        Vec& v = arr.image()(x, y);
-        fn(pt, o, arr.transform(), v, mapAToBase, a, mapBToBase, b);
+
+    static OperationFunction g_sampleFunctions[] =
+    {
+      nullOp,   // NoOp,
+      load,     // Load,
+      add,      // Add,
+      addConst, // AddConst,
+      0,        // Multiply,
+      0,        // MultiplyConst,
+      0,        // Convolve,
+      shuffle,  // Shuffle,
+      0,        // Splice
+    };
+
+    opData._writePoint = writePoint;
+    opData._inputBPoint = inputBPoint;
+    opData._function = g_sampleFunctions[op->operation()];//[mode];
+    opData._operation = op;
+    xAssert(opData._function);
+    }
+
+  xsize buildQueue(const XMathsOperation *op, xsize writePoint, xsize storageLocation)
+    {
+    const XMathsOperation *a = op->inputA();
+    const XMathsOperation *b = op->inputB();
+    xsize inputsWritePoint = writePoint-1;
+    xsize inputBPoint = 0;
+    if(b)
+      {
+      inputBPoint = _storageLocationCount++;
+      inputsWritePoint = buildQueue(b, inputsWritePoint, inputBPoint);
+      }
+    if(a)
+      {
+      inputsWritePoint = buildQueue(a, inputsWritePoint, storageLocation);
+      }
+
+    selectOperation(_operation[writePoint], op, storageLocation, inputBPoint);
+    return inputsWritePoint;
+    }
+
+  void runQueue(XVectorI2D sampleStart, xuint32 invSampleFreq, Array &arr)
+    {
+    XProfileFunction
+    xAssert(_storageLocationCount > 0);
+    Vec *writePoints = new Vec[_storageLocationCount];
+
+    for(xsize y = 0, h = arr.cols(); y < h; ++y)
+      {
+      for(xsize x = 0, w = arr.rows(); x < w; ++x)
+        {
+        XVectorI2D pt = sampleStart + XVectorI2D(x, y) * invSampleFreq;
+
+        for(xsize o = 0; o < _size; ++o)
+          {
+          const Operation &op = _operation[o];
+          op._function(pt, op._operation, writePoints[op._writePoint], writePoints[op._inputBPoint]);
+          }
+        arr(x, y) = writePoints[0];
         }
       }
     }
+
+  static void loadData(void **input,
+                       const void *data,
+                       xsize stride,
+                       xsize width,
+                       xsize height,
+                       xsize channels,
+                       const XVectorI2D &m)
+    {
+    ImageData<T> *&image = *(ImageData<T>**)input;
+    if(!image)
+      {
+      image = new ImageData<T>;
+      }
+    image->_offset = m;
+
+    T *dataPtr = (T*)data;
+    image->_data.resize(width, height);
+
+    Type::Vec wP(Type::white(),Type::white(), Type::white(), Type::white());
+
+    for(int y = 0; y < image->_data.cols(); ++y)
+      {
+      for(int x = 0; x < image->_data.rows(); ++x)
+        {
+        Type::Vec& v = image->_data(x, y);
+        v = wP;
+        memcpy(v.data(), dataPtr, sizeof(T)*channels);
+        dataPtr += stride;
+        }
+      }
+    }
+
+  xsize _storageLocationCount;
+  XAllocatorBase *_allocator;
+  xsize _size;
+  Operation _operation[1];
   };
 
-void XReferenceMathsEngine::evaluateData(const XMathsOperation *, const void *userData, QRectF, xuint32, XMathsOperation::DataType *type, const void **data, xsize *stride, xsize *dataWidth, xsize *dataHeight, xsize *dataChannels, XMatrix3x3 *m)
+template <typename T> struct ImageData
   {
-  const ReferenceMathsEngineResult *result = (const ReferenceMathsEngineResult *)userData;
+  typedef typename OperationQueue<T>::Vec Vec;
+  typedef typename OperationQueue<T>::Array Array;
 
-  *type = result->_type;
-  *dataChannels = result->_channels;
-  *m = result->_transform;
+  XVectorI2D _offset;
+  Array _data;
+  };
+
+struct QueueHolder
+  {
+  ~QueueHolder()
+    {
+    clearQueue();
+    clearImage();
+    }
+
+  void clearQueue()
+    {
+    if(_queue)
+      {
+      if(_type == XMathsOperation::Float)
+        {
+        OperationQueue<float> *data = (OperationQueue<float> *)_queue;
+        OperationQueue<float>::destroy(data);
+        }
+      else if(_type == XMathsOperation::Byte)
+        {
+        OperationQueue<xuint8> *data = (OperationQueue<xuint8> *)_queue;
+        OperationQueue<xuint8>::destroy(data);
+        }
+      _queue = 0;
+      }
+    }
+
+  void clearImage()
+  {
+    if(_imageData)
+      {
+      if(_type == XMathsOperation::Float)
+        {
+        ImageData<float> *imData = (ImageData<float> *)_imageData;
+        delete imData;
+        }
+      else if(_type == XMathsOperation::Byte)
+        {
+        ImageData<xuint8> *imData = (ImageData<xuint8> *)_imageData;
+        delete imData;
+        }
+      _imageData = 0;
+      }
+    }
+
+  void *_queue;
+  void *_imageData;
+  XMathsOperation::DataType _type;
+  };
+
+void XReferenceMathsEngine::evaluateData(const XMathsOperation *op,
+                                         void **userData,
+                                         const XVectorI2D &sampleOffset,
+                                         xuint32 invSampleDensity,
+                                         XMathsOperation::DataType type,
+                                         void *data)
+  {
+  QueueHolder *&result = *(QueueHolder **)userData;
+
+  if(!result)
+    {
+    result = new QueueHolder;
+    result->_type = type;
+    result->_imageData = 0;
+    result->_queue = 0;
+    }
+  xAssert(!result->_imageData);
 
   if(result->_type == XMathsOperation::Float)
     {
-    *data = result->_floats.data();
-    *dataWidth = result->_floats.rows();
-    *dataHeight = result->_floats.cols();
-    *stride = sizeof(Defs<float>::Array::Scalar);
+    OperationQueue<float> **queue = (OperationQueue<float> **)&result->_queue;
+    if(!*queue)
+      {
+      *queue = OperationQueue<float>::buildQueue(op, XGlobalAllocator::instance());
+      }
+
+    (*queue)->runQueue(sampleOffset, invSampleDensity, *(OperationQueue<float>::Array*)data);
     }
-  else if(result->_type == XMathsOperation::UnsignedInt)
+  else if(result->_type == XMathsOperation::Byte)
     {
-    *data = result->_ints.data();
-    *dataWidth = result->_ints.rows();
-    *dataHeight = result->_ints.cols();
-    *stride = sizeof(Defs<xuint32>::Array::Scalar);
+    OperationQueue<xuint8> **queue = (OperationQueue<xuint8> **)&result->_queue;
+    if(!*queue)
+      {
+      *queue = OperationQueue<xuint8>::buildQueue(op, XGlobalAllocator::instance());
+      }
+
+    (*queue)->runQueue(sampleOffset, invSampleDensity, *(OperationQueue<xuint8>::Array*)data);
     }
   }
 
-void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type, void* data, xsize stride, xsize width, xsize height, xuint8 channels, const XMatrix3x3 &m)
+void *XReferenceMathsEngine::loadData(XMathsOperation::DataType type,
+                                      void* data,
+                                      xsize stride,
+                                      xsize width,
+                                      xsize height,
+                                      xuint8 channels,
+                                      const XVectorI2D &m)
   {
-  ReferenceMathsEngineResult *ret = new ReferenceMathsEngineResult;
+  QueueHolder *ret = new QueueHolder;
   ret->_type = type;
-  ret->_channels = channels;
-  ret->_transform = m;
 
-  xAssert(channels <= 4);
-
-  if(data)
+  ret->_queue = 0;
+  ret->_imageData = 0;
+  if(!data)
     {
-    xAssert(stride);
-    if(type == XMathsOperation::Float)
-      {
-      float *dataPtr = (float*)data;
-      ret->_floats.resize(width, height);
+    xAssert(type == XMathsOperation::None);
+    return ret;
+    }
 
-      for(int y = 0; y < ret->_floats.cols(); ++y)
-        {
-        for(int x = 0; x < ret->_floats.rows(); ++x)
-          {
-          XVector4D& v = ret->_floats(x, y);
-          memcpy(v.data(), dataPtr, sizeof(float)*channels);
-          dataPtr += stride;
-          }
-        }
-      }
-    else if(type == XMathsOperation::Byte)
-      {
-      ret->_type = XMathsOperation::UnsignedInt;
-      xuint8 *dataPtr = (xuint8*)data;
-      ret->_ints.resize(width, height);
-
-      for(int y = 0; y < ret->_ints.cols(); ++y)
-        {
-        for(int x = 0; x < ret->_ints.rows(); ++x)
-          {
-          Defs<xuint32>::Vec& v = ret->_ints(x, y);
-          for(int w = 0; w < channels; ++w)
-            {
-            v(w) = dataPtr[w];
-            }
-          dataPtr += stride;
-          }
-        }
-      }
-    else
-      {
-      xAssertFail();
-      }
+  xAssert(stride);
+  if(type == XMathsOperation::Float)
+    {
+    OperationQueue<float>::loadData(&ret->_imageData, data, stride, width, height, channels, m);
+    }
+  else if(type == XMathsOperation::Byte)
+    {
+    OperationQueue<xuint8>::loadData(&ret->_imageData, data, stride, width, height, channels, m);
     }
   else
     {
-    xAssert(type == XMathsOperation::None);
+    xAssertFail();
     }
 
   return ret;
   }
 
-void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *o, void **userData)
+void XReferenceMathsEngine::onOperationDirty(const XMathsOperation *, void **userData)
   {
-  ReferenceMathsEngineResult *&res = *(ReferenceMathsEngineResult**)userData;
-  if(!res)
+  QueueHolder *&res = *(QueueHolder**)userData;
+  if(res)
     {
-    res = new ReferenceMathsEngineResult;
-    res->_transform = XMatrix3x3::Identity();
-    res->_type = XMathsOperation::None;
-    res->_channels = 0;
-    }
-
-  if(o->operation() == XMathsOperation::NoOp || o->operation() == XMathsOperation::Load)
-  {
-    xAssert(*userData);
-    return;
-    }
-
-  ReferenceMathsEngineResult *a = (ReferenceMathsEngineResult*)(o->inputA() ? o->inputA()->userData() : 0);
-  ReferenceMathsEngineResult *b = (ReferenceMathsEngineResult*)(o->inputB() ? o->inputB()->userData() : 0);
-
-  xAssert(a);
-
-  res->_channels = 4;//a->_channels;
-  res->_type = a->_type;
-  if(a->_type == XMathsOperation::Float)
-    {
-    Utils<float>::ImageRef aIm;
-    if(a)
-      {
-      aIm = Utils<float>::ImageRef(a->_transform, a->_floats);
-      }
-
-    Utils<float>::ImageRef bIm;
-    if(b)
-      {
-      bIm = Utils<float>::ImageRef(b->_transform, b->_floats);
-      }
-
-    Utils<float>::ImageRef im(res->_transform, res->_floats);
-    Utils<float>::doOperation(o, im, &aIm, &bIm);
-    }
-  else if(a->_type == XMathsOperation::UnsignedInt)
-    {
-    Utils<xuint32>::ImageRef aIm;
-    Utils<xuint32>::ImageRef *aImP = 0;
-    if(a)
-      {
-      aIm = Utils<xuint32>::ImageRef(a->_transform, a->_ints);
-      aImP = &aIm;
-      }
-
-    Utils<xuint32>::ImageRef bIm;
-    Utils<xuint32>::ImageRef *bImP = 0;
-    if(b)
-      {
-      bIm = Utils<xuint32>::ImageRef(b->_transform, b->_ints);
-      bImP = &bIm;
-      }
-
-    Utils<xuint32>::ImageRef im(res->_transform, res->_ints);
-    Utils<xuint32>::doOperation(o, im, aImP, bImP);
+    res->clearQueue();
+    res->clearImage();
     }
   }
 
-void XReferenceMathsEngine::onValueDirty(const XMathsOperation *o, void **userData)
+void XReferenceMathsEngine::onValueDirty(const XMathsOperation *, void **)
   {
-  onOperationDirty(o, userData);
   }
 
 void XReferenceMathsEngine::onInputDirty(const XMathsOperation *o, void **userData)
@@ -630,6 +650,7 @@ void XReferenceMathsEngine::onInputDirty(const XMathsOperation *o, void **userDa
 
 void XReferenceMathsEngine::onCleanUp(const XMathsOperation *, void **userData)
   {
-  ReferenceMathsEngineResult *&res = *(ReferenceMathsEngineResult**)userData;
+  QueueHolder *&res = *(QueueHolder**)userData;
   delete res;
+  res = 0;
   }

@@ -12,6 +12,9 @@ class GRAPHICSCORE_EXPORT GCViewableTransform : public GCTransform, public XCame
   {
   S_ABSTRACT_ENTITY(GCViewableTransform, GCTransform, 0)
 
+XProperties:
+  XProperty(bool, rotateEnabled, setRotateEnabled);
+
 public:
   GCViewableTransform();
 
@@ -46,6 +49,8 @@ public:
   void pan(float x, float y);
   void rotateAboutPoint(const XVector3D &point, float x, float y);
   };
+
+S_TYPED_POINTER_TYPE(GCViewableTransformPointer, GCViewableTransform)
 
 class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
   {

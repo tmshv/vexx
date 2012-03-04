@@ -1,17 +1,17 @@
 #include "mcimage.h"
 #include "QImage"
 
-void MCImage::computeImageOutput(const SPropertyInstanceInformation* inst, MCImage *image)
+void MCImage::computeImageOutput(const SPropertyInstanceInformation*, MCImage *image)
   {
   QImage imInput(image->filename());
 
   MCMathsOperation::ComputeLock l(&image->output);
   if(imInput.isNull())
     {
-    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XMatrix3x3::Identity());
+    l.data()->load(XMathsOperation::None, 0, 0, 0, 0, 0, XVectorI2D::Zero());
     }
 
-  XMatrix3x3 transform = XMatrix3x3::Identity();
+  XVectorI2D transform = XVectorI2D::Zero();
   bool useShuffle = true;
 
   xsize channels = 3;

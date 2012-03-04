@@ -72,11 +72,11 @@ private:
   };
 
 #ifdef X_PROFILING_ENABLED
-  #define XProfileFunction(component) XProfiler::ProfileScopedBlock functionBlock(component, xCurrentFunction);
-  #define XProfileScopedBlock(component, mess) XProfiler::ProfileScopedBlock scopeBlock##__LINE__(component, mess);
+  #define XProfileFunctionBase(component) XProfiler::ProfileScopedBlock functionBlock(component, xCurrentFunction);
+  #define XProfileScopedBlockBase(component, mess) XProfiler::ProfileScopedBlock scopeBlock##__LINE__(component, mess);
 #else
-  #define XProfileFunction(component)
-  #define XProfileScopedBlock(component, mess)
+  #define XProfileFunctionBase(component)
+  #define XProfileScopedBlockBase(component, mess)
 #endif
 
 

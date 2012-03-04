@@ -279,7 +279,9 @@ QString g_modeStrings[] = {
   /* InternalInput */ "internalinput",
   /* Input         */ "input",
   /* Output        */ "output",
-  /* Computed      */ "computed"
+  /* Computed      */ "computed",
+  /* InternalComputed */ "internalcomputed",
+  /* UserSettable  */ "usersettable"
 };
 
 const QString &SPropertyInstanceInformation::modeString() const
@@ -290,10 +292,23 @@ const QString &SPropertyInstanceInformation::modeString() const
 
 void SPropertyInstanceInformation::setMode(Mode m)
   {
-  xAssert(!_compute);
-  if(!_compute)
+  if(_compute)
     {
-    _mode = m;
+    if(m == Internal)
+      {
+      _mode = InternalComputed;
+      }
+    else
+      {
+      xAssertFail();
+      }
+    }
+  else
+    {
+    if(!_compute)
+      {
+      _mode = m;
+      }
     }
   }
 
@@ -333,6 +348,21 @@ void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation
   _affects = new xsize[2];
   _affects[0] = info->location();
   _affects[1] = 0;
+  }
+
+void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation **info, xsize size)
+  {
+  xAssert(!_affects);
+  xAssert(info);
+
+  _affects = new xsize[size+1];
+
+  for(xsize i = 0; i < size; ++i)
+    {
+    _affects[i] = info[i]->location();
+    }
+
+  _affects[size] = 0;
   }
 
 void SPropertyInstanceInformation::setAffects(xsize *affects)

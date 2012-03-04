@@ -198,7 +198,25 @@ Rectangle
         }
       }
 
-    // todo: input / output
+    var input = display.inputItem;
+    if(input.intersect)
+      {
+      var hit = input.intersect(x, y);
+      if(hit)
+        {
+        return hit;
+        }
+      }
+
+    var output = display.outputItem;
+    if(output.intersect)
+      {
+      var hit = output.intersect(x, y);
+      if(hit)
+        {
+        return hit;
+        }
+      }
 
     return null;
     }
@@ -283,10 +301,11 @@ Rectangle
 
   function editConnection(conn, mode, x, y)
     {
-    destroyOnConnectionComplete = conn;
-    destroyOnConnectionComplete.visible = false;
+    display.destroyConnection(conn);
+    //destroyOnConnectionComplete = conn;
+    //destroyOnConnectionComplete.visible = false;
 
-    var output = mode !== "input";
+    /*var output = mode !== "input";
 
     currentInputDraggingItem = output ? conn.driver : conn.driven;
     currentInputBeginMode = mode;
@@ -324,7 +343,7 @@ Rectangle
       {
       currentInputDragging.firstNormal.x = -100
       currentInputDragging.lastNormal.x = 100
-      }
+      }*/
     }
 
   function moveCreatingConnection(x, y)
@@ -360,8 +379,8 @@ Rectangle
         }
 
       display.destroyConnection(destroyOnConnectionComplete);
-      destroyOnConnectionComplete = null;
       }
+    destroyOnConnectionComplete = null;
 
     var intersectedItemParent = intersect(x, y);
 
@@ -428,7 +447,7 @@ Rectangle
 
       if(mouse.button === Qt.RightButton)
         {
-        external.emitRequest("contextMenu", [ mouse.x, mouse.y ]);
+        external.emitRequest("contextMenu", [ mouse.x, mouse.y, display.path ]);
         mouse.accepted = true;
         return;
         }

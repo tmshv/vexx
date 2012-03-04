@@ -4,7 +4,7 @@
 #include "sentity.h"
 #include "mcmathsoperation.h"
 
-class MCSource : public SEntity
+class MATHSCORE_EXPORT MCSource : public SEntity
   {
   S_ENTITY(MCSource, SEntity, 0);
 

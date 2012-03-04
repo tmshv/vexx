@@ -49,6 +49,7 @@ void UIDatabaseDebugSurface::contextMenu(QPoint point)
     {
     _clickedItem = (SProperty *)index.internalPointer();
 
+    menu.addAction(_clickedItem->isDirty() ? "Dirty" : "Not Dirty", this, SLOT(swapDirty()));
 
     QString path = _clickedItem->path();
     menu.addAction("Copy Path \"" + path + "\"", this, SLOT(copyPath()));
@@ -136,6 +137,18 @@ void UIDatabaseDebugSurface::copyPath()
 
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(path);
+  }
+
+void UIDatabaseDebugSurface::swapDirty()
+  {
+  if(_clickedItem)
+    {
+    _clickedItem->postSet();
+    }
+  else
+    {
+    _clickedItem->update();
+    }
   }
 
 void UIDatabaseDebugSurface::disconnectInput()

@@ -5,6 +5,7 @@ NodeItem {
   id: nodeItem
   property real propertyTabIn: 10
   property bool selected: false
+  property variant propertiesSection: null
 
   driverPoint: header.driverPoint()
   drivenPoint: header.drivenPoint()
@@ -137,6 +138,32 @@ NodeItem {
           onClick: {
             shouldSelect = true;
             nodecanvas.bringToTop(nodeItem);
+            }
+
+          onRightClick: {
+            if(propertiesSection && propertiesSection.visible)
+              {
+              propertiesSection.visible = false;
+              return;
+              }
+
+            if(!propertiesSection)
+              {
+              var component = Qt.createComponent("Properties.qml");
+
+              if(component.status === Component.Error)
+                {
+                // Error Handling
+                console.log("Error loading Input component:", component.errorString());
+                return;
+                }
+
+              propertiesSection = component.createObject(nodeItem);
+              propertiesSection.x = (function() { return node.width; });
+              }
+
+
+            propertiesSection.visible = true;
             }
 
           onClickReleased: {

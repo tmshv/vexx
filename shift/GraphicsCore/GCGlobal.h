@@ -12,8 +12,8 @@
 
 
 #define GCProfileScope 1090
-#define GCProfileFunction XProfileFunction(GCProfileScope)
-#define GCProfileFunctionScopedBlock(mess) XProfileScopedBlock(GCProfileScope, mess)
+#define GCProfileFunction XProfileFunctionBase(GCProfileScope)
+#define GCProfileFunctionScopedBlock(mess) XProfileScopedBlockBase(GCProfileScope, mess)
 
 S_DEFINE_INTERFACE_TYPE(GCShaderBindableInterface, 50)
 S_DEFINE_INTERFACE_TYPE(ManipulatableInterface, 51)

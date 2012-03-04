@@ -4,19 +4,21 @@
 #include "syglobal.h"
 #include "sbaseproperties.h"
 #include "sarrayproperty.h"
+#include "mcmathsoperation.h"
 
 class QImage;
 
-class SYNAPSECORE_EXPORT SyImageBase : public SPropertyContainer
+class SYNAPSECORE_EXPORT SyImageBase : public MCMathsOperation
   {
-  S_PROPERTY_CONTAINER(SyImageBase, SPropertyContainer, 0);
+  S_PROPERTY(SyImageBase, MCMathsOperation, 0);
+
 public:
   SyImageBase();
 
-  SFloatArrayProperty image;
+  void loadQImage(const QImage &, bool premult);
 
-  void loadQImage(const QImage &);
-  QImage asQImage() const;
+private:
+  XMathsOperation _preOperation;
   };
 
 #endif // SYIMAGEBASE_H

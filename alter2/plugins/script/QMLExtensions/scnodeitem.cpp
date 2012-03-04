@@ -1,6 +1,8 @@
 #include "scnodeitem.h"
 #include "sentity.h"
 #include "sinterfaces.h"
+#include "UI/sentityui.h"
+#include "QGraphicsProxyWidget"
 
 ScNodeItem::ScNodeItem(QDeclarativeItem *parent) :
   ScPropertyItem(parent)
@@ -67,6 +69,40 @@ void ScNodeItem::setPosition(float x, float y)
   {
   setPos(x, y);
   positionChanged();
+  }
+
+QVariantMap ScNodeItem::createPropertiesSection(QDeclarativeItem *parent, QColor labelColour, float expectedWidth, float expectedHeight)
+  {
+  SEntityUI ui;
+  bool added = false;
+  QWidget *widg = ui.createControlWidget(property()->entity(), 0, &added);
+
+  QPalette pal = widg->palette();
+  pal.setColor(QPalette::Background, Qt::transparent);
+  pal.setColor(QPalette::WindowText, labelColour);
+  widg->setPalette(pal);
+
+  QRect geo = widg->geometry();
+  if(expectedWidth > 0)
+    {
+    geo.setWidth(expectedWidth);
+    }
+  if(expectedHeight > 0)
+    {
+    geo.setHeight(expectedHeight);
+    }
+  widg->setGeometry(geo);
+
+  QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(parent);
+  proxy->setWidget(widg);
+
+  QSizeF s = proxy->size();
+
+  QVariantMap r;
+  r["width"] = s.width();
+  r["height"] = s.height();
+  r["anyControls"] = added;
+  return r;
   }
 
 void ScNodeItem::positionChanged()

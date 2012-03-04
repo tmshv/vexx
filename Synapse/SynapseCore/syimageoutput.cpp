@@ -1,8 +1,16 @@
 #include "syimageoutput.h"
 
-S_PROPERTY_CONTAINER_DEFINITION(SyImageOutput, SyImageBase)
-S_PROPERTY_CONTAINER_END_DEFINITION(SyImageOutput, SyImageBase, saveContainer, loadContainer)
+S_IMPLEMENT_PROPERTY(SyImageOutput)
+
+SPropertyInformation *SyImageOutput::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyImageOutput>("SyImageOutput");
+
+  //info.
+
+  return info;
+  }
 
 SyImageOutput::SyImageOutput()
-{
-}
+  {
+  }

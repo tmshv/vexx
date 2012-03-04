@@ -12,39 +12,23 @@ SPropertyInformation *MCMathsOperation::createTypeInformation()
   return info;
   }
 
-bool MCMathsOperation::saveResultToFile(QString filename)
+void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
   {
-  XMathsResult result(value());
+  MCProfileFunction
+  MCMathsOperation *to = t->uncheckedCastTo<MCMathsOperation>();
+  const MCMathsOperation *from = f->uncheckedCastTo<MCMathsOperation>();
 
-  if(result.dataType() == XMathsOperation::None)
-    {
-    qWarning() << "Saving invalid operation";
-    return false;
-    }
+  MCMathsOperation::ComputeLock l(to);
+  l.data()->copy(from->value());
+  }
 
-  if(result.dataType() != XMathsOperation::UnsignedInt)
-    {
-    xAssertFail();
-    return false;
-    }
+QImage MCMathsOperation::asQImage(const XVectorI2D &pt, xuint32 scale, xuint32 w, xuint32 h) const
+  {
+  MCProfileFunction
+  Eigen::Array<Eigen::Matrix<xint8, 4, 1>, Eigen::Dynamic, Eigen::Dynamic> arr(w, h);
+  XMathsResult result(value(), pt, scale, XMathsOperation::Byte, &arr);
 
-  xuint32* data = (xuint32*)result.data();
-  xsize stride = result.dataStride();
-  xsize w = result.dataWidth();
-  xsize h = result.dataHeight();
-  xsize channels = result.dataChannels();
-
-  QImage::Format fmt = QImage::Format_RGB888;
-  if(channels == 4)
-    {
-    fmt = QImage::Format_ARGB32;
-    }
-
-  if(!data)
-    {
-    xAssertFail();
-    return false;
-    }
+  QImage::Format fmt = QImage::Format_ARGB32;
 
   QImage im(w, h, fmt);
   uchar *bits = im.bits();
@@ -55,17 +39,25 @@ bool MCMathsOperation::saveResultToFile(QString filename)
     for(xuint32 x = 0; x < w; ++x)
       {
       xuint32 alpha = 255;
-      if(channels == 4)
+      /*if(channels == 4)
         {
         alpha = data[3];
-        }
+        }*/
 
-      *scanline = qRgba(data[0], data[1], data[2], alpha);
+      const Eigen::Matrix<xint8, 4, 1> &data = arr(x, y);
+
+      *scanline = qRgba(data(0), data(1), data(2), alpha);
       scanline++;
-      data = (xuint32*)((xuint8*)data + stride);
       }
     }
 
-  im.save(filename);
+  return im;
+  }
+
+bool MCMathsOperation::saveResultToFile(QString filename)
+  {/*
+  QImage im = asQImage();
+  im.save(filename);*/
+  return true;
   }
 

@@ -1,7 +1,13 @@
 #include "synode.h"
 
-S_ENTITY_DEFINITION(SyNode, SEntity)
-S_ENTITY_END_DEFINITION(SyNode, SEntity)
+S_IMPLEMENT_PROPERTY(SyNode)
+
+SPropertyInformation *SyNode::createTypeInformation()
+  {
+  SPropertyInformation *info = SPropertyInformation::create<SyNode>("SyNode");
+
+  return info;
+  }
 
 SyNode::SyNode()
 {
