@@ -43,6 +43,8 @@ public:
     void setLines( const XVector<unsigned int> & );
     void setTriangles( const XVector<unsigned int> & );
 
+    void setTriangles(const xuint32 *, xsize size);
+
     void setAttribute( const QString &, const XList<xReal> & );
     void setAttribute( const QString &, const XList<XVector2D> & );
     void setAttribute( const QString &, const XList<XVector3D> & );
@@ -52,6 +54,11 @@ public:
     void setAttribute( const QString &, const XVector<XVector2D> & );
     void setAttribute( const QString &, const XVector<XVector3D> & );
     void setAttribute( const QString &, const XVector<XVector4D> & );
+
+    void setAttribute( const QString &, const xReal *, xsize size );
+    void setAttribute( const QString &, const XVector2D *, xsize size );
+    void setAttribute( const QString &, const XVector3D *, xsize size );
+    void setAttribute( const QString &, const XVector4D *, xsize size );
 
     void removeAttribute( const QString & );
 

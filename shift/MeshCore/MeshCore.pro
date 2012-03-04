@@ -9,10 +9,11 @@ TEMPLATE = lib
 include("../../EksCore/GeneralOptions.pri")
 
 HEADERS += MeshCore.h \
-    MCCube.h \
     MCKernel.h \
     MCPolyhedron.h \
-    MCCGALSetup.h
+    MCCGALSetup.h \
+    MCGeometry.h \
+    MCCuboid.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift $$ROOT/shift/MeshCore
 
@@ -20,8 +21,9 @@ LIBS += -lshift -lEksCore -lEks3D -lShiftGraphicsCore
 
 SOURCES += \
     MeshCore.cpp \
-    MCCube.cpp \
-    MCPolyhedron.cpp
+    MCPolyhedron.cpp \
+    MCGeometry.cpp \
+    MCCuboid.cpp
 
 
 

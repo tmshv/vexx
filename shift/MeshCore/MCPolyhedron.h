@@ -5,6 +5,7 @@
 #include "MCCGALSetup.h"
 #include "MCKernel.h"
 #include "CGAL/Polyhedron_3.h"
+#include "CGAL/HalfedgeDS_vector.h"
 #include "XProperty"
 #include "sbaseproperties.h"
 
@@ -22,6 +23,7 @@ template <class Refs, typename Pt> struct MCVertex : public CGAL::HalfedgeDS_ver
 
 XProperties:
   XRefProperty(Point, point);
+  XRefProperty(XVector3D, normal);
   };
 
 class MCPolyhedronItems
@@ -48,9 +50,19 @@ public:
     };
   };
 
-typedef CGAL::Polyhedron_3<MCKernel, MCPolyhedronItems> MCPolyhedron;
+class MCPolyhedron : public CGAL::Polyhedron_3<MCKernel, MCPolyhedronItems>//, CGAL::HalfedgeDS_vector>
+  {
+public:
+  void computeNormals();
+  };
+
 typedef MCPolyhedron::Halfedge_handle MCHalfedgeHandle;
 
-DEFINE_POD_PROPERTY(MESHCORE_EXPORT, MCPolyhedronProperty, MCPolyhedron, MCPolyhedron(), 2000);
+class MESHCORE_EXPORT MCPolyhedronProperty : public SPODPropertyBase<MCPolyhedron, MCPolyhedronProperty>
+  {
+  S_PROPERTY(MCPolyhedronProperty, SProperty, 0)
+public:
+  static void assignProperty(const SProperty *p, SProperty *l );
+  };
 
 #endif // MCPOLYHEDRON_H

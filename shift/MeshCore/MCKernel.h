@@ -4,6 +4,7 @@
 #include "MCCGALSetup.h"
 #include "XGlobal"
 #include "XVector3D"
+#include "XPlane.h"
 #include <CGAL/Cartesian/Cartesian_base.h>
 #include <CGAL/Cartesian/Cartesian_base.h>
 #include <CGAL/Handle_for.h>
@@ -29,7 +30,7 @@ template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Ke
   typedef XVector3D                                   Vector_3;
   typedef XVector3D                                   Direction_3;
   typedef CGAL::LineC3<Kernel>                        Line_3;
-  typedef CGAL::PlaneC3<Kernel>                       Plane_3;
+  typedef XPlane                                      Plane_3;
   typedef CGAL::RayC3<Kernel>                         Ray_3;
   typedef CGAL::SegmentC3<Kernel>                     Segment_3;
   typedef CGAL::TriangleC3<Kernel>                    Triangle_3;

@@ -6,9 +6,6 @@
 #include "3D/Shaders/GCStandardSurface.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
-#include "3D/Renderable/GCCuboid.h"
-#include "3D/Renderable/GCSphere.h"
-#include "3D/Renderable/GCPlane.h"
 #include "saviewport.h"
 #include "QVBoxLayout"
 #include "QTextEdit"
@@ -54,9 +51,9 @@ public:
     GCGeometryTransform *transform = vp->addChild<GCGeometryTransform>("Transform");
     group->geometry.addPointer(transform);
 
-
-    GCPlane *shape = vp->addChild<GCPlane>("Sphere");
-    transform->geometry.setPointed(&shape->geometry);
+    const SPropertyInformation *info = STypeRegistry::findType("MCCuboid");
+    SProperty *shape = vp->addChild(info, "Cube");
+    transform->geometry.setPointed(shape->entity()->findChild("geometry")->castTo<GCGeometry>());
 
     vp->source.setPointed(msc);
     }

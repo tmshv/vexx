@@ -54,12 +54,7 @@ int main( int argc, char **argv )
   /*SPartDocument *part = db->db().addDocument<SPartDocument>();
   part->type = "GCShader";
   part->newFile();
-  part->createEditor()->show();
-
-  SPartDocument *part2 = db->db().addDocument<SPartDocument>();
-  part2->type = "SEntity";
-  part2->newFile();
-  part2->createEditor()->show();*/
+  part->createEditor()->show();*/
 
   return app.execute();
   }

@@ -120,6 +120,7 @@ protected:
   private:
     bool apply()
       {
+      property()->postSet();
       return true;
       }
     bool unApply()
@@ -320,7 +321,7 @@ S_PROPERTY_INTERFACE(name)
   S_IMPLEMENT_PROPERTY(name) \
   void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
     if(data.registerInterfaces) { \
-    info->addStaticInterface(new PODPropertyVariantInterface<name, name::Type>()); } } \
+    info->addStaticInterface(new PODPropertyVariantInterface<name, name::PODType>()); } } \
   name::name() { }
 
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);

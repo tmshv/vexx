@@ -1,11 +1,12 @@
 #ifndef GCDISTANCEMANIPULATOR_H
 #define GCDISTANCEMANIPULATOR_H
 
+#include "GCGlobal.h"
 #include "GCManipulator.h"
 #include "sbaseproperties.h"
 #include "sbasepointerproperties.h"
 
-class GCDistanceManipulator : public GCLinearDragManipulator
+class GRAPHICSCORE_EXPORT GCDistanceManipulator : public GCLinearDragManipulator
   {
   S_PROPERTY_CONTAINER(GCDistanceManipulator, GCLinearDragManipulator, 0);
 

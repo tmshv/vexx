@@ -7,7 +7,7 @@
 #include "sadocument.h"
 #include "scplugin.h"
 
-QScriptValue toScriptValue(QScriptEngine *eng, const SProperty *&ba)
+QScriptValue toScriptValue(QScriptEngine *, const SProperty *&ba)
   {
   xAssertFail();
   return ScEmbeddedTypes::packValue((SProperty *)ba);

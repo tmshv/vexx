@@ -39,7 +39,7 @@ db.types.registerType({
     {
       "name": "Frag",
       "type": "GCFragmentShaderComponent",
-      "defaultValue": "varying vec3 normal;\nuniform vec4 ambient;\nuniform vec4 diffuse;\n\nvoid main(void)\n  {\n  vec3 lightDir = vec3(-0.7, -0.8, -1.0);\n  float dot = max(0.0, dot(normal, -lightDir));\n  gl_FragColor = ambient + dot * diffuse;\n  }\n"
+      "defaultValue": "varying vec3 normal;\nuniform vec4 ambient;\nuniform vec4 diffuse;\n\nvoid main(void)\n  {\n  vec3 normalisedNormal = normalize(normal);\n  vec3 lightDir = vec3(-0.7, -0.8, -1.0);\n  float dot = max(0.0, dot(normalisedNormal, -lightDir));\n  gl_FragColor = ambient + dot * diffuse;\n  }\n"
     }
   ]
 });

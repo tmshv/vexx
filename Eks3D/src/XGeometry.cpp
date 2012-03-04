@@ -99,6 +99,13 @@ void XGeometry::setTriangles( const XVector<unsigned int> &v )
   _changedT = true;
   }
 
+void XGeometry::setTriangles(const xuint32 *in, xsize size)
+  {
+  _triangles.resize(size);
+  memcpy(_triangles.data(), in, size*sizeof(xuint32));
+  _changedT = true;
+  }
+
 void XGeometry::setAttribute( const QString &n, const XVector<xReal> &v )
   {
   if( v.size() )
@@ -173,6 +180,38 @@ void XGeometry::setAttribute( const QString &n, const XVector<XVector4D> &v )
     }
   _changedA4 << n;
   _changedAttrs = true;
+  }
+
+void XGeometry::setAttribute( const QString &n, const xReal *in, xsize size )
+  {
+  QVector<xReal> vec;
+  vec.resize(size);
+  memcpy(vec.data(), in, size*sizeof(xReal));
+  setAttribute(n, vec);
+  }
+
+void XGeometry::setAttribute( const QString &n, const XVector2D *in, xsize size )
+  {
+  QVector<XVector2D> vec;
+  vec.resize(size);
+  memcpy(vec.data(), in, size*sizeof(XVector2D));
+  setAttribute(n, vec);
+  }
+
+void XGeometry::setAttribute( const QString &n, const XVector3D *in, xsize size )
+  {
+  QVector<XVector3D> vec;
+  vec.resize(size);
+  memcpy(vec.data(), in, size*sizeof(XVector3D));
+  setAttribute(n, vec);
+  }
+
+void XGeometry::setAttribute( const QString &n, const XVector4D *in, xsize size )
+  {
+  QVector<XVector4D> vec;
+  vec.resize(size);
+  memcpy(vec.data(), in, size*sizeof(XVector4D));
+  setAttribute(n, vec);
   }
 
 void XGeometry::removeAttribute( const QString &in )

@@ -2,6 +2,7 @@
 #define MCCGALSETUP_H
 
 #include "QtGlobal"
+#include "XAssert"
 
 #ifdef Q_CC_MSVC
 # define CGAL_CFG_NO_NEXTAFTER

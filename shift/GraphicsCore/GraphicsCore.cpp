@@ -6,10 +6,6 @@
 #include "3D/GCTextureRenderTarget.h"
 #include "3D/GCTextureRenderTarget.h"
 
-#include "3D/Renderable/GCCuboid.h"
-#include "3D/Renderable/GCSphere.h"
-#include "3D/Renderable/GCPlane.h"
-
 #include "3D/GCCamera.h"
 #include "3D/GCTransform.h"
 #include "3D/GCRenderable.h"
@@ -37,8 +33,6 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCRuntimeGeometry::staticTypeInformation());
   STypeRegistry::addType(GCRuntimeShader::staticTypeInformation());
 
-
-  STypeRegistry::addType(GCGeometryAttribute::staticTypeInformation());
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
   STypeRegistry::addType(GCGeometryPointer::staticTypeInformation());
 
@@ -80,10 +74,6 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCScene::staticTypeInformation());
   STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
-
-  STypeRegistry::addType(GCCuboid::staticTypeInformation());
-  STypeRegistry::addType(GCSphere::staticTypeInformation());
-  STypeRegistry::addType(GCPlane::staticTypeInformation());
 
   STypeRegistry::addType(GCStandardSurface::staticTypeInformation());
 

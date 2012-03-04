@@ -11,11 +11,11 @@ void readValue(SLoader &, XShader &)
   xAssertFail();
   }
 
-IMPLEMENT_POD_PROPERTY(TransformProperty, XTransform);
-IMPLEMENT_POD_PROPERTY(ComplexTransformProperty, XComplexTransform);
-IMPLEMENT_POD_PROPERTY(GCRuntimeShader, XShader)
-IMPLEMENT_POD_PROPERTY(GCQImage, QImage)
-IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry, XGeometry)
+IMPLEMENT_POD_PROPERTY(TransformProperty);
+IMPLEMENT_POD_PROPERTY(ComplexTransformProperty);
+IMPLEMENT_POD_PROPERTY(GCRuntimeShader)
+IMPLEMENT_POD_PROPERTY(GCQImage)
+IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry)
 
 void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
   {

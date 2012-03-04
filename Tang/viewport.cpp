@@ -15,10 +15,8 @@
 #include "3D/Shaders/GCStandardSurface.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
-#include "3D/Renderable/GCCuboid.h"
 #include "3D/GCTexture.h"
-#include "3D/Renderable/GCPlane.h"
-#include "MCCube.h"
+#include "3D/GCGeometry.h"
 #include "object.h"
 
 class FractalGeometry : public SEntity
@@ -560,8 +558,9 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   group2->geometry.addPointer(transform2);
   transform2->transform = tr;
 
-  MCCube *cube = msc->addChild<MCCube>("Cube");
-  transform->geometry.setPointed(&cube->geometry);
+  const SPropertyInformation *info = STypeRegistry::findType("MCCuboid");
+  SProperty *shape = vp->addChild(info, "Cube");
+  transform->geometry.setPointed(shape->entity()->findChild("geometry")->castTo<GCGeometry>());
 
   STypeRegistry::addType(FractalGeometry::staticTypeInformation());
   FractalGeometry *geo = msc->addChild<FractalGeometry>("FractalGeometry");

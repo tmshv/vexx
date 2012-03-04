@@ -219,7 +219,13 @@ public:
     }
 
   Q_SLOT virtual void guiChanged( ) { propertyValue()->assign(toPlainText());}
-  void syncGUI() { setText( propertyValue()->value() ); }
+  void syncGUI()
+    {
+    if(toPlainText() != propertyValue()->value())
+      {
+      setText( propertyValue()->value() );
+      }
+    }
   };
 
 class SHIFT_EXPORT Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty>
