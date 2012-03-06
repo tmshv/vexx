@@ -26,7 +26,18 @@ template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Ke
   typedef CGAL::Iso_rectangleC2<Kernel>               Iso_rectangle_2;
   typedef CGAL::Aff_transformationC2<Kernel>          Aff_transformation_2;
 
-  typedef XVector3D                                   Point_3;
+
+  class Point_3 : public XVector3D
+    {
+  public:
+    Point_3() : XVector3D(XVector3D::Zero()) { }
+    Point_3(float x, float y, float z) : XVector3D(x, y, z) { }
+    Point_3(const XVector3D &p) : XVector3D(p) { }
+    Point_3(CGAL::Origin) : XVector3D(XVector3D::Zero()) { }
+    Point_3& operator=(const XVector3D& p) { *((XVector3D*)this) = p; return *this; }
+    Point_3(const Point_3 &p) : XVector3D(p) { }
+    };
+
   typedef XVector3D                                   Vector_3;
   typedef XVector3D                                   Direction_3;
   typedef CGAL::LineC3<Kernel>                        Line_3;

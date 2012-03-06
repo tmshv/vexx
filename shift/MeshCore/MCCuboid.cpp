@@ -52,21 +52,21 @@ void MCCuboid::computeGeometry(const SPropertyInstanceInformation*, MCCuboid* cu
 
   p.clear();
 
-  MCHalfedgeHandle h = p.make_tetrahedron(XVector3D(x, -y, -z),
-                                          XVector3D(-x, -y, z),
-                                          XVector3D(-x, -y, -z),
-                                          XVector3D(-x, y, -z));
+  MCHalfedgeHandle h = p.make_tetrahedron(MCKernel::Point_3(x, -y, -z),
+                                          MCKernel::Point_3(-x, -y, z),
+                                          MCKernel::Point_3(-x, -y, -z),
+                                          MCKernel::Point_3(-x, y, -z));
 
   MCHalfedgeHandle g = h->next()->opposite()->next();
   p.split_edge( h->next());
   p.split_edge( g->next());
   p.split_edge( g);
-  h->next()->vertex()->point()     = XVector3D(x, -y, z);
-  g->next()->vertex()->point()     = XVector3D(-x, y, z);
-  g->opposite()->vertex()->point() = XVector3D(x, y, -z);
+  h->next()->vertex()->point()     = MCKernel::Point_3(x, -y, z);
+  g->next()->vertex()->point()     = MCKernel::Point_3(-x, y, z);
+  g->opposite()->vertex()->point() = MCKernel::Point_3(x, y, -z);
   MCHalfedgeHandle f = p.split_facet( g->next(), g->next()->next()->next());
   MCHalfedgeHandle e = p.split_edge( f);
-  e->vertex()->point() = XVector3D(x, y, z);
+  e->vertex()->point() = MCKernel::Point_3(x, y, z);
   p.split_facet( e, f->next()->next());
 
   p.computeNormals();

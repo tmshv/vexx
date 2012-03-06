@@ -9,17 +9,17 @@
 #include "XProperty"
 #include "sbaseproperties.h"
 
-template <class Refs, typename Pt> struct MCVertex : public CGAL::HalfedgeDS_vertex_base<Refs>
+template <class Refs, class Pt> struct MCVertex : public CGAL::HalfedgeDS_vertex_base<Refs>
   {
   MCVertex()
     {
     }
 
-  MCVertex(const Pt& pt) : _point(pt)
+  typedef Pt Point;
+
+  MCVertex(const Point& pt) : _point(pt)
     {
     }
-
-  typedef Pt Point;
 
 XProperties:
   XRefProperty(Point, point);

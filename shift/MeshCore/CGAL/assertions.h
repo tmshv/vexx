@@ -1,9 +1,9 @@
-// Copyright (c) 1999  
+// Copyright (c) 1999
 // Utrecht University (The Netherlands),
 // ETH Zurich (Switzerland),
 // INRIA Sophia-Antipolis (France),
 // Max-Planck-Institute Saarbruecken (Germany),
-// and Tel-Aviv University (Israel).  All rights reserved. 
+// and Tel-Aviv University (Israel).  All rights reserved.
 //
 // This file is part of CGAL (www.cgal.org); you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License as
@@ -121,19 +121,19 @@ inline bool possibly(Uncertain<bool> c);
 #  if defined(CGAL_NO_ASSERTIONS)
 
 #    define CGAL_static_assertion(EX)
-  
+
 #    define CGAL_static_assertion_msg(EX,MSG)
 
 #  else // no CGAL_NO_ASSERTIONS
 
 #    define CGAL_static_assertion(EX)
-  
+
 #    define CGAL_static_assertion_msg(EX,MSG)
 
 #  endif // no CGAL_NO_ASSERTIONS
 
 #endif // if CGAL_CFG_NO_CPP0X_STATIC_ASSERT is true
-  
+
 #if defined(CGAL_NO_ASSERTIONS) || !defined(CGAL_CHECK_EXACTNESS)
 #  define CGAL_exactness_assertion(EX) (static_cast<void>(0))
 #  define CGAL_exactness_assertion_msg(EX,MSG) (static_cast<void>(0))
@@ -210,7 +210,7 @@ inline bool possibly(Uncertain<bool> c);
 #  define CGAL_expensive_precondition_code(CODE) CODE
 #endif // CGAL_NO_PRECONDITIONS
 
-#if defined(CGAL_NO_PRECONDITIONS) || !defined(CGAL_CHECK_EXACTNESS) || !defined(CGAL_CHECK_EXPENSIVE) 
+#if defined(CGAL_NO_PRECONDITIONS) || !defined(CGAL_CHECK_EXACTNESS) || !defined(CGAL_CHECK_EXPENSIVE)
 #  define CGAL_expensive_exactness_precondition(EX) (static_cast<void>(0))
 #  define CGAL_expensive_exactness_precondition_msg(EX,MSG) (static_cast<void>(0))
 #  define CGAL_expensive_exactness_precondition_code(CODE)
@@ -284,9 +284,9 @@ inline bool possibly(Uncertain<bool> c);
 #  define CGAL_warning_code(CODE)
 #else
 #  define CGAL_warning(EX) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__))
 #  define CGAL_warning_msg(EX,MSG) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__, MSG))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__, MSG))
 #  define CGAL_warning_code(CODE) CODE
 #endif // CGAL_NO_WARNINGS
 
@@ -296,9 +296,9 @@ inline bool possibly(Uncertain<bool> c);
 #  define CGAL_exactness_warning_code(CODE)
 #else
 #  define CGAL_exactness_warning(EX) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__))
 #  define CGAL_exactness_warning_msg(EX,MSG) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__, MSG))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__, MSG))
 #  define CGAL_exactness_warning_code(CODE) CODE
 #endif // CGAL_NO_WARNINGS
 
@@ -308,9 +308,9 @@ inline bool possibly(Uncertain<bool> c);
 #  define CGAL_expensive_warning_code(CODE)
 #else
 #  define CGAL_expensive_warning(EX) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__))
 #  define CGAL_expensive_warning_msg(EX,MSG) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__, MSG))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__, MSG))
 #  define CGAL_expensive_warning_code(CODE) CODE
 #endif // CGAL_NO_WARNINGS
 
@@ -320,9 +320,9 @@ inline bool possibly(Uncertain<bool> c);
 #  define CGAL_expensive_exactness_warning_code(CODE)
 #else
 #  define CGAL_expensive_exactness_warning(EX) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__))
 #  define CGAL_expensive_exactness_warning_msg(EX,MSG) \
-   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::warning_fail( # EX , __FILE__, __LINE__, MSG))
+   (CGAL::possibly(EX)?(static_cast<void>(0)): ::CGAL::assertion_fail( # EX , __FILE__, __LINE__, MSG))
 #  define CGAL_expensive_exactness_warning_code(CODE) CODE
 #endif // CGAL_NO_WARNINGS
 

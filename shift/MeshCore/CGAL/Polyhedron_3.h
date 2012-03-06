@@ -737,10 +737,11 @@ public:
                 12 + size_of_halfedges(),
                  4 + size_of_facets());
         HalfedgeDS_decorator<HDS> decorator(hds);
-        return make_tetrahedron( decorator.vertices_push_back( Vertex(p1)),
-                                 decorator.vertices_push_back( Vertex(p2)),
-                                 decorator.vertices_push_back( Vertex(p3)),
-                                 decorator.vertices_push_back( Vertex(p4)));
+
+        return make_tetrahedron( decorator.vertices_push_back( Vertex(Vertex::Point_3(p1))),
+                                 decorator.vertices_push_back( Vertex(Vertex::Point_3(p2))),
+                                 decorator.vertices_push_back( Vertex(Vertex::Point_3(p3))),
+                                 decorator.vertices_push_back( Vertex(Vertex::Point_3(p4))));
 
     }
 
