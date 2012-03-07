@@ -14,6 +14,7 @@ HEADERS += MeshCore.h \
     MCCGALSetup.h \
     MCGeometry.h \
     MCCuboid.h \
+    MCDensityShape.h \
     MCSphere.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift $$ROOT/shift/MeshCore
@@ -25,10 +26,11 @@ SOURCES += \
     MCPolyhedron.cpp \
     MCGeometry.cpp \
     MCCuboid.cpp \
-    MCSphere.cpp \
     MCCGALCore.cpp \
     MCCGALRandom.cpp \
-    MCCGALTimer.cpp
+    MCCGALTimer.cpp \
+    MCDensityShape.cpp \
+    MCSphere.cpp
 
 
 

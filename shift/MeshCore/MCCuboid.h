@@ -1,29 +1,25 @@
-#ifndef MCCUBOID_H
-#define MCCUBOID_H
+#ifndef MCSPHERE_H
+#define MCSPHERE_H
 
-#include "MeshCore.h"
-#include "sentity.h"
-#include "MCGeometry.h"
+#include "MCDensityShape.h"
 #include "3D/Manipulators/GCManipulator.h"
 
-class MESHCORE_EXPORT MCCuboid : public SEntity, public GCManipulatable
+class MCSphere : public MCDensityShape, public GCManipulatable
   {
-  S_ENTITY(MCCuboid, SEntity, 0)
+  S_ENTITY(MCSphere, MCDensityShape, 0)
 
 public:
-  MCCuboid();
-  ~MCCuboid();
+  MCSphere();
 
-  MCGeometry geometry;
+  FloatProperty radius;
 
-  FloatProperty width;
-  FloatProperty height;
-  FloatProperty depth;
-
-  void addManipulators(SPropertyArray *, const GCTransform *tr=0);
+  virtual float boundingRadius() const { return radius()+0.5f; }
+  virtual float minimumSurfaceAngle() const { return 30.0f; }
+  virtual float maximumApproximateTriangleSize() const { return 0.75f*radius(); }
+  virtual float evaluate(const XVector3D &p) const;
 
 private:
-  static void computeGeometry(const SPropertyInstanceInformation*, MCCuboid* cube);
+  virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
-#endif // MCCUBOID_H
+#endif // MCSPHERE_H

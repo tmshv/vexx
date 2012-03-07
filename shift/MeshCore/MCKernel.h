@@ -6,9 +6,14 @@
 #include "XVector3D"
 #include "XPlane.h"
 #include <CGAL/Cartesian/Cartesian_base.h>
-#include <CGAL/Cartesian/Cartesian_base.h>
 #include <CGAL/Handle_for.h>
 #include <CGAL/Kernel/Type_equality_wrapper.h>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+
+typedef CGAL::Simple_cartesian<float>::Point_3 F3;
+typedef CGAL::Simple_cartesian<double>::Point_3 D3;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_3 EPICK3;
 
 template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Kernel_, xReal>
   {
@@ -33,6 +38,9 @@ template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Ke
     Point_3() : XVector3D(XVector3D::Zero()) { }
     Point_3(float x, float y, float z) : XVector3D(x, y, z) { }
     Point_3(const XVector3D &p) : XVector3D(p) { }
+    Point_3(const F3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
+    Point_3(const D3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
+    Point_3(const EPICK3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
     Point_3(CGAL::Origin) : XVector3D(XVector3D::Zero()) { }
     Point_3& operator=(const XVector3D& p) { *((XVector3D*)this) = p; return *this; }
     Point_3(const Point_3 &p) : XVector3D(p) { }

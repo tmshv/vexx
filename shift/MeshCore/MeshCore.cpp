@@ -3,6 +3,8 @@
 
 #include "MCGeometry.h"
 #include "MCCuboid.h"
+#include "MCDensityShape.h"
+#include "MCSphere.h"
 #include "MCPolyhedron.h"
 
 void initiateMeshCore()
@@ -10,5 +12,8 @@ void initiateMeshCore()
   STypeRegistry::addType(MCPolyhedronProperty::staticTypeInformation());
   STypeRegistry::addType(MCGeometry::staticTypeInformation());
 
+  STypeRegistry::addType(MCDensityShape::staticTypeInformation());
+
   STypeRegistry::addType(MCCuboid::staticTypeInformation());
+  STypeRegistry::addType(MCSphere::staticTypeInformation());
   }
