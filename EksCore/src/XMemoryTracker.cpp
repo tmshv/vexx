@@ -1,6 +1,6 @@
 #include "XMemoryTracker"
 
-XMemoryTracker::XMemoryTracker(XAllocatorBase* forwarder) : _forwarder(forwarder)
+XMemoryTracker::XMemoryTracker(XAllocatorBase* forwarder) : _forwarder(forwarder), _liveAllocations(0)
   {
   }
 
