@@ -15,7 +15,9 @@ QT += opengl \
 SOURCES += main.cpp \
     viewport.cpp \
     webview.cpp \
-    object.cpp
+    object.cpp \
+    componentdocument.cpp \
+    component.cpp
 
 LIBS += -lEksCore \
     -lEksScript \
@@ -45,7 +47,12 @@ INCLUDEPATH += ../include \
 HEADERS += \
     viewport.h \
     webview.h \
-    object.h
+    object.h \
+    componentdocument.h \
+    component.h
+
+OTHER_FILES += \
+    startupTang.js
 
 
 

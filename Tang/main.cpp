@@ -7,6 +7,8 @@
 #include "webview.h"
 #include "GraphicsCore.h"
 #include "MeshCore.h"
+#include "component.h"
+#include "componentdocument.h"
 #include "saparteditor.h"
 
 int main( int argc, char **argv )
@@ -16,6 +18,10 @@ int main( int argc, char **argv )
   app.addDirectory(ACore::rootPath());
   app.load("UI");
   app.load("script");
+
+#ifdef X_DEBUG
+  app.addDirectory(ACore::rootPath() + "../Tang");
+#endif
 
   APlugin<ScPlugin> script(app, "script");
   if(!script.isValid())
@@ -49,12 +55,18 @@ int main( int argc, char **argv )
 
   ui->addSurface(webData);
 
+
+  STypeRegistry::addType(Component::staticTypeInformation());
+  STypeRegistry::addType(ComponentDocument::staticTypeInformation());
+  Component::staticTypeInformation()->addStaticInterface(new ComponentEditorInterface);
+
+  script->include("startupTang.js");
+
   ui->show();
 
-  /*SPartDocument *part = db->db().addDocument<SPartDocument>();
-  part->type = "GCShader";
+  ComponentDocument *part = db->db().addDocument<ComponentDocument>();
   part->newFile();
-  part->createEditor()->show();*/
+  part->createEditor()->show();
 
   return app.execute();
   }

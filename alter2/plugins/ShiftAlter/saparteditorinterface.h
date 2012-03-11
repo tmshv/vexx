@@ -88,7 +88,7 @@ public slots:
   void editType(const QString &);
   };
 
-class SDefaultPartEditorInterface : public SPartEditorInterface
+class SHIFTALTER_EXPORT SDefaultPartEditorInterface : public SPartEditorInterface
   {
 public:
   SDefaultPartEditorInterface();
