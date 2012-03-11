@@ -6,8 +6,9 @@
 #include "QDebug"
 #include "styperegistry.h"
 
-#include "XQtWrappers.h"
-#include "Serialisation/sjsonio.h"
+#ifdef X_DEBUG
+# include "XMemoryTracker"
+#endif
 
 S_IMPLEMENT_PROPERTY(SDatabase)
 
@@ -33,6 +34,16 @@ void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropert
 
 SDatabase::SDatabase()
   {
+  _memory = STypeRegistry::allocator();
+  xAssert(_memory);
+
+#ifdef X_DEBUG
+  XAllocatorBase* oldAllocator = _memory;
+  _memory = new XMemoryTracker(oldAllocator);
+#endif
+  xAssert(_memory);
+
+
   _handler = this;
   setDatabase(this);
   _info = staticTypeInformation();
@@ -46,12 +57,17 @@ SDatabase::~SDatabase()
 
   clearChanges();
 
-#if X_ASSERTS_ENABLED
-  if(!_memory.empty())
+#ifdef X_DEBUG
+  XMemoryTracker* tracker = dynamic_cast<XMemoryTracker*>(_memory);
+  xAssert(tracker);
+
+  if(!tracker->empty())
     {
-    _memory.debugDump();
+    //_memory.debugDump();
     xAssertFail();
     }
+  delete _memory;
+  _memory = 0;
 #endif
   }
 
@@ -102,7 +118,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   SProfileFunction
   xAssert(type);
 
-  SProperty *prop = (SProperty*)_memory.alloc(type->dynamicSize());
+  SProperty *prop = (SProperty*)_memory->alloc(type->dynamicSize());
   type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
 
   if(init)
@@ -130,7 +146,7 @@ void SDatabase::deleteProperty(SProperty *prop)
 void SDatabase::deleteDynamicProperty(SProperty *prop)
   {
   deleteProperty(prop);
-  _memory.free(prop);
+  _memory->free(prop);
   }
 
 void SDatabase::initiateInheritedDatabaseType(const SPropertyInformation *info)

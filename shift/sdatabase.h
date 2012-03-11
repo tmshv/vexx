@@ -29,7 +29,7 @@ public:
 
   XAllocatorBase *persistantAllocator()
     {
-    return &_memory;
+    return _memory;
     }
 
   bool stateStorageEnabled() const { return _stateStorageEnabled; }
@@ -51,7 +51,7 @@ private:
   void uninitiateProperty(SProperty *thisProp);
   void uninitiatePropertyFromMetaData(SPropertyContainer *container, const SPropertyInformation *mD);
 
-  XBucketAllocator _memory;
+  XAllocatorBase *_memory;
 
   bool _stateStorageEnabled;
 

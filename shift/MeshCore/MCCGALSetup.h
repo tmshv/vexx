@@ -3,6 +3,54 @@
 
 #include "QtGlobal"
 #include "XAssert"
+#include "styperegistry.h"
+
+template <typename T> class CGALAllocator
+  {
+public:
+  typedef T value_type;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+  typedef xsize size_type;
+  typedef xptrdiff difference_type;
+
+  template <typename O> struct rebind
+    {
+    typedef CGALAllocator<O> other;
+    };
+
+  pointer allocate(size_type n, void *h=0)
+    {
+    static XAllocatorBase* alloc = STypeRegistry::allocator();
+
+    (void)h;
+
+    return (pointer)alloc->alloc(sizeof(T)*n);
+    }
+
+  void deallocate(pointer p, size_type n)
+    {
+    static XAllocatorBase* alloc = STypeRegistry::allocator();
+
+    (void)n;
+    alloc->free(p);
+    }
+
+  void construct(pointer p, const_reference t)
+    {
+    new(p) T(t);
+    }
+
+  void destroy(pointer p)
+    {
+    (void)p;
+    p->~T();
+    }
+  };
+
+#define CGAL_ALLOCATOR(T) CGALAllocator<T>
 
 #ifdef Q_CC_MSVC
 # define CGAL_CFG_NO_NEXTAFTER

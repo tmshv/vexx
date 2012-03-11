@@ -5,6 +5,7 @@
 #include "sbasepointerproperties.h"
 #include "sdatabase.h"
 #include "XAllocatorBase"
+#include "XBucketAllocator"
 
 struct TypeData
   {
@@ -21,8 +22,7 @@ STypeRegistry::STypeRegistry()
 
 void STypeRegistry::initiate()
   {
-  XScriptEngine::initiate();
-  _internalTypes.allocator = XGlobalAllocator::instance();
+  _internalTypes.allocator = new XBucketAllocator();
 
   addType(SProperty::staticTypeInformation());
   addType(SPropertyContainer::staticTypeInformation());
@@ -68,6 +68,7 @@ void STypeRegistry::initiate()
 
 void STypeRegistry::terminate()
   {
+  delete _internalTypes.allocator;
   _internalTypes.allocator = 0;
 
   XScriptEngine::terminate();

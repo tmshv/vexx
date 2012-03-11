@@ -7,6 +7,7 @@
 class XAllocatorBase
   {
 public:
+  virtual ~XAllocatorBase() {}
   virtual void *alloc(xsize size, xsize alignment=X_ALIGN_BYTE_COUNT) = 0;
   virtual void free(void *mem) = 0;
   };

@@ -26,7 +26,8 @@ SOURCES += ../src/XObject.cpp \
     ../src/XBucketAllocator.cpp \
     ../src/XAssert.cpp \
     ../src/XCodeLocation.cpp \
-    ../src/XArrayMath.cpp
+    ../src/XArrayMath.cpp \
+    ../src/XMemoryTracker.cpp
 HEADERS += ../XObject \
     ../XGlobal \
     ../XVector \
@@ -141,7 +142,8 @@ HEADERS += ../XObject \
     ../XMathHelpers \
     ../XCodeLocation \
     ../XArrayMath \
-    ../XTemplateHelpers
+    ../XTemplateHelpers \
+    ../XMemoryTracker
 
 
 
