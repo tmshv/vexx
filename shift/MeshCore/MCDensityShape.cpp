@@ -38,7 +38,7 @@ typedef GT::Sphere_3 Sphere_3;
 typedef GT::Point_3 Point_3;
 typedef GT::FT FT;
 
-float MCDensityShape::evaluate(const XVector3D &p) const
+float MCDensityShape::evaluate(const XVector3D &) const
   {
   return 0;
   }

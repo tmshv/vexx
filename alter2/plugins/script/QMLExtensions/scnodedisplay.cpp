@@ -4,6 +4,7 @@
 #include "scconnectoritem.h"
 #include "sentity.h"
 #include "XAssert"
+#include "sbasepointerproperties.h"
 
 ScNodeDisplay::ScNodeDisplay(QDeclarativeItem *parent) : QDeclarativeItem(parent)
   {
@@ -80,7 +81,7 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
       {
       if(tC->before() == &_rootIndex->children)
         {
-        removeNode(ent);        
+        removeNode(ent);
         ent->removeConnectionObserver(this);
         return;
         }
@@ -549,5 +550,16 @@ void ScNodeDisplay::changeItemInput(QDeclarativeItem *item, QDeclarativeItem *ne
     qWarning() << "Invalid inputs to changeItemInput(...)";
     }
 
-  input->property()->connect(prop->property());
+  SProperty *drivenProp = prop->property();
+  PointerArray *pointerArray = drivenProp->castTo<PointerArray>();
+  if(pointerArray)
+    {
+    SBlock b(pointerArray->database());
+
+    pointerArray->addPointer(input->property());
+    }
+  else
+    {
+    input->property()->connect(drivenProp);
+    }
   }
