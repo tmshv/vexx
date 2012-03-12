@@ -22,6 +22,7 @@ class ScPropertyItem : public QDeclarativeItem
   Q_PROPERTY(QPointF drivenPoint READ drivenPoint WRITE setDrivenPoint)
   Q_PROPERTY(QPointF driverNormal READ driverNormal WRITE setDriverNormal)
   Q_PROPERTY(QPointF drivenNormal READ drivenNormal WRITE setDrivenNormal)
+  Q_PROPERTY(bool deletable READ deletable CONSTANT)
 
   XProperty(SProperty *, property, setProperty);
   XProperty(QPointF, driverPoint, setDriverPoint);
@@ -34,6 +35,9 @@ public:
 
   virtual const QString& name() const;
   virtual void setName(const QString& );
+
+  Q_INVOKABLE void remove();
+  bool deletable() const;
 
   bool hasChildren() const;
   QString mode() const;

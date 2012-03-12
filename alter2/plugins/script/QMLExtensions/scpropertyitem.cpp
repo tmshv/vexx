@@ -2,6 +2,8 @@
 #include "sinterfaces.h"
 #include "spropertyinformation.h"
 #include "scconnectoritem.h"
+#include "sentity.h"
+#include "sbasepointerproperties.h"
 
 ScPropertyItem::ScPropertyItem(QDeclarativeItem *parent) :
   QDeclarativeItem(parent)
@@ -25,6 +27,35 @@ void ScPropertyItem::setName(const QString& n)
 
   // todo, other changes, obsrver?
   emit nameChanged();
+  }
+
+void ScPropertyItem::remove()
+  {
+  SEntity* entity = _property->castTo<SEntity>();
+  Pointer* pointer = _property->castTo<Pointer>();
+  if(entity)
+    {
+    SPropertyArray *array = entity->parent()->castTo<SPropertyArray>();
+    if(array)
+      {
+      array->remove(entity);
+      }
+    }
+  else if(pointer)
+    {
+    PointerArray *array = pointer->parent()->castTo<PointerArray>();
+    if(array)
+      {
+      array->remove(pointer);
+      }
+    }
+  }
+
+bool ScPropertyItem::deletable() const
+  {
+  xAssert(_property);
+
+  return _property->isDynamic();
   }
 
 bool ScPropertyItem::hasChildren() const

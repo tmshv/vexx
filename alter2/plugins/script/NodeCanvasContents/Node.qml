@@ -126,10 +126,16 @@ NodeItem {
           text: nodeItem.name
           width: contents.width - 4
           showInterfaces: specialMode === ""
+          showClose: specialMode === "" && nodeItem.deletable
+
 
           property bool shouldSelect: false
 
           onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
+
+          onClose: {
+            nodeItem.remove();
+          }
 
           onEnter: {
             nodecanvas.setRootIndex(nodeItem);

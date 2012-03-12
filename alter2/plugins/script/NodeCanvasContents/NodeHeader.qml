@@ -7,7 +7,9 @@ Rectangle {
   property alias showInterfaces: nodeInputBlob.visible
   property bool dragging: false
   property alias text: headerText.text
+  property alias showClose: close.visible
 
+  signal close()
   signal click()
   signal clickReleased()
   signal rightClick()
@@ -90,6 +92,19 @@ Rectangle {
       color: Qt.darker(header.color, 2.0)
   }
 
+  Text {
+    id: close
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    anchors.margins: 5.0
+    horizontalAlignment: Text.AlignHCenter
+    verticalAlignment: Text.AlignVCenter
+    font.bold: true
+    font.pointSize: 10
+    text: "X"
+    color: Qt.darker(header.color, 2.0)
+  }
+
   MouseArea {
     property real lastX: 0
     property real lastY: 0
@@ -105,11 +120,18 @@ Rectangle {
         mouse.accepted = true;
         if(mouse.button === Qt.LeftButton)
           {
-          click();
-          dragging = true
-          var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
-          lastX = gc.x
-          lastY = gc.y
+          if(mouse.x > parent.width-15)
+            {
+            header.close();
+            }
+          else
+            {
+            click();
+            dragging = true
+            var gc = mapToItem(nodecanvas, mouse.x, mouse.y)
+            lastX = gc.x
+            lastY = gc.y
+            }
           }
         else if(mouse.button == Qt.RightButton)
           {
