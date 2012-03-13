@@ -21,7 +21,7 @@ template <typename JST> struct JSToNative<JST &>
   {
   typedef typename XScriptTypeInfo<JST>::Type &ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
     typedef JSToNative<JST*> Cast;
     typedef typename Cast::ResultType NH;
@@ -41,7 +41,7 @@ template <typename JST> struct JSToNative<JST const &>
   {
   typedef typename XScriptTypeInfo<JST>::Type const &ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
     typedef JSToNative<JST &> Cast;
     typedef typename Cast::ResultType NH;
@@ -53,38 +53,38 @@ template <typename JST> struct JSToNativeAbstract
   {
   typedef typename XScriptTypeInfo<JST>::NativeHandle ResultType;
 
-  ResultType operator()( v8::Handle<v8::Value> const & ) const
+  ResultType operator()( XScriptObject const & ) const
     {
     return 0;
     }
   };
 
-template <typename T> struct JSToNative<v8::Handle<T> >
-  {
-  typedef v8::Handle<T> ResultType;
+//template <typename T> struct JSToNative<XScriptObject>
+//  {
+//  typedef v8::Handle<T> ResultType;
 
-  ResultType operator()( v8::Handle<T> const & h ) const
-    {
-    return h;
-    }
-  };
+//  ResultType operator()( XScriptObject const & h ) const
+//    {
+//    return h;
+//    }
+//  };
 
-template <typename T> struct JSToNative<v8::Handle<T> const &> : JSToNative< v8::Handle<T> > {};
-template <typename T> struct JSToNative<v8::Handle<T> &> : JSToNative< v8::Handle<T> > {};
+//template <typename T> struct JSToNative<v8::Handle<T> const &> : JSToNative< v8::Handle<T> > {};
+//template <typename T> struct JSToNative<v8::Handle<T> &> : JSToNative< v8::Handle<T> > {};
 
-template <typename T> struct JSToNative<v8::Local<T> >
-  {
-  typedef v8::Local<T> ResultType;
+//template <typename T> struct JSToNative<v8::Local<T> >
+//  {
+//  typedef v8::Local<T> ResultType;
 
-  ResultType operator()( v8::Local<T> const & h ) const
-    {
-    return h;
-    }
-  };
+//  ResultType operator()( v8::Local<T> const & h ) const
+//    {
+//    return h;
+//    }
+//  };
 
-template <typename T> struct JSToNative<v8::Local<T> const &> : JSToNative< v8::Local<T> > {};
-template <typename T> struct JSToNative<v8::Local<T> &> : JSToNative< v8::Local<T> > {};
-
+//template <typename T> struct JSToNative<v8::Local<T> const &> : JSToNative< v8::Local<T> > {};
+//template <typename T> struct JSToNative<v8::Local<T> &> : JSToNative< v8::Local<T> > {};
+/*
 namespace
 {
 template <typename V8Type, bool (v8::Value::*IsA)() const> struct JSToNativeV8Type
@@ -111,7 +111,7 @@ template <> struct JSToNative<v8::Handle<v8::Array> const &> : JSToNative<v8::Ha
 template <> struct JSToNative<v8::Handle<v8::Function> > : JSToNativeV8Type<v8::Function, &v8::Value::IsFunction> {};
 template <> struct JSToNative<v8::Handle<v8::Function> &> : JSToNative<v8::Handle<v8::Function> > {};
 template <> struct JSToNative<v8::Handle<v8::Function> const &> : JSToNative<v8::Handle<v8::Function> > {};
-
+*/
 template <> struct JSToNative<void>
   {
   typedef void ResultType;
@@ -235,48 +235,45 @@ private:
 
 namespace
 {
-template <typename V8Type, typename Ret, bool (v8::Value::*IsA)() const> struct JSToNativeV8PODType
+template <typename Ret, Ret (XScriptObject::*ToA)() const> struct JSToNativePODType
   {
   typedef Ret ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
-    return (h.IsEmpty() || !((*h)->*IsA)())
-        ? 0
-        : V8Type::Cast(*h)->Value();
+    return ((*h)->*ToA)();
     }
   };
 
-template <typename ExtType> struct JSToNativeV8ExternalType
-    : JSToNativeV8PODType<v8::External, ExtType, &v8::Value::IsExternal>
+template <typename ExtType> struct JSToNativeExternalType
+    : JSToNativePODType<ExtType, &XScriptObject::toExternal>
   {
   };
 
-template <typename IntType> struct JSToNativeV8IntegerType
-    : JSToNativeV8PODType<v8::Integer, IntType, &v8::Value::IsNumber>
+template <typename IntType> struct JSToNativeIntegerType
+    : JSToNativePODType<IntType, &XScriptObject::toInteger>
   {
   };
 
-template <typename NumType> struct JSToNativeV8NumberType
-    : JSToNativeV8PODType<v8::Number, NumType, &v8::Value::IsNumber>
+template <typename NumType> struct JSToNativeNumberType
+    : JSToNativePODType<NumType, &XScriptObject::toNumber>
   {
   };
 }
 
-template <> struct JSToNative<void *> : JSToNativeV8ExternalType<void *> {};
-template <> struct JSToNative<void const *> : JSToNativeV8ExternalType<void const *> {};
+template <> struct JSToNative<void *> : JSToNativeExternalType<void *> {};
 
-template <> struct JSToNative<int8_t> : JSToNativeV8IntegerType<int8_t> {};
-template <> struct JSToNative<uint8_t> : JSToNativeV8IntegerType<uint8_t> {};
-template <> struct JSToNative<int16_t> : JSToNativeV8IntegerType<int16_t> {};
-template <> struct JSToNative<uint16_t> : JSToNativeV8IntegerType<uint16_t> {};
-template <> struct JSToNative<int32_t> : JSToNativeV8IntegerType<int32_t> {};
-template <> struct JSToNative<uint32_t> : JSToNativeV8IntegerType<uint32_t> {};
-template <> struct JSToNative<int64_t> : JSToNativeV8IntegerType<int64_t> {};
-template <> struct JSToNative<uint64_t> : JSToNativeV8IntegerType<uint64_t> {};
+template <> struct JSToNative<xint8> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint8> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint16> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint16> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint32> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint32> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint64> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint64> : JSToNativeIntegerType<xint64> {};
 
-template <> struct JSToNative<double> : JSToNativeV8IntegerType<double> {};
-template <> struct JSToNative<float> : JSToNativeV8IntegerType<float> {};
+template <> struct JSToNative<double> : JSToNativeNumberType<double> {};
+template <> struct JSToNative<float> : JSToNativeNumberType<double> {};
 
 template <> struct JSToNative<bool>
   {
@@ -292,13 +289,9 @@ template <> struct JSToNative<QString>
   {
   typedef QString ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
-    if(h->IsString())
-      {
-      v8::String::AsciiValue ascii(h->ToString());
-      return QString(*ascii);
-      }
+    return h.toString();
     }
   };
 
@@ -335,7 +328,7 @@ template <> struct NativeToJS< XIfElse< tmp::SameType<long long int,int64_t>::Va
 
 }
 
-template <typename NT> typename internal::JSToNative<NT>::ResultType from(v8::Handle<v8::Value> const &h)
+template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScriptObject const &h)
   {
   typedef internal::JSToNative<NT> F;
   return F()( h );

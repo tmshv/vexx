@@ -2,11 +2,11 @@
 
 XInterfaceBase::XInterfaceBase(xsize typeId,
                                const char *typeName,
-                               v8::Handle<v8::Value> ctor(v8::Arguments const &argv),
+                               XScriptObject ctor(v8::Arguments const &argv),
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount)
-  : _constructor(v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(ctor))),
+  : _constructor(v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor))),
     _prototype(v8::Persistent<v8::ObjectTemplate>::New(_constructor->PrototypeTemplate())),
     _typeName(typeName),
     _typeId(typeId),

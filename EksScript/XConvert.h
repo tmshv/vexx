@@ -2,10 +2,10 @@
 #define XCONVERT_H
 
 #include "XScriptTypeInfo.h"
+#include "XScriptObject.h"
 
 namespace XScriptConvert
 {
-
 
 template <typename T> inline const T &ptrMatcher(T *in, bool& valid)
 {
@@ -32,13 +32,13 @@ template <typename JST> struct JSToNative
   typedef typename XScriptTypeInfo<JST>::NativeHandle ResultType;
 
   //! Must be specialized to be useful.
-  ResultType operator()(v8::Handle<v8::Value> const &h) const;
+  ResultType operator()(XScriptObject const &h) const;
   };
 
 template <typename NT> struct NativeToJS
   {
   template <typename X>
-  v8::Handle<v8::Value> operator()( X const & ) const;
+  XScriptObject operator()( X const & ) const;
 
 private:
   typedef xCompileTimeAssertDef<false> NativeToJSMustBeSpecialized;

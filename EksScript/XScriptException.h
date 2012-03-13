@@ -3,10 +3,11 @@
 
 #include "QString"
 #include "XScriptGlobal.h"
-#include "v8.h"
 
-EKSSCRIPT_EXPORT v8::Handle<v8::Value> TossAsError( const QString &err );
-EKSSCRIPT_EXPORT v8::Handle<v8::Value> Toss(const QString &msg);
+class XScriptObject;
+
+EKSSCRIPT_EXPORT XScriptObject TossAsError( const QString &err );
+EKSSCRIPT_EXPORT XScriptObject Toss(const QString &msg);
 
 struct MissingThisException
   {
@@ -15,7 +16,7 @@ protected:
   template <typename T>
   void init()
   {
-    msg = QString("CastFromJS<%1>() returned NULL. Throwing to avoid dereferencing a NULL pointer!").arg(TypeName<T>::Value);
+    msg = QString("CastFromJS<%1>() returned NULL. Throwing to avoid dereferencing a NULL pointer!").arg(XScriptTypeName<T>::Value);
   }
   MissingThisException() {}
 

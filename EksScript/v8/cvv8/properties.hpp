@@ -211,7 +211,7 @@ namespace cvv8 {
     */
     struct ThrowingSetter : XAccessorSetterType
     {
-        inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::AccessorInfo &)
+        inline static void Set(XScriptObject property, XScriptObject, const v8::AccessorInfo &)
         {
           Toss(QString("Native member property setter '%1' is configured to throw an exception when modifying this read-only member!").arg(XScriptConvert::from<QString>(property)));
         }

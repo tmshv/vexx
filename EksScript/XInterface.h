@@ -27,7 +27,7 @@ XProperties:
 public:
   XInterfaceBase(xsize typeID,
                  const char *typeName,
-                 v8::Handle<v8::Value> ctor(v8::Arguments const &argv),
+                 XScriptObject ctor(v8::Arguments const &argv),
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount);
@@ -307,7 +307,7 @@ private:
   /**
      Gets installed as the NewInstance() handler for T.
    */
-  static v8::Handle<v8::Value> ctor_proxy( v8::Arguments const & argv )
+  static XScriptObject ctor_proxy( v8::Arguments const & argv )
   {
       using namespace v8;
       if(cvv8::ClassCreator_AllowCtorWithoutNew<T>::Value)

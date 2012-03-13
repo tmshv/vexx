@@ -4,20 +4,7 @@
 #include "XScriptGlobal.h"
 #include "XInterface.h"
 
-class EKSSCRIPT_EXPORT XScriptObject
-  {
-  XScriptObject();
-  XScriptObject(bool x);
-  XScriptObject(xuint32 x);
-  XScriptObject(xint32 x);
-  XScriptObject(xuint64 x);
-  XScriptObject(xint64 x);
-  XScriptObject(double x);
-  XScriptObject(float x);
-
-private:
-  v8::Handle<v8::Value> _object;
-  };
+template <typename T> class XInterface;
 
 class EKSSCRIPT_EXPORT XInterfaceObject
   {

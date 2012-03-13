@@ -97,25 +97,25 @@ template <> struct JSToNative< XIfElse<
 
 template <> struct NativeToJS<bool>
   {
-  v8::Handle<v8::Value> operator()( bool v ) const
+  XScriptObject operator()( bool v ) const
     {
-    return v8::Boolean::New( v );
+    return XScriptObject( v );
     }
   };
 
-template <typename T> struct NativeToJS< ::v8::Handle<T> >
-  {
-  typedef ::v8::Handle<T> HandleType;
-  v8::Handle<v8::Value> operator()(HandleType const &li) const
-    {
-    return li;
-    }
-  };
+//template <typename T> struct NativeToJS< ::v8::Handle<T> >
+//  {
+//  typedef ::v8::Handle<T> HandleType;
+//  XScriptObject operator()(HandleType const &li) const
+//    {
+//    return li;
+//    }
+//  };
 
 template <typename T> struct NativeToJS< ::v8::Local<T> >
   {
   typedef ::v8::Local<T> HandleType;
-  v8::Handle<v8::Value> operator()(HandleType const &li) const
+  XScriptObject operator()(HandleType const &li) const
     {
     return li;
     }
@@ -124,7 +124,7 @@ template <typename T> struct NativeToJS< ::v8::Local<T> >
 template <typename T> struct NativeToJS< ::v8::Persistent<T> >
   {
   typedef ::v8::Persistent<T> HandleType;
-  v8::Handle<v8::Value> operator()(HandleType const &li) const
+  XScriptObject operator()(HandleType const &li) const
     {
     return li;
     }
@@ -132,26 +132,28 @@ template <typename T> struct NativeToJS< ::v8::Persistent<T> >
 
 template <> struct NativeToJS< ::v8::InvocationCallback >
   {
-  v8::Handle<v8::Value> operator()(::v8::InvocationCallback const f) const
+  XScriptObject operator()(::v8::InvocationCallback const f) const
     {
-    return ::v8::FunctionTemplate::New(f)->GetFunction();
+    xAssertFail();
+    return XScriptObject();
+    //return ::v8::FunctionTemplate::New(f)->GetFunction();
     }
   };
 
 template <> struct NativeToJS<char const *>
   {
-  v8::Handle<v8::Value> operator()(char const *v) const
+  XScriptObject operator()(char const *v) const
     {
-    if( ! v ) return v8::Null();
-    else return v8::String::New( v );
+    if(!v) return XScriptObject();
+    else return XScriptObject( v );
     }
   };
 
 template <> struct NativeToJS<QString>
   {
-  v8::Handle<v8::Value> operator()(QString v) const
+  XScriptObject operator()(QString v) const
     {
-    return v8::String::New( v.toUtf8().data() );
+    return XScriptObject(v);
     }
   };
 
@@ -159,10 +161,12 @@ template <> struct NativeToJS<QString>
 // that exception via v8::ThrowException().
 template <> struct NativeToJS<std::exception>
   {
-  v8::Handle<v8::Value> operator()( std::exception const & ex ) const
+  XScriptObject operator()( std::exception const & ex ) const
     {
-    char const *msg = ex.what();
-    return v8::Exception::Error(v8::String::New( msg ? msg : "unspecified std::exception" ));
+    xAssertFail();
+    return XScriptObject();
+    //char const *msg = ex.what();
+    //return v8::Exception::Error(v8::String::New( msg ? msg : "unspecified std::exception" ));
     }
   };
 
@@ -173,25 +177,25 @@ template <> struct NativeToJS<std::logic_error> : NativeToJS<std::exception> {};
 }
 
 // Overloads to avoid ambiguity in certain calls.
-static inline v8::Handle<v8::Value> to(char const *v)
+static inline XScriptObject to(char const *v)
   {
   typedef internal::NativeToJS<char const *> F;
   return F()( v );
   }
 
-static inline v8::Handle<v8::Value> to(v8::InvocationCallback v)
+static inline XScriptObject to(v8::InvocationCallback v)
   {
   typedef internal::NativeToJS<v8::InvocationCallback> F;
   return F()( v );
   }
 
-static inline v8::Handle<v8::Value> to(char *v)
+static inline XScriptObject to(char *v)
   {
   typedef internal::NativeToJS<char const *> F;
   return F()( v );
   }
 
-template <typename T> inline v8::Handle<v8::Value> to(T const &v)
+template <typename T> inline XScriptObject to(T const &v)
   {
   typedef internal::NativeToJS<T const> F;
   return F()( v );
