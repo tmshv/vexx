@@ -7,7 +7,10 @@
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
 
-namespace cvv8
+namespace XScriptConvert
+{
+
+namespace internal
 {
 
 template <typename JST> struct JSToNative<JST const> : JSToNative<JST> {};
@@ -16,7 +19,7 @@ template <typename JST> struct JSToNative<JST const *> : JSToNative<JST> {};
 
 template <typename JST> struct JSToNative<JST &>
   {
-  typedef typename TypeInfo<JST>::Type &ResultType;
+  typedef typename XScriptTypeInfo<JST>::Type &ResultType;
 
   ResultType operator()(v8::Handle<v8::Value> const &h) const
     {
@@ -36,7 +39,7 @@ template <typename JST> struct JSToNative<JST &>
 
 template <typename JST> struct JSToNative<JST const &>
   {
-  typedef typename TypeInfo<JST>::Type const &ResultType;
+  typedef typename XScriptTypeInfo<JST>::Type const &ResultType;
 
   ResultType operator()(v8::Handle<v8::Value> const &h) const
     {
@@ -48,7 +51,7 @@ template <typename JST> struct JSToNative<JST const &>
 
 template <typename JST> struct JSToNativeAbstract
   {
-  typedef typename TypeInfo<JST>::NativeHandle ResultType;
+  typedef typename XScriptTypeInfo<JST>::NativeHandle ResultType;
 
   ResultType operator()( v8::Handle<v8::Value> const & ) const
     {
@@ -126,7 +129,7 @@ template <typename T,
 struct JSToNativeObjectWithInternalFields
   {
 public:
-  typedef typename TypeInfo<T>::NativeHandle ResultType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
   ResultType operator()(v8::Handle<v8::Value> const &h) const
     {
@@ -181,7 +184,7 @@ template <typename T,
 struct JSToNativeObjectWithInternalFieldsTypeSafe
   {
 public:
-  typedef typename TypeInfo<T>::NativeHandle ResultType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
   ResultType operator()(v8::Handle<v8::Value> const &h) const
     {
@@ -285,6 +288,20 @@ template <> struct JSToNative<bool>
     }
   };
 
+template <> struct JSToNative<QString>
+  {
+  typedef QString ResultType;
+
+  ResultType operator()(v8::Handle<v8::Value> const &h) const
+    {
+    if(h->IsString())
+      {
+      v8::String::AsciiValue ascii(h->ToString());
+      return QString(*ascii);
+      }
+    }
+  };
+
 namespace
 {
 template <typename T> struct UselessConversionTypeToNative
@@ -316,9 +333,11 @@ template <> struct NativeToJS< XIfElse< tmp::SameType<long long int,int64_t>::Va
   };
 #endif
 
-template <typename NT> typename JSToNative<NT>::ResultType CastFromScript(v8::Handle<v8::Value> const &h)
+}
+
+template <typename NT> typename internal::JSToNative<NT>::ResultType from(v8::Handle<v8::Value> const &h)
   {
-  typedef JSToNative<NT> F;
+  typedef internal::JSToNative<NT> F;
   return F()( h );
   }
 

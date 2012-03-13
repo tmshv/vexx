@@ -4,7 +4,10 @@
 #include "XConvertFromScript.h"
 #include "XConvertToScript.h"
 
-namespace cvv8
+namespace XScriptConvert
+{
+
+namespace internal
 {
 
 template <>struct JSToNative<std::string>
@@ -134,6 +137,8 @@ struct JSToNative_map
     }
   };
 #endif
+
+}
 }
 
 #endif // XCONVERTSCRIPTSTL_H

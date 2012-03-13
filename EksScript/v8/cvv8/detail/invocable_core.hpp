@@ -493,7 +493,7 @@ namespace Detail {
         typedef XMethodSignature<T,Sig> XSignatureType;
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename XSignatureType::FunctionType FunctionType;
-        typedef typename TypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::Type Type;
         static ReturnType CallNative( T & self, FunctionType func, v8::Arguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -620,7 +620,7 @@ namespace Detail {
     public:
         typedef XMethodSignature<T,RV (v8::Arguments const &)> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
-        typedef typename TypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XSignatureType::ReturnType ReturnType;
         static ReturnType CallNative( Type & self, FunctionType func, v8::Arguments const & argv )
         {
@@ -759,7 +759,7 @@ namespace Detail {
         typedef XConstMethodSignature<T,Sig> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        typedef typename TypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::Type Type;
         static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
@@ -802,7 +802,7 @@ namespace Detail {
         typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        typedef typename TypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::Type Type;
         static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );

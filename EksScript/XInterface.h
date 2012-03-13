@@ -10,6 +10,7 @@
 #include "XMacroHelpers"
 #include "cvv8/properties.hpp"
 #include "cvv8/ClassCreator.hpp"
+#include "XConvertToScript.h"
 
 class EKSSCRIPT_EXPORT XInterfaceBase
   {
@@ -215,8 +216,8 @@ private:
       using namespace v8;
       //std::cerr << "Entering weak_dtor<>(native="<<(void const *)nobj<<")\n";
       Local<Object> jobj( Object::Cast(*pv) );
-      typedef typename cvv8::JSToNative<T>::ResultType NT;
-      NT native = cvv8::CastFromJS<T>( pv );
+      typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NT;
+      NT native = XScriptConvert::from<T>( pv );
       if( !native )
       {
           /* see: http://code.google.com/p/v8-juice/issues/detail?id=27
@@ -262,7 +263,8 @@ private:
           WeakWrap::Unwrap( nholder /*jobj? subtle difference!*/, native );
           if( nholder.IsEmpty() || (nholder->InternalFieldCount() != InternalFields::Count) )
           {
-              cvv8::StringBuffer msg;
+            xAssertFail();
+            /*  cvv8::StringBuffer msg;
               msg << "SERIOUS INTERNAL ERROR:\n"
                   << "ClassCreator<T>::weak_dtor() "
                   << "validated that the JS/Native belong together, but "
@@ -274,10 +276,10 @@ private:
                   << ", nholder field count="<<nholder->InternalFieldCount()
                   << ", jobj field count="<<jobj->InternalFieldCount()
                   << "\nTHIS MAY LEAD TO A CRASH IF THIS JS HANDLE IS USED AGAIN!!!\n"
-                  ;
+                  ;*/
               Factory::Delete(native);
               pv.Dispose(); pv.Clear(); /* see comments below!*/
-              v8::ThrowException(msg.toError());
+              Toss("SERIOUS INTERNAL ERROR");
               return;
           }
           else
@@ -333,7 +335,7 @@ private:
           */
           if (!argv.IsConstructCall())
           {
-            return cvv8::Toss("This constructor cannot be called as function!");
+            return Toss("This constructor cannot be called as function!");
           }
       }
       Local<Object> const & jobj( argv.This()
@@ -358,7 +360,7 @@ private:
           nobj = Factory::Create( self, argv );
           if( ! nobj )
           {
-            return cvv8::CastToJS<std::exception>(std::runtime_error("Native constructor failed."));
+            return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
           }
           WeakWrap::Wrap( self, nobj );
           self.MakeWeak( nobj, weak_dtor );
@@ -369,20 +371,20 @@ private:
           WeakWrap::Unwrap( self, nobj );
           if( nobj ) Factory::Delete( nobj );
           self.Clear();
-          return cvv8::Toss(cvv8::CastToJS(ex));
+          return Toss(ex.what());
       }
       catch(...)
       {
           WeakWrap::Unwrap( self, nobj );
           if( nobj ) Factory::Delete( nobj );
           self.Clear();
-          return cvv8::Toss("Native constructor threw an unknown exception!");
+          return Toss("Native constructor threw an unknown exception!");
       }
       return self;
     }
 
   XInterface() : XInterfaceBase((xsize)cvv8::ClassCreator_TypeID<T>::Value,
-                                cvv8::TypeInfo<T>::TypeName,
+                                XScriptTypeInfo<T>::TypeName,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
                                 InternalFields::NativeIndex,
@@ -407,7 +409,7 @@ namespace cvv8
       const XInterfaceBase* interface = findInterface<T>(n);
       v8::Handle<v8::Object> obj = interface->newInstance(0, 0);
 
-      out = cvv8::CastFromJS<T>(obj);
+      out = XScriptConvert::from<T>(obj);
       *out = *n;
       return obj;
     }
@@ -457,17 +459,6 @@ namespace cvv8
     }
   };
 
-  template <typename T> inline const T &PtrMatcher(T *in, bool& valid)
-  {
-    if(!in)
-    {
-      static T o;
-      valid = false;
-      return o;
-    }
-    return *in;
-  }
-
 #define X_SCRIPTABLE_CONSTRUCTOR_DEF(variable, type, n) variable,
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) cvv8::CtorForwarder<type *(const type &)>, cvv8::CtorForwarder<type *()> )> name;
@@ -477,33 +468,33 @@ X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__) \
 template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {};
 
 #define X_SCRIPTABLE_MATCHERS(type) \
-template <> const type& Match<const type&, type*>(type *in, bool& valid) { return PtrMatcher<type>(in, valid); }
+template <> const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
-  namespace cvv8 { \
   CVV8_TypeInfo_DECL(type); \
-  template <> struct JSToNative<type> : JSToNative_ClassCreator<type, false> {}; \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct JSToNative<type> : cvv8::JSToNative_ClassCreator<type, false> {}; } \
   X_SCRIPTABLE_MATCHERS(type) \
   }
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public cvv8::NativeToJSCopyableType<type> {}; } } \
   namespace cvv8 { \
-  template <> struct NativeToJS<type> : public NativeToJSCopyableType<type> {}; \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
   }
 
 #define X_SCRIPTABLE_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public cvv8::NativeToJSConvertableType<type> {}; } } \
   namespace cvv8 { \
-  template <> struct NativeToJS<type> : public NativeToJSConvertableType<type> {}; \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
   }
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
 
 #define X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name) \
-  namespace cvv8 { \
-  CVV8_TypeInfo_IMPL(type, name); \
-  }
+  CVV8_TypeInfo_IMPL(type, name);
 
 #define X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
 #define X_IMPLEMENT_SCRIPTABLE_TYPE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)

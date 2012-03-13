@@ -2,14 +2,9 @@
 #define CODE_GOOGLE_COM_P_V8_CONVERT_PROPERTIES_HPP_INCLUDED 1
 
 #include "invocable.hpp"
+#include "XConvertFromScript.h"
 
 namespace cvv8 {
-
-    template <typename Out, typename In> Out Match(In in, bool &valid)
-    {
-      valid = true;
-      return (Out)in;
-    }
 
     /**
         Marker class, primarily for documentation purposes.
@@ -158,7 +153,7 @@ namespace cvv8 {
         /** Implements the v8::AccessorGetter() interface. */
         inline static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info)
         {
-            typedef typename TypeInfo<T>::Type Type;
+            typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename JSToNative<T>::ResultType NativeHandle;
             NativeHandle self = CastFromJS<T>( info.This() );
             return ( ! self )
@@ -186,7 +181,7 @@ namespace cvv8 {
         /** Implements the v8::AccessorSetter() interface. */
         inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
         {
-            typedef typename TypeInfo<T>::Type Type;
+            typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename JSToNative<T>::ResultType NativeHandle;
             NativeHandle self = CastFromJS<T>( info.This() );
             if( self ) self->*MemVar = CastFromJS<PropertyType>( value );
@@ -218,7 +213,7 @@ namespace cvv8 {
     {
         inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::AccessorInfo &)
         {
-          Toss(StringBuffer("Native member property setter '%1' is configured to throw an exception when modifying this read-only member!").arg(toString(property)));
+          Toss(QString("Native member property setter '%1' is configured to throw an exception when modifying this read-only member!").arg(XScriptConvert::from<QString>(property)));
         }
     };
 
@@ -297,13 +292,12 @@ namespace cvv8 {
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
-            typedef typename TypeInfo<T>::Type Type;
-            typedef typename JSToNative<T>::ResultType NativeHandle;
-            NativeHandle self = CastFromJS<T>( info.This() );
+            typedef typename XScriptTypeInfo<T>::Type Type;
+            typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+            NativeHandle self = XScriptConvert::from<T>( info.This() );
             return self
-                ? CastToJS( (self->*Getter)() )
-                : Toss( StringBuffer() << "Native member property getter '"
-                      << property << "' could not access native This object!" );
+                ? XScriptConvert::to( (self->*Getter)() )
+                : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
         }
     };
 
@@ -315,13 +309,12 @@ namespace cvv8 {
     {
         inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
         {
-            typedef typename TypeInfo<T>::Type Type;
-            typedef typename JSToNative<T>::ResultType NativeHandle;
-            NativeHandle const self = CastFromJS<T>( info.This() );
+            typedef typename XScriptTypeInfo<T>::Type Type;
+            typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+            NativeHandle const self = XScriptConvert::from<T>( info.This() );
             return self
-                ? CastToJS( (self->*Getter)() )
-                : Toss( (StringBuffer() << "Native member property getter '"
-                       << property << "' could not access native This object!").toError() )
+                ? XScriptConvert::to( (self->*Getter)() )
+                : Toss(QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)))
                ;
         }
     };
@@ -331,32 +324,30 @@ namespace cvv8 {
     {
         static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
         {
-            typedef typename TypeInfo<T>::Type Type;
-            typedef typename JSToNative<T>::ResultType NativeHandle;
-            NativeHandle self = CastFromJS<NativeHandle>( info.This() );
+            typedef typename XScriptTypeInfo<T>::Type Type;
+            typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+            NativeHandle self = XScriptConvert::from<NativeHandle>( info.This() );
             if( ! self )
             {
-                Toss( StringBuffer() << "Native member property setter '"
-                     << property << "' could not access native This object!" );
+              Toss( QString("Native member property setter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
             }
             else
             {
 
-                typedef typename sl::At< 0, XSignature<void (TypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
+                typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
                 ArgCaster<ArgT> ac;
 
                 ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
 
                 bool valid = true;
-                InputArg in = Match<InputArg, ArgCaster<ArgT>::ResultType>(handle, valid);
+                InputArg in = XScriptConvert::match<InputArg, ArgCaster<ArgT>::ResultType>(handle, valid);
                 if(!valid)
                 {
-                    Toss( StringBuffer() << "Native member property setter '"
-                        << property << "' could convert input argument!" );
+                  Toss(QString("Native member property setter '%1' could convert input argument!").arg(XScriptConvert::from<QString>(property) ));
                 }
                 else
                 {
-                    (self->*Setter)( in );
+                  (self->*Setter)( in );
                 }
             }
             return;

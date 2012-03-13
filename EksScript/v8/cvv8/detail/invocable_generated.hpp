@@ -11,11 +11,11 @@ namespace Detail {
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0 );
         }
@@ -35,11 +35,11 @@ namespace Detail {
         static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0 );
         }
@@ -61,11 +61,11 @@ namespace Detail {
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
@@ -97,11 +97,11 @@ namespace Detail {
         static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
@@ -142,11 +142,11 @@ namespace Detail {
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
@@ -178,11 +178,11 @@ namespace Detail {
         static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
@@ -253,12 +253,12 @@ struct CtorForwarderProxy<Sig,1>
         else
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
-		
+
              typedef ArgCaster<A0> AC0;
-		
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0 );
         }
     }
@@ -276,13 +276,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1 );
         }
@@ -303,13 +303,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1 );
         }
@@ -332,13 +332,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
@@ -371,13 +371,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
@@ -419,13 +419,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
@@ -458,13 +458,13 @@ namespace Detail {
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
@@ -536,14 +536,14 @@ struct CtorForwarderProxy<Sig,2>
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		
+     typedef ArgCaster<A1> AC1;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1 );
         }
     }
@@ -562,15 +562,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2 );
         }
@@ -592,15 +592,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2 );
         }
@@ -624,15 +624,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
@@ -666,15 +666,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
@@ -717,15 +717,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
@@ -759,15 +759,15 @@ namespace Detail {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
@@ -840,16 +840,16 @@ struct CtorForwarderProxy<Sig,3>
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2 );
         }
     }
@@ -869,17 +869,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -902,17 +902,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -937,17 +937,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -982,17 +982,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -1036,17 +1036,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -1081,17 +1081,17 @@ namespace Detail {
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
@@ -1165,18 +1165,18 @@ struct CtorForwarderProxy<Sig,4>
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3 );
         }
     }
@@ -1197,19 +1197,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1233,19 +1233,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1271,19 +1271,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1319,19 +1319,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1376,19 +1376,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1424,19 +1424,19 @@ namespace Detail {
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
@@ -1511,20 +1511,20 @@ struct CtorForwarderProxy<Sig,5>
     typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4 );
         }
     }
@@ -1546,21 +1546,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1585,21 +1585,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1626,21 +1626,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1677,21 +1677,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1737,21 +1737,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1788,21 +1788,21 @@ namespace Detail {
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
@@ -1878,22 +1878,22 @@ struct CtorForwarderProxy<Sig,6>
     typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
     }
@@ -1916,23 +1916,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -1958,23 +1958,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -2002,23 +2002,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -2056,23 +2056,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -2119,23 +2119,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -2173,23 +2173,23 @@ namespace Detail {
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
@@ -2266,24 +2266,24 @@ struct CtorForwarderProxy<Sig,7>
     typedef typename sl::At< 4, XSignature<Sig> >::Type A4;
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
     }
@@ -2307,25 +2307,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2352,25 +2352,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2399,25 +2399,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2456,25 +2456,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2522,25 +2522,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2579,25 +2579,25 @@ namespace Detail {
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
@@ -2675,26 +2675,26 @@ struct CtorForwarderProxy<Sig,8>
     typedef typename sl::At< 5, XSignature<Sig> >::Type A5;
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
     }
@@ -2719,27 +2719,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -2767,27 +2767,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -2817,27 +2817,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -2877,27 +2877,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -2946,27 +2946,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -3006,27 +3006,27 @@ namespace Detail {
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
@@ -3105,28 +3105,28 @@ struct CtorForwarderProxy<Sig,9>
     typedef typename sl::At< 6, XSignature<Sig> >::Type A6;
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
     }
@@ -3152,29 +3152,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3203,29 +3203,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3256,29 +3256,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3319,29 +3319,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3391,29 +3391,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3454,29 +3454,29 @@ namespace Detail {
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
@@ -3556,30 +3556,30 @@ struct CtorForwarderProxy<Sig,10>
     typedef typename sl::At< 7, XSignature<Sig> >::Type A7;
     typedef typename sl::At< 8, XSignature<Sig> >::Type A8;
     typedef typename sl::At< 9, XSignature<Sig> >::Type A9;
-		
+
              typedef ArgCaster<A0> AC0;
-		 typedef ArgCaster<A1> AC1;
-		 typedef ArgCaster<A2> AC2;
-		 typedef ArgCaster<A3> AC3;
-		 typedef ArgCaster<A4> AC4;
-		 typedef ArgCaster<A5> AC5;
-		 typedef ArgCaster<A6> AC6;
-		 typedef ArgCaster<A7> AC7;
-		 typedef ArgCaster<A8> AC8;
-		 typedef ArgCaster<A9> AC9;
-		
+     typedef ArgCaster<A1> AC1;
+     typedef ArgCaster<A2> AC2;
+     typedef ArgCaster<A3> AC3;
+     typedef ArgCaster<A4> AC4;
+     typedef ArgCaster<A5> AC5;
+     typedef ArgCaster<A6> AC6;
+     typedef ArgCaster<A7> AC7;
+     typedef ArgCaster<A8> AC8;
+     typedef ArgCaster<A9> AC9;
+
              AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-		 AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-		 AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-		 AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
-		 AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
-		 AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
-		 AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
-		 AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
-		 AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
-		 AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
-		
-            typedef typename TypeInfo<ReturnType>::Type Type;
+     AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
+     AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
+     AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+     AC4 ac4; A4 arg4(ac4.ToNative(argv[4]));
+     AC5 ac5; A5 arg5(ac5.ToNative(argv[5]));
+     AC6 ac6; A6 arg6(ac6.ToNative(argv[6]));
+     AC7 ac7; A7 arg7(ac7.ToNative(argv[7]));
+     AC8 ac8; A8 arg8(ac8.ToNative(argv[8]));
+     AC9 ac9; A9 arg9(ac9.ToNative(argv[9]));
+
+            typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
     }

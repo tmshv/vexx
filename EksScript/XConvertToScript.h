@@ -7,7 +7,10 @@
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
 
-namespace cvv8
+namespace XScriptConvert
+{
+
+namespace internal
 {
 
 template <typename NT> struct NativeToJS<NT *> : NativeToJS<NT> {};
@@ -17,10 +20,10 @@ template <typename NT> struct NativeToJS<const NT> : NativeToJS<NT> {};
 
 template <typename NT> struct NativeToJS<NT &>
   {
-  typedef typename TypeInfo<NT>::Type & ArgType;
+  typedef typename XScriptTypeInfo<NT>::Type & ArgType;
   v8::Handle<v8::Value> operator()( ArgType n ) const
     {
-    typedef NativeToJS< typename TypeInfo<NT>::NativeHandle > Cast;
+    typedef NativeToJS< typename XScriptTypeInfo<NT>::NativeHandle > Cast;
     return Cast()( &n );
     }
   };
@@ -144,30 +147,13 @@ template <> struct NativeToJS<char const *>
     }
   };
 
-template <typename T> inline v8::Handle<v8::Value> CastToJS(T const &v)
+template <> struct NativeToJS<QString>
   {
-  typedef NativeToJS<T const> F;
-  return F()( v );
-  }
-
-// Overloads to avoid ambiguity in certain calls.
-static inline v8::Handle<v8::Value> CastToJS(char const *v)
-  {
-  typedef NativeToJS<char const *> F;
-  return F()( v );
-  }
-
-static inline v8::Handle<v8::Value> CastToJS(v8::InvocationCallback v)
-  {
-  typedef NativeToJS<v8::InvocationCallback> F;
-  return F()( v );
-  }
-
-static inline v8::Handle<v8::Value> CastToScript(char *v)
-  {
-  typedef NativeToJS<char const *> F;
-  return F()( v );
-  }
+  v8::Handle<v8::Value> operator()(QString v) const
+    {
+    return v8::String::New( v.toUtf8().data() );
+    }
+  };
 
 // Converts a native std::exception to a JS exception and throws
 // that exception via v8::ThrowException().
@@ -185,4 +171,32 @@ template <> struct NativeToJS<std::range_error> : NativeToJS<std::exception> {};
 template <> struct NativeToJS<std::logic_error> : NativeToJS<std::exception> {};
 
 }
+
+// Overloads to avoid ambiguity in certain calls.
+static inline v8::Handle<v8::Value> to(char const *v)
+  {
+  typedef internal::NativeToJS<char const *> F;
+  return F()( v );
+  }
+
+static inline v8::Handle<v8::Value> to(v8::InvocationCallback v)
+  {
+  typedef internal::NativeToJS<v8::InvocationCallback> F;
+  return F()( v );
+  }
+
+static inline v8::Handle<v8::Value> to(char *v)
+  {
+  typedef internal::NativeToJS<char const *> F;
+  return F()( v );
+  }
+
+template <typename T> inline v8::Handle<v8::Value> to(T const &v)
+  {
+  typedef internal::NativeToJS<T const> F;
+  return F()( v );
+  }
+
+}
+
 #endif // XCONVERTTOSCRIPT_H

@@ -2,9 +2,11 @@
 #define XSCRIPTEXCEPTION_H
 
 #include "QString"
+#include "XScriptGlobal.h"
+#include "v8.h"
 
-inline v8::Handle<v8::Value> TossAsError( const QString &err );
-inline v8::Handle<v8::Value> Toss(const QString &msg);
+EKSSCRIPT_EXPORT v8::Handle<v8::Value> TossAsError( const QString &err );
+EKSSCRIPT_EXPORT v8::Handle<v8::Value> Toss(const QString &msg);
 
 struct MissingThisException
   {

@@ -782,7 +782,7 @@ namespace cvv8 {
         /**
             Force the ContextT into a native handle type.
         */
-        typedef typename TypeInfo<ContextT>::NativeHandle ReturnType;
+        typedef typename XScriptTypeInfo<ContextT>::NativeHandle ReturnType;
         /**
             For each PredicatedCtorForwarder (P) in PredList, if P()(argv)
             returns true then P::Call(argv) is returned, else the next
@@ -807,7 +807,7 @@ namespace cvv8 {
     template <typename ContextT>
     struct PredicatedCtorDispatcher< tmp::NilType, ContextT > : Signature< ContextT * () >
     {
-        typedef typename TypeInfo<ContextT>::NativeHandle ReturnType;
+        typedef typename XScriptTypeInfo<ContextT>::NativeHandle ReturnType;
         /**
             Triggers a native exception explaining (in English text) that no
             overloads could be matched to the given arguments. It's kinda

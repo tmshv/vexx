@@ -7,7 +7,7 @@ namespace cvv8 {
        A helper class to assist in the "two-way-binding" of
        natives to JS objects. This class holds native-to-JS
        binding information.
-       
+
        In the general case, a native-to-JS conversion is only
        needed at the framework-level if bound/converted
        functions/methods will _return_ bound native
@@ -37,7 +37,7 @@ namespace cvv8 {
     struct NativeToJSMap
     {
     private:
-        typedef TypeInfo<T> TI;
+        typedef XScriptTypeInfo<T> TI;
         typedef typename TI::Type Type;
         /**
            The native type to bind to.
@@ -49,11 +49,11 @@ namespace cvv8 {
         typedef std::pair<NativeHandle,JSObjHandle> ObjBindT;
         typedef std::map<void const *, ObjBindT> OneOfUsT;
         /** Maps (void const *) to ObjBindT.
-        
+
             Reminder to self: we might need to make this map a static
-            non-function member to work around linking problems (at 
-            least on Windows) which lead to multiple instances of 
-            the returned map being created when the types being 
+            non-function member to work around linking problems (at
+            least on Windows) which lead to multiple instances of
+            the returned map being created when the types being
             bound are loaded from multiple DLLs. The out-of-class
             initialization of the member is going to require a really
             ugly set of template parameters, though.
@@ -122,11 +122,11 @@ namespace cvv8 {
             if( Map().end() == it ) return v8::Handle<v8::Object>();
             else return (*it).second.second;
         }
-        
+
         /**
             A base NativeToJS<T> implementation for classes which use NativeToJSMap<T>
             to hold their native-to-JS bindings. To be used like this:
-            
+
             @code
             // must be in the v8::convert namespace!
             template <>
@@ -162,7 +162,7 @@ namespace cvv8 {
                     typedef typename NativeToJSMap<ParentType>::NativeToJSImpl PI;
                     return PI()(n);
 #if 0
-                    typedef typename TypeInfo<ParentType>::NativeHandle PH;
+                    typedef typename XScriptTypeInfo<ParentType>::NativeHandle PH;
                     rc = CastToJS<ParentType>(n);
                     if( rc.IsEmpty() ) return v8::Null();
                     else return rc;

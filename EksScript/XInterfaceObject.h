@@ -4,6 +4,21 @@
 #include "XScriptGlobal.h"
 #include "XInterface.h"
 
+class EKSSCRIPT_EXPORT XScriptObject
+  {
+  XScriptObject();
+  XScriptObject(bool x);
+  XScriptObject(xuint32 x);
+  XScriptObject(xint32 x);
+  XScriptObject(xuint64 x);
+  XScriptObject(xint64 x);
+  XScriptObject(double x);
+  XScriptObject(float x);
+
+private:
+  v8::Handle<v8::Value> _object;
+  };
+
 class EKSSCRIPT_EXPORT XInterfaceObject
   {
 public:
@@ -19,12 +34,12 @@ public:
 
   template <typename T> T *castTo()
     {
-    return cvv8::CastFromJS<T>(_object);
+    return XScriptConvert::from<T>(_object);
     }
 
   template <typename T> const T *castTo() const
     {
-    return cvv8::CastFromJS<T>(_object);
+    return XScriptConvert::from<T>(_object);
     }
 
 private:

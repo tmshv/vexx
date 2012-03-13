@@ -99,7 +99,7 @@ namespace cvv8 {
            Implementations must not perform the actual binding of the
            returned native to jsSelf - ClassCreator will do that
            immediately after Create() returns the new object.
-           
+
            The default implementation simply return (new T).
         */
         static ReturnType Create( v8::Persistent<v8::Object> &, v8::Arguments const & )
@@ -181,7 +181,7 @@ namespace cvv8 {
         implementation is fine for all cases i can think of, but i can
         concieve of one or two uses for specializations (e.g. storing the
         JS-side name of the class as the type ID).
-        
+
         The type id must be unique per type except that subtypes may
         (depending on various other binding options) may need use the same
         value as the parent type. If multiple types share the same type ID,
@@ -213,7 +213,7 @@ namespace cvv8 {
         static const void *Value;
     };
 
-    template <typename T> const void * ClassCreator_TypeID<T>::Value = TypeInfo<T>::TypeName;
+    template <typename T> const void * ClassCreator_TypeID<T>::Value = XScriptTypeInfo<T>::TypeName;
 
     /**
        Convenience base type for ClassCreator_InternalFields
@@ -254,11 +254,11 @@ namespace cvv8 {
            It must be 0 or greater, and must be less than Value.
         */
         static const int NativeIndex = ObjectIndex;
-        
+
         /**
             The internal field index at which ClassCreator policies
             should expect a type identifier tag to be stored.
-            This can be used in conjunction with 
+            This can be used in conjunction with
             JSToNative_ObjectWithInternalFieldsTypeSafe (or similar)
             to provide an extra level of type safety at JS runtime.
 
@@ -284,11 +284,11 @@ namespace cvv8 {
        ACHTUNG SUBCLASSERS:
 
        When using a heirarchy of native types, more than one of which
-       is compatible with CastFromJS(), conversions from subtype to 
-       base type will fail unless all subtypes use the same internal 
-       field placement as the parent type. If this code can detect a 
-       mismatch then it will fail gracefully (e.g. a JS-side 
-       exception), and if not then it might mis-cast an object and 
+       is compatible with CastFromJS(), conversions from subtype to
+       base type will fail unless all subtypes use the same internal
+       field placement as the parent type. If this code can detect a
+       mismatch then it will fail gracefully (e.g. a JS-side
+       exception), and if not then it might mis-cast an object and
        cause Undefined Behaviour.
 
        If a given parent type uses a custom ClassCreator_InternalFields
@@ -361,10 +361,10 @@ namespace cvv8 {
                 cc.AddClassTo( "T", dest );
                 return;
             }
-            
+
             // ... do your bindings here...
 
-            // As the final step:            
+            // As the final step:
             cc.AddClassTo( "T", dest );
             return;
             @endcode
@@ -409,7 +409,7 @@ namespace cvv8 {
     template <typename T>
     struct ClassCreator_WeakWrap
     {
-        typedef typename TypeInfo<T>::NativeHandle NativeHandle;
+        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
 
         /**
            Similar to ), but this is called before the native constructor is called.
@@ -436,7 +436,7 @@ namespace cvv8 {
            This operation is called one time from ClassCreator for each
            new object, directly after the native has been connected to
            a Persistent handle.
-   
+
            Note that the ClassCreator code which calls this has already
            taken care of connecting nativeSelf to jsSelf. Client
            specializations of this policy may opt to add their own
@@ -460,14 +460,14 @@ namespace cvv8 {
         {
             return;
         }
-        
+
         /**
            This is called from the ClassCreator-generated destructor,
            just before the native destructor is called. If nativeSelf
            is NULL then it means that native construction failed,
            but implementations must (if necessary) clean up any data
            stored in jsSelf by the PreWrap() function.
-        
+
            Specializations may use this to clean up data stored in
            other internal fields of the object (_not_ the field used
            to hold the native itself - that is removed by the
@@ -487,7 +487,7 @@ namespace cvv8 {
            the jsSelf object can be delegated to this function, as
            opposed to being performed (and possibly duplicated) in
            PreWrap() and/or Wrap().
-           
+
            The default implementation does nothing.
         */
         static void Unwrap( v8::Handle<v8::Object> const &, NativeHandle )
@@ -541,17 +541,17 @@ namespace cvv8 {
        number of internals fields and the index of the field where the
        native object is to be stored. See JSToNative_ClassCreator
        for an example.
-       
+
        TODOs:
 
        - Certain operations may not work properly when inheriting
        bound classes from JS space, and possibly not even when
        inheriting bound natives from one another. That depends on
        several factors too complex to summarize here.
-       
-       - See how much of the v8::juice::cw::ClassWrap 
+
+       - See how much of the v8::juice::cw::ClassWrap
        inheritance-related code we can salvage for re-use here.
-       
+
        - There are known problems when trying to bind inherited methods
        when the parent class has no bound them to JS. i'm not sure how
        i can fix the templates to get this working.
@@ -585,18 +585,18 @@ namespace cvv8 {
     template <typename T, bool TypeSafe = ClassCreator_InternalFields<T>::TypeIDIndex >= 0 >
     struct JSToNative_ClassCreator :
         XIfElse< TypeSafe,
-            JSToNativeObjectWithInternalFieldsTypeSafe<T,
+            XScriptConvert::internal::JSToNativeObjectWithInternalFieldsTypeSafe<T,
                                             ClassCreator_TypeID<T>::Value,
                                             ClassCreator_InternalFields<T>::Count,
                                             ClassCreator_InternalFields<T>::TypeIDIndex,
                                             ClassCreator_InternalFields<T>::NativeIndex,
                                             ClassCreator_SearchPrototypeForThis<T>::Value
                                             >,
-            JSToNativeObjectWithInternalFields<T,
+            XScriptConvert::internal::JSToNativeObjectWithInternalFields<T,
                                             ClassCreator_InternalFields<T>::Count,
                                             ClassCreator_InternalFields<T>::NativeIndex,
                                             ClassCreator_SearchPrototypeForThis<T>::Value
-                                            >            
+                                            >
         >::Type
     {
     };
@@ -606,17 +606,17 @@ namespace cvv8 {
     template <typename ParentT, typename SubT >
     struct JSToNative_ClassCreator_Subclass
     {
-        typedef typename TypeInfo<SubT>::NativeHandle ResultType;
+        typedef typename XScriptTypeInfo<SubT>::NativeHandle ResultType;
         ResultType operator()( v8::Handle<v8::Value> const & h ) const
         {
-            typedef typename TypeInfo<ParentT>::NativeHandle PTP;
+            typedef typename XScriptTypeInfo<ParentT>::NativeHandle PTP;
             PTP typeCheck; typeCheck = (ResultType)NULL
                 /* If compiler errors led you here then SubT probably does not
                     publicly subclass ParentT. */
                 ;
             PTP p = CastFromJS<ParentT>(h);
             //std::cerr << "dyncast="<<dynamic_cast<ResultType>(p)<<"\n";
-            return p ? dynamic_cast<ResultType>(p) : NULL; 
+            return p ? dynamic_cast<ResultType>(p) : NULL;
         }
     };
 #endif
@@ -631,8 +631,8 @@ namespace cvv8 {
         template <typename T>
         struct Factory_CtorForwarder_Base
         {
-            typedef typename TypeInfo<T>::Type Type;
-            typedef typename TypeInfo<T>::NativeHandle NativeHandle;
+            typedef typename XScriptTypeInfo<T>::Type Type;
+            typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
             static void Delete( NativeHandle nself )
             {
                 delete nself;
@@ -659,15 +659,15 @@ namespace cvv8 {
 #endif // !DOXYGEN
 
     /**
-        Can be used as a concrete ClassCreator_Factor<T> 
-        specialization to forward JS ctor calls directly to native 
+        Can be used as a concrete ClassCreator_Factor<T>
+        specialization to forward JS ctor calls directly to native
         ctors.
-    
+
         T must be the ClassCreator'd type to construct. CtorProxy must
         be a type having this interface:
-        
+
         @code
-        TypeInfo<T>::NativeHandle Call( v8::Arguments const & );
+        XScriptTypeInfo<T>::NativeHandle Call( v8::Arguments const & );
         @endcode
 
         Normally CtorProxy would be CtorForwarder or CtorArityDispatcher,
@@ -681,15 +681,15 @@ namespace cvv8 {
         If CtorProxy::Call() succeeds (returns non-NULL and does not throw)
         then NativeToJSMap<T> is used to create a native-to-JS mapping.
         To make use of this, the client should do the following:
-        
+
         @code
         // in the cvv8 namespace:
         template <>
             struct NativeToJS<T> : NativeToJSMap<T>::NativeToJSImpl {};
         @endcode
-        
+
         After that, CastToJS<T>( theNativeObject ) can work.
-        
+
         The mapping is cleaned up when (if!) the object is sent through
         the JS garbage collector or the client somehow triggers its
         JS-aware destruction (e.g. via ClassCreator::DestroyObject(),
@@ -700,9 +700,9 @@ namespace cvv8 {
     {
     public:
         typedef NativeToJSMap<T> N2JMap;
-        typedef typename TypeInfo<T>::Type Type;
-        typedef typename TypeInfo<T>::NativeHandle NativeHandle;
-        
+        typedef typename XScriptTypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+
         /**
             If CtorProxy::Call(argv) succeeds, N2JMap::Insert(jself, theNative)
             is called. The result of CtorProxy::Call() is returned.
@@ -729,8 +729,8 @@ namespace cvv8 {
     struct ClassCreator_Factory_CtorArityDispatcher : Detail::Factory_CtorForwarder_Base<T>
     {
     public:
-        typedef typename TypeInfo<T>::Type Type;
-        typedef typename TypeInfo<T>::NativeHandle NativeHandle;
+        typedef typename XScriptTypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
         static NativeHandle Create( v8::Persistent<v8::Object> , v8::Arguments const &  argv )
         {
             typedef CtorArityDispatcher<CtorForwarderList> Proxy;
@@ -745,23 +745,23 @@ namespace cvv8 {
         T must (or is assumed to) be a ClassCreator<T>-wrapped class.
         CtorForwarderList must be a Signature typelist of CtorForwarder
         types and its "return type" must be T (optionally pointer-qualified).
-        
+
         Example:
-        
+
         @code
         typedef CtorForwarder<MyType *()> C0;
         typedef CtorForwarder<MyType *(int)> C1;
         typedef CtorForwarder<MyType *(int, double)> C2;
         typedef Signature< CFT (C0, C1, C2) > CtorList;
-        
+
         // Then create Factory specialization based on those:
         template <>
-        struct ClassCreator_Factory<MyType> : 
+        struct ClassCreator_Factory<MyType> :
             ClassCreator_Factory_Dispatcher<MyType, CtorArityDispatcher<CtorList> > {};
         @endcode
 
         Or:
-        
+
         @code
         template <>
         struct ClassCreator_Factory<MyType> :
@@ -773,8 +773,8 @@ namespace cvv8 {
     struct ClassCreator_Factory_Dispatcher : Detail::Factory_CtorForwarder_Base<T>
     {
     public:
-        typedef typename TypeInfo<T>::Type Type;
-        typedef typename TypeInfo<T>::NativeHandle NativeHandle;
+        typedef typename XScriptTypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
         static NativeHandle Create( v8::Persistent<v8::Object>, v8::Arguments const &  argv )
         {
             return CtorT::Call( argv );
@@ -791,8 +791,8 @@ namespace cvv8 {
     struct ClassCreator_Factory_Abstract : Detail::Factory_CtorForwarder_Base<T>
     {
     public:
-        typedef typename TypeInfo<T>::Type Type;
-        typedef typename TypeInfo<T>::NativeHandle NativeHandle;
+        typedef typename XScriptTypeInfo<T>::Type Type;
+        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
         /**
            Always returns NULL.
         */

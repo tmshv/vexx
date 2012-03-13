@@ -37,7 +37,7 @@ namespace cvv8
 template <typename T>
 struct ArgCaster
   {
-  typedef typename JSToNative<T>::ResultType ResultType;
+  typedef typename XScriptConvert::internal::JSToNative<T>::ResultType ResultType;
   /**
            Default impl simply returns CastFromJS<T>(v).
            Specializations are allowed to store the result of the
@@ -46,7 +46,7 @@ struct ArgCaster
         */
   inline ResultType ToNative( v8::Handle<v8::Value> const & v ) const
     {
-    return CastFromJS<T>( v );
+    return XScriptConvert::from<T>( v );
     }
   /**
             To eventually be used for some internal optimizations.
@@ -116,7 +116,7 @@ public:
         */
   ResultType ToNative( v8::Handle<v8::Value> const & v )
     {
-    typedef JSToNative<std::string> C;
+    typedef XScriptConvert::internal::JSToNative<std::string> C;
     if( v.IsEmpty() || v->IsNull() || v->IsUndefined() )
       {
       return 0;
@@ -151,7 +151,7 @@ struct CtorForwarderProxy<Sig,0>
   typedef typename XSignature<Sig>::ReturnType ReturnType;
   static ReturnType Call( v8::Arguments const & )
     {
-    typedef typename TypeInfo<ReturnType>::Type RType;
+    typedef typename XScriptTypeInfo<ReturnType>::Type RType;
     return new RType;
     }
   };
@@ -162,7 +162,7 @@ struct CtorForwarderProxy<Sig,-1>
   typedef typename XSignature<Sig>::ReturnType ReturnType;
   static ReturnType Call( v8::Arguments const & argv )
     {
-    typedef typename TypeInfo<ReturnType>::Type T;
+    typedef typename XScriptTypeInfo<ReturnType>::Type T;
     return new T(argv);
     }
   };
@@ -237,7 +237,7 @@ namespace Detail
 template <typename T,typename CTOR>
 struct CtorFwdDispatch
   {
-  typedef typename TypeInfo<T>::NativeHandle ReturnType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
   static ReturnType Call( v8::Arguments const &  argv )
     {
     return CTOR::Call( argv );
@@ -249,7 +249,7 @@ struct CtorFwdDispatch
 template <typename T>
 struct CtorFwdDispatch<T, XNilType>
   {
-  typedef typename TypeInfo<T>::NativeHandle ReturnType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
   static ReturnType Call( v8::Arguments const & )
     {
     return 0;
@@ -266,7 +266,7 @@ struct CtorFwdDispatch<T, XNilType>
 template <typename T,typename List>
 struct CtorFwdDispatchList
   {
-  typedef typename TypeInfo<T>::NativeHandle ReturnType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
   /**
                Tries to dispatch Arguments to one of the constructors
                in the List type, based on the argument count.
@@ -289,13 +289,12 @@ struct CtorFwdDispatchList
 template <typename T>
 struct CtorFwdDispatchList<T,XNilType>
   {
-  typedef typename TypeInfo<T>::NativeHandle ReturnType;
+  typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
   /** Writes an error message to errmsg and returns 0. */
   static ReturnType Call( v8::Arguments const &  argv )
     {
-    StringBuffer msg;
-    msg << "No native constructor was defined for "<<argv.Length()<<" arguments!\n";
-    throw std::range_error(msg.Content().c_str());
+    QString error = QString("No native constructor was defined for %1 arguments!\n").arg(argv.Length());
+    throw std::range_error(error.toUtf8().data());
     return 0;
     }
   };
@@ -337,7 +336,7 @@ template <typename CtorList>
 struct CtorArityDispatcher
   {
   typedef typename CtorList::ReturnType RT;
-  typedef typename TypeInfo<RT>::NativeHandle NativeHandle;
+  typedef typename XScriptTypeInfo<RT>::NativeHandle NativeHandle;
   static NativeHandle Call( v8::Arguments const & argv )
     {
     typedef typename XPlainType<RT>::Type Type;
