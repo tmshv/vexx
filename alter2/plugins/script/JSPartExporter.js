@@ -3,7 +3,7 @@ var jsFileExporter = {
     fileType: "Javascript Source (*.js)",
     exportFile: function(filename, entity)
         {
-        db.cancelBlock(function()
+        entity.cancelBlock(function()
           {
           var file = io.createFile(filename);
           if(!file.open("write"))
