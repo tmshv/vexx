@@ -255,7 +255,10 @@ void SDefaultPartEditorInterface::properties(SEntity *p, QStringList &l) const
   SProperty *c = p->firstChild();
   while(c)
     {
-    if(c->isDynamic())
+    SPropertyInstanceInformation::Mode mode = c->instanceInformation()->mode();
+    if(c->isDynamic() &&
+       mode != SPropertyInstanceInformation::Internal &&
+       mode != SPropertyInstanceInformation::InternalComputed)
       {
       l << c->name();
       }

@@ -90,7 +90,7 @@ QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
   ScProfileFunction
   if(!prop)
     {
-    return QScriptValue();
+    return QScriptValue(QScriptValue::NullValue);
     }
 
   ScScriptInterface *interface = prop->interface<ScScriptInterface>();

@@ -141,7 +141,7 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScShiftPropertyBase(eng)
   addMemberProperty("dynamic", dynamic, QScriptValue::PropertyGetter);
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("valueString", valueString, QScriptValue::PropertyGetter);
-
+  addMemberProperty("mode", mode, QScriptValue::PropertyGetter);
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
   addMemberFunction("pathTo", pathTo);
@@ -248,6 +248,18 @@ QScriptValue ScShiftProperty::name(QScriptContext *ctx, QScriptEngine *)
     return QScriptValue((*prop)->name());
     }
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.name(...);");
+  return QScriptValue();
+  }
+
+QScriptValue ScShiftProperty::mode(QScriptContext *ctx, QScriptEngine *)
+  {
+  ScProfileFunction
+  SProperty **prop = getThis(ctx);
+  if(prop && *prop)
+    {
+    return QScriptValue((*prop)->instanceInformation()->modeString());
+    }
+  ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SProperty.mode(...);");
   return QScriptValue();
   }
 

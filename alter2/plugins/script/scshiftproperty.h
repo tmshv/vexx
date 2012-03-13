@@ -37,6 +37,7 @@ public:
   static QScriptValue affects(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue dynamic(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue name(QScriptContext *ctx, QScriptEngine *);
+  static QScriptValue mode(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue value(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue valueString(QScriptContext *ctx, QScriptEngine *);
   static QScriptValue setValue(QScriptContext *ctx, QScriptEngine *);

@@ -3,23 +3,15 @@ db.addType({
   "parent": "Component",
   "properties": [
     {
-      "name": "__position",
-      "type": "Vector3DProperty",
-      "defaultValue": "554 -36 0"
-    },
-    {
-      "name": "__outputsPosition",
-      "type": "Vector3DProperty",
-      "defaultValue": "758 49 0"
-    },
-    {
-      "name": "__inputsPosition",
-      "type": "Vector3DProperty",
-      "defaultValue": "-132 31 0"
-    },
-    {
       "name": "RenderGroups",
-      "type": "PointerArray"
+      "type": "PointerArray",
+      "properties": [
+        {
+          "name": "0",
+          "type": "Pointer",
+          "defaultInput": "../../3"
+        }
+      ]
     },
     {
       "name": "Thickness",
@@ -33,11 +25,35 @@ db.addType({
     },
     {
       "name": "1",
-      "type": "MCCuboid"
+      "type": "MCCuboid",
+      "properties": [
+        {
+          "name": "width",
+          "extend": true,
+          "defaultInput": "../../Size"
+        },
+        {
+          "name": "height",
+          "extend": true,
+          "defaultInput": "../../Size"
+        },
+        {
+          "name": "depth",
+          "extend": true,
+          "defaultInput": "../../Thickness"
+        }
+      ]
     },
     {
       "name": "3",
-      "type": "GCGeometryTransform"
+      "type": "GCGeometryTransform",
+      "properties": [
+        {
+          "name": "geometry",
+          "extend": true,
+          "defaultInput": "../../1/geometry"
+        }
+      ]
     }
   ]
 });
