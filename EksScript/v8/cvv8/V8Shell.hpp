@@ -121,7 +121,7 @@ namespace cvv8 {
             be used, e.g., to redirect std::cout to a libcurses window.
         */
         template <std::ostream * OS>
-        static v8::Handle<v8::Value> PrintToStdOstream( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> PrintToStdOstream( XScriptArguments const & argv )
         {
             v8::HandleScope hscope;
             int const argc = argv.Length();
@@ -495,7 +495,7 @@ namespace cvv8 {
            std::cout. See PrintToStdOstream() for the exact semantics
            argument/return.
         */
-        static v8::Handle<v8::Value> PrintToCout( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> PrintToCout( XScriptArguments const & argv )
         {
             return PrintToStdOstream<&std::cout>( argv );
         }
@@ -504,13 +504,13 @@ namespace cvv8 {
            Identical to PrintToCout(), but sends its output to
            std::cerr instead.
         */
-        static v8::Handle<v8::Value> PrintToCerr( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> PrintToCerr( XScriptArguments const & argv )
         {
             return PrintToStdOstream<&std::cerr>( argv );
         }
         
     private:
-        static v8::Handle<v8::Value> Include( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Include( XScriptArguments const & argv )
         {
             int const argc = argv.Length();
             if( argc < 1 ) return v8::Undefined();
@@ -586,7 +586,7 @@ namespace cvv8 {
            - Add a toString() member to the returned array which creates a
            conventional-looking stacktrace string.
         */
-        static v8::Handle<v8::Value> GetStackTrace( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> GetStackTrace( XScriptArguments const & argv )
         {
             using namespace v8;
             int32_t limitSigned = (argv.Length() > 0) ? argv[0]->Int32Value() : 0;

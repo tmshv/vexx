@@ -8,7 +8,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -19,7 +19,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -32,7 +32,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -43,7 +43,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -58,7 +58,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -69,18 +69,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -94,7 +94,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -105,7 +105,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -114,13 +114,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -139,7 +139,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -150,18 +150,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -175,7 +175,7 @@ namespace Detail {
         typedef char AssertArity[ (1 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -186,7 +186,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -195,13 +195,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -244,9 +244,9 @@ struct CtorForwarderProxy<Sig,1>
 {
     enum { Arity = 1 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
-        if( argv.Length() < Arity )
+        if( argv.length() < Arity )
         {
             throw std::range_error("CtorForwarder<T,1>::Ctor() expects at least 1 JS arguments!");
         }
@@ -256,7 +256,7 @@ struct CtorForwarderProxy<Sig,1>
 
              typedef ArgCaster<A0> AC0;
 
-             AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
+             AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
 
             typedef typename XScriptTypeInfo<ReturnType>::Type Type;
             return new Type(  arg0 );
@@ -272,7 +272,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -286,7 +286,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -299,7 +299,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -313,7 +313,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -328,7 +328,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -342,18 +342,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -367,7 +367,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -381,7 +381,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -390,13 +390,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -415,7 +415,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -429,18 +429,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -454,7 +454,7 @@ namespace Detail {
         typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -468,7 +468,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -477,13 +477,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -526,7 +526,7 @@ struct CtorForwarderProxy<Sig,2>
 {
     enum { Arity = 2 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -557,7 +557,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -574,7 +574,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -587,7 +587,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -604,7 +604,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -619,7 +619,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -636,18 +636,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -661,7 +661,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -678,7 +678,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -687,13 +687,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -712,7 +712,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -729,18 +729,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -754,7 +754,7 @@ namespace Detail {
         typedef char AssertArity[ (3 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -771,7 +771,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -780,13 +780,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -829,7 +829,7 @@ struct CtorForwarderProxy<Sig,3>
 {
     enum { Arity = 3 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -863,7 +863,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -883,7 +883,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -896,7 +896,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -916,7 +916,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -931,7 +931,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -951,18 +951,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -976,7 +976,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -996,7 +996,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1005,13 +1005,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1030,7 +1030,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1050,18 +1050,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -1075,7 +1075,7 @@ namespace Detail {
         typedef char AssertArity[ (4 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1095,7 +1095,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1104,13 +1104,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1153,7 +1153,7 @@ struct CtorForwarderProxy<Sig,4>
 {
     enum { Arity = 4 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -1190,7 +1190,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1213,7 +1213,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -1226,7 +1226,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1249,7 +1249,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -1264,7 +1264,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1287,18 +1287,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -1312,7 +1312,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1335,7 +1335,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1344,13 +1344,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1369,7 +1369,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1392,18 +1392,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -1417,7 +1417,7 @@ namespace Detail {
         typedef char AssertArity[ (5 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1440,7 +1440,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1449,13 +1449,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1498,7 +1498,7 @@ struct CtorForwarderProxy<Sig,5>
 {
     enum { Arity = 5 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -1538,7 +1538,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1564,7 +1564,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -1577,7 +1577,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1603,7 +1603,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -1618,7 +1618,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1644,18 +1644,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -1669,7 +1669,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1695,7 +1695,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1704,13 +1704,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1729,7 +1729,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1755,18 +1755,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -1780,7 +1780,7 @@ namespace Detail {
         typedef char AssertArity[ (6 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1806,7 +1806,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1815,13 +1815,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -1864,7 +1864,7 @@ struct CtorForwarderProxy<Sig,6>
 {
     enum { Arity = 6 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -1907,7 +1907,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1936,7 +1936,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -1949,7 +1949,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -1978,7 +1978,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -1993,7 +1993,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2022,18 +2022,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2047,7 +2047,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2076,7 +2076,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2085,13 +2085,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2110,7 +2110,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2139,18 +2139,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2164,7 +2164,7 @@ namespace Detail {
         typedef char AssertArity[ (7 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2193,7 +2193,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2202,13 +2202,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2251,7 +2251,7 @@ struct CtorForwarderProxy<Sig,7>
 {
     enum { Arity = 7 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -2297,7 +2297,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2329,7 +2329,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -2342,7 +2342,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2374,7 +2374,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -2389,7 +2389,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2421,18 +2421,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2446,7 +2446,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2478,7 +2478,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2487,13 +2487,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2512,7 +2512,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2544,18 +2544,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2569,7 +2569,7 @@ namespace Detail {
         typedef char AssertArity[ (8 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2601,7 +2601,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2610,13 +2610,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2659,7 +2659,7 @@ struct CtorForwarderProxy<Sig,8>
 {
     enum { Arity = 8 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -2708,7 +2708,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2743,7 +2743,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -2756,7 +2756,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2791,7 +2791,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -2806,7 +2806,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2841,18 +2841,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2866,7 +2866,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2901,7 +2901,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2910,13 +2910,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -2935,7 +2935,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -2970,18 +2970,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -2995,7 +2995,7 @@ namespace Detail {
         typedef char AssertArity[ (9 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3030,7 +3030,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3039,13 +3039,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3088,7 +3088,7 @@ struct CtorForwarderProxy<Sig,9>
 {
     enum { Arity = 9 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {
@@ -3140,7 +3140,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3178,7 +3178,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -3191,7 +3191,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3229,7 +3229,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -3244,7 +3244,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3282,18 +3282,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -3307,7 +3307,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T  & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3345,7 +3345,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3354,13 +3354,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T  * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3379,7 +3379,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3417,18 +3417,18 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative( self, func, argv ) ); }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try { return CastToJS( CallNative(func, argv) ); }
             HANDLE_PROPAGATE_EXCEPTION;
@@ -3442,7 +3442,7 @@ namespace Detail {
         typedef char AssertArity[ (10 == sl::Arity<SignatureType>::Value) ? 1 : -1];
         typedef typename SignatureType::FunctionType FunctionType;
         typedef typename SignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -3480,7 +3480,7 @@ namespace Detail {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3489,13 +3489,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -3538,7 +3538,7 @@ struct CtorForwarderProxy<Sig,10>
 {
     enum { Arity = 10 };
     typedef typename XSignature<Sig>::ReturnType ReturnType;
-    static ReturnType Call( v8::Arguments const & argv )
+    static ReturnType Call( XScriptArguments const & argv )
     {
         if( argv.Length() < Arity )
         {

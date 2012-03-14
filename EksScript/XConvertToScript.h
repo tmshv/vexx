@@ -21,7 +21,7 @@ template <typename NT> struct NativeToJS<const NT> : NativeToJS<NT> {};
 template <typename NT> struct NativeToJS<NT &>
   {
   typedef typename XScriptTypeInfo<NT>::Type & ArgType;
-  v8::Handle<v8::Value> operator()( ArgType n ) const
+  XScriptObject operator()( ArgType n ) const
     {
     typedef NativeToJS< typename XScriptTypeInfo<NT>::NativeHandle > Cast;
     return Cast()( &n );
@@ -33,25 +33,25 @@ namespace
 {
 template <typename IntegerT> struct NativeToJS_int_small
   {
-  v8::Handle<v8::Value> operator()( IntegerT v ) const
+  XScriptObject operator()( IntegerT v ) const
     {
-    return v8::Integer::New( static_cast<int32_t>(v) );
+    return XScriptObject(v);
     }
   };
 
 template <typename IntegerT> struct NativeToJSUIntSmall
   {
-  v8::Handle<v8::Value> operator()( IntegerT v ) const
+  XScriptObject operator()( IntegerT v ) const
     {
-    return v8::Integer::NewFromUnsigned( static_cast<uint32_t>(v) );
+    return XScriptObject(v);
     }
   };
 
 template <typename IntegerT> struct NativeToJSNumber
   {
-  v8::Handle<v8::Value> operator()( IntegerT v ) const
+  XScriptObject operator()( IntegerT v ) const
     {
-    return v8::Number::New( static_cast<double>(v) );
+    return XScriptObject(v);
     }
   };
 
@@ -111,7 +111,7 @@ template <> struct NativeToJS<bool>
 //    return li;
 //    }
 //  };
-
+/*
 template <typename T> struct NativeToJS< ::v8::Local<T> >
   {
   typedef ::v8::Local<T> HandleType;
@@ -132,13 +132,13 @@ template <typename T> struct NativeToJS< ::v8::Persistent<T> >
 
 template <> struct NativeToJS< ::v8::InvocationCallback >
   {
-  XScriptObject operator()(::v8::InvocationCallback const f) const
+  XScriptObject operator()(::v8::InvocationCallback const ) const
     {
     xAssertFail();
     return XScriptObject();
     //return ::v8::FunctionTemplate::New(f)->GetFunction();
     }
-  };
+  };*/
 
 template <> struct NativeToJS<char const *>
   {
@@ -161,7 +161,7 @@ template <> struct NativeToJS<QString>
 // that exception via v8::ThrowException().
 template <> struct NativeToJS<std::exception>
   {
-  XScriptObject operator()( std::exception const & ex ) const
+  XScriptObject operator()( std::exception const &) const
     {
     xAssertFail();
     return XScriptObject();
@@ -183,11 +183,11 @@ static inline XScriptObject to(char const *v)
   return F()( v );
   }
 
-static inline XScriptObject to(v8::InvocationCallback v)
-  {
-  typedef internal::NativeToJS<v8::InvocationCallback> F;
-  return F()( v );
-  }
+//static inline XScriptObject to(v8::InvocationCallback v)
+//  {
+//  typedef internal::NativeToJS<v8::InvocationCallback> F;
+//  return F()( v );
+//  }
 
 static inline XScriptObject to(char *v)
   {

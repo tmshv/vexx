@@ -79,7 +79,7 @@ namespace sl
   /**
       A metatype which calculates the number of arguments in the given
       typelist, but evaluates to -1 if SigT's only argument is
-      (v8::Arguments const &), as such function signatures are considered
+      (XScriptArguments const &), as such function signatures are considered
       to be n-arity.
   */
   template <typename SigT>
@@ -87,7 +87,7 @@ namespace sl
   {
     enum {
       Value = ((1==Length<SigT>::Value)
-              && (0==Index<v8::Arguments const &,SigT>::Value))
+              && (0==Index<XScriptArguments const &,SigT>::Value))
               ? -1
               : Length<SigT>::Value
     };
@@ -96,7 +96,7 @@ namespace sl
   /**
       This metafunction evaluates to true if SigT appears to be
       "InvocationCallback-like" (returns any type and takes one
-      (v8::Arguments const &) parameter).
+      (XScriptArguments const &) parameter).
 
       We could implement this a number of different ways. The
       current impl simply checks if the arity is -1.

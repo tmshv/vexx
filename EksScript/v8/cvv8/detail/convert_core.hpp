@@ -44,7 +44,7 @@ struct ArgCaster
            conversion, as long as they release it when the destruct.
            See ArgCaster<char const *> for an example of that.
         */
-  inline ResultType ToNative( v8::Handle<v8::Value> const & v ) const
+  inline ResultType ToNative( XScriptObject const & v ) const
     {
     return XScriptConvert::from<T>( v );
     }
@@ -114,15 +114,16 @@ public:
            - ToNative() is called again.
            - This object is destructed.
         */
-  ResultType ToNative( v8::Handle<v8::Value> const & v )
-    {
+  ResultType ToNative( XScriptObject const & )
+    {/*
     typedef XScriptConvert::internal::JSToNative<std::string> C;
-    if( v.IsEmpty() || v->IsNull() || v->IsUndefined() )
+    if( !v.isValid() )
       {
       return 0;
       }
-    this->val = C()( v );
-    return this->val.c_str();
+    this->val = C()( v );*/
+    xAssertFail();
+    return "";//this->val.c_str();
     }
   /**
             To eventually be used for some internal optimizations.
@@ -141,7 +142,7 @@ template <typename Sig, int Arity = sl::Arity< XSignature<Sig> >::Value >
 struct CtorForwarderProxy
   {
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( v8::Arguments const & );
+  static ReturnType Call( XScriptArguments const & );
   };
 
 //! Specialization for 0-arity ctors.
@@ -149,18 +150,18 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,0>
   {
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( v8::Arguments const & )
+  static ReturnType Call( XScriptArguments const & )
     {
     typedef typename XScriptTypeInfo<ReturnType>::Type RType;
     return new RType;
     }
   };
-//! Specialization for ctors taking (v8::Arguments const &).
+//! Specialization for ctors taking (XScriptArguments const &).
 template <typename Sig>
 struct CtorForwarderProxy<Sig,-1>
   {
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( v8::Arguments const & argv )
+  static ReturnType Call( XScriptArguments const & argv )
     {
     typedef typename XScriptTypeInfo<ReturnType>::Type T;
     return new T(argv);
@@ -170,7 +171,7 @@ struct CtorForwarderProxy<Sig,-1>
 }
 #endif
 /**
-       A utility type to help forward v8::Arguments to native
+       A utility type to help forward XScriptArguments to native
        constructors. This type is intended to assist in the creation
        of ctor functions for JS-bound C++ classes.
 
@@ -197,7 +198,7 @@ struct CtorForwarderProxy<Sig,-1>
        typedef CtorForwarder<MyType *()> CF0;
        typedef CtorForwarder<MyType *(int)> CF1;
        typedef CtorForwarder<MyType *(double,int)> CF2;
-       typedef CtorForwarder<MyType *(v8::Arguments const &)> CFAny;
+       typedef CtorForwarder<MyType *(XScriptArguments const &)> CFAny;
        @endcode
 
        @see CtorArityDispatcher
@@ -211,14 +212,14 @@ struct CtorForwarder : XSignature<Sig>
   /**
             If (argv.Length()>=Arity) or Arity is less than 0,
             then the constructor is called with Arity arguments
-            (if it >=0) or with 1 v8::Arguments parameter (for Arity<0).
+            (if it >=0) or with 1 XScriptArguments parameter (for Arity<0).
 
             Returns the result of (new Type(...)), transfering ownership
             to the caller.
 
             May propagate native exceptions.
         */
-  static ReturnType Call( v8::Arguments const & argv )
+  static ReturnType Call( XScriptArguments const & argv )
     {
     enum { Arity = sl::Arity< STL >::Value };
     typedef Detail::CtorForwarderProxy<Sig> Proxy;
@@ -238,7 +239,7 @@ template <typename T,typename CTOR>
 struct CtorFwdDispatch
   {
   typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
-  static ReturnType Call( v8::Arguments const &  argv )
+  static ReturnType Call( XScriptArguments const &  argv )
     {
     return CTOR::Call( argv );
     }
@@ -250,13 +251,13 @@ template <typename T>
 struct CtorFwdDispatch<T, XNilType>
   {
   typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
-  static ReturnType Call( v8::Arguments const & )
+  static ReturnType Call( XScriptArguments const & )
     {
     return 0;
     }
   };
 /**
-           Internal type to dispatch a v8::Arguments list to one of
+           Internal type to dispatch a XScriptArguments list to one of
            several a bound native constructors, depending on on the
            argument count.
 
@@ -271,14 +272,14 @@ struct CtorFwdDispatchList
                Tries to dispatch Arguments to one of the constructors
                in the List type, based on the argument count.
              */
-  static ReturnType Call( v8::Arguments const &  argv )
+  static ReturnType Call( XScriptArguments const &  argv )
     {
     typedef typename List::Head CTOR;
     typedef typename List::Tail Tail;
-    enum { Arity = (0==sl::Index<v8::Arguments const &,CTOR>::Value)
+    enum { Arity = (0==sl::Index<XScriptArguments const &,CTOR>::Value)
            ? -1 : sl::Length<CTOR>::Value
            };
-    return ( (Arity < 0) || (Arity == argv.Length()) )
+    return ( (Arity < 0) || (Arity == argv.length()) )
         ? CtorFwdDispatch< T, CTOR >::Call(argv )
         : CtorFwdDispatchList<T,Tail>::Call(argv);
     }
@@ -291,9 +292,9 @@ struct CtorFwdDispatchList<T,XNilType>
   {
   typedef typename XScriptTypeInfo<T>::NativeHandle ReturnType;
   /** Writes an error message to errmsg and returns 0. */
-  static ReturnType Call( v8::Arguments const &  argv )
+  static ReturnType Call( XScriptArguments const &  argv )
     {
-    QString error = QString("No native constructor was defined for %1 arguments!\n").arg(argv.Length());
+    QString error = QString("No native constructor was defined for %1 arguments!\n").arg(argv.length());
     throw std::range_error(error.toUtf8().data());
     return 0;
     }
@@ -302,7 +303,7 @@ struct CtorFwdDispatchList<T,XNilType>
 #endif // !DOXYGEN
 
 /**
-        Proxies a list of constructors from v8::Arguments.
+        Proxies a list of constructors from XScriptArguments.
 
         CtorList must be-a a Signature type in this form:
 
@@ -311,14 +312,14 @@ struct CtorFwdDispatchList<T,XNilType>
             CtorForwarder<MyType *()>,
             CtorForwarder<MyType *(char const *)>,
             CtorForwarder<MyType *( int, double )>,
-            CtorForwarder<MyType *( v8::Arguments const &)>
+            CtorForwarder<MyType *( XScriptArguments const &)>
         )> Ctors;
         @endcode
 
         All entries in the typelist must be interface-compatible with
         CtorForwarder. No two entries should have the same number
         of arguments with one exception: an InvocationCallback-like
-        function taking (v8::Arguments const &) can be used as a
+        function taking (XScriptArguments const &) can be used as a
         catch-all for any number of arguments. If used, it must be
         the LAST entry because it will always match any argument
         count (and will therefore trump any which (would) come after
@@ -337,7 +338,7 @@ struct CtorArityDispatcher
   {
   typedef typename CtorList::ReturnType RT;
   typedef typename XScriptTypeInfo<RT>::NativeHandle NativeHandle;
-  static NativeHandle Call( v8::Arguments const & argv )
+  static NativeHandle Call( XScriptArguments const & argv )
     {
     typedef typename XPlainType<RT>::Type Type;
     typedef Detail::CtorFwdDispatchList<Type, CtorList> Proxy;

@@ -8,11 +8,11 @@ namespace cvv8 {
 
     /**
         A functor which fetches an argument by index.
-        
+
         I = the argument index to fetch.
-        
-        The class is intended mainly to be invoked via code paths 
-        selected by template metaprograms, thus the hard-coding of 
+
+        The class is intended mainly to be invoked via code paths
+        selected by template metaprograms, thus the hard-coding of
         the argument parameter index at compile-time.
     */
     template <int I>
@@ -23,7 +23,7 @@ namespace cvv8 {
             Returns argv[I] if argv.Length() is <= I, else v8::Undefined()
             is returned.
         */
-        inline v8::Handle<v8::Value> operator()( v8::Arguments const & argv ) const
+        inline v8::Handle<v8::Value> operator()( XScriptArguments const & argv ) const
         {
             return (argv.Length() > I) ? argv[I] : v8::Undefined();
         }
@@ -32,9 +32,9 @@ namespace cvv8 {
     /**
         Functor to fetch an argument and return its result
         as a native value.
-        
+
         I = the argument index to fetch.
-        
+
         T = the native type to convert to. CastFromJS<T>() must be legal.
     */
     template <int I, typename T>
@@ -46,7 +46,7 @@ namespace cvv8 {
         /**
             Returns CastFromJS<T>( ArtAt<I>(argv) ).
         */
-        inline ReturnType operator()( v8::Arguments const & argv ) const
+        inline ReturnType operator()( XScriptArguments const & argv ) const
         {
             typedef ArgAt<I> Proxy;
             return CastFromJS<T>( Proxy()(argv) );
@@ -71,11 +71,11 @@ namespace cvv8 {
         "is-a" value of a particular native type. The default
         implementation is useable for any type for which the
         following is legal:
-        
+
         @code
         T const * t = CastFromJS<T const *>( aV8Handle );
         @endcode
-        
+
         Specializations are used for most data types, but this
         one is fine for client-bound types conformant with
         CastFromJS().
@@ -83,7 +83,7 @@ namespace cvv8 {
         Note that the default specializations treat T as a plain type,
         discarding const/pointer/reference qualifiers. Certain types may
         require that ValIs<T const &> (and similar) be specialized in order
-        to behave properly.        
+        to behave properly.
     */
     template <typename T>
     struct ValIs : ValuePredicate
@@ -143,12 +143,12 @@ namespace cvv8 {
     };
 
 
-#if !defined(DOXYGEN)    
+#if !defined(DOXYGEN)
     namespace Detail {
         /**
             ValuePredicate impl which returns retrue if
             Getter returns true for the given value.
-        
+
             Getter must be a pointer to one of the v8::Value::IsXXX()
             functions. This functor returns true if the passed-in handle is
             not empty and its IsXXX() function returns true.
@@ -159,13 +159,13 @@ namespace cvv8 {
             inline bool operator()( v8::Handle<v8::Value> const & v ) const
             {
                 return v.IsEmpty() ? false : ((*v)->*Getter)();
-            }  
+            }
         };
 
         /**
-            A ValuePredicate impl which returns true only if 
-            the given handle is-a number and the number is in the 
-            inclusive range (std::numeric_limits<NumT>::min .. 
+            A ValuePredicate impl which returns true only if
+            the given handle is-a number and the number is in the
+            inclusive range (std::numeric_limits<NumT>::min ..
             max()).
         */
         template <typename NumT>
@@ -184,7 +184,7 @@ namespace cvv8 {
             }
         };
         /** Special-case specialization which returns true if the given
-            handle is-a Number (without checking the range, which is 
+            handle is-a Number (without checking the range, which is
             not necessary for this specific type in this context).
         */
         template <>
@@ -297,35 +297,35 @@ namespace cvv8 {
 
     /**
         Marker class, mainly for documentation purposes.
-        
-        Classes matching this concept "evaluate" a v8::Arguments 
-        object for validity without actually performing any 
-        "application logic." These are intended to be used as 
-        functors, primarily triggered via code paths selected by 
+
+        Classes matching this concept "evaluate" a XScriptArguments
+        object for validity without actually performing any
+        "application logic." These are intended to be used as
+        functors, primarily triggered via code paths selected by
         template metaprograms.
-        
+
         They must be default-construcable and should have no
         private state. Their public API consists of only operator().
 
-        This Concept's operator() is intended only to be used for 
-        decision-making purposes ("are there enough arguments?" or 
-        "are the arguments of the proper types?"), and not 
+        This Concept's operator() is intended only to be used for
+        decision-making purposes ("are there enough arguments?" or
+        "are the arguments of the proper types?"), and not
         higher-level application logic.
     */
     struct ArgumentsPredicate
     {
         /**
-            Must "evaluate" the arguments and return true or false. 
+            Must "evaluate" the arguments and return true or false.
         */
-        bool operator()( v8::Arguments const & ) const;
+        bool operator()( XScriptArguments const & ) const;
     };
 
     /**
         Functor to evaluate whether an Arguments list
         has a certain range of argument count.
-        
-        Min is the minimum number. Max is the maximum. The range is 
-        inclusive. Use (Max<Min) to mean (at least MIN). Use 
+
+        Min is the minimum number. Max is the maximum. The range is
+        inclusive. Use (Max<Min) to mean (at least MIN). Use
         (Min==Max) to mean only that many arguments.
     */
     template <int Min_, int Max_ = Min_>
@@ -340,9 +340,9 @@ namespace cvv8 {
             requirements defined by the Min and Max
             values.
         */
-        bool operator()( v8::Arguments const & av ) const
+        bool operator()( XScriptArguments const & av ) const
         {
-            
+
             int const argc = av.Length();
             return (Max < Min)
                 ? argc >= Min
@@ -352,9 +352,9 @@ namespace cvv8 {
 
     /**
         Arguments predicate functor.
-    
+
         Index = arg index to check.
-        
+
         ValIsType must match the ValuePredicate interface.
     */
     template <unsigned short Index, typename ValIsType >
@@ -363,7 +363,7 @@ namespace cvv8 {
         /**
             Returns true if ValType()( av[Index] ) is true.
         */
-        inline bool operator()( v8::Arguments const & av ) const
+        inline bool operator()( XScriptArguments const & av ) const
         {
             return (Index >= av.Length())
                 ? false
@@ -373,9 +373,9 @@ namespace cvv8 {
 
     /**
         Arguments predicate functor.
-    
+
         Index = arg index to check.
-        
+
         T is a type for which ValIs<T> is legal. The functor
         returns true if ValIs<T> returns true the argument
         at the given index.
@@ -386,8 +386,8 @@ namespace cvv8 {
     namespace Detail {
         /**
             Functor which proxies the v8::Value "is-a" functions.
-            
-            Index is the argument index to check. Getter is the 
+
+            Index is the argument index to check. Getter is the
             member to be used to perform the is-a evaluation.
         */
         template <unsigned short Index, bool (v8::Value::*Getter)() const>
@@ -397,12 +397,12 @@ namespace cvv8 {
                 Returns true only if (Index < av.Length())
                 and av->Getter() returns true.
             */
-            inline bool operator()( v8::Arguments const & av ) const
+            inline bool operator()( XScriptArguments const & av ) const
             {
                 return ( av.Length() <= Index )
                     ? false
                     : ((*av[Index])->*Getter)();
-            }  
+            }
         };
     }
 
@@ -477,7 +477,7 @@ namespace cvv8 {
     */
     struct Argv_True : ArgumentsPredicate
     {
-        inline bool operator()( v8::Arguments const & ) const
+        inline bool operator()( XScriptArguments const & ) const
         {
             return true;
         }
@@ -489,7 +489,7 @@ namespace cvv8 {
     */
     struct Argv_False : ArgumentsPredicate
     {
-        inline bool operator()( v8::Arguments const & ) const
+        inline bool operator()( XScriptArguments const & ) const
         {
             return false;
         }
@@ -511,7 +511,7 @@ namespace cvv8 {
             Returns true only if ArgPred1()(args) and
             ArgPred2()(args) both return true.
         */
-        inline bool operator()( v8::Arguments const & args ) const
+        inline bool operator()( XScriptArguments const & args ) const
         {
             return ArgPred1()( args ) && ArgPred2()( args );
         }
@@ -529,7 +529,7 @@ namespace cvv8 {
             Returns true only if one of ArgPred1()(args) or
             ArgPred2()(args) return true.
         */
-        inline bool operator()( v8::Arguments const & args ) const
+        inline bool operator()( XScriptArguments const & args ) const
         {
             return ArgPred1()( args ) || ArgPred2()( args );
         }
@@ -568,7 +568,7 @@ namespace cvv8 {
             Returns true only if all predicates in PredList
             return true when passed the args object.
         */
-        inline bool operator()( v8::Arguments const & args ) const
+        inline bool operator()( XScriptArguments const & args ) const
         {
             typedef typename PredList::Head Head;
             typedef typename tmp::IfElse< tmp::SameType<tmp::NilType,Head>::Value,
@@ -600,7 +600,7 @@ namespace cvv8 {
             Returns true only if one of the predicates in PredList
             returns true when passed the args object.
         */
-        inline bool operator()( v8::Arguments const & args ) const
+        inline bool operator()( XScriptArguments const & args ) const
         {
             typedef typename PredList::Head Head;
             typedef typename tmp::IfElse< tmp::SameType<tmp::NilType,Head>::Value,
@@ -619,18 +619,18 @@ namespace cvv8 {
     /**
         Intended as a base class for a couple other
         PredicatedXyz types.
-        
+
         This type combines ArgumentsPredicate ArgPred and
         CallT::Call() into one type, for template-based dispatching
         purposes.
-        
+
         ArgPred must be-a ArgumentsPredicate. CallT must
         be a type having a static Call() function taking one
-        (v8::Arguments const &) and returning any type.
-        
+        (XScriptArguments const &) and returning any type.
+
         This type uses subclassing instead of composition
         to avoid having to specify the CallT::Call() return
-        type as an additional template parameter. i don't seem to 
+        type as an additional template parameter. i don't seem to
         be able to template-calculate it from here. We can't use
         CallT::ReturnType because for most bindings that value
         is different from its Call() return type. We will possibly
@@ -652,7 +652,7 @@ namespace cvv8 {
 
         This type is primarily intended to be used together with
         PredicatedInCaDispatcher.
-        
+
         @see PredicatedInCaLike
 
         Reminder to self: this class is only in arguments.hpp, as opposed to
@@ -706,7 +706,7 @@ namespace cvv8 {
 
             If no predicates match then a JS-side exception will be triggered.
         */
-        static inline v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static inline v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             typedef typename PredList::Head Head;
             typedef typename tmp::IfElse< tmp::SameType<tmp::NilType,Head>::Value,
@@ -734,7 +734,7 @@ namespace cvv8 {
             Triggers a JS-side exception explaining (in English text) that no
             overloads could be matched to the given arguments.
         */
-        static inline v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static inline v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Toss(StringBuffer()<<"No predicates in the "
                         << "argument dispatcher matched the given "
@@ -748,15 +748,15 @@ namespace cvv8 {
         ArgPred must be an ArgumentsPredicate type and
         FactoryT must be CtorForwarder or interface-compatible.
 
-        We could probably have this take a signature instead of 
-        FactoryT, and wrap that signature in a CtorForwarder. That 
+        We could probably have this take a signature instead of
+        FactoryT, and wrap that signature in a CtorForwarder. That
         would which would simplify most client code but:
 
-        a) ctor signatures are a bit kludgy to work with at the 
+        a) ctor signatures are a bit kludgy to work with at the
         templates level.
 
-        b) That would preclude the use of ctor-like factories which 
-        return subclasses of some base interface type (the 
+        b) That would preclude the use of ctor-like factories which
+        return subclasses of some base interface type (the
         parameterized type).
     */
     template <typename ArgPred, typename FactoryT>
@@ -764,14 +764,14 @@ namespace cvv8 {
         : PredicatedInCaLike<ArgPred, FactoryT> {};
 
     /**
-        The constructor counterpart of PredicatedInCaDispatcher. 
-        PredList must be a typelist of PredicatedCtorForwarder (or 
-        interface-compatible) types. The ReturnType part of the 
-        typelist must be the base type the constructors in the list 
-        can return (they must all share a common base). Clients must 
-        not pass the ContextT parameter - it is required internally 
+        The constructor counterpart of PredicatedInCaDispatcher.
+        PredList must be a typelist of PredicatedCtorForwarder (or
+        interface-compatible) types. The ReturnType part of the
+        typelist must be the base type the constructors in the list
+        can return (they must all share a common base). Clients must
+        not pass the ContextT parameter - it is required internally
         for handling the end-of-typelist case.
-        
+
         This template instantiates TypeName<PredList::ReturnType>, so
         if that template is to be specialized by client code, it should
         be specialized before this template used.
@@ -790,7 +790,7 @@ namespace cvv8 {
 
             If no predicates match then a JS-side exception will be triggered.
         */
-        static ReturnType Call( v8::Arguments const & argv )
+        static ReturnType Call( XScriptArguments const & argv )
         {
             typedef typename PredList::Head Head;
             typedef typename tmp::IfElse< tmp::SameType<tmp::NilType,Head>::Value,
@@ -814,7 +814,7 @@ namespace cvv8 {
             cryptic, but we can't be more specific at this level of
             the API.
         */
-        static ReturnType Call( v8::Arguments const & argv )
+        static ReturnType Call( XScriptArguments const & argv )
         {
             StringBuffer os;
             os << "No predicates in the "
@@ -851,7 +851,7 @@ namespace cvv8 {
                 in advance. We do not do it here because it's a waste
                 of cycles for all recursions after the first one.
             */
-            inline bool operator()( v8::Arguments const & argv ) const
+            inline bool operator()( XScriptArguments const & argv ) const
             {
                 enum {  Arity = sl::Arity<TypeListT>::Value };
                 /**
@@ -905,7 +905,7 @@ namespace cvv8 {
             As a special case, for 0-length typelists this function
             returns true if only the first condition applies.
         */
-        bool operator()( v8::Arguments const & argv ) const
+        bool operator()( XScriptArguments const & argv ) const
         {
             enum { Arity = sl::Length<TypeListT>::Value };
             typedef typename tmp::IfElse< 0==Arity,

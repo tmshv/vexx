@@ -13,32 +13,32 @@ template <typename Sig> struct XSignature;
     and use sl::Arity instead.
 */
 template <typename RV>
-struct XSignature<RV (v8::Arguments const &)>
+struct XSignature<RV (XScriptArguments const &)>
 {
     typedef RV ReturnType;
-    typedef RV (*FunctionType)(v8::Arguments const &);
+    typedef RV (*FunctionType)(XScriptArguments const &);
     typedef void Context;
-    typedef v8::Arguments const & Head;
+    typedef XScriptArguments const & Head;
     typedef XSignature<RV ()> Tail;
 };
 
 template <typename RV>
-struct XSignature<RV (*)(v8::Arguments const &)> : XSignature<RV (v8::Arguments const &)>
+struct XSignature<RV (*)(XScriptArguments const &)> : XSignature<RV (XScriptArguments const &)>
 {};
 
 template <typename T, typename RV>
-struct XSignature<RV (T::*)(v8::Arguments const &)> : XSignature<RV (v8::Arguments const &)>
+struct XSignature<RV (T::*)(XScriptArguments const &)> : XSignature<RV (XScriptArguments const &)>
 {
     typedef T Context;
-    typedef RV (Context::*FunctionType)(v8::Arguments const &);
+    typedef RV (Context::*FunctionType)(XScriptArguments const &);
 };
 
 
 template <typename T, typename RV>
-struct XSignature<RV (T::*)(v8::Arguments const &) const> : XSignature<RV (v8::Arguments const &)>
+struct XSignature<RV (T::*)(XScriptArguments const &) const> : XSignature<RV (XScriptArguments const &)>
 {
     typedef T const Context;
-    typedef RV (Context::*FunctionType)(v8::Arguments const &) const;
+    typedef RV (Context::*FunctionType)(XScriptArguments const &) const;
 };
 
 

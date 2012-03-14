@@ -13,6 +13,8 @@ conversion.
 */
 
 #include "convert_core.hpp"
+#include "XInterfaceObject.h"
+#include "XScriptFunction.h"
 #include "XSignature.h"
 #include "XSignatureSpecialisations.h"
 #include "XScriptException.h"
@@ -30,7 +32,7 @@ struct InCa
         InvocationCallback interface. Some bindings provide additional
         overloads as well.
     */
-    static v8::Handle<v8::Value> Call( v8::Arguments const & );
+    static v8::Handle<v8::Value> Call( XScriptArguments const & );
 };
 
 /**
@@ -44,9 +46,9 @@ struct InCaVoid : InCa {};
    (differing only in their return type) with an Arity value of -1.
 */
 template <typename RV>
-struct XFunctionSignature< RV (v8::Arguments const &) > : XSignature<RV (v8::Arguments const &)>
+struct XFunctionSignature< RV (XScriptArguments const &) > : XSignature<RV (XScriptArguments const &)>
 {
-    typedef RV (*FunctionType)(v8::Arguments const &);
+    typedef RV (*FunctionType)(XScriptArguments const &);
 };
 
 /**
@@ -55,10 +57,10 @@ struct XFunctionSignature< RV (v8::Arguments const &) > : XSignature<RV (v8::Arg
    Arity value of -1.
 */
 template <typename T, typename RV >
-struct XMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (v8::Arguments const &) >
+struct XMethodSignature< T, RV (XScriptArguments const &) > : XSignature< RV (XScriptArguments const &) >
 {
     typedef T Type;
-    typedef RV (T::*FunctionType)(v8::Arguments const &);
+    typedef RV (T::*FunctionType)(XScriptArguments const &);
 };
 
 /**
@@ -67,10 +69,10 @@ struct XMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (v8::A
    of -1.
 */
 template <typename T, typename RV >
-struct XConstMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (v8::Arguments const &) >
+struct XConstMethodSignature< T, RV (XScriptArguments const &) > : XSignature< RV (XScriptArguments const &) >
 {
     typedef T Type;
-    typedef RV (T::*FunctionType)(v8::Arguments const &) const;
+    typedef RV (T::*FunctionType)(XScriptArguments const &) const;
 };
 
 /**
@@ -78,12 +80,12 @@ struct XConstMethodSignature< T, RV (v8::Arguments const &) > : XSignature< RV (
    InvocationCallback-like functions (differing only by their return
    type), which uses an Arity value of -1.
 */
-template <typename RV, RV (*FuncPtr)(v8::Arguments const &) >
-struct XFunctionPtr<RV (v8::Arguments const &),FuncPtr>
-    : XFunctionSignature<RV (v8::Arguments const &)>
+template <typename RV, RV (*FuncPtr)(XScriptArguments const &) >
+struct XFunctionPtr<RV (XScriptArguments const &),FuncPtr>
+    : XFunctionSignature<RV (XScriptArguments const &)>
 {
     public:
-    typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+    typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
     typedef typename XSignatureType::ReturnType ReturnType;
     typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
@@ -97,11 +99,11 @@ struct XFunctionPtr<RV (v8::Arguments const &),FuncPtr>
    InvocationCallback-like functions (differing only by their return
    type), which uses an Arity value of -1.
 */
-template <typename T,typename RV, RV (T::*FuncPtr)(v8::Arguments const &) >
-struct XMethodPtr<T, RV (T::*)(v8::Arguments const &),FuncPtr>
-    : XMethodSignature<T, RV (T::*)(v8::Arguments const &)>
+template <typename T,typename RV, RV (T::*FuncPtr)(XScriptArguments const &) >
+struct XMethodPtr<T, RV (T::*)(XScriptArguments const &),FuncPtr>
+    : XMethodSignature<T, RV (T::*)(XScriptArguments const &)>
 {
-    typedef XMethodSignature<T, RV (T::*)(v8::Arguments const &)> XSignatureType;
+    typedef XMethodSignature<T, RV (T::*)(XScriptArguments const &)> XSignatureType;
     typedef typename XSignatureType::ReturnType ReturnType;
     typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
@@ -115,11 +117,11 @@ struct XMethodPtr<T, RV (T::*)(v8::Arguments const &),FuncPtr>
    InvocationCallback-like functions (differing only by their return
    type), which uses an Arity value of -1.
 */
-template <typename T,typename RV, RV (T::*FuncPtr)(v8::Arguments const &) const >
-struct XConstMethodPtr<T, RV (T::*)(v8::Arguments const &) const,FuncPtr>
-    : XConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const>
+template <typename T,typename RV, RV (T::*FuncPtr)(XScriptArguments const &) const >
+struct XConstMethodPtr<T, RV (T::*)(XScriptArguments const &) const,FuncPtr>
+    : XConstMethodSignature<T, RV (T::*)(XScriptArguments const &) const>
 {
-    typedef XConstMethodSignature<T, RV (T::*)(v8::Arguments const &) const> XSignatureType;
+    typedef XConstMethodSignature<T, RV (T::*)(XScriptArguments const &) const> XSignatureType;
     typedef typename XSignatureType::ReturnType ReturnType;
     typedef typename XSignatureType::FunctionType FunctionType;
     static FunctionType GetFunction()
@@ -154,7 +156,7 @@ namespace Detail {
 
     We optimistically assume that most types are safe and
     add specializations for types we know are not safe, e.g.
-    v8::Handle<Anything> and v8::Arguments.
+    v8::Handle<Anything> and XScriptArguments.
 
     Specializations of this type basically make up a collective
     "blacklist" of types which we know are not legal to use unless
@@ -204,7 +206,7 @@ template <typename T>
 struct IsUnlockable< v8::Local<T> > : XBoolVal<false> {};
 
 template <>
-struct IsUnlockable<v8::Arguments> : XBoolVal<false> {};
+struct IsUnlockable<XScriptArguments> : XBoolVal<false> {};
 
 /**
     Given a tmp::TypeList-compatible type list, this metafunction's
@@ -304,7 +306,7 @@ struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
     Example:
 
     @code
-    v8::Handle<v8::Value> my_bound_func( v8::Arguments const & argv ) {
+    v8::Handle<v8::Value> my_bound_func( XScriptArguments const & argv ) {
         T * self = CastFromJS<T>( argv.This() );
         if( ! self ) {
             return TossMissingThis<T>();
@@ -380,19 +382,19 @@ namespace Detail {
     struct FunctionForwarder;
 
     template <int Arity, typename RV, bool UnlockV8>
-    struct FunctionForwarder<Arity,RV (v8::Arguments const &), UnlockV8>
-        : XFunctionSignature<RV (v8::Arguments const &)>
+    struct FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
+        : XFunctionSignature<RV (XScriptArguments const &)>
     {
     public:
-        typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+        typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             return (RV) func(argv);
         }
 
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -403,8 +405,8 @@ namespace Detail {
 
     //! Reminder to self: we really do need this specialization for some cases.
     template <int Arity, typename RV, bool UnlockV8>
-    struct FunctionForwarder<Arity,RV (*)(v8::Arguments const &), UnlockV8>
-        : FunctionForwarder<Arity,RV (v8::Arguments const &), UnlockV8>
+    struct FunctionForwarder<Arity,RV (*)(XScriptArguments const &), UnlockV8>
+        : FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
     {};
 
     template <typename Sig, bool UnlockV8>
@@ -413,12 +415,12 @@ namespace Detail {
         typedef XFunctionSignature<Sig> XSignatureType;
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename XSignatureType::FunctionType FunctionType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return func();
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             return CastToJS( CallNative( func, argv ) );
         }
@@ -436,7 +438,7 @@ namespace Detail {
         typedef XFunctionSignature<Sig> XSignatureType;
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef Sig FunctionType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)func()
@@ -446,7 +448,7 @@ namespace Detail {
                return of a void expression without the cast.
             */;
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -456,19 +458,19 @@ namespace Detail {
     };
 
     template <int Arity, typename RV, bool UnlockV8>
-    struct FunctionForwarderVoid<Arity,RV (v8::Arguments const &), UnlockV8>
-        : XFunctionSignature<RV (v8::Arguments const &)>
+    struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
+        : XFunctionSignature<RV (XScriptArguments const &)>
     {
     public:
-        typedef XFunctionSignature<RV (v8::Arguments const &)> XSignatureType;
+        typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)func(argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             CallNative( func, argv );
             return v8::Undefined();
@@ -494,12 +496,12 @@ namespace Detail {
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XScriptTypeInfo<T>::Type Type;
-        static ReturnType CallNative( T & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (self.*func)();
         }
-        static v8::Handle<v8::Value> Call( T & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -507,13 +509,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -526,19 +528,19 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : XMethodSignature<T, RV (v8::Arguments const &)>
+    struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
+        : XMethodSignature<T, RV (XScriptArguments const &)>
     {
     public:
-        typedef XMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef XMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
         typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & argv )
         {
             return (self.*func)(argv);
         }
-        static v8::Handle<v8::Value> Call( T & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -546,13 +548,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -564,8 +566,8 @@ namespace Detail {
     };
 
     template <typename T, typename RV, bool UnlockV8, int _Arity>
-    struct XMethodForwarder<T,_Arity, RV (T::*)(v8::Arguments const &), UnlockV8> :
-            XMethodForwarder<T, _Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XMethodForwarder<T,_Arity, RV (T::*)(XScriptArguments const &), UnlockV8> :
+            XMethodForwarder<T, _Arity, RV (XScriptArguments const &), UnlockV8>
     {};
 
     template <typename T, int Arity_, typename Sig,
@@ -582,12 +584,12 @@ namespace Detail {
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef T Type;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( Type & self, FunctionType func, v8::Arguments const & )
+        static ReturnType CallNative( Type & self, FunctionType func, XScriptArguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)();
         }
-        static v8::Handle<v8::Value> Call( Type & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( Type & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -596,13 +598,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -614,19 +616,19 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XMethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
-        : XMethodSignature<T,RV (v8::Arguments const &)>
+    struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
+        : XMethodSignature<T,RV (XScriptArguments const &)>
     {
     public:
-        typedef XMethodSignature<T,RV (v8::Arguments const &)> XSignatureType;
+        typedef XMethodSignature<T,RV (XScriptArguments const &)> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( Type & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( Type & self, FunctionType func, XScriptArguments const & argv )
         {
             return (ReturnType)(self.*func)(argv);
         }
-        static v8::Handle<v8::Value> Call( Type & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( Type & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -636,13 +638,13 @@ namespace Detail {
             HANDLE_PROPAGATE_EXCEPTION;
 
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -655,8 +657,8 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XMethodForwarderVoid<T,Arity, RV (T::*)(v8::Arguments const &), UnlockV8>
-        : XMethodForwarderVoid<T,Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XMethodForwarderVoid<T,Arity, RV (T::*)(XScriptArguments const &), UnlockV8>
+        : XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
     {};
 
     /**
@@ -674,13 +676,13 @@ namespace Detail {
         typedef XConstMethodSignature<T,Sig> XSignatureType;
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (self.*func)();
         }
 
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -688,13 +690,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -705,19 +707,19 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : XConstMethodSignature<T, RV (v8::Arguments const &)>
+    struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
+        : XConstMethodSignature<T, RV (XScriptArguments const &)>
     {
     public:
-        typedef XConstMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef XConstMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
         typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             return (ReturnType)(self.*func)(argv);
         }
-        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -725,13 +727,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -743,8 +745,8 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XConstMethodForwarder<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
-        : XConstMethodForwarder<T, Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XConstMethodForwarder<T, Arity, RV (T::*)(XScriptArguments const &) const, UnlockV8>
+        : XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     {};
 
     template <typename T, int Arity_, typename Sig,
@@ -760,13 +762,13 @@ namespace Detail {
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename XScriptTypeInfo<T>::Type Type;
-        static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & )
+        static ReturnType CallNative( Type const & self, FunctionType func, XScriptArguments const & )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)();
         }
 
-        static v8::Handle<v8::Value> Call( Type const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( Type const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -775,13 +777,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return (ReturnType)CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -794,21 +796,21 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
-        : XConstMethodSignature<T, RV (v8::Arguments const &)>
+    struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>
+        : XConstMethodSignature<T, RV (XScriptArguments const &)>
     {
     public:
-        typedef XConstMethodSignature<T, RV (v8::Arguments const &)> XSignatureType;
+        typedef XConstMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
         typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
         typedef typename XSignatureType::FunctionType FunctionType;
         typedef typename XSignatureType::ReturnType ReturnType;
         typedef typename XScriptTypeInfo<T>::Type Type;
-        static ReturnType CallNative( Type const & self, FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( Type const & self, FunctionType func, XScriptArguments const & argv )
         {
             V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
             return (ReturnType)(self.*func)();
         }
-        static v8::Handle<v8::Value> Call( Type const & self, FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( Type const & self, FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -816,13 +818,13 @@ namespace Detail {
             }
             HANDLE_PROPAGATE_EXCEPTION;
         }
-        static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+        static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
         {
             T const * self = CastFromJS<T>(argv.This());
             if( ! self ) throw MissingThisExceptionT<T>();
             return CallNative(*self, func, argv);
         }
-        static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
         {
             try
             {
@@ -834,15 +836,15 @@ namespace Detail {
     };
 
     template <typename T, int Arity, typename RV, bool UnlockV8>
-    struct XConstMethodForwarderVoid<T, Arity, RV (T::*)(v8::Arguments const &) const, UnlockV8>
-    : XConstMethodForwarderVoid<T, Arity, RV (v8::Arguments const &), UnlockV8>
+    struct XConstMethodForwarderVoid<T, Arity, RV (T::*)(XScriptArguments const &) const, UnlockV8>
+    : XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>
     {};
 
 }
 #endif // DOXYGEN
 
 /**
-    A helper type for passing v8::Arguments lists to native non-member
+    A helper type for passing XScriptArguments lists to native non-member
     functions.
 
     Sig must be a function-signature-like argument. e.g. <double (int,double)>,
@@ -867,7 +869,7 @@ namespace Detail {
     return and arguments types.
 
     - Any of the return or argument types for the function are v8
-    types, e.g. v8::Handle<Anything> or v8::Arguments.
+    types, e.g. v8::Handle<Anything> or XScriptArguments.
     XSignatureIsUnlockable<Sig>::Value will evaluate to false
     if any of the "known bad" types is contained in the function's
     XSignature. If this function is given a true value but
@@ -920,7 +922,7 @@ public:
 
        The native return value of the call is returned to the caller.
     */
-    static ReturnType CallNative( FunctionType func, v8::Arguments const & argv )
+    static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::CallNative( func, argv );
     }
@@ -929,7 +931,7 @@ public:
         is void, in which case CastToJS() is not invoked and v8::Undefined()
         will be returned.
     */
-    static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+    static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::Call( func, argv );
     }
@@ -971,16 +973,14 @@ struct CallForwarder
 template <>
 struct CallForwarder<0>
 {
-    static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                       v8::Handle<v8::Function> const & func )
+    static XScriptObject Call( XInterfaceObject const &self, XScriptFunction const &func )
     {
-        return (self.IsEmpty() || func.IsEmpty())
-            ? Toss("Illegal argument: empty v8::Handle<>.")
-            : func->Call(self, 0, NULL);
+      return func.call(self, 0, 0);
     }
-    static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func )
+    static XScriptObject Call( XScriptFunction const &func )
     {
-        return Call( func, func );
+      XInterfaceObject obj(func);
+      return Call( obj, func );
     }
 };
 
@@ -1000,7 +1000,7 @@ namespace Detail {
         typedef XFunctionSignature<Sig> XSignatureType;
         typedef FunctionForwarder< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return (ReturnType)Proxy::CallNative( Func, argv );
             /**
@@ -1010,7 +1010,7 @@ namespace Detail {
                 foo() when foo() returns void.
             */
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
@@ -1033,11 +1033,11 @@ namespace Detail {
         typedef XFunctionSignature<Sig> XSignatureType;
         typedef FunctionForwarderVoid< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return (ReturnType)Proxy::CallNative( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
@@ -1056,19 +1056,19 @@ namespace Detail {
         enum { Arity = sl::Arity<XSignatureType>::Value };
         typedef XMethodForwarder< T, Arity, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T & self, v8::Arguments const & argv )
+        static ReturnType CallNative( T & self, XScriptArguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
         }
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( T & self, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T & self, XScriptArguments const & argv )
         {
             return Proxy::Call( self, Func, argv );
         }
@@ -1087,19 +1087,19 @@ namespace Detail {
         enum { Arity = sl::Arity<XSignatureType>::Value };
         typedef XMethodForwarderVoid< T, Arity, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T & self, v8::Arguments const & argv )
+        static ReturnType CallNative( T & self, XScriptArguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
         }
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( T & self, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T & self, XScriptArguments const & argv )
         {
             return Proxy::Call( self, Func, argv );
         }
@@ -1117,19 +1117,19 @@ namespace Detail {
         typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
         typedef XConstMethodForwarder< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, XScriptArguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
         }
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( T const & self, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, XScriptArguments const & argv )
         {
             return Proxy::Call( self, Func, argv );
         }
@@ -1145,19 +1145,19 @@ namespace Detail {
         typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
         typedef XConstMethodForwarderVoid< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
         typedef typename XSignatureType::ReturnType ReturnType;
-        static ReturnType CallNative( T const & self, v8::Arguments const & argv )
+        static ReturnType CallNative( T const & self, XScriptArguments const & argv )
         {
             return Proxy::CallNative( self, Func, argv );
         }
-        static ReturnType CallNative( v8::Arguments const & argv )
+        static ReturnType CallNative( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return Proxy::Call( Func, argv );
         }
-        static v8::Handle<v8::Value> Call( T const & self, v8::Arguments const & argv )
+        static v8::Handle<v8::Value> Call( T const & self, XScriptArguments const & argv )
         {
             return Proxy::Call( self, Func, argv );
         }
@@ -1233,7 +1233,7 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
 
    To convert JS objects to native 'this' pointers this API uses
    CastFromJS<T>(arguments.This()), where arguments is the
-   v8::Arguments instance passed to the generated InvocationCallback
+   XScriptArguments instance passed to the generated InvocationCallback
    implementation. If that conversion fails then the generated
    functions will throw a JS-side exception when called.
 
@@ -1310,7 +1310,7 @@ template <typename Ftor, typename Sig,
         >
 struct FunctorToInCa : InCa
 {
-    inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
     {
         typedef Detail::FunctorToInCaSelector<
             typename XSignature<Sig>::ReturnType, Ftor, Sig, UnlockV8
@@ -1328,7 +1328,7 @@ template <typename Ftor, typename Sig,
         >
 struct FunctorToInCaVoid : InCa
 {
-    inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
     {
         typedef Detail::FunctorToInCaSelector<
             void, Ftor, Sig, UnlockV8
@@ -1415,7 +1415,7 @@ public:
        (i.e. it is InvocationCallback-like) then argv is passed on
        to it regardless of the value of argv.Length().
     */
-    inline static v8::Handle<v8::Value> Call( T & self, FunctionType func, v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( T & self, FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::Call( self, func, argv );
     }
@@ -1424,7 +1424,7 @@ public:
        Like the 3-arg overload, but tries to extract the (T*) object using
        CastFromJS<T>(argv.This()).
     */
-    inline static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::Call( func, argv );
     }
@@ -1461,7 +1461,7 @@ public:
        InvocationCallback-like) then argv is passed on to it
        regardless of the value of argv.Length().
     */
-    inline static v8::Handle<v8::Value> Call( T const & self, FunctionType func, v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::Call( self, func, argv );
     }
@@ -1470,7 +1470,7 @@ public:
        Like the 3-arg overload, but tries to extract the (T const *)
        object using CastFromJS<T>(argv.This()).
     */
-    inline static v8::Handle<v8::Value> Call( FunctionType func, v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
     {
         return Proxy::Call( func, argv );
     }
@@ -1487,7 +1487,7 @@ public:
 */
 template <typename Sig>
 inline typename XFunctionSignature<Sig>::ReturnType
-forwardFunction( Sig func, v8::Arguments const & argv )
+forwardFunction( Sig func, XScriptArguments const & argv )
 {
     typedef XFunctionSignature<Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
@@ -1511,7 +1511,7 @@ forwardMethod( T & self,
                Sig func,
                /* if i do: typename XMethodSignature<T,Sig>::FunctionType
                   then this template is never selected. */
-               v8::Arguments const & argv )
+               XScriptArguments const & argv )
 {
     typedef XMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
@@ -1533,7 +1533,7 @@ forwardMethod( T & self,
 */
 template <typename T, typename Sig>
 inline typename XMethodSignature<T,Sig>::ReturnType
-forwardMethod(Sig func, v8::Arguments const & argv )
+forwardMethod(Sig func, XScriptArguments const & argv )
 {
     typedef XMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
@@ -1557,7 +1557,7 @@ inline typename XConstMethodSignature<T,Sig>::ReturnType
 forwardConstMethod( T const & self,
                     //typename XConstMethodSignature<T,Sig>::FunctionType func,
                     Sig func,
-                    v8::Arguments const & argv )
+                    XScriptArguments const & argv )
 {
     typedef XConstMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
@@ -1579,7 +1579,7 @@ forwardConstMethod( T const & self,
 */
 template <typename T, typename Sig>
 inline typename XConstMethodSignature<T,Sig>::ReturnType
-forwardConstMethod(Sig func, v8::Arguments const & argv )
+forwardConstMethod(Sig func, XScriptArguments const & argv )
 {
     typedef XConstMethodSignature<T,Sig> MSIG;
     typedef typename MSIG::ReturnType RV;
@@ -1599,7 +1599,7 @@ forwardConstMethod(Sig func, v8::Arguments const & argv )
    templates this way, this class can fill that gap.
 */
 template <v8::InvocationCallback ICB>
-struct InCaToInCa : FunctionToInCa< v8::Handle<v8::Value> (v8::Arguments const &), ICB>
+struct InCaToInCa : FunctionToInCa< v8::Handle<v8::Value> (XScriptArguments const &), ICB>
 {
 };
 
@@ -1627,7 +1627,7 @@ struct NativeToJS< InCaToInCa<ICB> >
 namespace Detail {
     /** Internal code duplication reducer. */
     template <int ExpectingArity>
-    v8::Handle<v8::Value> TossArgCountError( v8::Arguments const & args )
+    v8::Handle<v8::Value> TossArgCountError( XScriptArguments const & args )
     {
         return Toss((StringBuffer()
                    <<"Incorrect argument count ("<<args.Length()
@@ -1667,7 +1667,7 @@ struct ArityDispatch : InCa
 
        Implements the InvocationCallback interface.
     */
-    inline static v8::Handle<v8::Value> Call( v8::Arguments const & args )
+    inline static v8::Handle<v8::Value> Call( XScriptArguments const & args )
     {
         return ( (-1==Arity) || (Arity == args.Length()) )
             ? InCaT::Call(args)
@@ -1764,7 +1764,7 @@ struct InCaCatcher : InCa
 
         See the class-level docs for full details.
     */
-    static v8::Handle<v8::Value> Call( v8::Arguments const & args )
+    static v8::Handle<v8::Value> Call( XScriptArguments const & args )
     {
         try
         {
@@ -1850,7 +1850,7 @@ namespace Detail {
     template <typename InCaT>
     struct OverloadCallHelper : InCa
     {
-        inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        inline static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
         {
             return InCaT::Call(argv);
         }
@@ -1859,9 +1859,9 @@ namespace Detail {
     template <>
     struct OverloadCallHelper<XNilType> : InCa
     {
-        inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+        inline static XScriptObject Call( XScriptArguments const & argv )
         {
-          return Toss( QString("End of typelist reached. Argument count=%1").arg(argv.Length()) );
+          return Toss( QString("End of typelist reached. Argument count=%1").arg(argv.length()) );
         }
     };
 }
@@ -1874,7 +1874,7 @@ namespace Detail {
    FwdList must be-a TypeList (or interface-compatible type list)
    containing types which have the following function:
 
-   static v8::Handle<v8::Value> Call( v8::Arguments const & argv );
+   static v8::Handle<v8::Value> Call( XScriptArguments const & argv );
 
    And a static const integer (or enum) value called Arity,
    which must specify the expected number of arguments, or be
@@ -1913,7 +1913,7 @@ struct ArityDispatchList : InCa
 
        Implements the v8::InvocationCallback interface.
     */
-    inline static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+    inline static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
     {
         typedef typename FwdList::Head FWD;
         typedef typename FwdList::Tail Tail;
@@ -2035,12 +2035,12 @@ struct ToInCaVoid : Detail::ToInCaSigSelectorVoid<T,Sig>::template Base<Func,Unl
     only two arguments:
 
     @code
-    // int my_func( v8::Arguments const & );
+    // int my_func( XScriptArguments const & );
     typedef InCaLikeFunction< int, my_func > F;
     @endcode
 */
-template <typename RV, RV (*Func)(v8::Arguments const &)>
-struct InCaLikeFunction : FunctionToInCa< RV (v8::Arguments const &), Func>
+template <typename RV, RV (*Func)(XScriptArguments const &)>
+struct InCaLikeFunction : FunctionToInCa< RV (XScriptArguments const &), Func>
 {
 };
 
@@ -2049,12 +2049,12 @@ struct InCaLikeFunction : FunctionToInCa< RV (v8::Arguments const &), Func>
     useful for non-const "InvocationCallback-like" methods:
 
     @code
-    // Method: int MyType::func( v8::Arguments const & )
+    // Method: int MyType::func( XScriptArguments const & )
     typedef InCaLikeMethod<MyType, int, &MyType::func > F;
     @endcode
 */
-template <typename T, typename RV, RV (T::*Func)(v8::Arguments const &)>
-struct InCaLikeMethod : MethodToInCa< T, RV (v8::Arguments const &), Func>
+template <typename T, typename RV, RV (T::*Func)(XScriptArguments const &)>
+struct InCaLikeMethod : MethodToInCa< T, RV (XScriptArguments const &), Func>
 {};
 
 /**
@@ -2062,12 +2062,12 @@ struct InCaLikeMethod : MethodToInCa< T, RV (v8::Arguments const &), Func>
     useful for const "InvocationCallback-like" methods:
 
     @code
-    // Method: int MyType::func( v8::Arguments const & ) const
+    // Method: int MyType::func( XScriptArguments const & ) const
     typedef InCaLikeConstMethod<MyType, int, &MyType::func > F;
     @endcode
 */
-template <typename T, typename RV, RV (T::*Func)(v8::Arguments const &) const>
-struct InCaLikeConstMethod : ConstMethodToInCa< T, RV (v8::Arguments const &), Func>
+template <typename T, typename RV, RV (T::*Func)(XScriptArguments const &) const>
+struct InCaLikeConstMethod : ConstMethodToInCa< T, RV (XScriptArguments const &), Func>
 {};
 
 
@@ -2120,7 +2120,7 @@ struct OneTimeInitInCa : InCa
         in from multiple DLLs, the init routine might be called
         more than once, depending on the platform.
     */
-    static v8::Handle<v8::Value> Call( v8::Arguments const & argv )
+    static v8::Handle<v8::Value> Call( XScriptArguments const & argv )
     {
         static bool bob = false;
         if( ! bob )

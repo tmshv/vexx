@@ -102,7 +102,7 @@ namespace cvv8 {
 
            The default implementation simply return (new T).
         */
-        static ReturnType Create( v8::Persistent<v8::Object> &, v8::Arguments const & )
+        static ReturnType Create( XInterfaceObject &, XScriptArguments const & )
         {
             return new T;
         }
@@ -426,7 +426,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void PreWrap( v8::Persistent<v8::Object> const &, v8::Arguments const & )
+        static void PreWrap( XInterfaceObject const &, XScriptArguments const & )
         {
             return;
         }
@@ -456,7 +456,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void Wrap( v8::Persistent<v8::Object> const &, NativeHandle )
+        static void Wrap( XScriptObject const &, NativeHandle )
         {
             return;
         }
@@ -490,7 +490,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void Unwrap( v8::Handle<v8::Object> const &, NativeHandle )
+        static void Unwrap( XScriptObject const &, NativeHandle )
         {
             return;
         }
@@ -643,7 +643,7 @@ namespace cvv8 {
                returns true, otherwise it writes a descriptive error message
                to errmsg and return false.
             */
-            static bool argv_check( v8::Arguments const & argv, int Arity )
+            static bool argv_check( XScriptArguments const & argv, int Arity )
             {
                 if( argv.Length() >= Arity ) return true;
                 else
@@ -667,7 +667,7 @@ namespace cvv8 {
         be a type having this interface:
 
         @code
-        XScriptTypeInfo<T>::NativeHandle Call( v8::Arguments const & );
+        XScriptTypeInfo<T>::NativeHandle Call( XScriptArguments const & );
         @endcode
 
         Normally CtorProxy would be CtorForwarder or CtorArityDispatcher,
@@ -707,7 +707,7 @@ namespace cvv8 {
             If CtorProxy::Call(argv) succeeds, N2JMap::Insert(jself, theNative)
             is called. The result of CtorProxy::Call() is returned.
         */
-        static NativeHandle Create( v8::Persistent<v8::Object> jself, v8::Arguments const &  argv )
+        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
         {
             NativeHandle n = CtorProxy::Call( argv );
             if( n ) N2JMap::Insert( jself, n );
@@ -731,7 +731,7 @@ namespace cvv8 {
     public:
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( v8::Persistent<v8::Object> , v8::Arguments const &  argv )
+        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
         {
             typedef CtorArityDispatcher<CtorForwarderList> Proxy;
             return Proxy::Call( argv );
@@ -775,7 +775,7 @@ namespace cvv8 {
     public:
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( v8::Persistent<v8::Object>, v8::Arguments const &  argv )
+        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
         {
             return CtorT::Call( argv );
         }
@@ -796,7 +796,7 @@ namespace cvv8 {
         /**
            Always returns NULL.
         */
-        static NativeHandle Create( v8::Persistent<v8::Object> jself, v8::Arguments const &  argv )
+        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
         {
             return NULL;
         }

@@ -290,11 +290,11 @@ namespace cvv8 {
     template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Getter>
     struct XMethodToGetter : XAccessorGetterType
     {
-        inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
+        inline static XScriptObject Get( XScriptObject property, const XAccessorInfo & info )
         {
             typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
-            NativeHandle self = XScriptConvert::from<T>( info.This() );
+            NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
             return self
                 ? XScriptConvert::to( (self->*Getter)() )
                 : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
@@ -307,11 +307,11 @@ namespace cvv8 {
     template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Getter>
     struct XConstMethodToGetter : XAccessorGetterType
     {
-        inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
+        inline static XScriptObject Get( XScriptObject property, const XAccessorInfo & info )
         {
             typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
-            NativeHandle const self = XScriptConvert::from<T>( info.This() );
+            NativeHandle const self = XScriptConvert::from<T>( info.calleeThis() );
             return self
                 ? XScriptConvert::to( (self->*Getter)() )
                 : Toss(QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)))
@@ -322,11 +322,11 @@ namespace cvv8 {
     template <typename T, typename InputArg, typename XMethodSignature<T,void (InputArg)>::FunctionType Setter>
     struct XMethodToSetter : XAccessorSetterType
     {
-        static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
+        static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo &info)
         {
             typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
-            NativeHandle self = XScriptConvert::from<NativeHandle>( info.This() );
+            NativeHandle self = XScriptConvert::from<NativeHandle>( info.calleeThis() );
             if( ! self )
             {
               Toss( QString("Native member property setter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );

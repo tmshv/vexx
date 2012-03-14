@@ -197,7 +197,6 @@ int main(int, char*[])
     "var r = new Rect();"
     "r.top = 5;"
     "r.left = 61;"
-    "someClass.nonStatic = r;"
     "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
     );
 

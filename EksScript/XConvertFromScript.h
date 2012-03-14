@@ -131,22 +131,22 @@ struct JSToNativeObjectWithInternalFields
 public:
   typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
-    if( h.IsEmpty() || ! h->IsObject() )
+    if( !h.isValid() || ! h.isObject() )
       {
       return 0;
       }
     else
       {
       void *ext = 0;
-      v8::Handle<v8::Value> proto(h);
-      while(!ext && !proto.IsEmpty() && proto->IsObject())
+      XScriptObject proto(h);
+      while(!ext && proto.isValid() && proto.isObject())
         {
-        v8::Local<v8::Object> const & obj(v8::Object::Cast(*proto));
-        ext = (obj->InternalFieldCount() != InternalFieldCount)
+        XInterfaceObject const &obj(proto);
+        ext = (obj.internalFieldCount() != InternalFieldCount)
           ? 0
-          : obj->GetPointerFromInternalField(InternalFieldIndex);
+          : obj.internalField(InternalFieldIndex);
         if(!ext)
           {
           if(!SearchPrototypeChain)
@@ -155,7 +155,7 @@ public:
             }
           else
             {
-            proto = obj->GetPrototype();
+            proto = obj.getPrototype();
             }
           }
         }
@@ -186,7 +186,7 @@ struct JSToNativeObjectWithInternalFieldsTypeSafe
 public:
   typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
     if(h.IsEmpty() || ! h->IsObject())
       {
@@ -241,7 +241,7 @@ template <typename Ret, Ret (XScriptObject::*ToA)() const> struct JSToNativePODT
 
   ResultType operator()(XScriptObject const &h) const
     {
-    return ((*h)->*ToA)();
+    return (h.*ToA)();
     }
   };
 
@@ -279,9 +279,9 @@ template <> struct JSToNative<bool>
   {
   typedef bool ResultType;
 
-  ResultType operator()(v8::Handle<v8::Value> const &h) const
+  ResultType operator()(XScriptObject const &h) const
     {
-    return h->BooleanValue();
+    return h.toBoolean();
     }
   };
 

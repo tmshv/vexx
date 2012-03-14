@@ -8,6 +8,7 @@
 #include "XVariant"
 #include "XHash"
 #include "XMacroHelpers"
+#include "XScriptFunction.h"
 #include "cvv8/properties.hpp"
 #include "cvv8/ClassCreator.hpp"
 #include "XConvertToScript.h"
@@ -27,7 +28,7 @@ XProperties:
 public:
   XInterfaceBase(xsize typeID,
                  const char *typeName,
-                 XScriptObject ctor(v8::Arguments const &argv),
+                 XScriptObject ctor(XScriptArguments const &argv),
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount);
@@ -38,11 +39,11 @@ public:
     return _isSealed;
     }
 
-  void wrapInstance(v8::Handle<v8::Object> obj, void *object) const;
-  void unwrapInstance(v8::Handle<v8::Object> object) const;
+  void wrapInstance(XInterfaceObject obj, void *object) const;
+  void unwrapInstance(XInterfaceObject object) const;
 
-  v8::Handle<v8::Object> newInstance(int argc, v8::Handle<v8::Value> argv[]) const;
-  v8::Handle<v8::Object> newInstanceBase() const;
+  XInterfaceObject newInstance(int argc, v8::Handle<v8::Value> argv[]) const;
+  XInterfaceObject newInstanceBase() const;
 
   v8::Handle<v8::Function> constructorFunction() const;
   void set(const char *name, v8::Handle<v8::Value> val);
@@ -89,8 +90,8 @@ public:
             typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
   void addProperty(const char *name)
     {
-    v8::AccessorGetter getter = cvv8::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
-    v8::AccessorSetter setter = cvv8::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
+    v8::AccessorGetter getter = (v8::AccessorGetter)cvv8::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    v8::AccessorSetter setter = (v8::AccessorSetter)cvv8::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
 
     XInterfaceBase::addProperty(name, getter, setter);
     }
@@ -99,7 +100,7 @@ public:
             typename XMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD>
   void addAccessProperty(const char *name)
     {
-    v8::AccessorGetter getter = cvv8::XMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    v8::AccessorGetter getter = (v8::AccessorGetter)cvv8::XMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
 
     XInterfaceBase::addProperty(name, getter, 0);
     }
@@ -155,7 +156,7 @@ public:
      This function is not called DestroyObject to avoid name
      collisions during binding using Set(...,DestroyObjectCallback).
   */
-  static v8::Handle<v8::Value> destroyObjectCallback( v8::Arguments const & argv )
+  static v8::Handle<v8::Value> destroyObjectCallback( XScriptArguments const & argv )
     {
     return destroyObject(argv.This()) ? v8::True() : v8::False();
     }
@@ -185,18 +186,18 @@ private:
     return bob;
     }
 
-  static v8::Handle<v8::Object> FindHolder( v8::Handle<v8::Object> const & jo, T const * nh )
+  static XInterfaceObject FindHolder( XInterfaceObject const & jo, T const * nh )
   {
-      if( !nh || jo.IsEmpty() ) return v8::Handle<v8::Object>();
-      v8::Handle<v8::Value> proto(jo);
+      if( !nh || !jo.isValid() ) return XInterfaceObject();
+      XScriptObject proto(jo);
       void const * ext = NULL;
       typedef cvv8::ClassCreator_SearchPrototypeForThis<T> SPFT;
-      while( !ext && !proto.IsEmpty() && proto->IsObject() )
+      while( !ext && proto.isValid() && proto.isObject() )
       {
-          v8::Local<v8::Object> const & obj( v8::Object::Cast( *proto ) );
-          ext = (obj->InternalFieldCount() != InternalFields::Count)
+          XInterfaceObject obj(proto);
+          ext = (obj.internalFieldCount() != InternalFields::Count)
               ? NULL
-              : obj->GetPointerFromInternalField( InternalFields::NativeIndex );
+              : obj.internalField( InternalFields::NativeIndex );
           // FIXME: if InternalFields::TypeIDIndex>=0 then also do a check on that one.
           /*
               If !ext, there is no bound pointer. If (ext &&
@@ -204,18 +205,27 @@ private:
               we're looking for. In either case, (possibly) check the
               prototype...
           */
-          if( ext == nh ) return obj;
-          else if( !SPFT::Value ) break;
-          else proto = obj->GetPrototype();
+          if( ext == nh )
+            {
+            return obj;
+            }
+          else if( !SPFT::Value )
+            {
+            break;
+            }
+          else
+            {
+            proto = obj.getPrototype();
+            }
       }
-      return v8::Handle<v8::Object>();
+      return XInterfaceObject();
   }
 
-  static void weak_dtor( v8::Persistent< v8::Value > pv, void *nobj )
+  static void weak_dtor( XPersistentScriptObject pv, void * )
   {
       using namespace v8;
       //std::cerr << "Entering weak_dtor<>(native="<<(void const *)nobj<<")\n";
-      Local<Object> jobj( Object::Cast(*pv) );
+      XInterfaceObject jobj(pv);
       typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NT;
       NT native = XScriptConvert::from<T>( pv );
       if( !native )
@@ -234,8 +244,8 @@ private:
           crash, but the fact that this code block is hit AT ALL is a
           sign of a problem - the dtor shouldn't be called twice!
           */
-          pv.Dispose();
-          pv.Clear();
+          pv.dispose();
+          pv.clear();
 #if 1 /* i believe this problem was fixed. If you are reading this b/c
    you followed an assert() message, please report this as a bug.
   */
@@ -257,11 +267,11 @@ private:
              _exactly_ which JS object in the prototype chain nh is
              bound to.
           */
-          v8::Handle<v8::Object> nholder = FindHolder( jobj, native );
-#if 1 /* reminder: i've never actually seen this error happen, i'm just pedantic about checking... */
-          assert( ! nholder.IsEmpty() );
+          XInterfaceObject nholder = FindHolder( jobj, native );
+#if 0 /* reminder: i've never actually seen this error happen, i'm just pedantic about checking... */
+          assert( ! nholder.isValid() );
           WeakWrap::Unwrap( nholder /*jobj? subtle difference!*/, native );
-          if( nholder.IsEmpty() || (nholder->InternalFieldCount() != InternalFields::Count) )
+          if( nholder.isValid() || (nholder->InternalFieldCount() != InternalFields::Count) )
           {
             xAssertFail();
             /*  cvv8::StringBuffer msg;
@@ -300,14 +310,14 @@ private:
         sometime after this function with a !NEAR_DEATH
         assertion.
       */
-      pv.Dispose();
-      pv.Clear();
+      pv.dispose();
+      pv.clear();
   }
 
   /**
      Gets installed as the NewInstance() handler for T.
    */
-  static XScriptObject ctor_proxy( v8::Arguments const & argv )
+  static XScriptObject ctor_proxy( XScriptArguments const & argv )
   {
       using namespace v8;
       if(cvv8::ClassCreator_AllowCtorWithoutNew<T>::Value)
@@ -316,13 +326,9 @@ private:
              Allow construction without 'new' by forcing this
              function to be called in a ctor context...
           */
-          if (!argv.IsConstructCall())
+          if (!argv.isConstructCall())
           {
-              const int argc = argv.Length();
-              Handle<Function> ctor( Function::Cast(*argv.Callee()));
-              std::vector< Handle<Value> > av(static_cast<size_t>(argc),Undefined());
-              for( int i = 0; i < argc; ++i ) av[i] = argv[i];
-              return ctor->NewInstance( argc, &av[0] );
+            return argv.callee().callAsConstructor(argv);
           }
       }
       else
@@ -333,54 +339,55 @@ private:
              "v8::Object::SetInternalField() Writing internal
              field out of bounds".
           */
-          if (!argv.IsConstructCall())
+          if (!argv.isConstructCall())
           {
             return Toss("This constructor cannot be called as function!");
           }
       }
-      Local<Object> const & jobj( argv.This()
-                                  /*CastToJS<T>(*nobj)
 
-                                  We are not yet far enough
-                                  along in the binding that
-                                  CastToJS() can work. And it
-                                  can't work for the generic
-                                  case, anyway.
-                                  */);
-      if( jobj.IsEmpty() )
+      /*CastToJS<T>(*nobj)
+
+      We are not yet far enough
+      along in the binding that
+      CastToJS() can work. And it
+      can't work for the generic
+      case, anyway.
+      */
+      XInterfaceObject jobj(argv.calleeThis());
+      if( !jobj.isValid() )
         {
         return jobj /* assume exception*/;
         }
 
-      Persistent<Object> self( Persistent<Object>::New(jobj) );
+      //Persistent<Object> self( Persistent<Object>::New(jobj) );
       T * nobj = NULL;
       try
       {
-          WeakWrap::PreWrap( self, argv  );
-          nobj = Factory::Create( self, argv );
+          WeakWrap::PreWrap( jobj, argv  );
+          nobj = Factory::Create( jobj, argv );
           if( ! nobj )
           {
             return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
           }
-          WeakWrap::Wrap( self, nobj );
-          self.MakeWeak( nobj, weak_dtor );
-          findInterface<T>(nobj)->wrapInstance(self, nobj);
+          WeakWrap::Wrap( jobj, nobj );
+          jobj.makeWeak( nobj, weak_dtor );
+          findInterface<T>(nobj)->wrapInstance(jobj, nobj);
       }
       catch(std::exception const &ex)
       {
-          WeakWrap::Unwrap( self, nobj );
+          WeakWrap::Unwrap( jobj, nobj );
           if( nobj ) Factory::Delete( nobj );
-          self.Clear();
+          jobj = XInterfaceObject();
           return Toss(ex.what());
       }
       catch(...)
       {
-          WeakWrap::Unwrap( self, nobj );
+          WeakWrap::Unwrap( jobj, nobj );
           if( nobj ) Factory::Delete( nobj );
-          self.Clear();
+          jobj = XInterfaceObject();
           return Toss("Native constructor threw an unknown exception!");
       }
-      return self;
+      return jobj;
     }
 
   XInterface() : XInterfaceBase((xsize)cvv8::ClassCreator_TypeID<T>::Value,
@@ -403,17 +410,17 @@ namespace cvv8
 {
   template <typename T> struct NativeToJSCopyableType
   {
-    v8::Handle<v8::Value> operator()(T const *n) const
+    XScriptObject operator()(T const *n) const
     {
       T *out = 0;
       const XInterfaceBase* interface = findInterface<T>(n);
-      v8::Handle<v8::Object> obj = interface->newInstance(0, 0);
+      XInterfaceObject obj = interface->newInstance(0, 0);
 
       out = XScriptConvert::from<T>(obj);
       *out = *n;
       return obj;
     }
-    v8::Handle<v8::Value> operator()(T const &n) const
+    XScriptObject operator()(T const &n) const
     {
       return this->operator()(&n);
     }
@@ -421,14 +428,14 @@ namespace cvv8
 
   template <typename T> struct NativeToJSConvertableType
   {
-    v8::Handle<v8::Value> operator()(T *n) const
+    XScriptObject operator()(T *n) const
     {
       const XInterfaceBase* interface = findInterface<T>(n);
-      v8::Handle<v8::Object> self = interface->newInstanceBase();
+      XInterfaceObject self = interface->newInstanceBase();
       interface->wrapInstance(self, n);
       return self;
     }
-    v8::Handle<v8::Value> operator()(T &n) const
+    XScriptObject operator()(T &n) const
     {
       return this->operator()(&n);
     }
@@ -439,7 +446,7 @@ namespace cvv8
   public:
     typedef T* ReturnType;
 
-    static T *Create(v8::Persistent<v8::Object> &jsSelf, v8::Arguments const & argv)
+    static T *Create(XInterfaceObject &jsSelf, XScriptArguments const & argv)
     {
       typedef cvv8::CtorArityDispatcher<CTORS> Proxy;
       T *b = Proxy::Call(argv);

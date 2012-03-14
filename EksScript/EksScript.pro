@@ -18,7 +18,8 @@ SOURCES += XScriptGlobal.cpp \
     XContext.cpp \
     XScript.cpp \
     XScriptException.cpp \
-    XScriptObject.cpp
+    XScriptObject.cpp \
+    XScriptFunction.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \
@@ -56,7 +57,9 @@ HEADERS += XScriptGlobal.h \
     XConvert.h \
     XFunctions.h \
     XScriptException.h \
-    XScriptObject.h
+    XScriptObject.h \
+    XScriptObjectV8Internals.h \
+    XScriptFunction.h
 
 debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
 release:LIBS += -L$$ROOT/EksScript/v8/releaselib/

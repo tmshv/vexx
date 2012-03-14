@@ -44,7 +44,7 @@ namespace cvv8 {
         */
         typedef typename TI::NativeHandle NativeHandle;
         /** The type for holding the JS 'this' object. */
-        typedef v8::Persistent<v8::Object> JSObjHandle;
+        typedef XPersistentScriptObject JSObjHandle;
         //typedef v8::Handle<v8::Object> JSObjHandle; // Hmmm.
         typedef std::pair<NativeHandle,JSObjHandle> ObjBindT;
         typedef std::map<void const *, ObjBindT> OneOfUsT;

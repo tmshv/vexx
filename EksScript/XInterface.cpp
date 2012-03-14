@@ -1,8 +1,10 @@
 #include "XInterface.h"
+#include "XScriptObjectV8Internals.h"
+
 
 XInterfaceBase::XInterfaceBase(xsize typeId,
                                const char *typeName,
-                               XScriptObject ctor(v8::Arguments const &argv),
+                               XScriptObject ctor(XScriptArguments const &argv),
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount)
@@ -30,8 +32,9 @@ v8::Handle<v8::Function> XInterfaceBase::constructorFunction() const
   return _constructor->GetFunction();
   }
 
-void XInterfaceBase::wrapInstance(v8::Handle<v8::Object> obj, void *object) const
+void XInterfaceBase::wrapInstance(XInterfaceObject scObj, void *object) const
   {
+  v8::Handle<v8::Object> obj = getV8Internal(scObj);
   if( 0 <= _typeIdField )
     {
     xAssert(_typeIdField < (xsize)obj->InternalFieldCount());
@@ -41,8 +44,9 @@ void XInterfaceBase::wrapInstance(v8::Handle<v8::Object> obj, void *object) cons
   obj->SetPointerInInternalField(_nativeField, object);
 }
 
-void XInterfaceBase::unwrapInstance(v8::Handle<v8::Object> object) const
+void XInterfaceBase::unwrapInstance(XInterfaceObject scObj) const
   {
+  v8::Handle<v8::Object> object = getV8Internal(scObj);
   xAssert(_nativeField < (xsize)object->InternalFieldCount());
   object->SetInternalField(_nativeField, v8::Null());
   if(0 <= _typeIdField)
@@ -52,14 +56,14 @@ void XInterfaceBase::unwrapInstance(v8::Handle<v8::Object> object) const
     }
   }
 
-v8::Handle<v8::Object> XInterfaceBase::newInstance(int argc, v8::Handle<v8::Value> argv[]) const
+XInterfaceObject XInterfaceBase::newInstance(int argc, v8::Handle<v8::Value> argv[]) const
   {
-  return constructorFunction()->NewInstance(argc, argv);
+  return fromObjectHandle(constructorFunction()->NewInstance(argc, argv));
   }
 
-v8::Handle<v8::Object> XInterfaceBase::newInstanceBase() const
+XInterfaceObject XInterfaceBase::newInstanceBase() const
   {
-  return _constructor->InstanceTemplate()->NewInstance();
+  return fromObjectHandle(_constructor->InstanceTemplate()->NewInstance());
   }
 
 void XInterfaceBase::set(const char *name, v8::Handle<v8::Value> val)

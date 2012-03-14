@@ -31,17 +31,16 @@ template <> struct JSToNative<std::string const &> : public JSToNative<std::stri
 
 template <> struct NativeToJS<std::string>
   {
-  v8::Handle<v8::Value> operator()(std::string const &v) const
+  XScriptObject operator()(std::string const &v) const
     {
-    char const *const cstr  = v.data();
-    return cstr ? v8::String::New( cstr, static_cast<int>( v.size() ) ) : v8::String::New("",0);
+    return XScriptObject(QString::fromStdString(v));
     }
   };
 
 
 template <typename ListT> struct NativeToJSList
   {
-  v8::Handle<v8::Value> operator()( ListT const & li ) const
+  XScriptObject operator()( ListT const & li ) const
     {
     typedef typename ListT::const_iterator IT;
     IT it = li.begin();
@@ -60,7 +59,7 @@ template <typename T> struct NativeToJS<std::vector<T> > : NativeToJSList< std::
 
 template <typename MapT> struct NativeToJSLookup
   {
-  v8::Handle<v8::Value> operator()(MapT const &li) const
+  XScriptObject operator()(MapT const &li) const
     {
     typedef typename MapT::const_iterator IT;
     IT it( li.begin() );
@@ -79,7 +78,7 @@ template <typename ListT, typename ValueType = typename ListT::value_type> struc
   {
   typedef ListT ResultType;
 
-  ResultType operator()( v8::Handle<v8::Value> jv ) const
+  ResultType operator()( XScriptObject jv ) const
     {
     typedef ValueType VALT;
     ListT li;
