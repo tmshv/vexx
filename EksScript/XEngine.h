@@ -2,7 +2,6 @@
 #define XENGINE_H
 
 #include "XScriptGlobal.h"
-#include "v8.h"
 
 class EKSSCRIPT_EXPORT XEngine
   {
@@ -10,10 +9,12 @@ public:
   XEngine();
   ~XEngine();
 
+  static void adjustAmountOfExternalAllocatedMemory(int in);
+
+  class Impl;
+
 private:
-  v8::HandleScope _scope;
-  v8::Handle<v8::ObjectTemplate> _globalTemplate;
-  friend class XContext;
+  Impl *_impl;
   };
 
 #endif // XENGINE_H

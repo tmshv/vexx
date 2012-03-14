@@ -1,6 +1,7 @@
 #include "XScriptFunction.h"
 #include "XScriptObject.h"
 #include "XInterfaceObject.h"
+#include "XScriptException.h"
 #include "XScriptObjectV8Internals.h"
 
 struct XScriptFunctionInternal
@@ -189,4 +190,10 @@ xsize XScriptArguments::length() const
 XScriptObject XScriptArguments::at(xsize i) const
   {
   return fromHandle(XScriptArgumentsInternal::val(this)[i]);
+  }
+
+v8::Handle<v8::Function> getV8Internal(const XScriptFunction &o)
+  {
+  const XScriptFunctionInternal *internal = XScriptFunctionInternal::val(&o);
+  return internal->_object;
   }

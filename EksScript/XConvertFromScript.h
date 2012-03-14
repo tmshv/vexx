@@ -303,17 +303,17 @@ template <typename T> struct UselessConversionTypeToNative
 }
 
 template <> struct JSToNative< XIfElse<
-    XSameType<unsigned long int,uint64_t>::Value,
+    XSameType<unsigned long int,xuint64>::Value,
     UselessConversionTypeToNative<unsigned long>,
     unsigned long >::Type >
-    : JSToNative<uint64_t>
+    : JSToNative<xuint64>
   {
   };
 
 template <> struct JSToNative< XIfElse<
-    XSameType<long,int64_t>::Value,
+    XSameType<long,xint64>::Value,
     UselessConversionTypeToNative<long>,
-    long >::Type > : JSToNative<int64_t>
+    long >::Type > : JSToNative<xint64>
   {
   };
 

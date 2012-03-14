@@ -4,7 +4,8 @@
 #include "XEngine.h"
 #include "XContext.h"
 #include "XScript.h"
-#include "cvv8/ClassCreator.hpp"
+#include "XScriptConstructors.h"
+#include "XFunctions.h"
 
 #include "QRectF"
 

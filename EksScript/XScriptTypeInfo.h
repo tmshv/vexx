@@ -16,11 +16,11 @@ template <typename T> struct XScriptTypeInfoBase<T const *> : XScriptTypeInfoBas
 template <typename T> struct XScriptTypeInfoBase<T const &> : XScriptTypeInfoBase<T> {};
 template <typename T> struct XScriptTypeInfoBase<T &> : XScriptTypeInfoBase<T> {};
 
-template <typename T> struct XScriptTypeInfoBase< v8::Handle<T> >
-{
-    typedef v8::Handle<T> Type;
-    typedef v8::Handle<T> NativeHandle;
-};
+//template <typename T> struct XScriptTypeInfoBase< v8::Handle<T> >
+//{
+//    typedef v8::Handle<T> Type;
+//    typedef v8::Handle<T> NativeHandle;
+//};
 
 template <typename T> class XScriptTypeInfo : public XScriptTypeInfoBase<T> {};
 

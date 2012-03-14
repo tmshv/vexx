@@ -14,14 +14,14 @@ template <>struct JSToNative<std::string>
   {
   typedef std::string ResultType;
 
-  ResultType operator()( v8::Handle<v8::Value> const & h ) const
+  ResultType operator()( XScriptObject const & ) const
     {
-    static const std::string emptyString;
+    /*static const std::string emptyString;
     v8::String::Utf8Value const utf8String( h );
     const char* s = *utf8String;
     return s
       ? std::string(s, utf8String.length())
-      : emptyString;
+      : emptyString;*/
     }
   };
 

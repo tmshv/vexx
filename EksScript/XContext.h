@@ -17,8 +17,8 @@ public:
 
 private:
   XEngine* _engine;
-  v8::Persistent<v8::Context> _context;
-  v8::Context::Scope _scope;
+  class Impl;
+  Impl *_impl;
   };
 
 #endif // XCONTEXT_H

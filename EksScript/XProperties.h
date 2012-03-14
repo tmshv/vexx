@@ -1,8 +1,10 @@
-#if 0 && !defined(CODE_GOOGLE_COM_P_V8_CONVERT_PROPERTIES_HPP_INCLUDED)
-#define CODE_GOOGLE_COM_P_V8_CONVERT_PROPERTIES_HPP_INCLUDED 1
+#ifndef XPROPERTIES_H
+#define XPROPERTIES_H
 
-#include "invocable.hpp"
+#include "XConvert.h"
+#include "XFunctions.h"
 #include "XConvertFromScript.h"
+#include "XInterface.h"
 
 namespace cvv8 {
 
@@ -21,7 +23,7 @@ namespace cvv8 {
         /**
             The v8::AccessorGetter() interface.
         */
-        static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info);
+        static XScriptObject Get(XScriptObject property, const XAccessorInfo &info);
         //{ return Toss(StringBuffer()<<"Property '"<<property<<"' getter is unspecialized!");}
     };
 
@@ -38,7 +40,7 @@ namespace cvv8 {
     struct XAccessorSetterType
     {
         /** The v8::AccessorSetter() interface. */
-        static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
+        static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo& info);
     };
 
     typedef XAccessorGetterType Getter;
@@ -55,11 +57,11 @@ namespace cvv8 {
         templating contexts. e.g. this can be useful if we want to
         wrap a custom v8::AccessorGetter in a GetterCatcher.
     */
-    template <v8::AccessorGetter G>
+    template <XInterfaceBase::Getter G>
     struct GetterToGetter : XAccessorGetterType
     {
         /** Implements the v8::AccessorGetter() interface. */
-        inline static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info)
+        inline static XScriptObject Get(XScriptObject property, const XAccessorInfo &info)
         {
             return G(property, info);
         }
@@ -71,11 +73,11 @@ namespace cvv8 {
         templating contexts. e.g. this can be useful if we want to
         wrap a custom v8::AccessorSetter in a SetterCatcher.
     */
-    template <v8::AccessorSetter S>
+    template <XInterfaceBase::Setter S>
     struct SetterToSetter : AccessorSetterType
     {
         /** Implements the v8::AccessorSetter() interface. */
-        inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
+        inline static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo& info)
         {
             S(property, value, info);
         }
@@ -94,7 +96,7 @@ namespace cvv8 {
     struct VarToGetter : AccessorGetterType
     {
         /** Implements the v8::AccessorGetter() interface. */
-        inline static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info)
+        inline static XScriptObject Get(XScriptObject property, const XAccessorInfo &info)
         {
             return CastToJS( *SharedVar );
         }
@@ -118,7 +120,7 @@ namespace cvv8 {
     struct VarToSetter : AccessorSetterType
     {
         /** Implements the v8::AccessorSetter() interface. */
-        inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
+        inline static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo& info)
         {
             *SharedVar = CastFromJS<PropertyType>( value );
         }
@@ -151,7 +153,7 @@ namespace cvv8 {
     struct MemberToGetter : AccessorGetterType
     {
         /** Implements the v8::AccessorGetter() interface. */
-        inline static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo &info)
+        inline static XScriptObject Get(XScriptObject property, const XAccessorInfo &info)
         {
             typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename JSToNative<T>::ResultType NativeHandle;
@@ -179,7 +181,7 @@ namespace cvv8 {
     struct MemberToSetter : AccessorSetterType
     {
         /** Implements the v8::AccessorSetter() interface. */
-        inline static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
+        inline static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo& info)
         {
             typedef typename XScriptTypeInfo<T>::Type Type;
             typedef typename JSToNative<T>::ResultType NativeHandle;
@@ -211,7 +213,7 @@ namespace cvv8 {
     */
     struct ThrowingSetter : XAccessorSetterType
     {
-        inline static void Set(XScriptObject property, XScriptObject, const v8::AccessorInfo &)
+        inline static void Set(XScriptObject property, XScriptObject, const XAccessorInfo &)
         {
           Toss(QString("Native member property setter '%1' is configured to throw an exception when modifying this read-only member!").arg(XScriptConvert::from<QString>(property)));
         }
@@ -233,7 +235,7 @@ namespace cvv8 {
     template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Getter>
     struct FunctionToGetter : AccessorGetterType
     {
-        inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
+        inline static XScriptObject Get( XScriptObject property, const XAccessorInfo & info )
         {
             return CastToJS( (*Getter)() );
         }
@@ -266,7 +268,7 @@ namespace cvv8 {
     template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Func>
     struct FunctionToSetter : AccessorSetterType
     {
-        inline static void Set( v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
+        inline static void Set( XScriptObject property, XScriptObject value, const XAccessorInfo &info)
         {
             typedef XFunctionSignature<Sig> FT;
             ArgCaster<typename sl::At<0,FT>::Type> ac;
@@ -335,12 +337,12 @@ namespace cvv8 {
             {
 
                 typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
-                ArgCaster<ArgT> ac;
+                XScriptConvert::ArgCaster<ArgT> ac;
 
-                ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
+                XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
 
                 bool valid = true;
-                InputArg in = XScriptConvert::match<InputArg, ArgCaster<ArgT>::ResultType>(handle, valid);
+                InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(handle, valid);
                 if(!valid)
                 {
                   Toss(QString("Native member property setter '%1' could convert input argument!").arg(XScriptConvert::from<QString>(property) ));
@@ -357,7 +359,7 @@ namespace cvv8 {
     template <typename Ftor, typename Sig>
     struct XFunctorToGetter
     {
-        inline static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
+        inline static XScriptObject Get( XScriptObject property, const XAccessorInfo & info )
         {
             //const static Ftor f();
             return CastToJS(Ftor()());
@@ -367,7 +369,7 @@ namespace cvv8 {
     template <typename Ftor, typename Sig>
     struct XFunctorToSetter
     {
-        inline static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
+        inline static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo &info)
         {
             typedef typename sl::At< 0, Signature<Sig> >::Type ArgT;
             ArgCaster<ArgT> ac;
@@ -388,7 +390,7 @@ namespace cvv8 {
     >
     struct XSetterCatcher : XAccessorSetterType
     {
-        static void Set(v8::Local< v8::String > property, v8::Local< v8::Value > value, const v8::AccessorInfo &info)
+        static void Set(XScriptObject property, XScriptObject value, const XAccessorInfo &info)
         {
             try
             {
@@ -443,7 +445,7 @@ namespace cvv8 {
     >
     struct XGetterCatcher : XAccessorGetterType
     {
-        static v8::Handle<v8::Value> Get( v8::Local< v8::String > property, const v8::AccessorInfo & info )
+        static XScriptObject Get( XScriptObject property, const XAccessorInfo & info )
         {
             try
             {
@@ -486,6 +488,7 @@ namespace cvv8 {
     {};
 
 
+#if 0
     /**
         AccessAdder is a convenience class for use when applying several
         (or more) accessor bindings to a prototype object.
@@ -515,7 +518,7 @@ namespace cvv8 {
         struct NullSetter
         {
             /** The v8::AccessorSetter() interface. */
-            static void Set(v8::Local< v8::String >, v8::Local< v8::Value >, const v8::AccessorInfo &)
+            static void Set(XScriptObject, XScriptObject, const XAccessorInfo &)
             {
             }
         };
@@ -570,7 +573,8 @@ namespace cvv8 {
                                     data, settings, attribute);
         }
     };
+#endif
 
 } // namespaces
 
-#endif /* CODE_GOOGLE_COM_P_V8_CONVERT_PROPERTIES_HPP_INCLUDED */
+#endif // XPROPERTIES_H

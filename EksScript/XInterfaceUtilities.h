@@ -1,71 +1,12 @@
-#if 0 && !defined(CODE_GOOGLE_COM_P_V8_CONVERT_CLASS_CREATOR_HPP_INCLUDED)
-#define CODE_GOOGLE_COM_P_V8_CONVERT_CLASS_CREATOR_HPP_INCLUDED 1
-/** LICENSE
+#ifndef XINTERFACEUTILITIES_H
+#define XINTERFACEUTILITIES_H
 
-    This software's source code, including accompanying documentation and
-    demonstration applications, are licensed under the following
-    conditions...
-
-    The author (Stephan G. Beal [http://wanderinghorse.net/home/stephan/])
-    explicitly disclaims copyright in all jurisdictions which recognize
-    such a disclaimer. In such jurisdictions, this software is released
-    into the Public Domain.
-
-    In jurisdictions which do not recognize Public Domain property
-    (e.g. Germany as of 2011), this software is Copyright (c) 2011
-    by Stephan G. Beal, and is released under the terms of the MIT License
-    (see below).
-
-    In jurisdictions which recognize Public Domain property, the user of
-    this software may choose to accept it either as 1) Public Domain, 2)
-    under the conditions of the MIT License (see below), or 3) under the
-    terms of dual Public Domain/MIT License conditions described here, as
-    they choose.
-
-    The MIT License is about as close to Public Domain as a license can
-    get, and is described in clear, concise terms at:
-
-    http://en.wikipedia.org/wiki/MIT_License
-
-    The full text of the MIT License follows:
-
-    --
-    Copyright (c) 2011 Stephan G. Beal (http://wanderinghorse.net/home/stephan/)
-
-    Permission is hereby granted, free of charge, to any person
-    obtaining a copy of this software and associated documentation
-    files (the "Software"), to deal in the Software without
-    restriction, including without limitation the rights to use,
-    copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the
-    Software is furnished to do so, subject to the following
-    conditions:
-
-    The above copyright notice and this permission notice shall be
-    included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
-
-    --END OF MIT LICENSE--
-
-    For purposes of the above license, the term "Software" includes
-    documentation and demonstration source code which accompanies
-    this software. ("Accompanies" = is contained in the Software's
-    primary public source code repository.)
-
-*/
-
-#include <cassert>
 #include <stdexcept>
-#include "detail/convert_core.hpp"
-#include "NativeToJSMap.hpp"
+#include "XConvertFromScript.h"
+#include "XConvertToScriptMap.h"
+
+class XInterfaceObject;
+
 namespace cvv8 {
 
     /**
@@ -369,7 +310,7 @@ namespace cvv8 {
             return;
             @endcode
         */
-        static void Initialize( v8::Handle<v8::Object> const & target )
+        static void Initialize( XInterfaceObject const & target )
         {
             throw std::runtime_error("ClassCreator_SetupBindings<T> MUST be specialized "
                                      "in order to be useful!");
@@ -380,13 +321,13 @@ namespace cvv8 {
         A concrete ClassCreator_SetupBindings implementation which forwards
         the call to a user-defined function.
     */
-    template <typename T, void (*Func)( v8::Handle<v8::Object> const &) >
+    template <typename T, void (*Func)( XInterfaceObject const &) >
     struct ClassCreator_SetupBindings_ClientFunc
     {
         /**
             Calls Func(target).
         */
-        static void Initialize( v8::Handle<v8::Object> const & target )
+        static void Initialize( XInterfaceObject const & target )
         {
             Func(target);
         }
@@ -699,7 +640,7 @@ namespace cvv8 {
     struct ClassCreator_Factory_NativeToJSMap : Detail::Factory_CtorForwarder_Base<T>
     {
     public:
-        typedef NativeToJSMap<T> N2JMap;
+        typedef XNativeToJSMap<T> N2JMap;
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
 
@@ -804,4 +745,4 @@ namespace cvv8 {
 
 }// namespaces
 
-#endif /* CODE_GOOGLE_COM_P_V8_CONVERT_CLASS_CREATOR_HPP_INCLUDED */
+#endif // XINTERFACEUTILITIES_H

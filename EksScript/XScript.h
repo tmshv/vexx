@@ -11,7 +11,7 @@ public:
   void run();
 
 private:
-  void *_impl[1];
+  void *_impl;
   };
 
 

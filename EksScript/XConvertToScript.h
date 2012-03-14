@@ -60,29 +60,29 @@ template <typename T> struct UselessConversionType
   };
 }
 
-template <> struct NativeToJS<unsigned char> : NativeToJSUIntSmall<uint8_t> {};
-template <> struct NativeToJS<int16_t> : NativeToJS_int_small<int16_t> {};
-template <> struct NativeToJS<uint16_t> : NativeToJSUIntSmall<uint16_t> {};
-template <> struct NativeToJS<int32_t> : NativeToJS_int_small<int32_t> {};
-template <> struct NativeToJS<uint32_t> : NativeToJSUIntSmall<uint32_t> {};
+template <> struct NativeToJS<unsigned char> : NativeToJSUIntSmall<xuint8> {};
+template <> struct NativeToJS<xint16> : NativeToJS_int_small<xint16> {};
+template <> struct NativeToJS<xuint16> : NativeToJSUIntSmall<xuint16> {};
+template <> struct NativeToJS<xint32> : NativeToJS_int_small<xint32> {};
+template <> struct NativeToJS<xuint32> : NativeToJSUIntSmall<xuint32> {};
 
-template <> struct NativeToJS<int64_t> : NativeToJSNumber<int64_t> {};
-template <> struct NativeToJS<uint64_t> : NativeToJSNumber<uint64_t> {};
+template <> struct NativeToJS<xint64> : NativeToJSNumber<xint64> {};
+template <> struct NativeToJS<xuint64> : NativeToJSNumber<xuint64> {};
 template <> struct NativeToJS<double> : NativeToJSNumber<double> {};
 template <> struct NativeToJS<float> : NativeToJSNumber<float> {};
 
 // workarounds where long int != uint64
-template <> struct NativeToJS< XIfElse< XSameType<unsigned long int,uint64_t>::Value,
+template <> struct NativeToJS< XIfElse< XSameType<unsigned long int, xuint64>::Value,
     UselessConversionType<unsigned long>,
     unsigned long >::Type >
     : NativeToJSNumber<unsigned long int>
   {
   };
 
-template <> struct NativeToJS< XIfElse< XSameType<long,int64_t>::Value,
+template <> struct NativeToJS< XIfElse< XSameType<long, xint64>::Value,
     UselessConversionType<long>,
     long >::Type >
-    : NativeToJSNumber<int64_t>
+    : NativeToJSNumber<xint64>
   {
   };
 

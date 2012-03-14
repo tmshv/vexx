@@ -55,11 +55,16 @@ HEADERS += XScriptGlobal.h \
     XConvertFromScript.h \
     XConvertScriptSTL.h \
     XConvert.h \
-    XFunctions.h \
     XScriptException.h \
     XScriptObject.h \
     XScriptObjectV8Internals.h \
-    XScriptFunction.h
+    XScriptFunction.h \
+    XInterfaceUtilities.h \
+    XProperties.h \
+    XScriptConstructors.h \
+    XConvertToScriptMap.h \
+    XFunctions.h \
+    XFunctionSpecialisations.h
 
 debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
 release:LIBS += -L$$ROOT/EksScript/v8/releaselib/
