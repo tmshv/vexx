@@ -176,7 +176,6 @@ private:
   };
 
 template <typename T,
-          void const *&TypeID,
           int InternalFieldCount = 2,
           int TypeIdFieldIndex = 0,
           int ObjectFieldIndex = 1,
@@ -194,6 +193,7 @@ public:
       }
     else
       {
+      const void *TypeID = findInterface<T>->typeId();
       void const *tid = 0;
       void *ext = 0;
       v8::Handle<v8::Value> proto(h);

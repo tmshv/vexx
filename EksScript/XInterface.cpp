@@ -25,7 +25,7 @@ const ObjTempl *prototype(const void *& b)
   }
 
 XInterfaceBase::XInterfaceBase(xsize typeId,
-                               const char *typeName,
+                               const QString &typeName,
                                XScriptValue ctor(XScriptArguments const &argv),
                                xsize typeIdField,
                                xsize nativeField,
@@ -36,6 +36,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
     _nativeField(nativeField),
     _isSealed(false)
   {
+  xAssert(_typeName.length());
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
   new(prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
 
@@ -71,7 +72,7 @@ void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
     }
   xAssert(_nativeField < (xsize)obj->InternalFieldCount());
   obj->SetPointerInInternalField(_nativeField, object);
-}
+  }
 
 void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
   {
@@ -105,21 +106,17 @@ void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
   (*prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
   }
 
-void XInterfaceBase::addClassTo(const char *thisClassName, const XScriptObject &dest) const
+void XInterfaceBase::addClassTo(const QString &thisClassName, const XScriptObject &dest) const
   {
-  getV8Internal(dest)->Set(v8::String::NewSymbol(thisClassName), getV8Internal(constructorFunction()));
+  getV8Internal(dest)->Set(v8::String::NewSymbol(thisClassName.toAscii().constData()), getV8Internal(constructorFunction()));
   }
 
 void XInterfaceBase::inherit(XInterfaceBase *parentType)
   {
   if(!parentType->isSealed())
-  {
-      std::ostringstream os;
-      os << "XInterfaceBase<"
-         << parentType->typeName()
-         << "> has not been sealed yet!";
-      throw std::runtime_error(os.str());
-  }
+    {
+    throw std::runtime_error("XInterfaceBase<T> has not been sealed yet!");
+    }
   FnTempl* templ = constructor(_constructor);
   FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );

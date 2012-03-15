@@ -139,29 +139,24 @@ X_SCRIPTABLE_TYPE(Inheritor)
 
 int SomeClass::a = 0;
 int SomeClass::otherStatic = 0;
-X_IMPLEMENT_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass, "SomeClass")
-X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(QRectF, "Rect")
-X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(QPointF, "Point")
-X_IMPLEMENT_SCRIPTABLE_TYPE(Inheritable, "Inheritable")
-X_IMPLEMENT_SCRIPTABLE_TYPE(Inheritor, "Inheritor")
 
 int main(int, char*[])
 {
   XEngine engine;
 
   // build the template
-  XInterface<SomeClass> *someTempl = XInterface<SomeClass>::create();
+  XInterface<SomeClass> *someTempl = XInterface<SomeClass>::create("SomeClass");
   someTempl->addProperty<const QRectF &, const QRectF &, &SomeClass::getNonStatic, &SomeClass::setNonStatic>("nonStatic");
   someTempl->addAccessProperty<Inheritable *, &SomeClass::inh>("thing");
   someTempl->seal();
   //someTempl.addPropertyMap<&SomeClass::getOther, &SomeClass::setOther, SomeClass::getOtherStatic, SomeClass::setOtherStatic>();
 
-  XInterface<QPointF> *ptTempl = XInterface<QPointF>::create();
+  XInterface<QPointF> *ptTempl = XInterface<QPointF>::create("Point");
   ptTempl->addProperty<qreal, qreal, &QPointF::x, &QPointF::setX>("x");
   ptTempl->addProperty<qreal, qreal, &QPointF::y, &QPointF::setY>("y");
   ptTempl->seal();
 
-  XInterface<QRectF> *rectTempl = XInterface<QRectF>::create();
+  XInterface<QRectF> *rectTempl = XInterface<QRectF>::create("Rect");
   rectTempl->addProperty<qreal, qreal, &QRectF::left, &QRectF::setLeft>("left");
   rectTempl->addProperty<qreal, qreal, &QRectF::right, &QRectF::setRight>("right");
   rectTempl->addProperty<qreal, qreal, &QRectF::top, &QRectF::setTop>("top");
@@ -169,11 +164,11 @@ int main(int, char*[])
   rectTempl->addProperty<QPointF, const QPointF &, &QRectF::topLeft, &QRectF::setTopLeft>("topLeft");
   rectTempl->seal();
 
-  XInterface<Inheritable> *aTempl = XInterface<Inheritable>::create();
+  XInterface<Inheritable> *aTempl = XInterface<Inheritable>::create("Inheritable");
   aTempl->addProperty<int, int, &Inheritable::getA, &Inheritable::setA>("a");
   aTempl->seal();
 
-  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::create();
+  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::create("Inheritor");
   bTempl->inherit(aTempl);
   bTempl->addProperty<int, int, &Inheritor::getB, &Inheritor::setB>("b");
   bTempl->seal();
@@ -203,7 +198,7 @@ int main(int, char*[])
 
   bool err = false;
   XScriptValue result = script.run(&err);
-  xAssert(err);
+  xAssert(!err);
   qDebug() << result.toString();
 
   return 0;

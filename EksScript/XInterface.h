@@ -18,7 +18,7 @@
 class EKSSCRIPT_EXPORT XInterfaceBase
   {
   XProperties:
-  XROProperty(const char *, typeName);
+  XROProperty(QString, typeName);
   XROProperty(xsize, typeId);
 
   XROProperty(xsize, typeIdField);
@@ -26,7 +26,7 @@ class EKSSCRIPT_EXPORT XInterfaceBase
 
 public:
   XInterfaceBase(xsize typeID,
-                 const char *typeName,
+                 const QString &typeName,
                  XScriptValue ctor(XScriptArguments const &argv),
                  xsize typeIdField,
                  xsize nativeField,
@@ -53,7 +53,7 @@ public:
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);
 
-  void addClassTo(char const *thisClassName, XScriptObject const &dest) const;
+  void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
 
   void inherit(XInterfaceBase* parentType);
 
@@ -167,16 +167,16 @@ public:
     return destroyObject(argv.This()) ? v8::True() : v8::False();
     }
 
-  static XInterface *create()
+  static XInterface *create(const char *name)
     {
-    XInterface &bob = instance();
+    XInterface &bob = instance(name);
     xAssert(!bob.isSealed());
     return &bob;
     }
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance();
+    const XInterface &bob = instance("");
     xAssert(bob.isSealed());
     return &bob;
     }
@@ -186,9 +186,9 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance()
+  static XInterface &instance(const char *name)
     {
-    static XInterface bob;
+    static XInterface bob((xsize)name, name);
     return bob;
     }
 
@@ -393,8 +393,8 @@ private:
     return jobj;
     }
 
-  XInterface() : XInterfaceBase((xsize)XScript::ClassCreator_TypeID<T>::Value,
-                                XScriptTypeInfo<T>::TypeName,
+  XInterface(xsize typeId, const QString &name) : XInterfaceBase(typeId,
+                                name,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
                                 InternalFields::NativeIndex,
@@ -481,7 +481,6 @@ public:
   template <> const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
-  X_SCRIPT_TypeInfo_DECL(type); \
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScript::JSToNative_ClassCreator<type, false> {}; } \
   X_SCRIPTABLE_MATCHERS(type) \
@@ -500,13 +499,6 @@ public:
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
-
-#define X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name) X_SCRIPT_TypeInfo_IMPL(type, name);
-
-#define X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
-#define X_IMPLEMENT_SCRIPTABLE_TYPE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
-
-#define X_IMPLEMENT_SCRIPTABLE_TYPE_NOT_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
 }
 
 #endif // XINTERFACE_H

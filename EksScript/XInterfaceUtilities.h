@@ -148,13 +148,20 @@ namespace XScript {
         takes a (void const * &) and TypeName::Value is a (char const *), which
         won't convert to (void const *) in the context of template parameters.
     */
-    template <typename T>
+    /*template <typename T>
     struct ClassCreator_TypeID
     {
         static const void *Value;
     };
 
-    template <typename T> const void * ClassCreator_TypeID<T>::Value = XScriptTypeInfo<T>::TypeName;
+    template <typename T>
+    const void *getTypeId()
+      {
+      xAssertFail();
+      return 0;
+      }
+
+    template <typename T> const void * ClassCreator_TypeID<T>::Value = getTypeId<T>();*/
 
     /**
        Convenience base type for ClassCreator_InternalFields
@@ -527,7 +534,6 @@ namespace XScript {
     struct JSToNative_ClassCreator :
         XIfElse< TypeSafe,
             XScriptConvert::internal::JSToNativeObjectWithInternalFieldsTypeSafe<T,
-                                            ClassCreator_TypeID<T>::Value,
                                             ClassCreator_InternalFields<T>::Count,
                                             ClassCreator_InternalFields<T>::TypeIDIndex,
                                             ClassCreator_InternalFields<T>::NativeIndex,

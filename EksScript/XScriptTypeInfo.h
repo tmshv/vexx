@@ -5,7 +5,6 @@ template <typename T, typename NHT = T *> struct XScriptTypeInfoCore
   {
   typedef T Type;
   typedef NHT NativeHandle;
-  static char const *TypeName;
   };
 
 template <typename T> struct XScriptTypeInfoBase : XScriptTypeInfoCore<T, T*> {};
@@ -23,11 +22,5 @@ template <typename T> struct XScriptTypeInfoBase<T &> : XScriptTypeInfoBase<T> {
 //};
 
 template <typename T> class XScriptTypeInfo : public XScriptTypeInfoBase<T> {};
-
-#define X_SCRIPT_TypeInfo_DECL(X) template <> struct XScriptTypeInfo<X> : public XScriptTypeInfoBase<X> \
-{ static const char *TypeName; }
-
-#define X_SCRIPT_TypeInfo_IMPL(X,NAME) char const * XScriptTypeInfo<X>::TypeName = NAME
-
 
 #endif // XSCRIPTTYPEINFO_H
