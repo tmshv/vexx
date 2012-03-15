@@ -123,65 +123,65 @@ template <> struct JSToNative<void>
     }
   };
 
+//template <typename T,
+//          int InternalFieldCount = 1,
+//          int InternalFieldIndex = 0,
+//          bool SearchPrototypeChain = false>
+//struct JSToNativeObjectWithInternalFields
+//  {
+//public:
+//  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
+
+//  ResultType operator()(XScriptValue const &h) const
+//    {
+//    if( !h.isValid() || ! h.isObject() )
+//      {
+//      return 0;
+//      }
+//    else
+//      {
+//      void *ext = 0;
+//      XScriptValue proto(h);
+//      while(!ext && proto.isValid() && proto.isObject())
+//        {
+//        XScriptObject const &obj(proto);
+//        ext = (obj.internalFieldCount() != InternalFieldCount)
+//          ? 0
+//          : obj.internalField(InternalFieldIndex);
+//        if(!ext)
+//          {
+//          if(!SearchPrototypeChain)
+//            {
+//            break;
+//            }
+//          else
+//            {
+//            proto = obj.getPrototype();
+//            }
+//          }
+//        }
+//      return ext ? static_cast<ResultType>(ext) : 0;
+//      }
+//    }
+
+//#ifdef X_ASSERTS_ENABLED
+//private:
+//  typedef char AssertIndexRanges
+//    [xCompileTimeAssertDef<
+//    (InternalFieldIndex>=0)
+//    && (InternalFieldCount>0)
+//    && (InternalFieldIndex < InternalFieldCount)
+//    >::Value
+//    ? 1 : -1];
+//#endif
+//  };
+
 template <typename T,
-          int InternalFieldCount = 1,
-          int InternalFieldIndex = 0,
-          bool SearchPrototypeChain = false>
-struct JSToNativeObjectWithInternalFields
-  {
-public:
-  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
-
-  ResultType operator()(XScriptValue const &h) const
-    {
-    if( !h.isValid() || ! h.isObject() )
-      {
-      return 0;
-      }
-    else
-      {
-      void *ext = 0;
-      XScriptValue proto(h);
-      while(!ext && proto.isValid() && proto.isObject())
-        {
-        XScriptObject const &obj(proto);
-        ext = (obj.internalFieldCount() != InternalFieldCount)
-          ? 0
-          : obj.internalField(InternalFieldIndex);
-        if(!ext)
-          {
-          if(!SearchPrototypeChain)
-            {
-            break;
-            }
-          else
-            {
-            proto = obj.getPrototype();
-            }
-          }
-        }
-      return ext ? static_cast<ResultType>(ext) : 0;
-      }
-    }
-
-#ifdef X_ASSERTS_ENABLED
-private:
-  typedef char AssertIndexRanges
-    [xCompileTimeAssertDef<
-    (InternalFieldIndex>=0)
-    && (InternalFieldCount>0)
-    && (InternalFieldIndex < InternalFieldCount)
-    >::Value
-    ? 1 : -1];
-#endif
-  };
-
-template <typename T,
-          int InternalFieldCount = 2,
-          int TypeIdFieldIndex = 0,
-          int ObjectFieldIndex = 1,
-          bool SearchPrototypeChain = false>
-struct JSToNativeObjectWithInternalFieldsTypeSafe
+          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
+          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
+          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
+          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
+struct JSToNativeObject
   {
 public:
   typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
@@ -220,6 +220,66 @@ public:
           }
         }
       return ext ? static_cast<ResultType>(ext) : 0;
+      }
+    }
+
+private:
+  typedef char AssertIndexRanges
+    [(InternalFieldCount>=2)
+    && (TypeIdFieldIndex != ObjectFieldIndex)
+    && (TypeIdFieldIndex >= 0)
+    && (TypeIdFieldIndex < InternalFieldCount)
+    && (ObjectFieldIndex >= 0)
+    && (ObjectFieldIndex < InternalFieldCount)
+    ? 1 : -1];
+  };
+
+
+
+template <typename T, typename BASE,
+          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
+          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
+          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
+          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
+struct JSToNativeObjectInherited
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    if(!h.isObject())
+      {
+      return 0;
+      }
+    else
+      {
+      const xsize TypeID = findInterface<BASE>((const BASE*)0)->typeId();
+      void const *tid = 0;
+      void *ext = 0;
+      XScriptValue proto(h);
+      while(!ext && proto.isObject())
+        {
+        XScriptObject const &obj(proto);
+        tid = (obj.internalFieldCount() != InternalFieldCount)
+          ? 0
+          : obj.internalField(TypeIdFieldIndex);
+        ext = ((xsize)tid == TypeID)
+          ? obj.internalField(ObjectFieldIndex)
+          : 0;
+        if(!ext)
+          {
+          if(!SearchPrototypeChain)
+            {
+            break;
+            }
+          else
+            {
+            proto = obj.getPrototype();
+            }
+          }
+        }
+      return ext ? XScriptConvert::castFromBase<T>(static_cast<BASE*>(ext)) : 0;
       }
     }
 

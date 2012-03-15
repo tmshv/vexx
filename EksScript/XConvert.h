@@ -6,6 +6,12 @@
 
 namespace XScriptConvert
 {
+
+template <typename T, typename U> T *castFromBase(U *ptr)
+  {
+  return dynamic_cast<T*>(ptr);
+  }
+
 template <typename T> inline const T &ptrMatcher(T *in, bool& valid)
 {
   if(!in)

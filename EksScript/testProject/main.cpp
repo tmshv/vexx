@@ -134,7 +134,7 @@ X_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass)
 X_SCRIPTABLE_TYPE_COPYABLE(QRectF)
 X_SCRIPTABLE_TYPE_COPYABLE(QPointF)
 X_SCRIPTABLE_TYPE(Inheritable)
-X_SCRIPTABLE_TYPE(Inheritor)
+X_SCRIPTABLE_TYPE_INHERITS(Inheritor, Inheritable)
 
 
 int SomeClass::a = 0;
@@ -168,8 +168,7 @@ int main(int, char*[])
   aTempl->addProperty<int, int, &Inheritable::getA, &Inheritable::setA>("a");
   aTempl->seal();
 
-  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::create("Inheritor");
-  bTempl->inherit(aTempl);
+  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::create("Inheritor", aTempl);
   bTempl->addProperty<int, int, &Inheritor::getB, &Inheritor::setB>("b");
   bTempl->seal();
 

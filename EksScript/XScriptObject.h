@@ -34,6 +34,7 @@ public:
 
   template <typename T> T *castTo();
   template <typename T> const T *castTo() const;
+
 private:
   void *_object;
   friend class XContext;

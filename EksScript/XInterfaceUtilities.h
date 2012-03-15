@@ -529,7 +529,7 @@ namespace XScript {
         the type ID is used. For types where the internal fields' TypeIDIndex
         is negative, ClassCreator will not set up bits for the type check,
         which means a slightly smaller runtime memory footprint.
-    */
+    *//*
     template <typename T, bool TypeSafe = ClassCreator_InternalFields<T>::TypeIDIndex >= 0 >
     struct JSToNative_ClassCreator :
         XIfElse< TypeSafe,
@@ -546,7 +546,7 @@ namespace XScript {
                                             >
         >::Type
     {
-    };
+    };*/
 
 #if 0
     //! Experimental.

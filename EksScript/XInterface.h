@@ -53,9 +53,9 @@ public:
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
 
+protected:
   void inherit(XInterfaceBase* parentType);
 
-protected:
   mutable bool _isSealed;
   void *_constructor;
   void *_prototype;
@@ -167,16 +167,28 @@ public:
     return destroyObject(argv.This()) ? v8::True() : v8::False();
     }
 
-  static XInterface *create(const char *name)
+  static XInterface *create(const char *name, XInterfaceBase *parent=0)
     {
-    XInterface &bob = instance(name);
+    xsize id = (xsize)name;
+    if(parent)
+      {
+      id = parent->typeId();
+      }
+
+    XInterface &bob = instance(name, id);
+
+    if(parent)
+      {
+      bob.inherit(parent);
+      }
+
     xAssert(!bob.isSealed());
     return &bob;
     }
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance("");
+    const XInterface &bob = instance("", 0);
     xAssert(bob.isSealed());
     return &bob;
     }
@@ -186,9 +198,9 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance(const char *name)
+  static XInterface &instance(const char *name, xsize id)
     {
-    static XInterface bob((xsize)name, name);
+    static XInterface bob(id, name);
     return bob;
     }
 
@@ -482,9 +494,13 @@ public:
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
   namespace XScriptConvert { namespace internal { \
-  template <> struct JSToNative<type> : XScript::JSToNative_ClassCreator<type> {}; } \
-  X_SCRIPTABLE_MATCHERS(type) \
-}
+  template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObject<type> {}; } \
+  X_SCRIPTABLE_MATCHERS(type) }
+
+#define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
+  X_SCRIPTABLE_MATCHERS(type) }
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
@@ -497,6 +513,14 @@ public:
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
+
+
+#define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
+  namespace XScript { \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
+
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
 }
