@@ -2,12 +2,13 @@
 #define XFUNCTIONS_H
 
 #include "XEngine.h"
-#include "XScriptObject.h"
+#include "XScriptValue.h"
 #include "XScriptFunction.h"
 #include "XScriptConstructors.h"
 #include "XInterface.h"
 
-namespace cvv8 {
+namespace XScript
+{
 
 /**
     A concept class, primarily for documentation and tag-type purposes.
@@ -20,7 +21,7 @@ struct InCa
         InvocationCallback interface. Some bindings provide additional
         overloads as well.
     */
-  static XScriptObject Call( XScriptArguments const & );
+  static XScriptValue Call( XScriptArguments const & );
   };
 
 /**
@@ -185,10 +186,10 @@ template <>
 struct IsUnlockable<void const *> : XBoolVal<false> {};
 
 template <>
-struct IsUnlockable< XScriptObject > : XBoolVal<false> {};
+struct IsUnlockable< XScriptValue > : XBoolVal<false> {};
 
 template <>
-struct IsUnlockable< XPersistentScriptObject > : XBoolVal<false> {};
+struct IsUnlockable< XPersistentScriptValue > : XBoolVal<false> {};
 
 template <>
 struct IsUnlockable<XScriptArguments> : XBoolVal<false> {};
@@ -281,7 +282,7 @@ struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
 
     This is primarily intended for use in two cases:
 
-    - Internally in the cvv8 binding mechanisms.
+    - Internally in the binding mechanisms.
 
     - In client code when binding non-member functions as JS-side methods of
     native objects.
@@ -309,7 +310,7 @@ struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
     i hope to eventually find a solution which is both cross-platform and
     allows us to invoke TypeName<T>::Value from here.
 */
-template <typename T> XScriptObject TossMissingThis()
+template <typename T> XScriptValue TossMissingThis()
   {
   return Toss(StringBuffer()<<"CastFromJS<'T'>() returned NULL! Cannot find 'this' pointer!");
   }
@@ -372,7 +373,7 @@ struct FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
     return (RV) func(argv);
     }
 
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -398,7 +399,7 @@ struct FunctionForwarder<0,Sig, UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return func();
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -426,7 +427,7 @@ struct FunctionForwarderVoid<0,Sig, UnlockV8> : XFunctionSignature<Sig>
                    return of a void expression without the cast.
                 */;
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -448,7 +449,7 @@ struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)func(argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -458,7 +459,7 @@ struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
   };
 
 /**
-        Internal impl for cvv8::XConstMethodForwarder.
+        Internal impl for XConstMethodForwarder.
     */
 template <typename T, int Arity_, typename Sig,
           bool UnlockV8 = XSignatureIsUnlockable< XMethodSignature<T, Sig> >::Value
@@ -479,7 +480,7 @@ public:
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (self.*func)();
     }
-  static XScriptObject Call( T & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -493,7 +494,7 @@ public:
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -518,7 +519,7 @@ struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     {
     return (self.*func)(argv);
     }
-  static XScriptObject Call( T & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -532,7 +533,7 @@ struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -567,7 +568,7 @@ public:
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)();
     }
-  static XScriptObject Call( Type & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( Type & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -582,12 +583,12 @@ public:
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     CallNative(func, argv);
-    return XScriptObject();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -606,12 +607,12 @@ struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
     {
     return (ReturnType)(self.*func)(argv);
     }
-  static XScriptObject Call( Type & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( Type & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     CallNative( self, func, argv );
-    return XScriptObject();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
 
@@ -622,12 +623,12 @@ struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     CallNative(func, argv);
-    return XScriptObject();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -640,7 +641,7 @@ struct XMethodForwarderVoid<T,Arity, RV (T::*)(XScriptArguments const &), Unlock
   {};
 
 /**
-        Internal impl for cvv8::XConstMethodForwarder.
+        Internal impl for XConstMethodForwarder.
     */
 template <typename T, int Arity_, typename Sig,
           bool UnlockV8 = XSignatureIsUnlockable< XConstMethodSignature<T, Sig> >::Value
@@ -660,7 +661,7 @@ public:
     return (self.*func)();
     }
 
-  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -674,7 +675,7 @@ public:
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -697,7 +698,7 @@ struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     {
     return (ReturnType)(self.*func)(argv);
     }
-  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -711,7 +712,7 @@ struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -746,12 +747,12 @@ public:
     return (ReturnType)(self.*func)();
     }
 
-  static XScriptObject Call( Type const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( Type const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     CallNative( self, func, argv );
-    return XScriptObject();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -761,12 +762,12 @@ public:
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     CallNative(func, argv);
-    return XScriptObject();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -788,7 +789,7 @@ struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), Unlock
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)();
     }
-  static XScriptObject Call( Type const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( Type const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -802,7 +803,7 @@ struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), Unlock
     if( ! self ) throw MissingThisExceptionT<T>();
     return CallNative(*self, func, argv);
     }
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -909,7 +910,7 @@ public:
         is void, in which case CastToJS() is not invoked and v8::Undefined()
         will be returned.
     */
-  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     return Proxy::Call( func, argv );
     }
@@ -937,26 +938,26 @@ struct CallForwarder
         Arity). The ARGS array must be populated by calling CastToJS(ARG_N)
         for each argument, where ARG_N is the Nth argument.
     */
-  static XScriptObject Call( XScriptObject const & self, XScriptFunction const & func,
+  static XScriptValue Call( XScriptValue const & self, XScriptFunction const & func,
                                      ... );
   /**
         Convenience form of Call() which must be equivalent to
         Call(func,func,...).
     */
-  static XScriptObject Call( XScriptFunction const & func, ... );
+  static XScriptValue Call( XScriptFunction const & func, ... );
   };
 
 //! Specialization for 0-arity calls.
 template <>
 struct CallForwarder<0>
   {
-  static XScriptObject Call( XInterfaceObject const &self, XScriptFunction const &func )
+  static XScriptValue Call( XScriptObject const &self, XScriptFunction const &func )
     {
     return func.call(self, 0, 0);
     }
-  static XScriptObject Call( XScriptFunction const &func )
+  static XScriptValue Call( XScriptFunction const &func )
     {
-    XInterfaceObject obj(func);
+    XScriptObject obj(func);
     return Call( obj, func );
     }
   };
@@ -966,7 +967,7 @@ struct CallForwarder<0>
 namespace Detail {
 
 /**
-        Base internal implementation of cvv8::FunctionToInCa.
+        Base internal implementation of FunctionToInCa.
     */
 template <typename Sig,
           typename XFunctionSignature<Sig>::FunctionType Func,
@@ -987,7 +988,7 @@ struct FunctionToInCa : XFunctionPtr<Sig,Func>, InCa
                 foo() when foo() returns void.
             */
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
@@ -1014,7 +1015,7 @@ struct FunctionToInCaVoid : XFunctionPtr<Sig,Func>, InCa
     {
     return (ReturnType)Proxy::CallNative( Func, argv );
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
@@ -1041,11 +1042,11 @@ struct MethodToInCa : XMethodPtr<T,Sig, Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( T & self, XScriptArguments const & argv )
+  static XScriptValue Call( T & self, XScriptArguments const & argv )
     {
     return Proxy::Call( self, Func, argv );
     }
@@ -1072,11 +1073,11 @@ struct MethodToInCaVoid : XMethodPtr<T,Sig,Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( T & self, XScriptArguments const & argv )
+  static XScriptValue Call( T & self, XScriptArguments const & argv )
     {
     return Proxy::Call( self, Func, argv );
     }
@@ -1102,11 +1103,11 @@ struct ConstMethodToInCa : XConstMethodPtr<T,Sig, Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( T const & self, XScriptArguments const & argv )
+  static XScriptValue Call( T const & self, XScriptArguments const & argv )
     {
     return Proxy::Call( self, Func, argv );
     }
@@ -1130,11 +1131,11 @@ struct ConstMethodToInCaVoid : XConstMethodPtr<T,Sig,Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptObject Call( T const & self, XScriptArguments const & argv )
+  static XScriptValue Call( T const & self, XScriptArguments const & argv )
     {
     return Proxy::Call( self, Func, argv );
     }
@@ -1287,7 +1288,7 @@ template <typename Ftor, typename Sig,
           >
 struct FunctorToInCa : InCa
   {
-  inline static XScriptObject Call( XScriptArguments const & argv )
+  inline static XScriptValue Call( XScriptArguments const & argv )
     {
     typedef Detail::FunctorToInCaSelector<
         typename XSignature<Sig>::ReturnType, Ftor, Sig, UnlockV8
@@ -1305,7 +1306,7 @@ template <typename Ftor, typename Sig,
           >
 struct FunctorToInCaVoid : InCa
   {
-  inline static XScriptObject Call( XScriptArguments const & argv )
+  inline static XScriptValue Call( XScriptArguments const & argv )
     {
     typedef Detail::FunctorToInCaSelector<
         void, Ftor, Sig, UnlockV8
@@ -1392,7 +1393,7 @@ public:
        (i.e. it is InvocationCallback-like) then argv is passed on
        to it regardless of the value of argv.Length().
     */
-  inline static XScriptObject Call( T & self, FunctionType func, XScriptArguments const & argv )
+  inline static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
     {
     return Proxy::Call( self, func, argv );
     }
@@ -1401,7 +1402,7 @@ public:
        Like the 3-arg overload, but tries to extract the (T*) object using
        CastFromJS<T>(argv.This()).
     */
-  inline static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
+  inline static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     return Proxy::Call( func, argv );
     }
@@ -1576,7 +1577,7 @@ forwardConstMethod(Sig func, XScriptArguments const & argv )
    templates this way, this class can fill that gap.
 */
 template <XInterfaceBase::Invocation ICB>
-struct InCaToInCa : FunctionToInCa< XScriptObject (XScriptArguments const &), ICB>
+struct InCaToInCa : FunctionToInCa< XScriptValue (XScriptArguments const &), ICB>
   {
   };
 
@@ -1604,7 +1605,7 @@ struct NativeToJS< InCaToInCa<ICB> >
 namespace Detail {
 /** Internal code duplication reducer. */
 template <int ExpectingArity>
-XScriptObject TossArgCountError( XScriptArguments const & args )
+XScriptValue TossArgCountError( XScriptArguments const & args )
   {
   return Toss((StringBuffer()
                <<"Incorrect argument count ("<<args.Length()
@@ -1644,7 +1645,7 @@ struct ArityDispatch : InCa
 
        Implements the InvocationCallback interface.
     */
-  inline static XScriptObject Call( XScriptArguments const & args )
+  inline static XScriptValue Call( XScriptArguments const & args )
     {
     return ( (-1==Arity) || (Arity == args.Length()) )
         ? InCaT::Call(args)
@@ -1741,7 +1742,7 @@ struct InCaCatcher : InCa
 
         See the class-level docs for full details.
     */
-  static XScriptObject Call( XScriptArguments const & args )
+  static XScriptValue Call( XScriptArguments const & args )
     {
     try
     {
@@ -1827,7 +1828,7 @@ namespace Detail {
 template <typename InCaT>
 struct OverloadCallHelper : InCa
   {
-  inline static XScriptObject Call( XScriptArguments const & argv )
+  inline static XScriptValue Call( XScriptArguments const & argv )
     {
     return InCaT::Call(argv);
     }
@@ -1836,7 +1837,7 @@ struct OverloadCallHelper : InCa
 template <>
 struct OverloadCallHelper<XNilType> : InCa
   {
-  inline static XScriptObject Call( XScriptArguments const & argv )
+  inline static XScriptValue Call( XScriptArguments const & argv )
     {
     return Toss( QString("End of typelist reached. Argument count=%1").arg(argv.length()) );
     }
@@ -1865,7 +1866,7 @@ struct OverloadCallHelper<XNilType> : InCa
 
    @code
    // Overload 3 variants of a member function:
-   typedef CVV8_TYPELIST((
+   typedef X_SCRIPT_TYPELIST((
             MethodToInCa<BoundNative, void (), &BoundNative::overload0>,
             MethodToInCa<BoundNative, void (int), &BoundNative::overload1>,
             MethodToInCa<BoundNative, void (int,int), &BoundNative::overload2>
@@ -1890,7 +1891,7 @@ struct ArityDispatchList : InCa
 
        Implements the v8::InvocationCallback interface.
     */
-  inline static XScriptObject Call( XScriptArguments const & argv )
+  inline static XScriptValue Call( XScriptArguments const & argv )
     {
     typedef typename FwdList::Head FWD;
     typedef typename FwdList::Tail Tail;
@@ -1916,7 +1917,7 @@ template <typename T, typename Sig >
 struct ToInCaSigSelector : XMethodSignature<T,Sig>
   {
   template < typename XMethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
-  struct Base : cvv8::MethodToInCa<T, Sig, Func, UnlockV8 >
+  struct Base : MethodToInCa<T, Sig, Func, UnlockV8 >
     {
     };
   };
@@ -1926,7 +1927,7 @@ template <typename Sig>
 struct ToInCaSigSelector<void,Sig> : XFunctionSignature<Sig>
   {
   template < typename XFunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
-  struct Base : cvv8::FunctionToInCa<Sig, Func, UnlockV8 >
+  struct Base : FunctionToInCa<Sig, Func, UnlockV8 >
     {
     };
   };
@@ -1936,7 +1937,7 @@ template <typename T, typename Sig >
 struct ToInCaSigSelectorVoid : XMethodSignature<T,Sig>
   {
   template < typename XMethodSignature<T,Sig>::FunctionType Func, bool UnlockV8 >
-  struct Base : cvv8::MethodToInCaVoid<T, Sig, Func, UnlockV8 >
+  struct Base : MethodToInCaVoid<T, Sig, Func, UnlockV8 >
     {
     };
   };
@@ -1946,7 +1947,7 @@ template <typename Sig>
 struct ToInCaSigSelectorVoid<void,Sig> : XFunctionSignature<Sig>
   {
   template < typename XFunctionSignature<Sig>::FunctionType Func, bool UnlockV8 >
-  struct Base : cvv8::FunctionToInCaVoid<Sig, Func, UnlockV8 >
+  struct Base : FunctionToInCaVoid<Sig, Func, UnlockV8 >
     {
     };
   };
@@ -2097,7 +2098,7 @@ struct OneTimeInitInCa : InCa
         in from multiple DLLs, the init routine might be called
         more than once, depending on the platform.
     */
-  static XScriptObject Call( XScriptArguments const & argv )
+  static XScriptValue Call( XScriptArguments const & argv )
     {
     static bool bob = false;
     if( ! bob )

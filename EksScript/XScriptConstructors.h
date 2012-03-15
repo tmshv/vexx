@@ -9,8 +9,9 @@
 #include "XScriptTypeInfo.h"
 #include "XConvertScriptSTL.h"
 
-namespace cvv8
+namespace XScript
 {
+
 #if !defined(DOXYGEN)
 namespace Detail {
 /**

@@ -1,9 +1,9 @@
 #include "XInterface.h"
 #include "XSignatureHelpers.h"
-#include "XInterfaceObject.h"
+#include "XScriptObject.h"
 #include "XEngine.h"
 #include "XContext.h"
-#include "XScript.h"
+#include "XScriptSource.h"
 #include "XScriptConstructors.h"
 #include "XFunctions.h"
 
@@ -188,12 +188,12 @@ int main(int, char*[])
   c.addInterface(bTempl);
 
   SomeClass *m = NULL;
-  XInterfaceObject obj = XInterfaceObject::newInstance(someTempl);
+  XScriptObject obj = XScriptObject::newInstance(someTempl);
   m = obj.castTo<SomeClass>();
 
   c.set("someClass", obj);
 
-  XScript script(
+  XScriptSource script(
     "var a = someClass.thing;"
     "var r = new Rect();"
     "r.top = 5;"
@@ -201,7 +201,10 @@ int main(int, char*[])
     "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
     );
 
-  script.run();
+  bool err = false;
+  XScriptValue result = script.run(&err);
+  xAssert(err);
+  qDebug() << result.toString();
 
   return 0;
 }

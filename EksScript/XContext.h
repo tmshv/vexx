@@ -3,7 +3,7 @@
 
 #include "XScriptGlobal.h"
 #include "XEngine.h"
-#include "XInterfaceObject.h"
+#include "XScriptObject.h"
 
 class EKSSCRIPT_EXPORT XContext
   {
@@ -11,7 +11,7 @@ public:
   XContext(XEngine *e);
   ~XContext();
 
-  void set(const char* in, const XInterfaceObject& obj);
+  void set(const char* in, const XScriptObject& obj);
 
   void addInterface(const XInterfaceBase *i);
 

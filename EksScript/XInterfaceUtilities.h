@@ -5,9 +5,9 @@
 #include "XConvertFromScript.h"
 #include "XConvertToScriptMap.h"
 
-class XInterfaceObject;
+class XScriptObject;
 
-namespace cvv8 {
+namespace XScript {
 
     /**
        Policy template used by ClassCreator<T> for
@@ -43,7 +43,7 @@ namespace cvv8 {
 
            The default implementation simply return (new T).
         */
-        static ReturnType Create( XInterfaceObject &, XScriptArguments const & )
+        static ReturnType Create( XScriptObject &, XScriptArguments const & )
         {
             return new T;
         }
@@ -288,7 +288,7 @@ namespace cvv8 {
 
             On error the binding should throw a NATIVE exception (ideally
             deriving from std::exception because (A) it's portable practice
-            and (B) parts of the cvv8 API handles those explicitly).
+            and (B) parts of the API handles those explicitly).
 
             Several years of experience have shown that this function (or
             similar implementations) should take some care to make sure
@@ -310,7 +310,7 @@ namespace cvv8 {
             return;
             @endcode
         */
-        static void Initialize( XInterfaceObject const & target )
+        static void Initialize( XScriptObject const & target )
         {
             throw std::runtime_error("ClassCreator_SetupBindings<T> MUST be specialized "
                                      "in order to be useful!");
@@ -321,13 +321,13 @@ namespace cvv8 {
         A concrete ClassCreator_SetupBindings implementation which forwards
         the call to a user-defined function.
     */
-    template <typename T, void (*Func)( XInterfaceObject const &) >
+    template <typename T, void (*Func)( XScriptObject const &) >
     struct ClassCreator_SetupBindings_ClientFunc
     {
         /**
             Calls Func(target).
         */
-        static void Initialize( XInterfaceObject const & target )
+        static void Initialize( XScriptObject const & target )
         {
             Func(target);
         }
@@ -367,7 +367,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void PreWrap( XInterfaceObject const &, XScriptArguments const & )
+        static void PreWrap( XScriptObject const &, XScriptArguments const & )
         {
             return;
         }
@@ -397,7 +397,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void Wrap( XScriptObject const &, NativeHandle )
+        static void Wrap( XScriptValue const &, NativeHandle )
         {
             return;
         }
@@ -431,7 +431,7 @@ namespace cvv8 {
 
            The default implementation does nothing.
         */
-        static void Unwrap( XScriptObject const &, NativeHandle )
+        static void Unwrap( XScriptValue const &, NativeHandle )
         {
             return;
         }
@@ -459,7 +459,7 @@ namespace cvv8 {
        A basic Native-to-JS class binding mechanism. This class does
        not aim to be a monster framework, just something simple,
        mainly for purposes of showing (and testing) what the core
-       cvv8 can do.
+       can do.
 
        The framework must know how to convert JS objects to T objects,
        and for this to work client code must define a JSToNative<T>
@@ -624,7 +624,7 @@ namespace cvv8 {
         To make use of this, the client should do the following:
 
         @code
-        // in the cvv8 namespace:
+        // in the namespace:
         template <>
             struct NativeToJS<T> : NativeToJSMap<T>::NativeToJSImpl {};
         @endcode
@@ -648,7 +648,7 @@ namespace cvv8 {
             If CtorProxy::Call(argv) succeeds, N2JMap::Insert(jself, theNative)
             is called. The result of CtorProxy::Call() is returned.
         */
-        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
+        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
         {
             NativeHandle n = CtorProxy::Call( argv );
             if( n ) N2JMap::Insert( jself, n );
@@ -672,7 +672,7 @@ namespace cvv8 {
     public:
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
+        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
         {
             typedef CtorArityDispatcher<CtorForwarderList> Proxy;
             return Proxy::Call( argv );
@@ -716,7 +716,7 @@ namespace cvv8 {
     public:
         typedef typename XScriptTypeInfo<T>::Type Type;
         typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
+        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
         {
             return CtorT::Call( argv );
         }
@@ -737,7 +737,7 @@ namespace cvv8 {
         /**
            Always returns NULL.
         */
-        static NativeHandle Create( XInterfaceObject jself, XScriptArguments const &  argv )
+        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
         {
             return NULL;
         }

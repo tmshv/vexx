@@ -13,7 +13,7 @@ private:
         */
   typedef typename TI::NativeHandle NativeHandle;
   /** The type for holding the JS 'this' object. */
-  typedef XPersistentScriptObject JSObjHandle;
+  typedef XPersistentScriptValue JSObjHandle;
   typedef std::pair<NativeHandle,JSObjHandle> ObjBindT;
   typedef std::map<void const *, ObjBindT> OneOfUsT;
   /** Maps (void const *) to ObjBindT.
@@ -83,11 +83,11 @@ public:
            Returns the JS object associated with key, or
            an empty handle if !key or no object is found.
         */
-  static XScriptObject GetJSObject( void const * key )
+  static XScriptValue GetJSObject( void const * key )
     {
-    if( ! key ) return XScriptObject();
+    if( ! key ) return XScriptValue();
     typename OneOfUsT::const_iterator it = Map().find(key);
-    if( Map().end() == it ) return XScriptObject();
+    if( Map().end() == it ) return XScriptValue();
     else return (*it).second.second;
     }
 
@@ -103,14 +103,14 @@ public:
         */
   struct NativeToJSImpl
     {
-    XScriptObject operator()( Type const * n ) const
+    XScriptValue operator()( Type const * n ) const
       {
       typedef XNativeToJSMap<T> BM;
-      XScriptObject const & rc( BM::GetJSObject(n) );
-      if( rc.IsEmpty() ) return XScriptObject();
+      XScriptValue const & rc( BM::GetJSObject(n) );
+      if( rc.IsEmpty() ) return XScriptValue();
       else return rc;
       }
-    XScriptObject operator()( Type const & n ) const
+    XScriptValue operator()( Type const & n ) const
       {
       return this->operator()( &n );
       }

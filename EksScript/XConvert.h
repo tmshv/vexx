@@ -2,7 +2,7 @@
 #define XCONVERT_H
 
 #include "XScriptTypeInfo.h"
-#include "XScriptObject.h"
+#include "XScriptValue.h"
 
 namespace XScriptConvert
 {
@@ -31,13 +31,13 @@ template <typename JST> struct JSToNative
   typedef typename XScriptTypeInfo<JST>::NativeHandle ResultType;
 
   //! Must be specialized to be useful.
-  ResultType operator()(XScriptObject const &h) const;
+  ResultType operator()(XScriptValue const &h) const;
   };
 
 template <typename NT> struct NativeToJS
   {
   template <typename X>
-  XScriptObject operator()( X const & ) const;
+  XScriptValue operator()( X const & ) const;
 
 private:
   typedef xCompileTimeAssertDef<false> NativeToJSMustBeSpecialized;
@@ -72,7 +72,7 @@ struct ArgCaster
            conversion, as long as they release it when the destruct.
            See ArgCaster<char const *> for an example of that.
         */
-  inline ResultType ToNative( XScriptObject const & v ) const
+  inline ResultType ToNative( XScriptValue const & v ) const
     {
     return XScriptConvert::from<T>( v );
     }
@@ -142,7 +142,7 @@ public:
            - ToNative() is called again.
            - This object is destructed.
         */
-  ResultType ToNative( XScriptObject const & )
+  ResultType ToNative( XScriptValue const & )
     {/*
     typedef XScriptConvert::internal::JSToNative<std::string> C;
     if( !v.isValid() )

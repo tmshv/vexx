@@ -1,5 +1,5 @@
 #include "XInterface.h"
-#include "XScriptObjectV8Internals.h"
+#include "XScriptValueV8Internals.h"
 
 typedef v8::Persistent<v8::FunctionTemplate> FnTempl;
 typedef v8::Persistent<v8::ObjectTemplate> ObjTempl;
@@ -26,7 +26,7 @@ const ObjTempl *prototype(const void *& b)
 
 XInterfaceBase::XInterfaceBase(xsize typeId,
                                const char *typeName,
-                               XScriptObject ctor(XScriptArguments const &argv),
+                               XScriptValue ctor(XScriptArguments const &argv),
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount)
@@ -61,7 +61,7 @@ XScriptFunction XInterfaceBase::constructorFunction() const
   return fromFunction((*constructor(_constructor))->GetFunction());
   }
 
-void XInterfaceBase::wrapInstance(XInterfaceObject scObj, void *object) const
+void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
   {
   v8::Handle<v8::Object> obj = getV8Internal(scObj);
   if( 0 <= _typeIdField )
@@ -73,7 +73,7 @@ void XInterfaceBase::wrapInstance(XInterfaceObject scObj, void *object) const
   obj->SetPointerInInternalField(_nativeField, object);
 }
 
-void XInterfaceBase::unwrapInstance(XInterfaceObject scObj) const
+void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
   {
   v8::Handle<v8::Object> object = getV8Internal(scObj);
   xAssert(_nativeField < (xsize)object->InternalFieldCount());
@@ -85,17 +85,17 @@ void XInterfaceBase::unwrapInstance(XInterfaceObject scObj) const
     }
   }
 
-XInterfaceObject XInterfaceBase::newInstance(int argc, XScriptObject argv[]) const
+XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[]) const
   {
   return fromObjectHandle(getV8Internal(constructorFunction())->NewInstance(argc, getV8Internal(argv)));
   }
 
-XInterfaceObject XInterfaceBase::newInstanceBase() const
+XScriptObject XInterfaceBase::newInstanceBase() const
   {
   return fromObjectHandle((*constructor(_constructor))->InstanceTemplate()->NewInstance());
   }
 
-void XInterfaceBase::set(const char *name, XScriptObject val)
+void XInterfaceBase::set(const char *name, XScriptValue val)
   {
   (*prototype(_prototype))->Set(v8::String::NewSymbol(name), getV8Internal(val));
   }
@@ -105,7 +105,7 @@ void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
   (*prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
   }
 
-void XInterfaceBase::addClassTo(const char *thisClassName, const XInterfaceObject &dest) const
+void XInterfaceBase::addClassTo(const char *thisClassName, const XScriptObject &dest) const
   {
   getV8Internal(dest)->Set(v8::String::NewSymbol(thisClassName), getV8Internal(constructorFunction()));
   }

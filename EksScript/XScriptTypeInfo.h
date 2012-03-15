@@ -24,10 +24,10 @@ template <typename T> struct XScriptTypeInfoBase<T &> : XScriptTypeInfoBase<T> {
 
 template <typename T> class XScriptTypeInfo : public XScriptTypeInfoBase<T> {};
 
-#define CVV8_TypeInfo_DECL(X) template <> struct XScriptTypeInfo<X> : public XScriptTypeInfoBase<X> \
+#define X_SCRIPT_TypeInfo_DECL(X) template <> struct XScriptTypeInfo<X> : public XScriptTypeInfoBase<X> \
 { static const char *TypeName; }
 
-#define CVV8_TypeInfo_IMPL(X,NAME) char const * XScriptTypeInfo<X>::TypeName = NAME
+#define X_SCRIPT_TypeInfo_IMPL(X,NAME) char const * XScriptTypeInfo<X>::TypeName = NAME
 
 
 #endif // XSCRIPTTYPEINFO_H

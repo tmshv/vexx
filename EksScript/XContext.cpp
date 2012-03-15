@@ -1,5 +1,5 @@
 #include "XContext.h"
-#include "XScriptObjectV8Internals.h"
+#include "XScriptValueV8Internals.h"
 
 class XContext::Impl
   {
@@ -26,7 +26,7 @@ XContext::~XContext()
   delete _impl;
   }
 
-void XContext::set(const char* in, const XInterfaceObject& obj)
+void XContext::set(const char* in, const XScriptObject& obj)
   {
     v8::Handle<v8::String> propName = v8::String::New(in);
   _impl->_context->Global()->Set(propName, getV8Internal(obj));

@@ -21,7 +21,7 @@ template <typename NT> struct NativeToJS<const NT> : NativeToJS<NT> {};
 template <typename NT> struct NativeToJS<NT &>
   {
   typedef typename XScriptTypeInfo<NT>::Type & ArgType;
-  XScriptObject operator()( ArgType n ) const
+  XScriptValue operator()( ArgType n ) const
     {
     typedef NativeToJS< typename XScriptTypeInfo<NT>::NativeHandle > Cast;
     return Cast()( &n );
@@ -33,25 +33,25 @@ namespace
 {
 template <typename IntegerT> struct NativeToJS_int_small
   {
-  XScriptObject operator()( IntegerT v ) const
+  XScriptValue operator()( IntegerT v ) const
     {
-    return XScriptObject(v);
+    return XScriptValue(v);
     }
   };
 
 template <typename IntegerT> struct NativeToJSUIntSmall
   {
-  XScriptObject operator()( IntegerT v ) const
+  XScriptValue operator()( IntegerT v ) const
     {
-    return XScriptObject(v);
+    return XScriptValue(v);
     }
   };
 
 template <typename IntegerT> struct NativeToJSNumber
   {
-  XScriptObject operator()( IntegerT v ) const
+  XScriptValue operator()( IntegerT v ) const
     {
-    return XScriptObject(v);
+    return XScriptValue(v);
     }
   };
 
@@ -97,16 +97,16 @@ template <> struct JSToNative< XIfElse<
 
 template <> struct NativeToJS<bool>
   {
-  XScriptObject operator()( bool v ) const
+  XScriptValue operator()( bool v ) const
     {
-    return XScriptObject( v );
+    return XScriptValue( v );
     }
   };
 
 //template <typename T> struct NativeToJS< ::v8::Handle<T> >
 //  {
 //  typedef ::v8::Handle<T> HandleType;
-//  XScriptObject operator()(HandleType const &li) const
+//  XScriptValue operator()(HandleType const &li) const
 //    {
 //    return li;
 //    }
@@ -115,7 +115,7 @@ template <> struct NativeToJS<bool>
 template <typename T> struct NativeToJS< ::v8::Local<T> >
   {
   typedef ::v8::Local<T> HandleType;
-  XScriptObject operator()(HandleType const &li) const
+  XScriptValue operator()(HandleType const &li) const
     {
     return li;
     }
@@ -124,7 +124,7 @@ template <typename T> struct NativeToJS< ::v8::Local<T> >
 template <typename T> struct NativeToJS< ::v8::Persistent<T> >
   {
   typedef ::v8::Persistent<T> HandleType;
-  XScriptObject operator()(HandleType const &li) const
+  XScriptValue operator()(HandleType const &li) const
     {
     return li;
     }
@@ -132,28 +132,28 @@ template <typename T> struct NativeToJS< ::v8::Persistent<T> >
 
 template <> struct NativeToJS< ::v8::InvocationCallback >
   {
-  XScriptObject operator()(::v8::InvocationCallback const ) const
+  XScriptValue operator()(::v8::InvocationCallback const ) const
     {
     xAssertFail();
-    return XScriptObject();
+    return XScriptValue();
     //return ::v8::FunctionTemplate::New(f)->GetFunction();
     }
   };*/
 
 template <> struct NativeToJS<char const *>
   {
-  XScriptObject operator()(char const *v) const
+  XScriptValue operator()(char const *v) const
     {
-    if(!v) return XScriptObject();
-    else return XScriptObject( v );
+    if(!v) return XScriptValue();
+    else return XScriptValue( v );
     }
   };
 
 template <> struct NativeToJS<QString>
   {
-  XScriptObject operator()(QString v) const
+  XScriptValue operator()(QString v) const
     {
-    return XScriptObject(v);
+    return XScriptValue(v);
     }
   };
 
@@ -161,10 +161,10 @@ template <> struct NativeToJS<QString>
 // that exception via v8::ThrowException().
 template <> struct NativeToJS<std::exception>
   {
-  XScriptObject operator()( std::exception const &) const
+  XScriptValue operator()( std::exception const &) const
     {
     xAssertFail();
-    return XScriptObject();
+    return XScriptValue();
     //char const *msg = ex.what();
     //return v8::Exception::Error(v8::String::New( msg ? msg : "unspecified std::exception" ));
     }
@@ -177,25 +177,25 @@ template <> struct NativeToJS<std::logic_error> : NativeToJS<std::exception> {};
 }
 
 // Overloads to avoid ambiguity in certain calls.
-static inline XScriptObject to(char const *v)
+static inline XScriptValue to(char const *v)
   {
   typedef internal::NativeToJS<char const *> F;
   return F()( v );
   }
 
-//static inline XScriptObject to(v8::InvocationCallback v)
+//static inline XScriptValue to(v8::InvocationCallback v)
 //  {
 //  typedef internal::NativeToJS<v8::InvocationCallback> F;
 //  return F()( v );
 //  }
 
-static inline XScriptObject to(char *v)
+static inline XScriptValue to(char *v)
   {
   typedef internal::NativeToJS<char const *> F;
   return F()( v );
   }
 
-template <typename T> inline XScriptObject to(T const &v)
+template <typename T> inline XScriptValue to(T const &v)
   {
   typedef internal::NativeToJS<T const> F;
   return F()( v );

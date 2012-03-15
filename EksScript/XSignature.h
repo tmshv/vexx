@@ -3,7 +3,7 @@
 
 template <typename Sig> struct XSignature;
 
-#define CVV8_TYPELIST(X) ::XSignature< void X >
+#define X_SCRIPT_TYPELIST(X) ::XSignature< void X >
 
 /**
     Specialization to give "InvacationCallback-like" functions

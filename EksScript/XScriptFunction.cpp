@@ -1,8 +1,8 @@
 #include "XScriptFunction.h"
+#include "XScriptValue.h"
 #include "XScriptObject.h"
-#include "XInterfaceObject.h"
 #include "XScriptException.h"
-#include "XScriptObjectV8Internals.h"
+#include "XScriptValueV8Internals.h"
 
 struct XScriptFunctionInternal
   {
@@ -121,7 +121,7 @@ XScriptFunction& XScriptFunction::operator=(const XScriptFunction &other)
   return *this;
   }
 
-XScriptObject XScriptFunction::call(const XInterfaceObject &self, int argc, XScriptObject args[]) const
+XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, XScriptValue args[]) const
   {
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
@@ -130,7 +130,7 @@ XScriptObject XScriptFunction::call(const XInterfaceObject &self, int argc, XScr
       : fromHandle(func->_object->Call(getV8Internal(self), argc, getV8Internal(args)));
   }
 
-XScriptObject XScriptFunction::callAsConstructor(const XScriptArguments &argv)
+XScriptValue XScriptFunction::callAsConstructor(const XScriptArguments &argv)
   {
   const v8::Arguments &args = XScriptArgumentsInternal::val(&argv);
 
@@ -154,7 +154,7 @@ XScriptFunction fromFunction(v8::Handle<v8::Function> fn)
   return o;
   }
 
-XInterfaceObject XAccessorInfo::calleeThis() const
+XScriptObject XAccessorInfo::calleeThis() const
   {
   return fromObjectHandle(XAccessorInfoInternal::val(this).This());
   }
@@ -177,7 +177,7 @@ XScriptFunction XScriptArguments::callee() const
   return fromFunction(XScriptArgumentsInternal::val(this).Callee());
   }
 
-XInterfaceObject XScriptArguments::calleeThis() const
+XScriptObject XScriptArguments::calleeThis() const
   {
   return fromObjectHandle(XScriptArgumentsInternal::val(this).This());
   }
@@ -187,7 +187,7 @@ xsize XScriptArguments::length() const
   return XScriptArgumentsInternal::val(this).Length();
   }
 
-XScriptObject XScriptArguments::at(xsize i) const
+XScriptValue XScriptArguments::at(xsize i) const
   {
   return fromHandle(XScriptArgumentsInternal::val(this)[i]);
   }

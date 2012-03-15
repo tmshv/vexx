@@ -10,7 +10,7 @@
 #include "XScriptFunction.h"
 #include "XConvertToScript.h"
 #include "XInterfaceUtilities.h"
-#include "XInterfaceObject.h"
+#include "XScriptObject.h"
 #include "XScriptException.h"
 #include "XConvertToScriptMap.h"
 #include "XInterfaceUtilities.h"
@@ -27,7 +27,7 @@ class EKSSCRIPT_EXPORT XInterfaceBase
 public:
   XInterfaceBase(xsize typeID,
                  const char *typeName,
-                 XScriptObject ctor(XScriptArguments const &argv),
+                 XScriptValue ctor(XScriptArguments const &argv),
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount);
@@ -39,21 +39,21 @@ public:
     return _isSealed;
     }
 
-  void wrapInstance(XInterfaceObject obj, void *object) const;
-  void unwrapInstance(XInterfaceObject object) const;
+  void wrapInstance(XScriptObject obj, void *object) const;
+  void unwrapInstance(XScriptObject object) const;
 
-  XInterfaceObject newInstance(int argc, XScriptObject argv[]) const;
-  XInterfaceObject newInstanceBase() const;
+  XScriptObject newInstance(int argc, XScriptValue argv[]) const;
+  XScriptObject newInstanceBase() const;
 
   XScriptFunction constructorFunction() const;
-  void set(const char *name, XScriptObject val);
+  void set(const char *name, XScriptValue val);
 
-  typedef XScriptObject (*Invocation)(const XScriptArguments& args);
-  typedef XScriptObject (*Getter)(XScriptObject property,const XAccessorInfo& info);
-  typedef void (*Setter)(XScriptObject property, XScriptObject value, const XAccessorInfo& info);
+  typedef XScriptValue (*Invocation)(const XScriptArguments& args);
+  typedef XScriptValue (*Getter)(XScriptValue property,const XAccessorInfo& info);
+  typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);
 
-  void addClassTo(char const *thisClassName, XInterfaceObject const &dest) const;
+  void addClassTo(char const *thisClassName, XScriptObject const &dest) const;
 
   void inherit(XInterfaceBase* parentType);
 
@@ -72,24 +72,24 @@ template <typename T> class XInterface : public XInterfaceBase
 public:
   typedef typename XPlainType<T>::Type Type;
 
-  void wrapInstance(XInterfaceObject object, T *native) const
+  void wrapInstance(XScriptObject object, T *native) const
     {
     XInterfaceBase::wrapInstance(object, (void*)native);
     }
 
-  void unwrapInstance(XInterfaceObject object) const
+  void unwrapInstance(XScriptObject object) const
     {
     return XInterfaceBase::unwrapInstance(object);
     }
 
   template <typename ValueT> inline void set(char const *name, ValueT val)
     {
-    set(name, cvv8::CastToJS(val));
+    set(name, XScriptConvert::to(val));
     }
 
   /*inline void set(char const *name, v8::InvocationCallback val)
     {
-    set(name, cvv8::CastToJS(val));
+    set(name, XScriptConvert::to(val));
     }*/
 
   template <typename GETTYPE,
@@ -98,8 +98,8 @@ public:
             typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
   void addProperty(const char *name)
     {
-    Getter getter = cvv8::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
-    Setter setter = cvv8::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
+    Getter getter = XScript::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    Setter setter = XScript::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
 
     XInterfaceBase::addProperty(name, getter, setter);
     }
@@ -108,7 +108,7 @@ public:
             typename XMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD>
   void addAccessProperty(const char *name)
     {
-    Getter getter = cvv8::XMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+    Getter getter = XScript::XMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
 
     XInterfaceBase::addProperty(name, getter, 0);
     }
@@ -129,7 +129,7 @@ public:
      (which _might_ have been re-allocated to a different
      object, even of a different type, in the mean time).
   */
-  static bool destroyObject( XInterfaceObject const & jo )
+  static bool destroyObject( XScriptObject const & jo )
     {
     T * t = CastFromJS<T>(jo);
     if( ! t ) return false;
@@ -146,9 +146,9 @@ public:
      otherwise it returns the result of
      DestroyObject(Handle<Object>).
   */
-  static bool destroyObject( XScriptObject const & jv )
+  static bool destroyObject( XScriptValue const & jv )
     {
-    return !jv->isObject() ? false : destroyObject(XInterfaceObject(jv));
+    return !jv->isObject() ? false : destroyObject(XScriptObject(jv));
     }
 
   /**
@@ -162,7 +162,7 @@ public:
      This function is not called DestroyObject to avoid name
      collisions during binding using Set(...,DestroyObjectCallback).
   */
-  static XScriptObject destroyObjectCallback( XScriptArguments const & argv )
+  static XScriptValue destroyObjectCallback( XScriptArguments const & argv )
     {
     return destroyObject(argv.This()) ? v8::True() : v8::False();
     }
@@ -182,9 +182,9 @@ public:
     }
 
 private:
-  typedef cvv8::ClassCreator_InternalFields<T> InternalFields;
-  typedef cvv8::ClassCreator_WeakWrap<T> WeakWrap;
-  typedef cvv8::ClassCreator_Factory<T> Factory;
+  typedef XScript::ClassCreator_InternalFields<T> InternalFields;
+  typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
+  typedef XScript::ClassCreator_Factory<T> Factory;
 
   static XInterface &instance()
     {
@@ -192,15 +192,15 @@ private:
     return bob;
     }
 
-  static XInterfaceObject FindHolder( XInterfaceObject const & jo, T const * nh )
+  static XScriptObject FindHolder( XScriptObject const & jo, T const * nh )
     {
-    if( !nh || !jo.isValid() ) return XInterfaceObject();
-    XScriptObject proto(jo);
+    if( !nh || !jo.isValid() ) return XScriptObject();
+    XScriptValue proto(jo);
     void const * ext = NULL;
-    typedef cvv8::ClassCreator_SearchPrototypeForThis<T> SPFT;
+    typedef XScript::ClassCreator_SearchPrototypeForThis<T> SPFT;
     while( !ext && proto.isValid() && proto.isObject() )
       {
-      XInterfaceObject obj(proto);
+      XScriptObject obj(proto);
       ext = (obj.internalFieldCount() != InternalFields::Count)
             ? NULL
             : obj.internalField( InternalFields::NativeIndex );
@@ -224,12 +224,12 @@ private:
         proto = obj.getPrototype();
         }
       }
-    return XInterfaceObject();
+    return XScriptObject();
     }
 
-  static void weak_dtor( XPersistentScriptObject pv, void * )
+  static void weak_dtor( XPersistentScriptValue pv, void * )
     {
-    XInterfaceObject jobj(pv);
+    XScriptObject jobj(pv);
     typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NT;
     NT native = XScriptConvert::from<T>( pv );
     if( !native )
@@ -271,7 +271,7 @@ private:
              _exactly_ which JS object in the prototype chain nh is
              bound to.
           */
-      XInterfaceObject nholder = FindHolder( jobj, native );
+      XScriptObject nholder = FindHolder( jobj, native );
 #if 0 /* reminder: i've never actually seen this error happen, i'm just pedantic about checking... */
       assert( ! nholder.isValid() );
       WeakWrap::Unwrap( nholder /*jobj? subtle difference!*/, native );
@@ -321,9 +321,9 @@ private:
   /**
      Gets installed as the NewInstance() handler for T.
    */
-  static XScriptObject ctor_proxy( XScriptArguments const & argv )
+  static XScriptValue ctor_proxy( XScriptArguments const & argv )
     {
-    if(cvv8::ClassCreator_AllowCtorWithoutNew<T>::Value)
+    if(XScript::ClassCreator_AllowCtorWithoutNew<T>::Value)
       {
       /**
              Allow construction without 'new' by forcing this
@@ -356,7 +356,7 @@ private:
       can't work for the generic
       case, anyway.
       */
-    XInterfaceObject jobj(argv.calleeThis());
+    XScriptObject jobj(argv.calleeThis());
     if( !jobj.isValid() )
       {
       return jobj /* assume exception*/;
@@ -380,20 +380,20 @@ private:
     {
       WeakWrap::Unwrap( jobj, nobj );
       if( nobj ) Factory::Delete( nobj );
-      jobj = XInterfaceObject();
+      jobj = XScriptObject();
       return Toss(ex.what());
       }
     catch(...)
     {
     WeakWrap::Unwrap( jobj, nobj );
     if( nobj ) Factory::Delete( nobj );
-    jobj = XInterfaceObject();
+    jobj = XScriptObject();
     return Toss("Native constructor threw an unknown exception!");
     }
     return jobj;
     }
 
-  XInterface() : XInterfaceBase((xsize)cvv8::ClassCreator_TypeID<T>::Value,
+  XInterface() : XInterfaceBase((xsize)XScript::ClassCreator_TypeID<T>::Value,
                                 XScriptTypeInfo<T>::TypeName,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
@@ -409,21 +409,21 @@ template <typename T> const XInterfaceBase *findInterface(const T*)
   return XInterface<T>::lookup();
   }
 
-namespace cvv8
+namespace XScript
 {
 template <typename T> struct NativeToJSCopyableType
   {
-  XScriptObject operator()(T const *n) const
+  XScriptValue operator()(T const *n) const
     {
     T *out = 0;
     const XInterfaceBase* interface = findInterface<T>(n);
-    XInterfaceObject obj = interface->newInstance(0, 0);
+    XScriptObject obj = interface->newInstance(0, 0);
 
     out = XScriptConvert::from<T>(obj);
     *out = *n;
     return obj;
     }
-  XScriptObject operator()(T const &n) const
+  XScriptValue operator()(T const &n) const
     {
     return this->operator()(&n);
     }
@@ -431,14 +431,14 @@ template <typename T> struct NativeToJSCopyableType
 
 template <typename T> struct NativeToJSConvertableType
   {
-  XScriptObject operator()(T *n) const
+  XScriptValue operator()(T *n) const
     {
     const XInterfaceBase* interface = findInterface<T>(n);
-    XInterfaceObject self = interface->newInstanceBase();
+    XScriptObject self = interface->newInstanceBase();
     interface->wrapInstance(self, n);
     return self;
     }
-  XScriptObject operator()(T &n) const
+  XScriptValue operator()(T &n) const
     {
     return this->operator()(&n);
     }
@@ -449,9 +449,9 @@ template <typename T, typename CTORS> class ClassCreatorCopyableFactory
 public:
   typedef T* ReturnType;
 
-  static T *Create(XInterfaceObject &jsSelf, XScriptArguments const & argv)
+  static T *Create(XScriptObject &jsSelf, XScriptArguments const & argv)
     {
-    typedef cvv8::CtorArityDispatcher<CTORS> Proxy;
+    typedef XScript::CtorArityDispatcher<CTORS> Proxy;
     T *b = Proxy::Call(argv);
     if(b)
       {
@@ -471,7 +471,7 @@ public:
 
 #define X_SCRIPTABLE_CONSTRUCTOR_DEF(variable, type, n) variable,
 
-#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) cvv8::CtorForwarder<type *(const type &)>, cvv8::CtorForwarder<type *()> )> name;
+#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) XScript::CtorForwarder<type *(const type &)>, XScript::CtorForwarder<type *()> )> name;
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, ...) \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__) \
@@ -481,30 +481,27 @@ public:
   template <> const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
-  CVV8_TypeInfo_DECL(type); \
+  X_SCRIPT_TypeInfo_DECL(type); \
   namespace XScriptConvert { namespace internal { \
-  template <> struct JSToNative<type> : cvv8::JSToNative_ClassCreator<type, false> {}; } \
+  template <> struct JSToNative<type> : XScript::JSToNative_ClassCreator<type, false> {}; } \
   X_SCRIPTABLE_MATCHERS(type) \
 }
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
-  template <> struct NativeToJS<type> : public cvv8::NativeToJSCopyableType<type> {}; } } \
-  namespace cvv8 { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
-}
+  template <> struct NativeToJS<type> : public XScript::NativeToJSCopyableType<type> {}; } } \
+  namespace XScript { \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
 
 #define X_SCRIPTABLE_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
-  template <> struct NativeToJS<type> : public cvv8::NativeToJSConvertableType<type> {}; } } \
-  namespace cvv8 { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
-}
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
+  namespace XScript { \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
 
-#define X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name) \
-  CVV8_TypeInfo_IMPL(type, name);
+#define X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name) X_SCRIPT_TypeInfo_IMPL(type, name);
 
 #define X_IMPLEMENT_SCRIPTABLE_TYPE_COPYABLE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)
 #define X_IMPLEMENT_SCRIPTABLE_TYPE(type, name) X_IMPLEMENT_SCRIPTABLE_TYPE_BASE(type, name)

@@ -14,7 +14,7 @@ template <>struct JSToNative<std::string>
   {
   typedef std::string ResultType;
 
-  ResultType operator()( XScriptObject const & ) const
+  ResultType operator()( XScriptValue const & ) const
     {
     /*static const std::string emptyString;
     v8::String::Utf8Value const utf8String( h );
@@ -31,16 +31,16 @@ template <> struct JSToNative<std::string const &> : public JSToNative<std::stri
 
 template <> struct NativeToJS<std::string>
   {
-  XScriptObject operator()(std::string const &v) const
+  XScriptValue operator()(std::string const &v) const
     {
-    return XScriptObject(QString::fromStdString(v));
+    return XScriptValue(QString::fromStdString(v));
     }
   };
 
 
 template <typename ListT> struct NativeToJSList
   {
-  XScriptObject operator()( ListT const & li ) const
+  XScriptValue operator()( ListT const & li ) const
     {
     typedef typename ListT::const_iterator IT;
     IT it = li.begin();
@@ -59,7 +59,7 @@ template <typename T> struct NativeToJS<std::vector<T> > : NativeToJSList< std::
 
 template <typename MapT> struct NativeToJSLookup
   {
-  XScriptObject operator()(MapT const &li) const
+  XScriptValue operator()(MapT const &li) const
     {
     typedef typename MapT::const_iterator IT;
     IT it( li.begin() );
@@ -78,7 +78,7 @@ template <typename ListT, typename ValueType = typename ListT::value_type> struc
   {
   typedef ListT ResultType;
 
-  ResultType operator()( XScriptObject jv ) const
+  ResultType operator()( XScriptValue jv ) const
     {
     typedef ValueType VALT;
     ListT li;

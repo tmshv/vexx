@@ -1,87 +1,59 @@
-#ifndef XSCRIPTOBJECT_H
-#define XSCRIPTOBJECT_H
+#ifndef XScriptObject_H
+#define XScriptObject_H
 
 #include "XScriptGlobal.h"
 
-class XInterfaceObject;
+template <typename T> class XInterface;
+class XScriptFunction;
+class XScriptValue;
+class XPersistentScriptValue;
 
 class EKSSCRIPT_EXPORT XScriptObject
   {
 public:
   XScriptObject();
-  XScriptObject(bool x);
-  XScriptObject(xuint32 x);
-  XScriptObject(xint32 x);
-  XScriptObject(xuint64 x);
-  XScriptObject(xint64 x);
-  XScriptObject(double x);
-  XScriptObject(float x);
-  XScriptObject(const QString &str);
-  XScriptObject(const XInterfaceObject &str);
+  XScriptObject(const XScriptValue &func);
+  XScriptObject(const XScriptFunction &func);
   ~XScriptObject();
 
   XScriptObject(const XScriptObject&);
   XScriptObject& operator=(const XScriptObject&);
 
-  void clear();
+  xsize internalFieldCount() const;
+  void *internalField(xsize idx) const;
+
+  XScriptValue getPrototype() const;
 
   bool isValid() const;
-  bool isObject() const;
 
-  void *toExternal() const;
-  double toNumber() const;
-  xint64 toInteger() const;
-  bool toBoolean() const;
-  QString toString() const;
+  typedef void (*WeakDtor)(XPersistentScriptValue object, void* p);
+  void makeWeak(void *data, WeakDtor cb);
 
+  template <typename T>
+  static XScriptObject newInstance(XInterface<T>* i);
+
+  template <typename T> T *castTo();
+  template <typename T> const T *castTo() const;
 private:
   void *_object;
+  friend class XContext;
   };
 
-class EKSSCRIPT_EXPORT XPersistentScriptObject : public XScriptObject
+#include "XInterface.h"
+
+template <typename T> XScriptObject XScriptObject::newInstance(XInterface<T>* i)
   {
-public:
-  XPersistentScriptObject() : XScriptObject()
-    {
-    }
+  return i->newInstance(0, NULL);
+  }
 
-  XPersistentScriptObject(bool x) : XScriptObject(x)
-    {
-    }
+template <typename T> T *XScriptObject::castTo()
+  {
+  return XScriptConvert::from<T>(*this);
+  }
 
-  XPersistentScriptObject(xuint32 x) : XScriptObject(x)
-    {
-    }
+template <typename T> const T *XScriptObject::castTo() const
+  {
+  return XScriptConvert::from<T>(*this);
+  }
 
-  XPersistentScriptObject(xint32 x) : XScriptObject(x)
-    {
-    }
-
-  XPersistentScriptObject(xuint64 x) : XScriptObject(x)
-    {
-    }
-
-  XPersistentScriptObject(xint64 x) : XScriptObject(x)
-    {
-    }
-
-  XPersistentScriptObject(double x) : XScriptObject(x)
-    {
-    }
-
-  XPersistentScriptObject(float x) : XScriptObject(x)
-    {
-    }
-
-  XPersistentScriptObject(const QString &str) : XScriptObject(str)
-    {
-    }
-
-  XPersistentScriptObject(const XInterfaceObject &str) : XScriptObject(str)
-    {
-    }
-
-  void dispose();
-  };
-
-#endif // XSCRIPTOBJECT_H
+#endif // XScriptObject_H

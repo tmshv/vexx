@@ -21,7 +21,7 @@ template <typename JST> struct JSToNative<JST &>
   {
   typedef typename XScriptTypeInfo<JST>::Type &ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     typedef JSToNative<JST*> Cast;
     typedef typename Cast::ResultType NH;
@@ -41,7 +41,7 @@ template <typename JST> struct JSToNative<JST const &>
   {
   typedef typename XScriptTypeInfo<JST>::Type const &ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     typedef JSToNative<JST &> Cast;
     typedef typename Cast::ResultType NH;
@@ -53,17 +53,17 @@ template <typename JST> struct JSToNativeAbstract
   {
   typedef typename XScriptTypeInfo<JST>::NativeHandle ResultType;
 
-  ResultType operator()( XScriptObject const & ) const
+  ResultType operator()( XScriptValue const & ) const
     {
     return 0;
     }
   };
 
-//template <typename T> struct JSToNative<XScriptObject>
+//template <typename T> struct JSToNative<XScriptValue>
 //  {
 //  typedef v8::Handle<T> ResultType;
 
-//  ResultType operator()( XScriptObject const & h ) const
+//  ResultType operator()( XScriptValue const & h ) const
 //    {
 //    return h;
 //    }
@@ -131,7 +131,7 @@ struct JSToNativeObjectWithInternalFields
 public:
   typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     if( !h.isValid() || ! h.isObject() )
       {
@@ -140,10 +140,10 @@ public:
     else
       {
       void *ext = 0;
-      XScriptObject proto(h);
+      XScriptValue proto(h);
       while(!ext && proto.isValid() && proto.isObject())
         {
-        XInterfaceObject const &obj(proto);
+        XScriptObject const &obj(proto);
         ext = (obj.internalFieldCount() != InternalFieldCount)
           ? 0
           : obj.internalField(InternalFieldIndex);
@@ -186,7 +186,7 @@ struct JSToNativeObjectWithInternalFieldsTypeSafe
 public:
   typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     if(h.IsEmpty() || ! h->IsObject())
       {
@@ -235,28 +235,28 @@ private:
 
 namespace
 {
-template <typename Ret, Ret (XScriptObject::*ToA)() const> struct JSToNativePODType
+template <typename Ret, Ret (XScriptValue::*ToA)() const> struct JSToNativePODType
   {
   typedef Ret ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     return (h.*ToA)();
     }
   };
 
 template <typename ExtType> struct JSToNativeExternalType
-    : JSToNativePODType<ExtType, &XScriptObject::toExternal>
+    : JSToNativePODType<ExtType, &XScriptValue::toExternal>
   {
   };
 
 template <typename IntType> struct JSToNativeIntegerType
-    : JSToNativePODType<IntType, &XScriptObject::toInteger>
+    : JSToNativePODType<IntType, &XScriptValue::toInteger>
   {
   };
 
 template <typename NumType> struct JSToNativeNumberType
-    : JSToNativePODType<NumType, &XScriptObject::toNumber>
+    : JSToNativePODType<NumType, &XScriptValue::toNumber>
   {
   };
 }
@@ -279,7 +279,7 @@ template <> struct JSToNative<bool>
   {
   typedef bool ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     return h.toBoolean();
     }
@@ -289,7 +289,7 @@ template <> struct JSToNative<QString>
   {
   typedef QString ResultType;
 
-  ResultType operator()(XScriptObject const &h) const
+  ResultType operator()(XScriptValue const &h) const
     {
     return h.toString();
     }
@@ -328,7 +328,7 @@ template <> struct NativeToJS< XIfElse< tmp::SameType<long long int,int64_t>::Va
 
 }
 
-template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScriptObject const &h)
+template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScriptValue const &h)
   {
   typedef internal::JSToNative<NT> F;
   return F()( h );

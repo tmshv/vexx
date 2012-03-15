@@ -3,8 +3,8 @@
 
 #include "XScriptGlobal.h"
 
-class XInterfaceObject;
 class XScriptObject;
+class XScriptValue;
 class XScriptArguments;
 
 class EKSSCRIPT_EXPORT XScriptFunction
@@ -16,8 +16,8 @@ public:
   XScriptFunction(const XScriptFunction&);
   XScriptFunction& operator=(const XScriptFunction&);
 
-  XScriptObject call(const XInterfaceObject &thisObject, int argc, XScriptObject args[]) const;
-  XScriptObject callAsConstructor(const XScriptArguments&);
+  XScriptValue call(const XScriptObject &thisObject, int argc, XScriptValue args[]) const;
+  XScriptValue callAsConstructor(const XScriptArguments&);
 
 private:
   void *_func;
@@ -26,7 +26,7 @@ private:
 class EKSSCRIPT_EXPORT XAccessorInfo
   {
 public:
-  XInterfaceObject calleeThis() const;
+  XScriptObject calleeThis() const;
 
 private:
   XAccessorInfo();
@@ -42,9 +42,9 @@ class EKSSCRIPT_EXPORT XScriptArguments
 public:
   bool isConstructCall() const;
   XScriptFunction callee() const;
-  XInterfaceObject calleeThis() const;
+  XScriptObject calleeThis() const;
   xsize length() const;
-  XScriptObject at(xsize i) const;
+  XScriptValue at(xsize i) const;
 
 private:
   XScriptArguments();
