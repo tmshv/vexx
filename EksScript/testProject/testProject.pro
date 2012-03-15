@@ -14,9 +14,5 @@ include("../../EksCore/GeneralOptions.pri")
 
 SOURCES += main.cpp
 
-
-debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
-release:LIBS += -L$$ROOT/EksScript/v8/releaselib/
-
-LIBS += -lEksCore -lEksScript -lv8
-INCLUDEPATH += $$ROOT/EksScript/ $$ROOT/EksScript/v8 $$ROOT/EksCore
+LIBS += -lEksCore -lEksScript
+INCLUDEPATH += $$ROOT/EksScript/ $$ROOT/EksCore

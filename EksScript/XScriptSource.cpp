@@ -42,8 +42,7 @@ XScriptValue XScriptSource::run(bool *error)
       *error = true;
     }
     v8::String::AsciiValue exception_str(trycatch.Exception());
-    printf("Exception: %s\n", *exception_str);
-    return fromHandle(trycatch.Exception());
+    return XScriptValue(*exception_str);
     }
 
   return fromHandle(result);
