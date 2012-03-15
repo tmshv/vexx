@@ -482,7 +482,7 @@ public:
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
   namespace XScriptConvert { namespace internal { \
-  template <> struct JSToNative<type> : XScript::JSToNative_ClassCreator<type, false> {}; } \
+  template <> struct JSToNative<type> : XScript::JSToNative_ClassCreator<type> {}; } \
   X_SCRIPTABLE_MATCHERS(type) \
 }
 

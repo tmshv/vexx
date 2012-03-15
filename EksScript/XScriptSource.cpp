@@ -38,9 +38,9 @@ XScriptValue XScriptSource::run(bool *error)
   if (result.IsEmpty())
     {
     if(error)
-    {
+      {
       *error = true;
-    }
+      }
     v8::String::AsciiValue exception_str(trycatch.Exception());
     return XScriptValue(*exception_str);
     }
