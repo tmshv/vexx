@@ -6,6 +6,7 @@
 #include "XScriptTypeInfo.h"
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
+#include "XInterface.h"
 
 namespace XScriptConvert
 {
@@ -187,24 +188,24 @@ public:
 
   ResultType operator()(XScriptValue const &h) const
     {
-    if(h.IsEmpty() || ! h->IsObject())
+    if(!h.isObject())
       {
       return 0;
       }
     else
       {
-      const void *TypeID = findInterface<T>->typeId();
+      const xsize TypeID = findInterface<T>((const T*)0)->typeId();
       void const *tid = 0;
       void *ext = 0;
-      v8::Handle<v8::Value> proto(h);
-      while(!ext && !proto.IsEmpty() && proto->IsObject())
+      XScriptValue proto(h);
+      while(!ext && proto.isObject())
         {
-        v8::Local<v8::Object> const & obj(v8::Object::Cast(*proto));
-        tid = (obj->InternalFieldCount() != InternalFieldCount)
+        XScriptObject const &obj(proto);
+        tid = (obj.internalFieldCount() != InternalFieldCount)
           ? 0
-          : obj->GetPointerFromInternalField(TypeIdFieldIndex);
-        ext = (tid == TypeID)
-          ? obj->GetPointerFromInternalField(ObjectFieldIndex)
+          : obj.internalField(TypeIdFieldIndex);
+        ext = ((xsize)tid == TypeID)
+          ? obj.internalField(ObjectFieldIndex)
           : 0;
         if(!ext)
           {
@@ -214,7 +215,7 @@ public:
             }
           else
             {
-            proto = obj->GetPrototype();
+            proto = obj.getPrototype();
             }
           }
         }

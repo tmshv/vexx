@@ -8,11 +8,9 @@
 #include "XHash"
 #include "XMacroHelpers"
 #include "XScriptFunction.h"
-#include "XConvertToScript.h"
 #include "XInterfaceUtilities.h"
 #include "XScriptObject.h"
 #include "XScriptException.h"
-#include "XConvertToScriptMap.h"
 #include "XInterfaceUtilities.h"
 
 class EKSSCRIPT_EXPORT XInterfaceBase
@@ -65,6 +63,8 @@ protected:
 
 template <typename T> const XInterfaceBase* findInterface(const T*);
 
+#include "XConvertToScript.h"
+#include "XConvertToScriptMap.h"
 #include "XProperties.h"
 
 template <typename T> class XInterface : public XInterfaceBase
