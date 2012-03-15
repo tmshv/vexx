@@ -13,6 +13,11 @@ public:
 
   class Impl;
 
+  class Unlocker
+    {
+    //v8::Unlocker
+    };
+
 private:
   Impl *_impl;
   };

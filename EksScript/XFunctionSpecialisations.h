@@ -17,7 +17,7 @@ struct FunctionForwarder<1,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -41,7 +41,7 @@ struct FunctionForwarderVoid<1,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -67,7 +67,7 @@ struct XMethodForwarder<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -78,7 +78,7 @@ struct XMethodForwarder<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -103,7 +103,7 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -118,7 +118,7 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -148,7 +148,7 @@ struct XConstMethodForwarder<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -159,7 +159,7 @@ struct XConstMethodForwarder<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -184,7 +184,7 @@ struct XConstMethodForwarderVoid<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -199,7 +199,7 @@ struct XConstMethodForwarderVoid<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -215,12 +215,12 @@ template <>
 struct CallForwarder<1>
   {
   template < typename A0>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -228,7 +228,7 @@ struct CallForwarder<1>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0
                                      )
     {
@@ -253,7 +253,7 @@ struct CtorForwarderProxy<Sig,1>
       {
       typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
-      typedef ArgCaster<A0> AC0;
+      typedef XScriptConvert::ArgCaster<A0> AC0;
 
       AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
 
@@ -285,7 +285,7 @@ struct FunctionForwarder<2,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -312,7 +312,7 @@ struct FunctionForwarderVoid<2,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -341,7 +341,7 @@ struct XMethodForwarder<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -352,7 +352,7 @@ struct XMethodForwarder<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -380,7 +380,7 @@ struct XMethodForwarderVoid<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -395,7 +395,7 @@ struct XMethodForwarderVoid<T, 2,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -428,7 +428,7 @@ struct XConstMethodForwarder<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -439,7 +439,7 @@ struct XConstMethodForwarder<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -467,7 +467,7 @@ struct XConstMethodForwarderVoid<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -482,7 +482,7 @@ struct XConstMethodForwarderVoid<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -498,12 +498,12 @@ template <>
 struct CallForwarder<2>
   {
   template < typename A0, typename A1>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -511,7 +511,7 @@ struct CallForwarder<2>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1
                                      )
     {
@@ -573,7 +573,7 @@ struct FunctionForwarder<3,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -603,7 +603,7 @@ struct FunctionForwarderVoid<3,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -635,7 +635,7 @@ struct XMethodForwarder<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -646,7 +646,7 @@ struct XMethodForwarder<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -677,7 +677,7 @@ struct XMethodForwarderVoid<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -692,7 +692,7 @@ struct XMethodForwarderVoid<T, 3,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -728,7 +728,7 @@ struct XConstMethodForwarder<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -739,7 +739,7 @@ struct XConstMethodForwarder<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -770,7 +770,7 @@ struct XConstMethodForwarderVoid<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -785,7 +785,7 @@ struct XConstMethodForwarderVoid<T, 3,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -801,12 +801,12 @@ template <>
 struct CallForwarder<3>
   {
   template < typename A0, typename A1, typename A2>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -814,7 +814,7 @@ struct CallForwarder<3>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2
                                      )
     {
@@ -882,7 +882,7 @@ struct FunctionForwarder<4,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -915,7 +915,7 @@ struct FunctionForwarderVoid<4,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -950,7 +950,7 @@ struct XMethodForwarder<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -961,7 +961,7 @@ struct XMethodForwarder<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -995,7 +995,7 @@ struct XMethodForwarderVoid<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1010,7 +1010,7 @@ struct XMethodForwarderVoid<T, 4,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1049,7 +1049,7 @@ struct XConstMethodForwarder<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1060,7 +1060,7 @@ struct XConstMethodForwarder<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1094,7 +1094,7 @@ struct XConstMethodForwarderVoid<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1109,7 +1109,7 @@ struct XConstMethodForwarderVoid<T, 4,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1125,12 +1125,12 @@ template <>
 struct CallForwarder<4>
   {
   template < typename A0, typename A1, typename A2, typename A3>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -1138,7 +1138,7 @@ struct CallForwarder<4>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3
                                      )
     {
@@ -1212,7 +1212,7 @@ struct FunctionForwarder<5,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -1248,7 +1248,7 @@ struct FunctionForwarderVoid<5,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -1286,7 +1286,7 @@ struct XMethodForwarder<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1297,7 +1297,7 @@ struct XMethodForwarder<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1334,7 +1334,7 @@ struct XMethodForwarderVoid<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1349,7 +1349,7 @@ struct XMethodForwarderVoid<T, 5,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1391,7 +1391,7 @@ struct XConstMethodForwarder<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1402,7 +1402,7 @@ struct XConstMethodForwarder<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1439,7 +1439,7 @@ struct XConstMethodForwarderVoid<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1454,7 +1454,7 @@ struct XConstMethodForwarderVoid<T, 5,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1470,12 +1470,12 @@ template <>
 struct CallForwarder<5>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -1483,7 +1483,7 @@ struct CallForwarder<5>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
                                      )
     {
@@ -1563,7 +1563,7 @@ struct FunctionForwarder<6,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -1602,7 +1602,7 @@ struct FunctionForwarderVoid<6,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -1643,7 +1643,7 @@ struct XMethodForwarder<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1654,7 +1654,7 @@ struct XMethodForwarder<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1694,7 +1694,7 @@ struct XMethodForwarderVoid<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1709,7 +1709,7 @@ struct XMethodForwarderVoid<T, 6,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1754,7 +1754,7 @@ struct XConstMethodForwarder<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1765,7 +1765,7 @@ struct XConstMethodForwarder<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -1805,7 +1805,7 @@ struct XConstMethodForwarderVoid<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1820,7 +1820,7 @@ struct XConstMethodForwarderVoid<T, 6,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -1836,12 +1836,12 @@ template <>
 struct CallForwarder<6>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -1849,7 +1849,7 @@ struct CallForwarder<6>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
                                      )
     {
@@ -1935,7 +1935,7 @@ struct FunctionForwarder<7,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -1977,7 +1977,7 @@ struct FunctionForwarderVoid<7,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -2021,7 +2021,7 @@ struct XMethodForwarder<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2032,7 +2032,7 @@ struct XMethodForwarder<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2075,7 +2075,7 @@ struct XMethodForwarderVoid<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2090,7 +2090,7 @@ struct XMethodForwarderVoid<T, 7,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2138,7 +2138,7 @@ struct XConstMethodForwarder<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2149,7 +2149,7 @@ struct XConstMethodForwarder<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2192,7 +2192,7 @@ struct XConstMethodForwarderVoid<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2207,7 +2207,7 @@ struct XConstMethodForwarderVoid<T, 7,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2223,12 +2223,12 @@ template <>
 struct CallForwarder<7>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -2236,7 +2236,7 @@ struct CallForwarder<7>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
                                      )
     {
@@ -2328,7 +2328,7 @@ struct FunctionForwarder<8,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -2373,7 +2373,7 @@ struct FunctionForwarderVoid<8,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -2420,7 +2420,7 @@ struct XMethodForwarder<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2431,7 +2431,7 @@ struct XMethodForwarder<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2477,7 +2477,7 @@ struct XMethodForwarderVoid<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2492,7 +2492,7 @@ struct XMethodForwarderVoid<T, 8,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2543,7 +2543,7 @@ struct XConstMethodForwarder<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2554,7 +2554,7 @@ struct XConstMethodForwarder<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2600,7 +2600,7 @@ struct XConstMethodForwarderVoid<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2615,7 +2615,7 @@ struct XConstMethodForwarderVoid<T, 8,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2631,12 +2631,12 @@ template <>
 struct CallForwarder<8>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -2644,7 +2644,7 @@ struct CallForwarder<8>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
                                      )
     {
@@ -2742,7 +2742,7 @@ struct FunctionForwarder<9,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -2790,7 +2790,7 @@ struct FunctionForwarderVoid<9,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -2840,7 +2840,7 @@ struct XMethodForwarder<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2851,7 +2851,7 @@ struct XMethodForwarder<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2900,7 +2900,7 @@ struct XMethodForwarderVoid<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2915,7 +2915,7 @@ struct XMethodForwarderVoid<T, 9,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -2969,7 +2969,7 @@ struct XConstMethodForwarder<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -2980,7 +2980,7 @@ struct XConstMethodForwarder<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -3029,7 +3029,7 @@ struct XConstMethodForwarderVoid<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,S
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3044,7 +3044,7 @@ struct XConstMethodForwarderVoid<T, 9,Sig, UnlockV8> : XConstMethodSignature<T,S
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3060,12 +3060,12 @@ template <>
 struct CallForwarder<9>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7), CastToJS(a8)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -3073,7 +3073,7 @@ struct CallForwarder<9>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
                                      )
     {
@@ -3177,7 +3177,7 @@ struct FunctionForwarder<10,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
     }
@@ -3228,7 +3228,7 @@ struct FunctionForwarderVoid<10,Sig,UnlockV8> : XFunctionSignature<Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     CallNative( func, argv );
     return v8::Undefined();
@@ -3281,7 +3281,7 @@ struct XMethodForwarder<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -3292,7 +3292,7 @@ struct XMethodForwarder<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -3344,7 +3344,7 @@ struct XMethodForwarderVoid<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( T  & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T  & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3359,7 +3359,7 @@ struct XMethodForwarderVoid<T, 10,Sig, UnlockV8> : XMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3416,7 +3416,7 @@ struct XConstMethodForwarder<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -3427,7 +3427,7 @@ struct XConstMethodForwarder<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
@@ -3479,7 +3479,7 @@ struct XConstMethodForwarderVoid<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)(  arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
     }
-  static v8::Handle<v8::Value> Call( T const & self, FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3494,7 +3494,7 @@ struct XConstMethodForwarderVoid<T, 10,Sig, UnlockV8> : XConstMethodSignature<T,
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
-  static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
+  static XScriptObject Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
@@ -3510,12 +3510,12 @@ template <>
 struct CallForwarder<10>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Object> const & self,
-                                     v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XInterfaceObject const & self,
+                                     XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
                                      )
     {
-    v8::Handle<v8::Value> args[] = {
+    XScriptObject args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7), CastToJS(a8), CastToJS(a9)
     };
     return (self.IsEmpty() || func.IsEmpty())
@@ -3523,7 +3523,7 @@ struct CallForwarder<10>
         : func->Call(self, sizeof(args)/sizeof(args[0]), args);
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-  static v8::Handle<v8::Value> Call( v8::Handle<v8::Function> const & func,
+  static XScriptObject Call( XScriptFunction const & func,
                                      A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
                                      )
     {

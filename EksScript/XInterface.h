@@ -48,6 +48,7 @@ public:
   XScriptFunction constructorFunction() const;
   void set(const char *name, XScriptObject val);
 
+  typedef XScriptObject (*Invocation)(const XScriptArguments& args);
   typedef XScriptObject (*Getter)(XScriptObject property,const XAccessorInfo& info);
   typedef void (*Setter)(XScriptObject property, XScriptObject value, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);

@@ -4,7 +4,7 @@
 class XEngine::Impl
   {
 public:
-  Impl(v8::Handle<v8::ObjectTemplate> templ) : globalTemplate(templ)
+  Impl() : globalTemplate(v8::ObjectTemplate::New())
     {
     }
 
@@ -17,7 +17,7 @@ public:
   v8::Handle<v8::ObjectTemplate> globalTemplate;
   };
 
-XEngine::XEngine() : _impl(new XEngine::Impl(v8::ObjectTemplate::New()))
+XEngine::XEngine() : _impl(new XEngine::Impl)
   {
   }
 
