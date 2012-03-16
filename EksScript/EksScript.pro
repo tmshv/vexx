@@ -53,11 +53,8 @@ HEADERS += XScriptGlobal.h \
     XScriptSource.h \
     XScriptObject.h
 
-debug:LIBS += -L$$ROOT/EksScript/v8/debuglib/
-release:LIBS += -L$$ROOT/EksScript/v8/releaselib/
-
-LIBS += -lv8 -lEksCore
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/v8
+LIBS += -lQtV8 -lEksCore
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript\qtjsbackend\src\3rdparty\v8\include
 
 OTHER_FILES += \
     License.txt
