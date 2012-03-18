@@ -81,6 +81,10 @@ void *XScriptObject::internalField(xsize idx) const
   return internal->_object->GetPointerFromInternalField(idx);
   }
 
+XInterfaceBase *XScriptObject::getInterface() const
+  {
+  }
+
 XScriptValue XScriptObject::getPrototype() const
   {
   const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);

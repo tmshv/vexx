@@ -121,7 +121,15 @@ XScriptValue::XScriptValue(const QVariant& val)
     }
   else
     {
-    xAssertFail();
+    const XInterfaceBase* interface = findInterface(val.userType());
+    if(interface)
+      {
+      *this = interface->copyValue(*(void**)val.data());
+      }
+    else
+      {
+      xAssertFail();
+      }
     }
   }
 
@@ -205,6 +213,15 @@ QVariant XScriptValue::toVariant() const
   if(internal->_object->IsString())
     {
     return toString();
+    }
+
+  if(internal->_object->IsObject())
+    {
+    XScriptObject object(*this);
+    XInterfaceBase* interface = object.getInterface();
+    if(interface)
+      {
+      }
     }
 
   xAssertFail();

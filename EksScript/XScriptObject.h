@@ -22,6 +22,7 @@ public:
   xsize internalFieldCount() const;
   void *internalField(xsize idx) const;
 
+  XInterfaceBase *getInterface() const;
   XScriptValue getPrototype() const;
 
   bool isValid() const;

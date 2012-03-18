@@ -10,143 +10,13 @@
 
 #include "QApplication"
 #include "testobject.h"
-#include "QRectF"
-
-
-class Inheritable
-  {
-public:
-  virtual ~Inheritable(){}
-  int getA() const
-    {
-    return 3;
-    }
-
-  void setA(int)
-    {
-    }
-  };
-
-class Inheritor : public Inheritable
-  {
-public:
-  int getB() const
-    {
-    return 4;
-    }
-
-  void setB(int )
-    {
-    }
-  };
-
-class SomeClass
-{
-public:
-  SomeClass() : v()
-  {
-  }
-  virtual ~SomeClass() {}
-
-  virtual const QRectF &getNonStatic() const
-  {
-    return v;
-  }
-
-  virtual void setNonStatic(const QRectF &inA)
-  {
-    v = inA;
-  }
-
-  Inheritable *inh()
-    {
-    return &_inh;
-    }
-
-  QVariant getOther(const char *name)
-  {
-    if(strcmp(name, "other") == 0)
-    {
-      return other;
-    }
-    return QVariant();
-  }
-
-  virtual bool setOther(const char *name, const QVariant &inA)
-  {
-    if(strcmp(name, "other") == 0)
-    {
-      other = inA.toInt();
-      return true;
-    }
-    return false;
-  }
-
-  static QVariant getOtherStatic(const char *name)
-  {
-    if(strcmp(name, "otherStatic") == 0)
-    {
-      return otherStatic;
-    }
-    return QVariant();
-  }
-
-  static bool setOtherStatic(const char *name, const QVariant &inA)
-  {
-    if(strcmp(name, "otherStatic") == 0)
-    {
-      otherStatic = inA.toInt();
-      return true;
-    }
-    return false;
-  }
-
-  static int getA()
-  {
-    return a;
-  }
-
-  static void setA(const int &inA)
-  {
-    a = inA;
-  }
-
-  int nonStatic;
-  int other;
-  static int a;
-  static int otherStatic;
-  QRectF v;
-  Inheritor _inh;
-};
-
-template <> const XInterfaceBase* findInterface<Inheritable>(const Inheritable *toWrap)
-  {
-  if(dynamic_cast<const Inheritor*>(toWrap))
-    {
-    return XInterface<Inheritor>::lookup();
-    }
-  return XInterface<Inheritable>::lookup();
-  }
-
-template <> const XInterfaceBase* findInterface<Inheritor>(const Inheritor *toWrap)
-  {
-  return findInterface<Inheritable>(toWrap);
-  }
-
-X_SCRIPTABLE_TYPE(SomeClass)
-X_SCRIPTABLE_TYPE_COPYABLE(QRectF)
-X_SCRIPTABLE_TYPE_COPYABLE(QPointF)
-X_SCRIPTABLE_TYPE(Inheritable)
-X_SCRIPTABLE_TYPE_INHERITS(Inheritor, Inheritable)
-
-
-int SomeClass::a = 0;
-int SomeClass::otherStatic = 0;
 
 int main(int a, char* b[])
 {
   QApplication app(a, b);
   XEngine engine;
+
+  qRegisterMetaType<SomeClass*>("SomeClass*");
 
   // build the template
   XInterface<SomeClass> *someTempl = XInterface<SomeClass>::create("SomeClass");
@@ -205,7 +75,7 @@ int main(int a, char* b[])
     "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
     */
     "file.objectName = 'CAKE';"
-    "file.thing(4, 5.5).objectName;"
+    "'YO ' + file.thing(someClass).thing.a;"
     );
 
   bool err = false;

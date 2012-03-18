@@ -15,12 +15,17 @@
 
 class EKSSCRIPT_EXPORT XInterfaceBase
   {
-  XProperties:
+public:
+  typedef XScriptValue (*ToScriptFn)(const void * const &);
+
+XProperties:
   XROProperty(QString, typeName);
   XROProperty(xsize, typeId);
 
   XROProperty(xsize, typeIdField);
   XROProperty(xsize, nativeField);
+
+  XProperty(ToScriptFn, toScript, setToScript);
 
 public:
   XInterfaceBase(xsize typeID,
@@ -28,7 +33,8 @@ public:
                  XScriptValue ctor(XScriptArguments const &argv),
                  xsize typeIdField,
                  xsize nativeField,
-                 xsize internalFieldCount);
+                 xsize internalFieldCount,
+                 ToScriptFn convert=0);
   ~XInterfaceBase();
 
   void seal();
@@ -36,6 +42,8 @@ public:
     {
     return _isSealed;
     }
+
+  XScriptValue copyValue(const void *) const;
 
   void wrapInstance(XScriptObject obj, void *object) const;
   void unwrapInstance(XScriptObject object) const;
@@ -64,6 +72,14 @@ protected:
   };
 
 template <typename T> const XInterfaceBase* findInterface(const T*);
+
+EKSSCRIPT_EXPORT XInterfaceBase *findInterface(int qMetaTypeId);
+EKSSCRIPT_EXPORT void registerInterface(int qMetaTypeId, XInterfaceBase *interface);
+template <typename T> void registerInterface(XInterfaceBase *interface)
+  {
+  registerInterface(qMetaTypeId<T>(), interface);
+  }
+
 
 #include "XConvertToScript.h"
 #include "XConvertToScriptMap.h"
@@ -179,6 +195,7 @@ public:
 
     XInterface &bob = instance(name, id);
 
+    registerInterface<T*>(&bob);
     if(parent)
       {
       bob.inherit(parent);
@@ -202,6 +219,11 @@ public:
                                 InternalFields::NativeIndex,
                                 InternalFields::Count)
     {
+    typedef XScriptValue (*TVal)(T * const &);
+    TVal val = XScriptConvert::to<T*>;
+
+    ToScriptFn unTyped = (ToScriptFn)val;
+    setToScript(unTyped);
     }
 
 private:
@@ -492,17 +514,19 @@ public:
   template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {};
 
 #define X_SCRIPTABLE_MATCHERS(type) \
-  template <> const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
+  template <> inline const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObject<type> {}; } \
-  X_SCRIPTABLE_MATCHERS(type) }
+  X_SCRIPTABLE_MATCHERS(type) } \
+  Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
-  X_SCRIPTABLE_MATCHERS(type) }
+  X_SCRIPTABLE_MATCHERS(type) } \
+  Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \

@@ -1,5 +1,6 @@
 #include "XInterface.h"
 #include "XScriptValueV8Internals.h"
+#include "XUnorderedMap"
 
 typedef v8::Persistent<v8::FunctionTemplate> FnTempl;
 typedef v8::Persistent<v8::ObjectTemplate> ObjTempl;
@@ -29,12 +30,14 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                XScriptValue ctor(XScriptArguments const &argv),
                                xsize typeIdField,
                                xsize nativeField,
-                               xsize internalFieldCount)
+                               xsize internalFieldCount,
+                               ToScriptFn convert)
   : _typeName(typeName),
     _typeId(typeId),
     _typeIdField(typeIdField),
     _nativeField(nativeField),
-    _isSealed(false)
+    _isSealed(false),
+    _toScript(convert)
   {
   xAssert(_typeName.length());
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
@@ -47,6 +50,18 @@ XInterfaceBase::~XInterfaceBase()
   {
   constructor(_constructor)->~FnTempl();
   ::prototype(_prototype)->~ObjTempl();
+  }
+
+XScriptValue XInterfaceBase::copyValue(const void *val) const
+  {
+  xAssert(val);
+
+  if(_toScript)
+    {
+    return _toScript(val);
+    }
+
+  return XScriptValue();
   }
 
 void XInterfaceBase::seal()
@@ -131,4 +146,17 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
   {
   void *proto = o->prototype();
   return *::prototype(proto);
+  }
+
+XUnorderedMap<int, XInterfaceBase*> _interfaces;
+void registerInterface(int id, XInterfaceBase *interface)
+  {
+  _interfaces.insert(id, interface);
+  }
+
+XInterfaceBase *findInterface(int id)
+  {
+  XInterfaceBase *base = _interfaces[id];
+  xAssert(base->isSealed());
+  return base;
   }
