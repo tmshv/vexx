@@ -53,9 +53,11 @@ public:
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
 
-protected:
   void inherit(XInterfaceBase* parentType);
 
+  void *prototype();
+
+protected:
   mutable bool _isSealed;
   void *_constructor;
   void *_prototype;
@@ -191,6 +193,15 @@ public:
     const XInterface &bob = instance("", 0);
     xAssert(bob.isSealed());
     return &bob;
+    }
+
+  XInterface(xsize typeId, const QString &name) : XInterfaceBase(typeId,
+                                name,
+                                ctor_proxy,
+                                InternalFields::TypeIDIndex,
+                                InternalFields::NativeIndex,
+                                InternalFields::Count)
+    {
     }
 
 private:
@@ -403,15 +414,6 @@ private:
     return Toss("Native constructor threw an unknown exception!");
     }
     return jobj;
-    }
-
-  XInterface(xsize typeId, const QString &name) : XInterfaceBase(typeId,
-                                name,
-                                ctor_proxy,
-                                InternalFields::TypeIDIndex,
-                                InternalFields::NativeIndex,
-                                InternalFields::Count)
-    {
     }
   };
 

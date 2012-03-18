@@ -19,18 +19,13 @@ SOURCES += XScriptGlobal.cpp \
     XScriptValue.cpp \
     XScriptFunction.cpp \
     XScriptSource.cpp \
-    XScriptObject.cpp
+    XScriptObject.cpp \
+    XQObjectWrapper.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \
     XEngine.h \
     XContext.h \
-    v8/v8-testing.h \
-    v8/v8stdint.h \
-    v8/v8-profiler.h \
-    v8/v8-preparser.h \
-    v8/v8-debug.h \
-    v8/v8.h \
     XSignature.h \
     XSignatureHelpers.h \
     XSignatureSpecialisations.h \
@@ -51,10 +46,11 @@ HEADERS += XScriptGlobal.h \
     XFunctions.h \
     XFunctionSpecialisations.h \
     XScriptSource.h \
-    XScriptObject.h
+    XScriptObject.h \
+    XQObjectWrapper.h
 
 LIBS += -lQtV8 -lEksCore
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript\qtjsbackend\src\3rdparty\v8\include
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/qtjsbackend/src/3rdparty/v8/include
 
 OTHER_FILES += \
     License.txt

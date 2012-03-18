@@ -38,7 +38,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   {
   xAssert(_typeName.length());
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
-  new(prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
+  new(::prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
 
   (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
   }
@@ -46,7 +46,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
 XInterfaceBase::~XInterfaceBase()
   {
   constructor(_constructor)->~FnTempl();
-  prototype(_prototype)->~ObjTempl();
+  ::prototype(_prototype)->~ObjTempl();
   }
 
 void XInterfaceBase::seal()
@@ -98,12 +98,12 @@ XScriptObject XInterfaceBase::newInstanceBase() const
 
 void XInterfaceBase::set(const char *name, XScriptValue val)
   {
-  (*prototype(_prototype))->Set(v8::String::NewSymbol(name), getV8Internal(val));
+  (*::prototype(_prototype))->Set(v8::String::NewSymbol(name), getV8Internal(val));
   }
 
 void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
   {
-  (*prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
+  (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
   }
 
 void XInterfaceBase::addClassTo(const QString &thisClassName, const XScriptObject &dest) const
@@ -120,4 +120,15 @@ void XInterfaceBase::inherit(XInterfaceBase *parentType)
   FnTempl* templ = constructor(_constructor);
   FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );
+  }
+
+void *XInterfaceBase::prototype()
+  {
+  return _prototype;
+  }
+
+v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
+  {
+  void *proto = o->prototype();
+  return *::prototype(proto);
   }

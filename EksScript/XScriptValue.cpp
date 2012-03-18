@@ -1,6 +1,7 @@
 #include "XScriptValue.h"
 #include "XScriptValueV8Internals.h"
 #include "XScriptObject.h"
+#include "XUnorderedMap"
 #include "XAssert"
 
 struct XScriptValueInternal
@@ -110,6 +111,20 @@ XScriptValue::XScriptValue(const XScriptObject &obj)
   internal->_object = getV8Internal(obj);
   }
 
+XScriptValue::XScriptValue(const QVariant& val)
+  {
+  XScriptValueInternal::init(this);
+
+  if(val.type() == QVariant::String)
+    {
+    *this = XScriptValue(val.toString());
+    }
+  else
+    {
+    xAssertFail();
+    }
+  }
+
 XScriptValue::~XScriptValue()
   {
   XScriptValueInternal::term(this);
@@ -182,6 +197,18 @@ QString XScriptValue::toString() const
   xCompileTimeAssert(sizeof(QChar) == sizeof(uint16_t));
   str->Write((uint16_t*)strOut.data(), 0, strOut.length());
   return strOut;
+  }
+
+QVariant XScriptValue::toVariant() const
+  {
+  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  if(internal->_object->IsString())
+    {
+    return toString();
+    }
+
+  xAssertFail();
+  return QVariant();
   }
 
 XScriptValue fromHandle(v8::Handle<v8::Value> v)

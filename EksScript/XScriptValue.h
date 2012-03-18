@@ -4,6 +4,7 @@
 #include "XScriptGlobal.h"
 
 class XScriptObject;
+class QVariant;
 
 class EKSSCRIPT_EXPORT XScriptValue
   {
@@ -18,6 +19,7 @@ public:
   XScriptValue(float x);
   XScriptValue(const QString &str);
   XScriptValue(const XScriptObject &str);
+  XScriptValue(const QVariant& val);
   ~XScriptValue();
 
   XScriptValue(const XScriptValue&);
@@ -33,6 +35,7 @@ public:
   xint64 toInteger() const;
   bool toBoolean() const;
   QString toString() const;
+  QVariant toVariant() const;
 
 private:
   void *_object;

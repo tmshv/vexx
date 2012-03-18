@@ -6,7 +6,10 @@
 #include "XScriptSource.h"
 #include "XScriptConstructors.h"
 #include "XFunctions.h"
+#include "XQObjectWrapper.h"
 
+#include "QApplication"
+#include "testobject.h"
 #include "QRectF"
 
 
@@ -130,7 +133,7 @@ template <> const XInterfaceBase* findInterface<Inheritor>(const Inheritor *toWr
   return findInterface<Inheritable>(toWrap);
   }
 
-X_SCRIPTABLE_TYPE_NOT_COPYABLE(SomeClass)
+X_SCRIPTABLE_TYPE(SomeClass)
 X_SCRIPTABLE_TYPE_COPYABLE(QRectF)
 X_SCRIPTABLE_TYPE_COPYABLE(QPointF)
 X_SCRIPTABLE_TYPE(Inheritable)
@@ -140,8 +143,9 @@ X_SCRIPTABLE_TYPE_INHERITS(Inheritor, Inheritable)
 int SomeClass::a = 0;
 int SomeClass::otherStatic = 0;
 
-int main(int, char*[])
+int main(int a, char* b[])
 {
+  QApplication app(a, b);
   XEngine engine;
 
   // build the template
@@ -175,24 +179,33 @@ int main(int, char*[])
 
   // Create a new context.
   XContext c(&engine);
+  XQObjectWrapper::initiate(&c);
   c.addInterface(someTempl);
   c.addInterface(rectTempl);
   c.addInterface(ptTempl);
   c.addInterface(aTempl);
   c.addInterface(bTempl);
 
-  SomeClass *m = NULL;
+  SomeClass *m = 0;
   XScriptObject obj = XScriptObject::newInstance(someTempl);
   m = obj.castTo<SomeClass>();
 
+
+  TestObject file;
+  XScriptValue jsFile = XScriptConvert::to<QObject*>(&file);
+
+  c.set("file", jsFile);
   c.set("someClass", obj);
 
   XScriptSource script(
-    "var a = someClass.thing;"
+    /*"var a = someClass.thing;"
     "var r = new Rect();"
     "r.top = 5;"
     "r.left = 61;"
     "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
+    */
+    "file.objectName = 'CAKE';"
+    "file.thing(4, 5.5).objectName;"
     );
 
   bool err = false;

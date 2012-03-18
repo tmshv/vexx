@@ -5,14 +5,17 @@
 #-------------------------------------------------
 
 QT       += core
-QT       -= gui
 
 TEMPLATE = app
 TARGET = testProject
 
 include("../../EksCore/GeneralOptions.pri")
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    testobject.cpp
 
 LIBS += -lEksCore -lEksScript
 INCLUDEPATH += $$ROOT/EksScript/ $$ROOT/EksCore
+
+HEADERS += \
+    testobject.h

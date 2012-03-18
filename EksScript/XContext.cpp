@@ -34,5 +34,6 @@ void XContext::set(const char* in, const XScriptObject& obj)
 
 void XContext::addInterface(const XInterfaceBase *i)
   {
+  xAssert(i->isSealed());
   i->addClassTo(i->typeName(), fromObjectHandle(_impl->_context->Global()));
   }
