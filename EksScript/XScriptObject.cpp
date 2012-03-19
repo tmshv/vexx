@@ -83,6 +83,18 @@ void *XScriptObject::internalField(xsize idx) const
 
 XInterfaceBase *XScriptObject::getInterface() const
   {
+  typedef XScript::ClassCreator_InternalFields_Base<void> IF;
+  xsize tid = 0;
+  XScriptValue proto(*this);
+  while(!tid && proto.isObject())
+    {
+    XScriptObject const &obj(proto);
+    tid = (obj.internalFieldCount() != IF::Count)
+      ? 0
+      : (xsize)obj.internalField(IF::TypeIDIndex);
+    }
+
+  return findInterface(tid);
   }
 
 XScriptValue XScriptObject::getPrototype() const

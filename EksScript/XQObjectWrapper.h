@@ -48,7 +48,6 @@ namespace XScript
 {
 typedef XSignature< QObject (XScript::CtorForwarder<QObject *()> )> QObjectCtors;
 template <> class ClassCreator_Factory<QObject> : public ClassCreatorCopyableFactory<QObject, QObjectCtors> {};
-
 }
 
 #endif // XQOBJECTWRAPPER_H

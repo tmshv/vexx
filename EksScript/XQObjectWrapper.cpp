@@ -67,7 +67,8 @@ XInterfaceBase *XQObjectWrapper::findInterface(const QMetaObject *object)
     return base;
     }
 
-  base = new XInterface<QObject>((xsize)qobjectName, formatClassName(object->className()));
+  XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
+  base = new XInterface<QObject>(qobject->typeId(), formatClassName(object->className()));
 
   const QMetaObject *parent = object->superClass();
   if(parent)

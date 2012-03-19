@@ -221,6 +221,7 @@ QVariant XScriptValue::toVariant() const
     XInterfaceBase* interface = object.getInterface();
     if(interface)
       {
+      return interface->toVariant(*this);
       }
     }
 

@@ -144,7 +144,7 @@ public:
 
   Q_INVOKABLE SomeClass *thing(SomeClass *b)
     {
-    qDebug() << "YAY" << b->getA();
+    qDebug() << "YAY" << b->getNonStatic();
     return &_a;
     }
   };

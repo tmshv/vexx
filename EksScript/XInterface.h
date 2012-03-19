@@ -17,6 +17,7 @@ class EKSSCRIPT_EXPORT XInterfaceBase
   {
 public:
   typedef XScriptValue (*ToScriptFn)(const void * const &);
+  typedef void *(*FromScriptFn)(XScriptValue const &);
 
 XProperties:
   XROProperty(QString, typeName);
@@ -26,6 +27,7 @@ XProperties:
   XROProperty(xsize, nativeField);
 
   XProperty(ToScriptFn, toScript, setToScript);
+  XProperty(FromScriptFn, fromScript, setFromScript);
 
 public:
   XInterfaceBase(xsize typeID,
@@ -34,7 +36,8 @@ public:
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount,
-                 ToScriptFn convert=0);
+                 ToScriptFn convertTo=0,
+                 FromScriptFn convertFrom=0);
   ~XInterfaceBase();
 
   void seal();
@@ -43,6 +46,7 @@ public:
     return _isSealed;
     }
 
+  QVariant toVariant(const XScriptValue &val);
   XScriptValue copyValue(const void *) const;
 
   void wrapInstance(XScriptObject obj, void *object) const;
@@ -74,11 +78,7 @@ protected:
 template <typename T> const XInterfaceBase* findInterface(const T*);
 
 EKSSCRIPT_EXPORT XInterfaceBase *findInterface(int qMetaTypeId);
-EKSSCRIPT_EXPORT void registerInterface(int qMetaTypeId, XInterfaceBase *interface);
-template <typename T> void registerInterface(XInterfaceBase *interface)
-  {
-  registerInterface(qMetaTypeId<T>(), interface);
-  }
+EKSSCRIPT_EXPORT void registerInterface(XInterfaceBase *interface);
 
 
 #include "XConvertToScript.h"
@@ -187,7 +187,7 @@ public:
 
   static XInterface *create(const char *name, XInterfaceBase *parent=0)
     {
-    xsize id = (xsize)name;
+    xsize id = (xsize)qMetaTypeId<T*>();
     if(parent)
       {
       id = parent->typeId();
@@ -195,7 +195,8 @@ public:
 
     XInterface &bob = instance(name, id);
 
-    registerInterface<T*>(&bob);
+    registerInterface(&bob);
+    //registerInterface<T>(&bob);
     if(parent)
       {
       bob.inherit(parent);
@@ -219,11 +220,21 @@ public:
                                 InternalFields::NativeIndex,
                                 InternalFields::Count)
     {
-    typedef XScriptValue (*TVal)(T * const &);
-    TVal val = XScriptConvert::to<T*>;
+      {
+      typedef XScriptValue (*TVal)(T * const &);
+      TVal val = XScriptConvert::to<T*>;
 
-    ToScriptFn unTyped = (ToScriptFn)val;
-    setToScript(unTyped);
+      ToScriptFn unTyped = (ToScriptFn)val;
+      setToScript(unTyped);
+      }
+
+      {
+      typedef T *(*FVal)(XScriptValue const &);
+      FVal from = XScriptConvert::from<T*>;
+
+      FromScriptFn unTyped = (FromScriptFn)from;
+      setFromScript(unTyped);
+      }
     }
 
 private:
@@ -520,12 +531,14 @@ public:
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObject<type> {}; } \
   X_SCRIPTABLE_MATCHERS(type) } \
+  Q_DECLARE_METATYPE(type); \
   Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
   X_SCRIPTABLE_MATCHERS(type) } \
+  Q_DECLARE_METATYPE(type); \
   Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \

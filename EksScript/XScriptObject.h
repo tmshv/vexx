@@ -3,6 +3,7 @@
 
 #include "XScriptGlobal.h"
 
+class XInterfaceBase;
 template <typename T> class XInterface;
 class XScriptFunction;
 class XScriptValue;

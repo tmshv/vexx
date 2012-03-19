@@ -31,13 +31,15 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount,
-                               ToScriptFn convert)
+                               ToScriptFn tScr,
+                               FromScriptFn fScr)
   : _typeName(typeName),
     _typeId(typeId),
     _typeIdField(typeIdField),
     _nativeField(nativeField),
     _isSealed(false),
-    _toScript(convert)
+    _toScript(tScr),
+    _fromScript(fScr)
   {
   xAssert(_typeName.length());
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
@@ -50,6 +52,18 @@ XInterfaceBase::~XInterfaceBase()
   {
   constructor(_constructor)->~FnTempl();
   ::prototype(_prototype)->~ObjTempl();
+  }
+
+QVariant XInterfaceBase::toVariant(const XScriptValue &inp)
+  {
+  if(_fromScript)
+    {
+    const void *val = _fromScript(inp);
+    xAssert(val);
+    return QVariant(_typeId, &val);
+    }
+
+  return 0;
   }
 
 XScriptValue XInterfaceBase::copyValue(const void *val) const
@@ -79,6 +93,7 @@ XScriptFunction XInterfaceBase::constructorFunction() const
 
 void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
   {
+  xAssert(findInterface(_typeId));
   v8::Handle<v8::Object> obj = getV8Internal(scObj);
   if( 0 <= _typeIdField )
     {
@@ -149,14 +164,15 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
   }
 
 XUnorderedMap<int, XInterfaceBase*> _interfaces;
-void registerInterface(int id, XInterfaceBase *interface)
+void registerInterface(XInterfaceBase *interface)
   {
-  _interfaces.insert(id, interface);
+  _interfaces.insert(interface->typeId(), interface);
   }
 
 XInterfaceBase *findInterface(int id)
   {
   XInterfaceBase *base = _interfaces[id];
+  xAssert(base);
   xAssert(base->isSealed());
   return base;
   }
