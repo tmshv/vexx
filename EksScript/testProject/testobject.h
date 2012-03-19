@@ -142,9 +142,9 @@ class TestObject : public QObject
 public:
   TestObject();
 
-  Q_INVOKABLE SomeClass *thing(SomeClass *b)
+  Q_INVOKABLE SomeClass *thing(QRectF b)
     {
-    qDebug() << "YAY" << b->getNonStatic();
+    qDebug() << "YAY" << b;
     return &_a;
     }
   };

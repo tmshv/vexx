@@ -26,6 +26,7 @@ const ObjTempl *prototype(const void *& b)
   }
 
 XInterfaceBase::XInterfaceBase(xsize typeId,
+                               xsize nonPointerTypeId,
                                const QString &typeName,
                                XScriptValue ctor(XScriptArguments const &argv),
                                xsize typeIdField,
@@ -35,6 +36,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                FromScriptFn fScr)
   : _typeName(typeName),
     _typeId(typeId),
+    _nonPointerTypeId(nonPointerTypeId),
     _typeIdField(typeIdField),
     _nativeField(nativeField),
     _isSealed(false),
@@ -54,16 +56,24 @@ XInterfaceBase::~XInterfaceBase()
   ::prototype(_prototype)->~ObjTempl();
   }
 
-QVariant XInterfaceBase::toVariant(const XScriptValue &inp)
+QVariant XInterfaceBase::toVariant(const XScriptValue &inp, int typeHint)
   {
   if(_fromScript)
     {
     const void *val = _fromScript(inp);
     xAssert(val);
-    return QVariant(_typeId, &val);
+
+    if(typeHint == _typeId)
+      {
+      return QVariant(_typeId, &val);
+      }
+    else if(typeHint == _nonPointerTypeId)
+      {
+      return QVariant(_nonPointerTypeId, val);
+      }
     }
 
-  return 0;
+  return QVariant();
   }
 
 XScriptValue XInterfaceBase::copyValue(const void *val) const

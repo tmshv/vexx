@@ -35,7 +35,7 @@ public:
   xint64 toInteger() const;
   bool toBoolean() const;
   QString toString() const;
-  QVariant toVariant() const;
+  QVariant toVariant(int typeHint=0) const;
 
 private:
   void *_object;

@@ -68,14 +68,16 @@ int main(int a, char* b[])
   c.set("someClass", obj);
 
   XScriptSource script(
-    /*"var a = someClass.thing;"
+    /*"var a = someClass.thing;"*/
     "var r = new Rect();"
     "r.top = 5;"
-    "r.left = 61;"
-    "'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
+    "r.left = 10;"
+    "r.bottom = 100;"
+    "r.right = 20;"
+    /*"'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
     */
     "file.objectName = 'CAKE';"
-    "'YO ' + file.thing(someClass).thing.a;"
+    "'YO ' + file.thing(r).thing.a;"
     );
 
   bool err = false;

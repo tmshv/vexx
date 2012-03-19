@@ -207,10 +207,10 @@ QString XScriptValue::toString() const
   return strOut;
   }
 
-QVariant XScriptValue::toVariant() const
+QVariant XScriptValue::toVariant(int typeHint) const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  if(internal->_object->IsString())
+  if(typeHint == QVariant::String || internal->_object->IsString())
     {
     return toString();
     }
@@ -221,7 +221,7 @@ QVariant XScriptValue::toVariant() const
     XInterfaceBase* interface = object.getInterface();
     if(interface)
       {
-      return interface->toVariant(*this);
+      return interface->toVariant(*this, typeHint);
       }
     }
 

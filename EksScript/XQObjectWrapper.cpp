@@ -68,7 +68,7 @@ XInterfaceBase *XQObjectWrapper::findInterface(const QMetaObject *object)
     }
 
   XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
-  base = new XInterface<QObject>(qobject->typeId(), formatClassName(object->className()));
+  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()));
 
   const QMetaObject *parent = object->superClass();
   if(parent)
@@ -253,7 +253,7 @@ struct CallArgument
         qvariantPtr = new (&allocData) QVariant();
         type = -1;
 
-        QVariant v = fromHandle(value).toVariant();
+        QVariant v = fromHandle(value).toVariant(callType);
         if (v.userType() == callType)
           {
           *qvariantPtr = v;

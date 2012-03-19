@@ -13,6 +13,22 @@
 #include "XScriptException.h"
 #include "XInterfaceUtilities.h"
 
+template <typename T, bool HasQMetaType = QMetaTypeId<T>::Defined> struct XQMetaTypeIdOrInvalid
+  {
+  static int id()
+    {
+    return 0;
+    }
+  };
+
+template <typename T> struct XQMetaTypeIdOrInvalid<T, true>
+  {
+  static int id()
+    {
+    return qMetaTypeId<T>();
+    }
+  };
+
 class EKSSCRIPT_EXPORT XInterfaceBase
   {
 public:
@@ -22,6 +38,7 @@ public:
 XProperties:
   XROProperty(QString, typeName);
   XROProperty(xsize, typeId);
+  XROProperty(xsize, nonPointerTypeId);
 
   XROProperty(xsize, typeIdField);
   XROProperty(xsize, nativeField);
@@ -31,6 +48,7 @@ XProperties:
 
 public:
   XInterfaceBase(xsize typeID,
+                 xsize nonPointerTypeID,
                  const QString &typeName,
                  XScriptValue ctor(XScriptArguments const &argv),
                  xsize typeIdField,
@@ -46,7 +64,7 @@ public:
     return _isSealed;
     }
 
-  QVariant toVariant(const XScriptValue &val);
+  QVariant toVariant(const XScriptValue &val, int typeHint);
   XScriptValue copyValue(const void *) const;
 
   void wrapInstance(XScriptObject obj, void *object) const;
@@ -188,12 +206,13 @@ public:
   static XInterface *create(const char *name, XInterfaceBase *parent=0)
     {
     xsize id = (xsize)qMetaTypeId<T*>();
+    xsize nonPointerId = (xsize)XQMetaTypeIdOrInvalid<T>::id();
     if(parent)
       {
       id = parent->typeId();
       }
 
-    XInterface &bob = instance(name, id);
+    XInterface &bob = instance(name, id, nonPointerId);
 
     registerInterface(&bob);
     //registerInterface<T>(&bob);
@@ -208,12 +227,12 @@ public:
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance("", 0);
+    const XInterface &bob = instance("", 0, 0);
     xAssert(bob.isSealed());
     return &bob;
     }
 
-  XInterface(xsize typeId, const QString &name) : XInterfaceBase(typeId,
+  XInterface(xsize typeId, xsize nonPointerTypeId, const QString &name) : XInterfaceBase(typeId, nonPointerTypeId,
                                 name,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
@@ -242,9 +261,9 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance(const char *name, xsize id)
+  static XInterface &instance(const char *name, xsize id, xsize nonPointerId)
     {
-    static XInterface bob(id, name);
+    static XInterface bob(id, nonPointerId, name);
     return bob;
     }
 
@@ -516,13 +535,36 @@ public:
     }
   };
 
+template <typename T, typename CTORS> class ClassCreatorConvertibleFactory
+  {
+public:
+  typedef T* ReturnType;
+
+  static T *Create(XScriptObject &jsSelf, XScriptArguments const & argv)
+    {
+    typedef XScript::CtorArityDispatcher<CTORS> Proxy;
+    T *b = Proxy::Call(argv);
+    if(b)
+      {
+      XNativeToJSMap<T>::Insert(jsSelf, b);
+      }
+    XEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
+    return b;
+    }
+
+  static void Delete(T *obj)
+    {
+    XNativeToJSMap<T>::Remove(obj);
+    XEngine::adjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
+    }
+  };
+
 #define X_SCRIPTABLE_CONSTRUCTOR_DEF(variable, type, n) variable,
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) XScript::CtorForwarder<type *(const type &)>, XScript::CtorForwarder<type *()> )> name;
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, ...) \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__) \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {};
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__)
 
 #define X_SCRIPTABLE_MATCHERS(type) \
   template <> inline const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
@@ -545,13 +587,15 @@ public:
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSCopyableType<type> {}; } } \
   namespace XScript { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
+  template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {}; }
 
 #define X_SCRIPTABLE_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) }
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertibleFactory<type, type##Ctors> {}; }
 
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
