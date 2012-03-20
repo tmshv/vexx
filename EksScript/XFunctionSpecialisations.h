@@ -60,11 +60,11 @@ struct XMethodForwarder<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
-    typedef ArgCaster<A0> AC0;
+    typedef XScriptConvert::ArgCaster<A0> AC0;
 
-    AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
+    AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
 
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Detail::Unlocker<UnlockV8> const unlocker;
     return (ReturnType)(self.*func)(  arg0 );
     }
   static XScriptValue Call( T  & self, FunctionType func, XScriptArguments const & argv )
@@ -74,13 +74,13 @@ struct XMethodForwarder<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T  * self = CastFromJS<T>(argv.This());
+    T  * self = XScriptConvert::from<T>(argv.calleeThis());
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
-    try { return CastToJS( CallNative(func, argv) ); }
+    try { return XScriptConvert::to( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
     }
   };
@@ -256,6 +256,7 @@ struct CtorForwarderProxy<Sig,1>
       typedef XScriptConvert::ArgCaster<A0> AC0;
 
       AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
+      (void)arg0;
 
       typedef typename XScriptTypeInfo<ReturnType>::Type Type;
       return new Type(  arg0 );

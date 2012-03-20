@@ -131,4 +131,6 @@ private:
   friend class SDatabase;
   };
 
+S_PROPERTY_INTERFACE(SPropertyContainer)
+
 #endif // SPROPERTYCONTAINER_H

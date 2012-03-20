@@ -16,7 +16,7 @@ protected:
   template <typename T>
   void init()
   {
-    msg = QString("CastFromJS<%1>() returned NULL. Throwing to avoid dereferencing a NULL pointer!").arg(XScriptTypeName<T>::Value);
+    msg = QString("CastFromJS<T>() returned NULL. Throwing to avoid dereferencing a NULL pointer!");
   }
   MissingThisException() {}
 

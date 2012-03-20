@@ -67,15 +67,16 @@ XInterfaceBase *XQObjectWrapper::findInterface(const QMetaObject *object)
     return base;
     }
 
-  XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
-  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()), 0);
-
   const QMetaObject *parent = object->superClass();
+  XInterfaceBase *parentInterface = 0;
   if(parent)
     {
-    XInterfaceBase *parentInterface = findInterface(parent);
-    base->inherit(parentInterface);
+    parentInterface = findInterface(parent);
     }
+
+
+  XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
+  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()), parentInterface);
 
   _objects.insert(object, base);
 

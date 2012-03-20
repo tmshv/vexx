@@ -57,4 +57,6 @@ private:
   friend class SPropertyContainer::TreeChange;
   };
 
+S_PROPERTY_INTERFACE(SDatabase)
+
 #endif // SDATABASE_H

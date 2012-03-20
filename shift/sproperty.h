@@ -5,6 +5,7 @@
 #include "XObject"
 #include "schange.h"
 #include "XFlags"
+#include "XInterface.h"
 
 class SEntity;
 class SProperty;
@@ -76,6 +77,10 @@ class SDatabase;
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()
+
+#define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE(name)
+
+#define S_PROPERTY_INTERFACE_TYPED(name) X_SCRIPTABLE_TYPE_TYPED(name)
 
 class SPropertyInstanceInformation;
 class SPropertyInformation;
@@ -328,6 +333,7 @@ public:
   X_ALIGNED_OPERATOR_NEW
 
 private:
+  X_DISABLE_COPY(SProperty);
   void setDirty();
   void internalSetName(const QString &name);
 
@@ -358,5 +364,7 @@ private:
   friend class SPropertyContainer;
   friend class SProcessManager;
   };
+
+S_PROPERTY_INTERFACE(SProperty)
 
 #endif // SPROPERTY_H

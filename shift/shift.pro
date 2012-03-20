@@ -13,7 +13,8 @@ INCLUDEPATH += $$ROOT/Shift \
     $$ROOT/EksScript
 
 LIBS += -lEksCore \
-    -lEksGui
+    -lEksGui \
+    -lEksScript
 
 SOURCES += \
     sentity.cpp \

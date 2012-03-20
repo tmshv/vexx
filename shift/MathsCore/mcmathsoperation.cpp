@@ -7,7 +7,8 @@ SPropertyInformation *MCMathsOperation::createTypeInformation()
   {
   SPropertyInformation *info = SPropertyInformation::create<MCMathsOperation>("MCMathsOperation");
 
-  info->addAPIMemberFunction<bool, MCMathsOperation, QString, &MCMathsOperation::saveResultToFile>("saveResultToFile");
+  XInterface<MCMathsOperation> *ifc = info->apiInterface<MCMathsOperation>();
+  ifc->addMethod<bool (QString), &MCMathsOperation::saveResultToFile>("saveResultToFile");
 
   return info;
   }

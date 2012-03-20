@@ -31,7 +31,7 @@ public:
 
 template <typename T> class STypedPropertyArray : public SPropertyContainer
   {
-  S_PROPERTY_CONTAINER(STypedPropertyArray, SPropertyContainer, 0);
+  //S_PROPERTY_CONTAINER(STypedPropertyArray, SPropertyContainer, 0);
 
 public:
   T *add()
@@ -82,11 +82,15 @@ public:
   using SPropertyContainer::clear;
   };
 
-S_IMPLEMENT_TEMPLATED_PROPERTY(template <typename T>, STypedPropertyArray<T>)
+//S_IMPLEMENT_TEMPLATED_PROPERTY(template <typename T>, STypedPropertyArray<T>)
 
-template <typename T>SPropertyInformation *STypedPropertyArray<T>::createTypeInformation()
+/*template <typename T> SPropertyInformation *STypedPropertyArray<T>::createTypeInformation()
   {
   return SPropertyInformation::create<STypedPropertyArray<T> >("STypedPropertyArray<T>");
-  }
+  }*/
+
+S_PROPERTY_INTERFACE(SPropertyArray)
+
+//S_PROPERTY_INTERFACE_TYPED(STypedPropertyArray)
 
 #endif // SPROPERTYARRAY_H

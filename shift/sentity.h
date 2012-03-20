@@ -100,4 +100,6 @@ private:
   XList<ObserverStruct> _observers;
   };
 
+S_PROPERTY_INTERFACE(SEntity)
+
 #endif // SENTITY_H

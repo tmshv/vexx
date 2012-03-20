@@ -49,7 +49,7 @@ XProperties:
   XProperty(ToScriptFn, toScript, setToScript);
   XProperty(FromScriptFn, fromScript, setFromScript);
 
-  XROProperty(XInterfaceBase *, parent);
+  XROProperty(const XInterfaceBase *, parent);
 
   XRORefProperty(UpCastMap, upcasts);
 
@@ -61,7 +61,7 @@ public:
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount,
-                 XInterfaceBase *parent,
+                 const XInterfaceBase *parent,
                  ToScriptFn convertTo=0,
                  FromScriptFn convertFrom=0);
   ~XInterfaceBase();
@@ -84,20 +84,22 @@ public:
   XScriptFunction constructorFunction() const;
   void set(const char *name, XScriptValue val);
 
+  typedef XScriptValue (*Function)( XScriptArguments const & argv );
   typedef XScriptValue (*Invocation)(const XScriptArguments& args);
   typedef XScriptValue (*Getter)(XScriptValue property,const XAccessorInfo& info);
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);
+  void addFunction(const char *name, Function);
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
-
-  void inherit(XInterfaceBase* parentType);
 
   void addChildInterface(int typeId, UpCastFn fn);
 
   void *prototype();
 
 protected:
+  void inherit(const XInterfaceBase* parentType);
+
   mutable bool _isSealed;
   void *_constructor;
   void *_prototype;
@@ -157,6 +159,24 @@ public:
     Getter getter = XScript::XMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
 
     XInterfaceBase::addProperty(name, getter, 0);
+    }
+
+  template <typename SIG,
+            typename XMethodSignature<T, SIG>::FunctionType METHOD>
+  void addMethod(const char *name)
+    {
+    Function fn = XScript::MethodToInCa<T, SIG, METHOD>::Call;
+
+    XInterfaceBase::addFunction(name, fn);
+    }
+
+  template <typename SIG,
+            typename XMethodSignature<T, SIG>::FunctionType METHOD>
+  void addStaticMethod(const char *name)
+    {
+    Function fn = XScript::FunctionToInCa<SIG, METHOD>::Call;
+
+    XInterfaceBase::addFunction(name, fn);
     }
 
   /**
@@ -226,7 +246,7 @@ public:
     }
 
   template <typename PARENT>
-  static XInterface *createWithParent(const char *name, XInterface<PARENT> *parent)
+  static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *parent)
     {
     xsize id = parent->typeId();
     xsize nonPointerId = (xsize)XQMetaTypeIdOrInvalid<T>::id();
@@ -238,8 +258,7 @@ public:
     UpCastFn fn = (UpCastFn)typedFn;
 
 
-    parent->addChildInterface(qMetaTypeId<T*>(), fn);
-    bob.inherit(parent);
+    const_cast<XInterface<PARENT>*>(parent)->addChildInterface(qMetaTypeId<T*>(), fn);
 
     xAssert(!bob.isSealed());
     return &bob;
@@ -252,7 +271,7 @@ public:
     return &bob;
     }
 
-  XInterface(xsize typeId, xsize nonPointerTypeId, const QString &name, XInterfaceBase* parent) : XInterfaceBase(typeId, nonPointerTypeId,
+  XInterface(xsize typeId, xsize nonPointerTypeId, const QString &name, const XInterfaceBase* parent) : XInterfaceBase(typeId, nonPointerTypeId,
                                 name,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
@@ -282,7 +301,7 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, XInterfaceBase* parent)
+  static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, const XInterfaceBase* parent)
     {
     static XInterface bob(id, nonPointerId, name, parent);
     return bob;
@@ -556,21 +575,23 @@ public:
   }
 };
 
-template <typename T, typename CTORS> class ClassCreatorConvertableFactory
+template <typename T> class ClassCreatorConvertableFactory
 {
 public:
   typedef T* ReturnType;
 
-  static T *Create(XScriptObject &jsSelf, XScriptArguments const & argv)
+  static T *Create(XScriptObject &, XScriptArguments const &)
   {
-    typedef XScript::CtorArityDispatcher<CTORS> Proxy;
+    /*typedef XScript::CtorArityDispatcher<CTORS> Proxy;
     T *b = Proxy::Call(argv);
     if(b)
     {
       XNativeToJSMap<T>::Insert(jsSelf, b);
     }
     XEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
-    return b;
+    return b;*/
+    xAssertFail();
+    return 0;
   }
 
   static void Delete(T *obj)
@@ -584,6 +605,9 @@ public:
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) XScript::CtorForwarder<type *(const type &)>, XScript::CtorForwarder<type *()> )> name;
 
+#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_COPYABLE(type, ...) \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__)
+
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, ...) \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__)
 
@@ -594,29 +618,27 @@ public:
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObject<type> {}; } \
   X_SCRIPTABLE_MATCHERS(type) } \
-  Q_DECLARE_METATYPE(type); \
   Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
   namespace XScriptConvert { namespace internal { \
   template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
   X_SCRIPTABLE_MATCHERS(type) } \
-  Q_DECLARE_METATYPE(type); \
   Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSCopyableType<type> {}; } } \
+  Q_DECLARE_METATYPE(type); \
   namespace XScript { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
+  X_SCRIPTABLE_BUILD_CONSTRUCTABLE_COPYABLE(type, __VA_ARGS__) \
   template <> class ClassCreator_Factory<type> : public ClassCreatorCopyableFactory<type, type##Ctors> {}; }
 
 #define X_SCRIPTABLE_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type##Ctors> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
 
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \

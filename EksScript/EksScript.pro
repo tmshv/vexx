@@ -20,7 +20,8 @@ SOURCES += XScriptGlobal.cpp \
     XScriptFunction.cpp \
     XScriptSource.cpp \
     XScriptObject.cpp \
-    XQObjectWrapper.cpp
+    XQObjectWrapper.cpp \
+    XFunctions.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \

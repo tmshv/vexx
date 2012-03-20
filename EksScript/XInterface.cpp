@@ -32,7 +32,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount,
-                               XInterfaceBase *parent,
+                               const XInterfaceBase *parent,
                                ToScriptFn tScr,
                                FromScriptFn fScr)
   : _typeName(typeName),
@@ -50,6 +50,11 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   new(::prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
 
   (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
+
+  if(parent)
+    {
+    inherit(parent);
+    }
   }
 
 XInterfaceBase::~XInterfaceBase()
@@ -155,19 +160,25 @@ void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
   (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
   }
 
+void XInterfaceBase::addFunction(const char *name, Function fn)
+  {
+  v8::Handle<v8::FunctionTemplate> fnTmpl = ::v8::FunctionTemplate::New((v8::InvocationCallback)fn);
+  (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
+  }
+
 void XInterfaceBase::addClassTo(const QString &thisClassName, const XScriptObject &dest) const
   {
   getV8Internal(dest)->Set(v8::String::NewSymbol(thisClassName.toAscii().constData()), getV8Internal(constructorFunction()));
   }
 
-void XInterfaceBase::inherit(XInterfaceBase *parentType)
+void XInterfaceBase::inherit(const XInterfaceBase *parentType)
   {
   if(!parentType->isSealed())
     {
     throw std::runtime_error("XInterfaceBase<T> has not been sealed yet!");
     }
   FnTempl* templ = constructor(_constructor);
-  FnTempl* pTempl = constructor(parentType->_constructor);
+  const FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );
   }
 

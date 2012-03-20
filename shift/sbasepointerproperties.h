@@ -99,6 +99,8 @@ private:
   Pointer *_p;
   };
 
+S_PROPERTY_INTERFACE(Pointer)
+
 #define S_TYPED_POINTER_TYPE(name, type) \
   class name : public TypedPointer<type> { \
     S_PROPERTY(name, Pointer, 0); }; \
@@ -106,14 +108,16 @@ private:
   inline SPropertyInformation *name::createTypeInformation() { \
     SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
     assignPointerInformation(info, type::staticTypeInformation()); \
-    return info;}
+    return info;} \
+  S_PROPERTY_INTERFACE(name)
 
 #define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
   class name : public TypedPointerArray<type> { \
   S_PROPERTY_CONTAINER(PointerArray, STypedPropertyArray<type>, 0); }; \
   S_IMPLEMENT_INLINE_PROPERTY(name) \
   inline SPropertyInformation *name::createTypeInformation() { \
-    return SPropertyInformation::create<name>(#name); }
+    return SPropertyInformation::create<name>(#name); } \
+  S_PROPERTY_INTERFACE(name)
 
 
 S_TYPED_POINTER_ARRAY_TYPE(PointerArray, Pointer)

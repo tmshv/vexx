@@ -396,4 +396,5 @@ template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScrip
   }
 
 }
+
 #endif // XCONVERTFROMSCRIPT_H

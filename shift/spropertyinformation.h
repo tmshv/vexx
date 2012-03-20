@@ -52,6 +52,7 @@ public:
 
 class XInterfaceBase;
 template <typename T> class XInterface;
+template <typename T, typename PARENT> XInterfaceBase* initiateAPIInterfaceWithParent(const SPropertyInformation *);
 template <typename T> XInterfaceBase* initiateAPIInterface(const SPropertyInformation *);
 
 // Child information
@@ -296,95 +297,6 @@ public:
 
   template <typename T> static const SPropertyInformation *findStaticTypeInformation(const char *);
 
-  template <typename Class, void (Class::*Member)()>
-  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *, xuint32 argCount, bool *success, QString *error)
-    {
-    xAssert(argCount == 0);
-
-    (cls->*Member)();
-    return QVariant();
-    }
-
-  template <typename Ret, typename Class, Ret (Class::*Member)()>
-  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *, xuint32 argCount, bool *success, QString *error)
-    {
-    xAssert(argCount == 0);
-
-    return ShiftTypePacker::pack((cls->*Member)());
-    }
-
-  template <typename Class, typename T1, void (Class::*Member)(T1)>
-  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *args, xuint32 argCount, bool *success, QString *error)
-    {
-    xAssert(argCount == 1);
-
-    T1 t1;
-    ShiftTypePacker::unpack(args[0], success, t1);
-    if(!success)
-      {
-      return QVariant();
-      }
-
-    (cls->*Member)(t1);
-    return QVariant();
-    }
-
-  template <typename Ret, typename Class, typename T1, Ret (Class::*Member)(T1)>
-  static QVariant wrapAPIMemberFunctionHelper(Class *cls, QVariant *args, xuint32 argCount, bool *success, QString *error)
-    {
-    xAssert(argCount == 1);
-    T1 t1;
-    ShiftTypePacker::unpack(args[0], success, t1);
-    if(!success)
-      {
-      *error = "Could not extract argument 0, incorrect input type.";
-      return QVariant();
-      }
-
-
-    return ShiftTypePacker::pack((cls->*Member)(t1));
-    }
-
-  template <typename Ret, typename Class, Ret (Class::*Member)()>
-  void addAPIMemberFunction(const QString &str)
-    {
-    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
-
-    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Ret, Class, Member>;
-    WrappedFunction wFn = (WrappedFunction)tFn;
-    addAPIMemberFunction(str, wFn, 0);
-    }
-
-  template <typename Class, void (Class::*Member)()>
-  void addAPIMemberFunction(const QString &str)
-    {
-    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
-
-    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Class, Member>;
-    WrappedFunction wFn = (WrappedFunction)tFn;
-    addAPIMemberFunction(str, wFn, 0);
-    }
-
-  template <typename Ret, typename Class, typename T1, Ret (Class::*Member)(T1)>
-  void addAPIMemberFunction(const QString &str)
-    {
-    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
-
-    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Ret, Class, T1, Member>;
-    WrappedFunction wFn = (WrappedFunction)tFn;
-    addAPIMemberFunction(str, wFn, 1);
-    }
-
-  template <typename Class, typename T1, void (Class::*Member)(T1)>
-  void addAPIMemberFunction(const QString &str)
-    {
-    typedef QVariant (*WrappedTypedFunction)(Class *cls, QVariant *v, xuint32 argCount, bool *success, QString *error);
-
-    WrappedTypedFunction tFn = wrapAPIMemberFunctionHelper<Class, T1, Member>;
-    WrappedFunction wFn = (WrappedFunction)tFn;
-    addAPIMemberFunction(str, wFn, 1);
-    }
-
   template <typename T> XInterface<T> *apiInterface();
 
   X_ALIGNED_OPERATOR_NEW
@@ -472,6 +384,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::create(
   info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
   initiate<PropType>(info, typeName, postCreate);
 
+  info->_apiInterface = initiateAPIInterfaceWithParent<PropType, PropType::ParentType>(info);
+
   return info;
   }
 
@@ -481,6 +395,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::createN
 
   info->setParentTypeInformation(0);
   initiate<PropType>(info, typeName, postCreate);
+
+  info->_apiInterface = initiateAPIInterface<PropType>(info);
 
   return info;
   }
@@ -506,8 +422,6 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->_extendedParent = 0;
 
   info->_typeName = typeName;
-
-  info->_apiInterface = initiateAPIInterface<PropType>(info);
 
   return info;
   }

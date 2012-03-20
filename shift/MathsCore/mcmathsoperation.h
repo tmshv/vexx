@@ -16,4 +16,6 @@ public:
   QImage asQImage(const XVectorI2D &pt, xuint32 scale, xuint32 w, xuint32 h) const;
   };
 
+S_PROPERTY_INTERFACE(MCMathsOperation)
+
 #endif // MCMATHSOPERATION_H

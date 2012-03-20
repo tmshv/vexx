@@ -9,6 +9,12 @@
 
 namespace XScript
 {
+class EKSSCRIPT_EXPORT Unlock
+  {
+public:
+  Unlock();
+  ~Unlock();
+  };
 
 /**
     A concept class, primarily for documentation and tag-type purposes.
@@ -131,7 +137,7 @@ template <bool> struct Unlocker {};
         Equivalent to v8::Unlocker.
     */
 template <>
-struct Unlocker<true> : XEngine::Unlocker
+struct Unlocker<true> : Unlock
   {
   };
 
@@ -312,7 +318,7 @@ struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
 */
 template <typename T> XScriptValue TossMissingThis()
   {
-  return Toss(StringBuffer()<<"CastFromJS<'T'>() returned NULL! Cannot find 'this' pointer!");
+  return Toss("CastFromJS<'T'>() returned NULL! Cannot find 'this' pointer!");
   }
 
 #if !defined(DOXYGEN)

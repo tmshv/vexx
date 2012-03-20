@@ -11,4 +11,6 @@ public:
   SReferenceEntity();
   };
 
+S_PROPERTY_INTERFACE(SReferenceEntity)
+
 #endif // SREFERENCEENTITY_H

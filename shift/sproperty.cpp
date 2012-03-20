@@ -109,6 +109,17 @@ SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
   {
   }
 
+SProperty::SProperty(const SProperty &) : _flags(Dirty)
+  {
+  xAssertFail();
+  }
+
+SProperty& SProperty::operator =(const SProperty &)
+  {
+  xAssertFail();
+  return *this;
+  }
+
 SProperty::~SProperty()
   {
   UserData *ud = _userData;
