@@ -48,9 +48,9 @@ public:
     return false;
     }
 
-  virtual void render(const GCVisualManipulator *toRender,
-      const GCCamera *camera,
-      XRenderer *r)
+  virtual void render(const GCVisualManipulator *,
+      const GCCamera *,
+      XRenderer *)
     {
     /*XTransform t = camera->getPixelScaleFacingTransform(toRender->worldCentre().translation());
 

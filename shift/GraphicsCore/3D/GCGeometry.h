@@ -59,6 +59,8 @@ public:
   SUIntArrayProperty polygons;
   };
 
+S_PROPERTY_INTERFACE(GCGeometryAttribute)
+
 class GRAPHICSCORE_EXPORT GCGeometry : public SPropertyContainer
   {
   S_PROPERTY_CONTAINER(GCGeometry, SPropertyContainer, 0)
@@ -121,6 +123,8 @@ public:
 
   void appendTo(XGeometry *geo) const;
   };
+
+S_PROPERTY_INTERFACE(GCGeometry)
 
 S_TYPED_POINTER_TYPE(GCGeometryPointer, GCGeometry)
 

@@ -21,4 +21,6 @@ public:
   void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
+S_PROPERTY_INTERFACE(GCPlane)
+
 #endif // GCPLANE_H

@@ -45,7 +45,8 @@ namespace XScript {
         */
         static ReturnType Create( XScriptObject &, XScriptArguments const & )
         {
-            return new T;
+          xAssertFail();
+          return 0;
         }
 
         /**
@@ -56,7 +57,8 @@ namespace XScript {
         */
         static void Delete( T * obj )
         {
-            delete obj;
+          xAssertFail();
+          delete obj;
         }
     };
 

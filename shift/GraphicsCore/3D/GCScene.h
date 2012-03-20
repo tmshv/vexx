@@ -24,6 +24,8 @@ public:
   GCShadingGroupPointerArray shadingGroups;
   };
 
+S_PROPERTY_INTERFACE(GCScene)
+
 class GRAPHICSCORE_EXPORT GCManipulatableScene : public GCScene
   {
   S_ENTITY(GCManipulatableScene, GCScene, 0);
@@ -59,5 +61,7 @@ private:
   XVector3D _initialRay;
   XVector3D _finalRay;
   };
+
+S_PROPERTY_INTERFACE(GCManipulatableScene)
 
 #endif // GCSCENE_H

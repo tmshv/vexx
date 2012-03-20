@@ -1,8 +1,6 @@
 #include "GraphicsCore.h"
 #include "styperegistry.h"
 
-#include "GCImage.h"
-
 #include "3D/GCGeometry.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/GCTextureRenderTarget.h"
@@ -33,7 +31,6 @@
 
 void initiateGraphicsCore()
   {
-  STypeRegistry::addType(GCImage::staticTypeInformation());
   STypeRegistry::addType(GCQImage::staticTypeInformation());
   STypeRegistry::addType(TransformProperty::staticTypeInformation());
   STypeRegistry::addType(ComplexTransformProperty::staticTypeInformation());

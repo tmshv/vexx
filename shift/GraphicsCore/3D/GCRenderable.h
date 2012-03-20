@@ -17,6 +17,8 @@ public:
   virtual void render(XRenderer *) const;
   };
 
+S_PROPERTY_INTERFACE(GCRenderable)
+
 S_TYPED_POINTER_TYPE(GCRenderablePointer, GCRenderable)
 
 #endif // GCRENDERABLE_H

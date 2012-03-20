@@ -12,8 +12,6 @@ include("../../EksCore/GeneralOptions.pri")
 
 HEADERS += GCGlobal.h \
     GraphicsCore.h \
-    GCImage.h \
-    GCImageChannel.h \
     GCShiftRenderModel.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
@@ -42,14 +40,12 @@ HEADERS += GCGlobal.h \
     3D/Renderable/GCPlane.h \
     3D/GCTexture.h
 
-INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift
+INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Shift
 
-LIBS += -lshift -lEksCore -lEks3D
+LIBS += -lshift -lEksCore -lEks3D -lEksScript
 
 SOURCES += \
     GraphicsCore.cpp \
-    GCImage.cpp \
-    GCImageChannel.cpp \
     GCShiftRenderModel.cpp \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \

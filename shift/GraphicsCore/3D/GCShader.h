@@ -23,15 +23,21 @@ public:
   GCShaderComponent();
   };
 
+S_PROPERTY_INTERFACE(GCShaderComponent)
+
 class GRAPHICSCORE_EXPORT GCFragmentShaderComponent : public GCShaderComponent
   {
   S_ENTITY(GCFragmentShaderComponent, GCShaderComponent, 0)
   };
 
+S_PROPERTY_INTERFACE(GCFragmentShaderComponent)
+
 class GRAPHICSCORE_EXPORT GCVertexShaderComponent : public GCShaderComponent
   {
   S_ENTITY(GCVertexShaderComponent, GCShaderComponent, 0)
   };
+
+S_PROPERTY_INTERFACE(GCVertexShaderComponent)
 
 S_TYPED_POINTER_TYPE(GCShaderComponentPointer, GCShaderComponent);
 
@@ -55,6 +61,8 @@ private:
   bool _setVariables;
   static void computeShaderRuntime(const SPropertyInstanceInformation *info, GCShader *cont);
   };
+
+S_PROPERTY_INTERFACE(GCShader)
 
 S_TYPED_POINTER_TYPE(GCShaderPointer, GCShader);
 

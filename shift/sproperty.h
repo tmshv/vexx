@@ -80,6 +80,8 @@ class SDatabase;
 
 #define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE(name)
 
+#define S_PROPERTY_ABSTRACT_INTERFACE(name) X_SCRIPTABLE_ABSTRACT_TYPE(name)
+
 #define S_PROPERTY_INTERFACE_TYPED(name) X_SCRIPTABLE_TYPE_TYPED(name)
 
 class SPropertyInstanceInformation;

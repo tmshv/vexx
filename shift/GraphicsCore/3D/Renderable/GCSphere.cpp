@@ -144,7 +144,7 @@ GCSphere::GCSphere()
   {
   }
 
-void GCSphere::addManipulators(SPropertyArray *a, const GCTransform *tr)
+void GCSphere::addManipulators(SPropertyArray *, const GCTransform *)
   {
   /*
   // X

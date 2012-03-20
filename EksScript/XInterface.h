@@ -640,6 +640,12 @@ public:
   namespace XScript { \
   template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
 
+#define X_SCRIPTABLE_ABSTRACT_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
+  namespace XScript { \
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
   namespace XScriptConvert { namespace internal { \

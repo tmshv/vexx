@@ -23,4 +23,6 @@ private:
   static void postCreate(GCStandardSurface *);
   };
 
+S_PROPERTY_INTERFACE(GCStandardSurface)
+
 #endif // STANDARDSURFACE_H

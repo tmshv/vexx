@@ -17,4 +17,6 @@ public:
   virtual void onClick();
   };
 
+S_PROPERTY_INTERFACE(GCButtonManipulator);
+
 #endif // GCBUTTONMANIPULATOR_H

@@ -26,4 +26,6 @@ private:
   QVector <FloatProperty *> _driven;
   };
 
+S_PROPERTY_INTERFACE(GCDistanceManipulator);
+
 #endif // GCDISTANCEMANIPULATOR_H

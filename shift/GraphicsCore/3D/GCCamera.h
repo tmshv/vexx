@@ -51,6 +51,7 @@ public:
   };
 
 S_TYPED_POINTER_TYPE(GCViewableTransformPointer, GCViewableTransform)
+S_PROPERTY_ABSTRACT_INTERFACE(GCViewableTransform)
 
 class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
   {
@@ -59,6 +60,8 @@ class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
 public:
   GCCamera();
   };
+
+S_PROPERTY_ABSTRACT_INTERFACE(GCCamera)
 
 class GRAPHICSCORE_EXPORT GCPerspectiveCamera : public GCCamera
   {
@@ -74,6 +77,8 @@ public:
   FloatProperty nearClip;
   FloatProperty farClip;
   };
+
+S_PROPERTY_INTERFACE(GCPerspectiveCamera)
 
 S_TYPED_POINTER_TYPE(GCCameraPointer, GCCamera)
 

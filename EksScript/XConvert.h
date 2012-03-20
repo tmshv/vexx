@@ -16,9 +16,9 @@ template <typename T> inline const T &ptrMatcher(T *in, bool& valid)
 {
   if(!in)
   {
-    static T o;
+    static char o[sizeof(T)];
     valid = false;
-    return o;
+    return *(T*)o;
   }
   return *in;
 }
