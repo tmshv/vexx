@@ -213,7 +213,7 @@ public:
     return destroyObject(argv.This()) ? v8::True() : v8::False();
     }
 
-  static XInterface *create(const char *name)
+  static XInterface *create(const QString &name)
     {
     xsize id = (xsize)qMetaTypeId<T*>();
     xsize nonPointerId = (xsize)XQMetaTypeIdOrInvalid<T>::id();
@@ -282,7 +282,7 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance(const char *name, xsize id, xsize nonPointerId, XInterfaceBase* parent)
+  static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, XInterfaceBase* parent)
     {
     static XInterface bob(id, nonPointerId, name, parent);
     return bob;

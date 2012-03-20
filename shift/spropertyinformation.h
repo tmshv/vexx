@@ -50,6 +50,10 @@ public:
   virtual void initialise(SPropertyInstanceInformation *) = 0;
   };
 
+class XInterfaceBase;
+template <typename T> class XInterface;
+template <typename T> XInterfaceBase* initiateAPIInterface(const SPropertyInformation *);
+
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
   {
@@ -166,19 +170,6 @@ public:
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
-  enum
-    {
-    MaxWrappedArguments = 1
-    };
-  typedef QVariant (*WrappedFunction)(SProperty *p, QVariant *v, xuint32 argCount, bool *success, QString *errorString);
-  struct WrappedMember
-    {
-    QString memberName;
-    xuint32 expectedArguments;
-    WrappedFunction function;
-    };
-  typedef XHash<QString, WrappedMember> MemberHash;
-
 XProperties:
   XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
   XProperty(SaveFunction, save, setSave);
@@ -200,11 +191,12 @@ XProperties:
   XProperty(xsize, instanceInformationSize, setInstanceInformationSize);
 
   XRORefProperty(DataHash, data);
-  XRORefProperty(MemberHash, wrappedMembers);
 
   XROProperty(xsize, instances);
 
   XProperty(SPropertyInstanceInformation *, extendedParent, setExtendedParent);
+
+  XROProperty(XInterfaceBase*, apiInterface);
 
 public:
   SPropertyInformation() { }
@@ -393,7 +385,7 @@ public:
     addAPIMemberFunction(str, wFn, 1);
     }
 
-  void addAPIMemberFunction(const QString &name, WrappedFunction, xuint32 expectedArguments);
+  template <typename T> XInterface<T> *apiInterface();
 
   X_ALIGNED_OPERATOR_NEW
 
@@ -413,6 +405,7 @@ private:
   CreateInstanceInformationFunction _createInstanceInformation;
 
   mutable InterfaceHash _interfaceFactories;
+
 
   friend class SProperty;
   friend class SDatabase;
@@ -513,6 +506,8 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->_extendedParent = 0;
 
   info->_typeName = typeName;
+
+  info->_apiInterface = initiateAPIInterface<PropType>(info);
 
   return info;
   }
@@ -633,9 +628,16 @@ template <typename T> static const SPropertyInformation *SPropertyInformation::f
   else
     {
     static bool found = STypeRegistry::findType(name);
+
+    XAssert ass(X_CURRENT_CODE_LOCATION, "", "");
+
+    ass X_EXPAND_ARGS(X_ASSERT_VARIABLE, 0, name);
+
     xAssertMessage(found, "Types should be registered before they are used.", name);
     }
   return info;
   }
+
+#include "spropertyinformationapiutilities.h"
 
 #endif // SPROPERTYINFORMATION_H
