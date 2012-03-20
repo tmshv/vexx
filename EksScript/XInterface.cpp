@@ -32,6 +32,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount,
+                               XInterfaceBase *parent,
                                ToScriptFn tScr,
                                FromScriptFn fScr)
   : _typeName(typeName),
@@ -40,6 +41,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
     _typeIdField(typeIdField),
     _nativeField(nativeField),
     _isSealed(false),
+    _parent(parent),
     _toScript(tScr),
     _fromScript(fScr)
   {
@@ -70,6 +72,13 @@ QVariant XInterfaceBase::toVariant(const XScriptValue &inp, int typeHint)
     else if(typeHint == _nonPointerTypeId)
       {
       return QVariant(_nonPointerTypeId, val);
+      }
+
+    UpCastFn fn = _upcasts.value(typeHint, 0);
+    if(fn)
+      {
+      void *typedPtr = fn((void*)val);
+      return QVariant(typeHint, &typedPtr);
       }
     }
 
@@ -162,6 +171,12 @@ void XInterfaceBase::inherit(XInterfaceBase *parentType)
   (*templ)->Inherit( (*pTempl) );
   }
 
+void XInterfaceBase::addChildInterface(int typeId, UpCastFn fn)
+  {
+  xAssert(!_upcasts.contains(typeId));
+  _upcasts.insert(typeId, fn);
+  }
+
 void *XInterfaceBase::prototype()
   {
   return _prototype;
@@ -176,6 +191,7 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
 XUnorderedMap<int, XInterfaceBase*> _interfaces;
 void registerInterface(XInterfaceBase *interface)
   {
+  xAssert(!_interfaces.contains(interface->typeId()));
   _interfaces.insert(interface->typeId(), interface);
   }
 

@@ -22,7 +22,7 @@ private:
   static void buildInterface(XInterfaceBase *interface, const QMetaObject *metaObject);
 
   XContext *_context;
-  XHash<const QMetaObject *, XInterfaceBase *> _objects;
+  XUnorderedMap<const QMetaObject *, XInterfaceBase *> _objects;
   };
 
 namespace XScriptConvert {

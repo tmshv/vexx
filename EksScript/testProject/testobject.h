@@ -142,7 +142,7 @@ class TestObject : public QObject
 public:
   TestObject();
 
-  Q_INVOKABLE SomeClass *thing(QRectF b)
+  Q_INVOKABLE SomeClass *thing(TestObject *b)
     {
     qDebug() << "YAY" << b;
     return &_a;

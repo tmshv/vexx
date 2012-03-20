@@ -36,7 +36,7 @@ void XQObjectWrapper::initiate(XContext *c)
   {
   instance()->_context = c;
 
-  XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName, 0);
+  XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName);
   buildInterface(interface, &QObject::staticMetaObject);
   interface->seal();
   c->addInterface(interface);
@@ -68,7 +68,7 @@ XInterfaceBase *XQObjectWrapper::findInterface(const QMetaObject *object)
     }
 
   XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
-  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()));
+  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()), 0);
 
   const QMetaObject *parent = object->superClass();
   if(parent)

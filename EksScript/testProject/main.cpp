@@ -17,6 +17,8 @@ int main(int a, char* b[])
   XEngine engine;
 
   qRegisterMetaType<SomeClass*>("SomeClass*");
+  qRegisterMetaType<Inheritable*>("Inheritable*");
+  qRegisterMetaType<Inheritor*>("Inheritor*");
 
   // build the template
   XInterface<SomeClass> *someTempl = XInterface<SomeClass>::create("SomeClass");
@@ -42,7 +44,7 @@ int main(int a, char* b[])
   aTempl->addProperty<int, int, &Inheritable::getA, &Inheritable::setA>("a");
   aTempl->seal();
 
-  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::create("Inheritor", aTempl);
+  XInterface<Inheritor> *bTempl = XInterface<Inheritor>::createWithParent("Inheritor", aTempl);
   bTempl->addProperty<int, int, &Inheritor::getB, &Inheritor::setB>("b");
   bTempl->seal();
 
@@ -77,7 +79,7 @@ int main(int a, char* b[])
     /*"'Hello' + someClass.nonStatic + \" \" + someClass.nonStatic.topLeft.x + \" \" + someClass.nonStatic.topLeft.y + \" \" + a + \" \" + a.a + \" \" + a.b;"
     */
     "file.objectName = 'CAKE';"
-    "'YO ' + file.thing(r).thing.a;"
+    "'YO ' + file.thing(file);"
     );
 
   bool err = false;
