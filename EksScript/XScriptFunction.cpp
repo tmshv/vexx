@@ -121,13 +121,37 @@ XScriptFunction& XScriptFunction::operator=(const XScriptFunction &other)
   return *this;
   }
 
-XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, XScriptValue args[]) const
+XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, const XScriptValue args[]) const
   {
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
   return (func->_object.IsEmpty() || func->_object.IsEmpty())
       ? Toss("Illegal argument: empty v8::Handle<>.")
       : fromHandle(func->_object->Call(getV8Internal(self), argc, getV8Internal(args)));
+  }
+
+XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue args[], bool *error) const
+  {
+  v8::TryCatch trycatch;
+  if(error)
+  {
+    *error = false;
+  }
+
+  const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
+  v8::Handle<v8::Value> result = func->_object->Call(getV8Internal(self), argc, getV8Internal(args));
+
+  if (result.IsEmpty())
+    {
+    if(error)
+      {
+      *error = true;
+      }
+    v8::String::AsciiValue exception_str(trycatch.Exception());
+    return XScriptValue(*exception_str);
+    }
+
+  return fromHandle(result);
   }
 
 XScriptValue XScriptFunction::callAsConstructor(const XScriptArguments &argv)

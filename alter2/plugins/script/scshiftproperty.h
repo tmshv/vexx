@@ -1,4 +1,4 @@
-#ifndef SCSHIFTPROPERTY_H
+#if 0 //ndef SCSHIFTPROPERTY_H
 #define SCSHIFTPROPERTY_H
 
 #include "scwrappedclass.h"

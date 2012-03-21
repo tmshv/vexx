@@ -7,15 +7,17 @@ TEMPLATE = lib
 
 include("../../../EksCore/GeneralOptions.pri")
 
-QT += script scripttools declarative opengl
+QT += declarative opengl
 INCLUDEPATH += ../../ \
     $$ROOT/EksCore \
+    $$ROOT/EksScript \
     $$ROOT/shift \
     $$ROOT/alter2/plugins/UI/ \
     $$ROOT/alter2/plugins/ShiftAlter/
 
 LIBS += -lalter \
     -lEksCore \
+    -lEksScript \
     -lUI \
     -lshift \
     -lShiftAlter

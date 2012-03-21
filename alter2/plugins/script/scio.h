@@ -1,4 +1,4 @@
-#ifndef SCIO_H
+#if 0 //ndef SCIO_H
 #define SCIO_H
 
 #include "QObject"

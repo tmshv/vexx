@@ -548,7 +548,23 @@ template <typename T> struct NativeToJSConvertableType
     {
     return this->operator()(&n);
     }
-};
+  };
+
+template <typename T, typename BASE> struct NativeToJSConvertableTypeInherited
+  {
+  XScriptValue operator()(T *n) const
+    {
+    BASE* base = n;
+    const XInterfaceBase* interface = findInterface<T>(n);
+    XScriptObject self = interface->newInstanceBase();
+    interface->wrapInstance(self, base);
+    return self;
+    }
+  XScriptValue operator()(T &n) const
+    {
+    return this->operator()(&n);
+    }
+  };
 
 template <typename T, typename CTORS> class ClassCreatorCopyableFactory
 {
@@ -563,7 +579,7 @@ public:
     {
       XNativeToJSMap<T>::Insert(jsSelf, b);
     }
-    XEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
+    XScriptEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
     return b;
   }
 
@@ -571,7 +587,7 @@ public:
   {
     XNativeToJSMap<T>::Remove(obj);
     delete obj;
-    XEngine::adjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
+    XScriptEngine::adjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
   }
 };
 
@@ -588,7 +604,7 @@ public:
     {
       XNativeToJSMap<T>::Insert(jsSelf, b);
     }
-    XEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
+    XScriptEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
     return b;*/
     xAssertFail();
     return 0;
@@ -597,7 +613,7 @@ public:
   static void Delete(T *obj)
   {
     XNativeToJSMap<T>::Remove(obj);
-    XEngine::adjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
+    XScriptEngine::adjustAmountOfExternalAllocatedMemory(-((int)sizeof(*obj)));
   }
 };
 
@@ -651,8 +667,14 @@ public:
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
-  X_SCRIPTABLE_BUILD_CONSTRUCTABLE(type, __VA_ARGS__) \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type##Ctors> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+
+
+#define X_SCRIPTABLE_ABSTRACT_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableTypeInherited<type, base> {}; } } \
+  namespace XScript { \
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
 
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)

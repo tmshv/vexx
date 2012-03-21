@@ -6,16 +6,14 @@
 
 #include "styperegistry.h"
 class ScCoreObject;
-class QScriptEngine;
-class QScriptValue;
-class QScriptClass;
-class QScriptEngineDebugger;
+class XScriptEngine;
+class XScriptContext;
 class ScObject;
 class ScInputThread;
 class ScSurface;
-class ScEmbeddedTypes;
-class ScIO;
 class SDatabaseModel;
+class XScriptValue;
+class XScriptFunction;
 
 class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
   {
@@ -41,17 +39,16 @@ public:
 
   Q_INVOKABLE bool isDebuggingEnabled();
 
-  QScriptEngine *engine();
+  XScriptEngine *engine();
 
   Q_INVOKABLE QWidget *addQMLWindow(const QString &url, const QVariantMap &qmlData=QVariantMap());
   Q_INVOKABLE QObject *addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData=QVariantMap());
 
-  static QScriptValue call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args);
+  static XScriptValue call(XScriptFunction fn, XScriptValue th, const QVector<XScriptValue> &args);
 
   void registerScriptGlobal(QObject *);
   void registerScriptGlobal(const QString &, QObject *);
-  void registerScriptGlobal(const QString &, QScriptClass *cl);
-  void registerScriptGlobal(const QString &, const QScriptValue &cl);
+  void registerScriptGlobal(const QString &, const XScriptValue &cl);
 
 signals:
   void debuggingStateChanged(bool enabled);
@@ -71,12 +68,10 @@ private:
   virtual void pluginAdded(const QString &type);
   virtual void pluginRemoved(const QString &type);
 
-  QScriptEngine *_engine;
-  QScriptEngineDebugger *_debugger;
+  XScriptEngine *_engine;
+  XScriptContext *_context;
 
   ScSurface *_surface;
-  ScEmbeddedTypes *_types;
-  ScIO *_io;
 
   SDatabaseModel *_model;
   };

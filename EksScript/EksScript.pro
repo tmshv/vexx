@@ -13,20 +13,18 @@ include("../EksCore/GeneralOptions.pri")
 
 SOURCES += XScriptGlobal.cpp \
     XInterface.cpp \
-    XEngine.cpp \
-    XContext.cpp \
     XScriptException.cpp \
     XScriptValue.cpp \
     XScriptFunction.cpp \
     XScriptSource.cpp \
     XScriptObject.cpp \
     XQObjectWrapper.cpp \
-    XFunctions.cpp
+    XFunctions.cpp \
+    XScriptEngine.cpp \
+    XScriptContext.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \
-    XEngine.h \
-    XContext.h \
     XSignature.h \
     XSignatureHelpers.h \
     XSignatureSpecialisations.h \
@@ -48,7 +46,9 @@ HEADERS += XScriptGlobal.h \
     XFunctionSpecialisations.h \
     XScriptSource.h \
     XScriptObject.h \
-    XQObjectWrapper.h
+    XQObjectWrapper.h \
+    XScriptEngine.h \
+    XScriptContext.h
 
 LIBS += -lQtV8 -lEksCore
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/qtjsbackend/src/3rdparty/v8/include

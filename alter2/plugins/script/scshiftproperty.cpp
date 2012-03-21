@@ -1,3 +1,4 @@
+#if 0
 #include "scshiftproperty.h"
 #include "sproperty.h"
 #include "scembeddedtypes.h"
@@ -571,3 +572,4 @@ QScriptValue ScShiftProperty::endBlock(QScriptContext *ctx, QScriptEngine *)
   return QScriptValue();
   }
 
+#endif

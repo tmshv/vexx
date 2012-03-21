@@ -14,7 +14,7 @@
 int main(int a, char* b[])
 {
   QApplication app(a, b);
-  XEngine engine;
+  XScriptEngine engine;
 
   qRegisterMetaType<SomeClass*>("SomeClass*");
   qRegisterMetaType<Inheritable*>("Inheritable*");

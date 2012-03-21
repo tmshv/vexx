@@ -3,7 +3,6 @@
 
 #include "QDeclarativeView"
 #include "UISurface.h"
-#include "QScriptValue"
 
 class SDatabaseModel;
 

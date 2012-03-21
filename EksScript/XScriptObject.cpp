@@ -116,6 +116,14 @@ void XScriptObject::makeWeak(void *data, WeakDtor cb)
   self.MakeWeak(data, (v8::WeakReferenceCallback)cb);
   }
 
+XScriptObject XScriptObject::newObject()
+  {
+  XScriptObject obj;
+  const XScriptObjectInternal *internal = XScriptObjectInternal::val(&obj);
+  internal->_object = v8::Object::New();
+  return obj;
+  }
+
 v8::Handle<v8::Object> getV8Internal(const XScriptObject &o)
   {
   const XScriptObjectInternal *internal = XScriptObjectInternal::val(&o);

@@ -7,7 +7,7 @@ class XScriptValue;
 class XScriptObject;
 class XInterfaceBase;
 class XScriptFunction;
-class XEngine;
+class XScriptEngine;
 
 XScriptValue fromHandle(v8::Handle<v8::Value>);
 XScriptObject fromObjectHandle(v8::Handle<v8::Object>);
@@ -20,6 +20,6 @@ v8::Handle<v8::Function> getV8Internal(const XScriptFunction&);
 
 v8::Handle<v8::Value> *getV8Internal(const XScriptValue*);
 
-v8::Handle<v8::ObjectTemplate> getGlobalTemplate(XEngine *);
+v8::Handle<v8::ObjectTemplate> getGlobalTemplate(XScriptEngine *);
 
 #endif // XScriptValueV8INTERNALS_H

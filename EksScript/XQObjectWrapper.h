@@ -4,12 +4,12 @@
 #include "XUnorderedMap"
 #include "XInterface.h"
 #include "XScriptObject.h"
-#include "XContext.h"
+#include "XScriptContext.h"
 
 class EKSSCRIPT_EXPORT XQObjectWrapper
   {
 public:
-  static void initiate(XContext *);
+  static void initiate(XScriptContext *);
   static XQObjectWrapper *instance();
   ~XQObjectWrapper();
 
@@ -21,7 +21,7 @@ private:
 
   static void buildInterface(XInterfaceBase *interface, const QMetaObject *metaObject);
 
-  XContext *_context;
+  XScriptContext *_context;
   XUnorderedMap<const QMetaObject *, XInterfaceBase *> _objects;
   };
 

@@ -1,4 +1,4 @@
-#ifndef SCEMBEDDEDTYPES_H
+#if 0 //ndef SCEMBEDDEDTYPES_H
 #define SCEMBEDDEDTYPES_H
 
 #include "QObject"

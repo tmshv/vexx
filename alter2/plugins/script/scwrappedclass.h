@@ -1,4 +1,4 @@
-#ifndef SCWRAPPEDCLASS_H
+#if 0 //ndef SCWRAPPEDCLASS_H
 #define SCWRAPPEDCLASS_H
 
 #include "QScriptClass"

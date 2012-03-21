@@ -27,6 +27,8 @@ public:
   virtual QWidget *createEditor();
   };
 
+S_PROPERTY_INTERFACE(SPartDocument)
+
 class SHIFTALTER_EXPORT SPartEditor : public SDocumentEditor, public SPartEditorInterfaceFeedbacker
   {
   Q_OBJECT

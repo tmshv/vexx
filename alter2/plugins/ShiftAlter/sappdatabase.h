@@ -33,4 +33,6 @@ public:
   SDocument *addDocument(const SPropertyInformation *info);
   };
 
+S_PROPERTY_INTERFACE(SAppDatabase)
+
 #endif // SAPPDATABASE_H

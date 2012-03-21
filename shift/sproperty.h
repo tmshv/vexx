@@ -78,12 +78,6 @@ class SDatabase;
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()
 
-#define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE(name)
-
-#define S_PROPERTY_ABSTRACT_INTERFACE(name) X_SCRIPTABLE_ABSTRACT_TYPE(name)
-
-#define S_PROPERTY_INTERFACE_TYPED(name) X_SCRIPTABLE_TYPE_TYPED(name)
-
 class SPropertyInstanceInformation;
 class SPropertyInformation;
 class SSaver;
@@ -367,6 +361,10 @@ private:
   friend class SProcessManager;
   };
 
-S_PROPERTY_INTERFACE(SProperty)
+#define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE_INHERITS(name, SProperty)
+
+#define S_PROPERTY_ABSTRACT_INTERFACE(name) X_SCRIPTABLE_ABSTRACT_TYPE_INHERITS(name, SProperty)
+
+X_SCRIPTABLE_TYPE(SProperty)
 
 #endif // SPROPERTY_H

@@ -1,3 +1,4 @@
+#if 0
 #include "scshiftpropertycontainer.h"
 #include "spropertycontainer.h"
 #include "scembeddedtypes.h"
@@ -115,3 +116,4 @@ QScriptValue ScShiftPropertyContainer::size(QScriptContext *ctx, QScriptEngine *
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect this argument to SPropertyContainer.size(...);");
   return QScriptValue();
   }
+#endif

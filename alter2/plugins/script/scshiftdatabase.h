@@ -1,4 +1,4 @@
-#ifndef SCSHIFTDATABASE_H
+#if 0 //ndef SCSHIFTDATABASE_H
 #define SCSHIFTDATABASE_H
 
 #include "scglobal.h"

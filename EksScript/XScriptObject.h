@@ -37,9 +37,11 @@ public:
   template <typename T> T *castTo();
   template <typename T> const T *castTo() const;
 
+  static XScriptObject newObject();
+
 private:
   void *_object;
-  friend class XContext;
+  friend class XScriptContext;
   };
 
 #include "XInterface.h"

@@ -1,7 +1,7 @@
 #ifndef XFUNCTIONS_H
 #define XFUNCTIONS_H
 
-#include "XEngine.h"
+#include "XScriptEngine.h"
 #include "XScriptValue.h"
 #include "XScriptFunction.h"
 #include "XScriptConstructors.h"

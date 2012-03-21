@@ -27,10 +27,10 @@ HEADERS += splugin.h \
     saviewport.h \
     sadocument.h
 
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore
+INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore
 
 QT += opengl
-LIBS += -lshift -lEksCore -lEksGui -lEks3D -lalter -lShiftGraphicsCore -lShiftMathsCore
+LIBS += -lshift -lEksCore -lEksGui -lEksScript -lEks3D -lalter -lShiftGraphicsCore -lShiftMathsCore
 
 FORMS +=
 

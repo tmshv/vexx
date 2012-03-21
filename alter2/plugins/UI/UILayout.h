@@ -11,4 +11,6 @@ public:
   UILayout();
   };
 
+S_PROPERTY_INTERFACE(UILayout)
+
 #endif // UILAYOUT_BASE_H

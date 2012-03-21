@@ -16,7 +16,8 @@ public:
   XScriptFunction(const XScriptFunction&);
   XScriptFunction& operator=(const XScriptFunction&);
 
-  XScriptValue call(const XScriptObject &thisObject, int argc, XScriptValue args[]) const;
+  XScriptValue callWithTryCatch(const XScriptObject &thisObject, int argc, const XScriptValue args[], bool *error) const;
+  XScriptValue call(const XScriptObject &thisObject, int argc, const XScriptValue args[]) const;
   XScriptValue callAsConstructor(const XScriptArguments&);
 
 private:

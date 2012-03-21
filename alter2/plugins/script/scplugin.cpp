@@ -3,15 +3,18 @@
 #include "scsurface.h"
 #include "scembeddedtypes.h"
 #include "QApplication"
-#include "QScriptEngine"
+#include "XScriptEngine.h"
+#include "XQObjectWrapper.h"
+#include "XScriptFunction.h"
 #include "UIPlugin.h"
 #include "acore.h"
-#include "QScriptEngineDebugger"
+#include "XScriptContext.h"
 #include "scshiftentity.h"
 #include "QDir"
 #include "aplugin.h"
 #include "QDebug"
 #include "QMainWindow"
+#include "XScriptSource.h"
 #include "scio.h"
 #include "sdatabasemodel.h"
 #include "QGraphicsObject"
@@ -28,16 +31,14 @@
 
 ALTER_PLUGIN(ScPlugin);
 
-ScPlugin::ScPlugin() : _engine(0), _debugger(0), _surface(0), _types(0), _io(0), _model(0)
+ScPlugin::ScPlugin() : _engine(0), _surface(0), _model(0)
   {
   setObjectName("script");
   }
 
 ScPlugin::~ScPlugin()
   {
-  delete _io;
   delete _engine;
-  delete _types;
   delete _model;
 
   _model = 0;
@@ -47,19 +48,19 @@ ScPlugin::~ScPlugin()
 
 void ScPlugin::initDebugger()
   {
-  if(_debugger)
-    {
-    return;
-    }
+//  if(_debugger)
+//    {
+//    return;
+//    }
 
-  _debugger = new QScriptEngineDebugger(this);
-  _debugger->setAutoShowStandardWindow(true);
+//  _debugger = new QScriptEngineDebugger(this);
+//  _debugger->setAutoShowStandardWindow(true);
 
-  APlugin<UIPlugin> ui(this, "ui");
-  if(ui.isValid())
-    {
-    connect(ui.plugin(), SIGNAL(aboutToClose()), _debugger, SLOT(deleteLater()));
-    }
+//  APlugin<UIPlugin> ui(this, "ui");
+//  if(ui.isValid())
+//    {
+//    connect(ui.plugin(), SIGNAL(aboutToClose()), _debugger, SLOT(deleteLater()));
+//    }
   }
 
 
@@ -86,7 +87,7 @@ void ScPlugin::pluginAdded(const QString &type)
 
 void ScPlugin::pluginRemoved(const QString &type)
   {
-  engine()->globalObject().setProperty(type, QScriptValue());
+  _context->set(type, XScriptValue());
 
   if(type == "db")
     {
@@ -100,43 +101,40 @@ void ScPlugin::pluginRemoved(const QString &type)
     }
   }
 
-QScriptValue printFn(QScriptContext *context, QScriptEngine *engine)
+XScriptValue printFn(XScriptArguments const &args)
   {
   QString result;
-  for (int i = 0; i < context->argumentCount(); ++i)
+  for (xsize i = 0; i < args.length(); ++i)
     {
-    result.append(context->argument(i).toString());
+    result.append(args.at(i).toString());
     }
 
   qDebug() << result;
 
-  return engine->undefinedValue();
+  return XScriptValue();
   }
 
 void ScPlugin::load()
   {
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
-  _engine = new QScriptEngine(this);
+  _engine = new XScriptEngine();
+  _context = new XScriptContext(_engine);
 
-  _engine->globalObject().setProperty("print", _engine->newFunction(printFn));
-
-  _io = new ScIO;
-  registerScriptGlobal(_io);
+  _context->set("print", printFn);
 
   registerScriptGlobal(this);
 
   APlugin<SPlugin> db(this, "db");
   xAssert(db.isValid());
 
-  _engine->globalObject().setProperty("dbTypes", _engine->newObject());
-  _types = new ScEmbeddedTypes(_engine);
+  _context->set("dbTypes", XScriptValue(XScriptObject::newObject()));
 
   connect(_types, SIGNAL(typeAdded(QString)), this, SIGNAL(typeAdded(QString)));
   connect(_types, SIGNAL(typeRemoved(QString)), this, SIGNAL(typeRemoved(QString)));
 
-  registerScriptGlobal("db", ScEmbeddedTypes::packValue(&db->db()));
+  registerScriptGlobal("db", XScriptConvert::to(&db->db()));
 
-  QScriptValue dbObject = engine()->globalObject().property("db");
+  /*QScriptValue dbObject = _context->set(engine()->globalObject().property("db");
   foreach(const SPropertyInformation *t, STypeRegistry::types())
     {
     QScriptValue type = dbObject.property(t->typeName());
@@ -145,7 +143,7 @@ void ScPlugin::load()
       type = _engine->newObject();
       type.setProperty("typeName", t->typeName());
       }
-    }
+    }*/
 
   qmlRegisterType<ScPath>("VexxQMLExtensions", 1, 0, "Path");
   qmlRegisterType<ScEllipse>("VexxQMLExtensions", 1, 0, "Ellipse");
@@ -172,30 +170,30 @@ void ScPlugin::load()
 
 void ScPlugin::enableDebugging(bool enable)
   {
-  initDebugger();
-  emit debuggingStateChanged(enable);
-  if(enable)
-    {
-    _debugger->attachTo(_engine);
-    }
-  else
-    {
-    _debugger->detach();
-    }
+//  initDebugger();
+//  emit debuggingStateChanged(enable);
+//  if(enable)
+//    {
+//    _debugger->attachTo(_engine);
+//    }
+//  else
+//    {
+//    _debugger->detach();
+//    }
   }
 
 void ScPlugin::showDebugger()
   {
-  initDebugger();
-  _debugger->standardWindow()->show();
+//  initDebugger();
+//  _debugger->standardWindow()->show();
   }
 
 void ScPlugin::hideDebugger()
   {
-  if(_debugger)
-    {
-    _debugger->standardWindow()->hide();
-    }
+//  if(_debugger)
+//    {
+//    _debugger->standardWindow()->hide();
+//    }
   }
 
 bool ScPlugin::loadPlugin(const QString &plugin)
@@ -268,25 +266,19 @@ void ScPlugin::includeFolder(const QString &folder)
 
 void ScPlugin::registerScriptGlobal(QObject *in)
   {
-  QScriptValue objectValue = _engine->newQObject(in);
-  _engine->globalObject().setProperty(in->objectName(), objectValue);
+  XScriptValue objectValue = XScriptConvert::to(in);
+  _context->set(in->objectName(), objectValue);
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, QObject *in)
   {
-  QScriptValue objectValue = _engine->newQObject(in);
-  _engine->globalObject().setProperty(name, objectValue);
+  XScriptValue objectValue = XScriptConvert::to(in);
+  _context->set(name, objectValue);
   }
 
-void ScPlugin::registerScriptGlobal(const QString &name, const QScriptValue &val)
+void ScPlugin::registerScriptGlobal(const QString &name, const XScriptValue &val)
   {
-  _engine->globalObject().setProperty(name, val);
-  }
-
-void ScPlugin::registerScriptGlobal(const QString &name, QScriptClass *in)
-  {
-  QScriptValue objectValue = _engine->newObject(in);
-  _engine->globalObject().setProperty(name, objectValue);
+  _context->set(name, val);
   }
 
 bool ScPlugin::executeFile(const QString &filename)
@@ -303,29 +295,29 @@ bool ScPlugin::executeFile(const QString &filename)
 
 bool ScPlugin::isDebuggingEnabled()
   {
-  return _engine->agent() != 0;
+  return false;//_engine->agent() != 0;
   }
 
-QScriptEngine *ScPlugin::engine()
+XScriptEngine *ScPlugin::engine()
   {
   return _engine;
   }
 
-QScriptValue ScPlugin::call(QScriptValue fn, QScriptValue th, const QList<QScriptValue> &args)
+XScriptValue ScPlugin::call(XScriptFunction fn, XScriptValue th, const QVector<XScriptValue> &args)
   {
-  QScriptEngine *e = fn.engine();
-  QScriptValue ret = fn.call(th, args);
+  const XScriptValue *argPtr = args.size() ? &args.front() : 0;
 
-  if(e->hasUncaughtException())
+  bool error = false;
+  XScriptValue ret = fn.callWithTryCatch(th, args.size(), argPtr, &error);
+
+  if(error)
     {
-    qWarning() << "Error in script at line " << e->uncaughtExceptionLineNumber() << ": " << endl << ret.toString() << endl;
-    return QScriptValue();
+    qWarning() << "Error in script at line " << ret.toString() << endl;
+    return XScriptValue();
     }
-  else if(!ret.isUndefined())
-    {
-    qDebug() << "Script Returned: " << ret.toString() << endl;
-    }
-  return QScriptValue();
+
+  qDebug() << "Script Returned: " << ret.toString() << endl;
+  return ret;
   }
 
 QWidget *ScPlugin::addQMLWindow(const QString &url, const QVariantMap &qmlData)
@@ -360,16 +352,19 @@ QObject *ScPlugin::addQMLSurface(const QString &name, const QString &type, const
 bool ScPlugin::execute(const QString &code)
   {
   ScProfileFunction
-  QScriptValue ret = _engine->evaluate(code);
+  XScriptSource src(code);
 
-  if(_engine->hasUncaughtException())
+  bool error = false;
+  XScriptValue ret = src.run(&error);
+
+  if(error)
     {
-    qWarning() << "Error in script at line " << _engine->uncaughtExceptionLineNumber() << ": " << endl << ret.toString() << endl;
+    qWarning() << "Error in script at line " << ret.toString();
     return false;
     }
-  else if(!ret.isUndefined())
+  else
     {
-    qDebug() << "Script Returned: " << ret.toString() << endl;
+    qDebug() << "Script Returned: " << ret.toString();
     }
   return true;
   }

@@ -1,3 +1,4 @@
+#if 0
 #include "scio.h"
 #include "QIODevice"
 #include "QScriptValue"
@@ -45,3 +46,4 @@ QObject *ScIO::createFile(const QString &path)
   {
   return new ScFile(path);
   }
+#endif

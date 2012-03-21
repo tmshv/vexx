@@ -13,10 +13,10 @@ struct XScriptSourceImpl
 
 xCompileTimeAssert(sizeof(XScriptSourceImpl) == sizeof(XScriptSource));
 
-XScriptSource::XScriptSource(const char *data)
+XScriptSource::XScriptSource(const QString &data)
   {
   // Create a string containing the JavaScript source code.
-  v8::Handle<v8::String> source = v8::String::New(data);
+  v8::Handle<v8::String> source = v8::String::New((xuint16*)data.constData(), data.length());
 
   // Compile the source code.
   XScriptSourceImpl *i = XScriptSourceImpl::impl(this);
