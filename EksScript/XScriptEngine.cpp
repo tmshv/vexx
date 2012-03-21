@@ -13,9 +13,37 @@ public:
     return e->_impl;
     }
 
-  v8::HandleScope scope;
   v8::Handle<v8::ObjectTemplate> globalTemplate;
   };
+
+struct StaticEngine
+  {
+  v8::HandleScope scope;
+  };
+StaticEngine *g_engine = 0;
+
+
+void fatal(const char* location, const char* message)
+  {
+  qFatal("%s: %s", location, message);
+  }
+
+void XScriptEngine::initiate()
+  {
+  if(g_engine)
+    {
+    return;
+    }
+
+  v8::V8::SetFatalErrorHandler(fatal);
+
+  g_engine = new StaticEngine();
+  }
+
+void XScriptEngine::terminate()
+  {
+  delete g_engine;
+  }
 
 XScriptEngine::XScriptEngine() : _impl(new XScriptEngine::Impl)
   {

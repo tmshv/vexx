@@ -11,6 +11,9 @@ public:
 
   static void adjustAmountOfExternalAllocatedMemory(int in);
 
+  static void initiate();
+  static void terminate();
+
   class Impl;
 
 private:

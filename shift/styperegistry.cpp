@@ -21,6 +21,7 @@ STypeRegistry::STypeRegistry()
 
 void STypeRegistry::initiate()
   {
+  XScriptEngine::initiate();
   _internalTypes.allocator = XGlobalAllocator::instance();
 
   addType(SProperty::staticTypeInformation());
@@ -68,6 +69,8 @@ void STypeRegistry::initiate()
 void STypeRegistry::terminate()
   {
   _internalTypes.allocator = 0;
+
+  XScriptEngine::terminate();
   }
 
 XAllocatorBase *STypeRegistry::allocator()
