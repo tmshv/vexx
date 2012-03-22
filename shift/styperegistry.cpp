@@ -105,6 +105,7 @@ void STypeRegistry::removeTypeObserver(Observer *o)
 
 void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
+  xAssert(t);
   if(!_internalTypes.types.contains(t))
     {
     _internalTypes.types.insert(t);

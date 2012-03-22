@@ -105,18 +105,16 @@ S_PROPERTY_INTERFACE(Pointer)
   class name : public TypedPointer<type> { \
     S_PROPERTY(name, Pointer, 0); }; \
     S_IMPLEMENT_INLINE_PROPERTY(name) \
-  inline SPropertyInformation *name::createTypeInformation() { \
-    SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
-    assignPointerInformation(info, type::staticTypeInformation()); \
-    return info;} \
+  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
+  if(data.registerInterfaces) { \
+    assignPointerInformation(info, type::staticTypeInformation()); } } \
   S_PROPERTY_INTERFACE(name)
 
 #define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
   class name : public TypedPointerArray<type> { \
   S_PROPERTY_CONTAINER(PointerArray, SPropertyContainer, 0); }; \
   S_IMPLEMENT_INLINE_PROPERTY(name) \
-  inline SPropertyInformation *name::createTypeInformation() { \
-    return SPropertyInformation::create<name>(#name); } \
+  inline void name::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &) { } \
   S_PROPERTY_INTERFACE(name)
 
 

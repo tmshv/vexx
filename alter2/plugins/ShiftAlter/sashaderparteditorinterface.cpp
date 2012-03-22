@@ -114,7 +114,7 @@ void SShaderPartEditorInterface::addProperty(SEntity *e) const
   Initialiser i;
   i.shader = e->uncheckedCastTo<GCShader>();
 
-  ColourProperty *newProp = e->addProperty<ColourProperty>("", &i);
+  e->addProperty<ColourProperty>("", &i);
   }
 
 QStringList SShaderPartEditorInterface::possiblePropertyTypes() const

@@ -68,14 +68,13 @@ private:
 
 S_IMPLEMENT_PROPERTY(GCButtonManipulator)
 
-SPropertyInformation *GCButtonManipulator::createTypeInformation()
+void GCButtonManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCButtonManipulator>("GCButtonManipulator");
-
-  info->add(&GCButtonManipulator::checked, "checked");
-  info->add(&GCButtonManipulator::checkable, "checkable");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&GCButtonManipulator::checked, "checked");
+    info->add(&GCButtonManipulator::checkable, "checkable");
+    }
   }
 
 GCButtonManipulator::GCButtonManipulator()

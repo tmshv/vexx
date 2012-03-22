@@ -6,13 +6,13 @@
 
 S_IMPLEMENT_PROPERTY(SEntity)
 
-SPropertyInformation *SEntity::createTypeInformation()
+void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<SEntity>("SEntity");
-  SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
-  childInst->setMode(SPropertyInstanceInformation::Internal);
-
-  return info;
+  if(data.registerAttributes)
+    {
+    SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
+    childInst->setMode(SPropertyInstanceInformation::Internal);
+    }
   }
 
 SEntity::SEntity()

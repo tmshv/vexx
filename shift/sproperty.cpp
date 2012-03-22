@@ -11,9 +11,8 @@
 
 S_IMPLEMENT_PROPERTY(SProperty)
 
-SPropertyInformation *SProperty::createTypeInformation()
+void SProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::createNoParent<SProperty>("SProperty");
   }
 
 void SProperty::setDependantsDirty()
@@ -469,6 +468,16 @@ bool SProperty::shouldSaveProperty(const SProperty *p)
     }
 
   return false;
+  }
+
+const XInterfaceBase *SProperty::apiInterface() const
+  {
+  return typeInformation()->apiInterface();
+  }
+
+const XInterfaceBase *SProperty::staticApiInterface()
+  {
+  return staticTypeInformation()->apiInterface();
   }
 
 bool SProperty::inheritsFromType(const SPropertyInformation *type) const

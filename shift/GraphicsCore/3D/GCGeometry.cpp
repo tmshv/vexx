@@ -4,11 +4,12 @@
 
 S_IMPLEMENT_PROPERTY(GCGeometryAttribute)
 
-SPropertyInformation *GCGeometryAttribute::createTypeInformation()
+void GCGeometryAttribute::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCGeometryAttribute>("GCGeometryAttribute");
-  info->add(&GCGeometryAttribute::polygons, "polygons");
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&GCGeometryAttribute::polygons, "polygons");
+    }
   }
 
 GCGeometryAttribute::GCGeometryAttribute()
@@ -138,18 +139,17 @@ void computeRuntimeGeometry(const SPropertyInstanceInformation *, GCGeometry *rt
   rtGeo->runtimeGeometry = x;
   }
 
-SPropertyInformation *GCGeometry::createTypeInformation()
+void GCGeometry::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCGeometry>("GCGeometry");
+  if(data.registerAttributes)
+    {
+    GCRuntimeGeometry::InstanceInformation *rtGeo = info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
+    rtGeo->setCompute(computeRuntimeGeometry);
+    rtGeo->setComputeLockedToMainThread(true);
 
-  GCRuntimeGeometry::InstanceInformation *rtGeo = info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
-  rtGeo->setCompute(computeRuntimeGeometry);
-  rtGeo->setComputeLockedToMainThread(true);
-
-  STypedPropertyArray<GCGeometryAttribute>::InstanceInformation *attrs = info->add(&GCGeometry::attributes, "attributes");
-  attrs->setAffects(rtGeo);
-
-  return info;
+    STypedPropertyArray<GCGeometryAttribute>::InstanceInformation *attrs = info->add(&GCGeometry::attributes, "attributes");
+    attrs->setAffects(rtGeo);
+    }
   }
 
 GCGeometry::GCGeometry()

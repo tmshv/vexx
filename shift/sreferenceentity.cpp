@@ -3,9 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(SReferenceEntity)
 
-SPropertyInformation *SReferenceEntity::createTypeInformation()
+void SReferenceEntity::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SReferenceEntity>("SReferenceEntity");
   }
 
 SReferenceEntity::SReferenceEntity()

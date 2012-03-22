@@ -2,16 +2,15 @@
 
 S_IMPLEMENT_PROPERTY(GCViewport)
 
-SPropertyInformation *GCViewport::createTypeInformation()
+void GCViewport::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCViewport>("GCViewport");
-
-  UnsignedIntProperty::InstanceInformation *xInst = info->add(&GCViewport::x, "x");
-  xInst->setMode(SPropertyInstanceInformation::Output);
-  UnsignedIntProperty::InstanceInformation *yInst = info->add(&GCViewport::y, "y");
-  yInst->setMode(SPropertyInstanceInformation::Output);
-
-  return info;
+  if(data.registerAttributes)
+    {
+    UnsignedIntProperty::InstanceInformation *xInst = info->add(&GCViewport::x, "x");
+    xInst->setMode(SPropertyInstanceInformation::Output);
+    UnsignedIntProperty::InstanceInformation *yInst = info->add(&GCViewport::y, "y");
+    yInst->setMode(SPropertyInstanceInformation::Output);
+    }
   }
 
 GCViewport::GCViewport()

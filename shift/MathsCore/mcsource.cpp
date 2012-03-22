@@ -2,13 +2,12 @@
 
 S_IMPLEMENT_PROPERTY(MCSource)
 
-SPropertyInformation *MCSource::createTypeInformation()
+void MCSource::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<MCSource>("MCSource");
-
-  info->add(&MCSource::output, "output");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&MCSource::output, "output");
+    }
   }
 
 MCSource::MCSource()

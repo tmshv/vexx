@@ -63,24 +63,26 @@ void computePlane(const SPropertyInstanceInformation *, GCPlane *plane)
   uvs->setPolygon(0, uv, 4);
   }
 
-SPropertyInformation *GCPlane::createTypeInformation()
+void GCPlane::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCPlane>("GCPlane");
+  if(data.registerAttributes)
+    {
+    GCGeometry::InstanceInformation *geoInfo = info->add(&GCPlane::geometry, "geometry");
+    geoInfo->setCompute(computePlane);
 
-  GCGeometry::InstanceInformation *geoInfo = info->add(&GCPlane::geometry, "geometry");
-  geoInfo->setCompute(computePlane);
+    FloatProperty::InstanceInformation *wInfo = info->add(&GCPlane::width, "width");
+    wInfo->setAffects(geoInfo);
+    wInfo->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation *wInfo = info->add(&GCPlane::width, "width");
-  wInfo->setAffects(geoInfo);
-  wInfo->setDefault(1.0f);
+    FloatProperty::InstanceInformation *hInfo = info->add(&GCPlane::height, "height");
+    hInfo->setAffects(geoInfo);
+    hInfo->setDefault(1.0f);
+    }
 
-  FloatProperty::InstanceInformation *hInfo = info->add(&GCPlane::height, "height");
-  hInfo->setAffects(geoInfo);
-  hInfo->setDefault(1.0f);
-
-  info->addInheritedInterface<GCPlane, GCManipulatable>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<GCPlane, GCManipulatable>();
+    }
   }
 
 GCPlane::GCPlane()

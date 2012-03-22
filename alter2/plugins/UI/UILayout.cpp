@@ -3,9 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(UILayout)
 
-SPropertyInformation *UILayout::createTypeInformation()
+void UILayout::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<UILayout>("UILayout");
   }
 
 UILayout::UILayout()

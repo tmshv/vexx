@@ -19,9 +19,8 @@ IMPLEMENT_POD_PROPERTY(ByteArrayProperty, QByteArray);
 
 S_IMPLEMENT_PROPERTY(StringProperty)
 
-SPropertyInformation *StringProperty::createTypeInformation()
+void StringProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<StringProperty>("StringProperty");
   }
 
 S_IMPLEMENT_PROPERTY(FilenameProperty)

@@ -22,29 +22,28 @@ void GCStandardSurface::postCreate(GCStandardSurface *surface)
 
 S_IMPLEMENT_PROPERTY(GCStandardSurface);
 
-SPropertyInformation *GCStandardSurface::createTypeInformation()
+void GCStandardSurface::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCStandardSurface>("GCStandardSurface", postCreate);
+  if(data.registerAttributes)
+    {
+    SPropertyInstanceInformation *rtShader = info->child(&GCStandardSurface::runtimeShader);
 
-  SPropertyInstanceInformation *rtShader = info->child(&GCStandardSurface::runtimeShader);
+    ColourProperty::InstanceInformation *diffuse = info->add(&GCStandardSurface::diffuse, "diffuse");
+    diffuse->setDefault(XColour(0.6f, 0.6f, 0.6f, 1.0f));
+    diffuse->setAffects(rtShader);
 
-  ColourProperty::InstanceInformation *diffuse = info->add(&GCStandardSurface::diffuse, "diffuse");
-  diffuse->setDefault(XColour(0.6f, 0.6f, 0.6f, 1.0f));
-  diffuse->setAffects(rtShader);
+    GCVertexShaderComponent::InstanceInformation *vertInst = info->add(&GCStandardSurface::vertex, "vertex");
+    GCFragmentShaderComponent::InstanceInformation *fragInst = info->add(&GCStandardSurface::fragment, "fragment");
 
-  GCVertexShaderComponent::InstanceInformation *vertInst = info->add(&GCStandardSurface::vertex, "vertex");
-  GCFragmentShaderComponent::InstanceInformation *fragInst = info->add(&GCStandardSurface::fragment, "fragment");
+    GCShaderComponentPointerArray::InstanceInformation *componentsInst = info->child(&GCStandardSurface::components);
+    SPropertyInformation *componentsInfo = info->extendContainedProperty(componentsInst);
 
-  GCShaderComponentPointerArray::InstanceInformation *componentsInst = info->child(&GCStandardSurface::components);
-  SPropertyInformation *componentsInfo = info->extendContainedProperty(componentsInst);
+    Pointer::InstanceInformation *fragPtrInst = componentsInfo->add<GCShaderComponentPointer>("FragmentPtr");
+    fragPtrInst->setDefaultInput(fragInst);
 
-  Pointer::InstanceInformation *fragPtrInst = componentsInfo->add<GCShaderComponentPointer>("FragmentPtr");
-  fragPtrInst->setDefaultInput(fragInst);
-
-  Pointer::InstanceInformation *vertPtrInst = componentsInfo->add<GCShaderComponentPointer>("VertexPtr");
-  vertPtrInst->setDefaultInput(vertInst);
-
-  return info;
+    Pointer::InstanceInformation *vertPtrInst = componentsInfo->add<GCShaderComponentPointer>("VertexPtr");
+    vertPtrInst->setDefaultInput(vertInst);
+    }
   }
 
 GCStandardSurface::GCStandardSurface()

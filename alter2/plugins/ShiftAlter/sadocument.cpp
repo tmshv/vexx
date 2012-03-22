@@ -11,30 +11,29 @@ void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocumen
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument)
 
-SPropertyInformation *SDocument::createTypeInformation()
+void SDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<SDocument>("SDocument");
+  if(data.registerAttributes)
+    {
+    SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
+    transientInst->setMode(SPropertyInstanceInformation::Internal);
 
-  SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
-  transientInst->setMode(SPropertyInstanceInformation::Internal);
+    StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
+    filenameInst->setMode(SPropertyInstanceInformation::Internal);
 
-  StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
-  filenameInst->setMode(SPropertyInstanceInformation::Internal);
+    UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
+    rev->setCompute(incrementRevision);
+    rev->setMode(SPropertyInstanceInformation::Internal);
 
+    PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
+    fCS->setAffects(rev);
+    fCS->setMode(SPropertyInstanceInformation::Internal);
+    }
 
-  UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
-  rev->setCompute(incrementRevision);
-  rev->setMode(SPropertyInstanceInformation::Internal);
-
-
-  PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
-  fCS->setAffects(rev);
-  fCS->setMode(SPropertyInstanceInformation::Internal);
-
-
-  info->addInheritedInterface<SDocument, SHandler>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<SDocument, SHandler>();
+    }
   }
 
 SDocument::SDocument()

@@ -2,9 +2,8 @@
 
 S_IMPLEMENT_PROPERTY(GCRenderable)
 
-SPropertyInformation *GCRenderable::createTypeInformation()
+void GCRenderable::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<GCRenderable>("GCRenderable");
   }
 
 GCRenderable::GCRenderable()

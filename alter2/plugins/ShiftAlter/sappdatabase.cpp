@@ -4,16 +4,15 @@
 
 S_IMPLEMENT_PROPERTY(SAppDatabase)
 
-SPropertyInformation *SAppDatabase::createTypeInformation()
+void SAppDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<SAppDatabase>("SAppDatabase");
+  if(data.registerAttributes)
+    {
+    SPropertyArray::InstanceInformation *childInst = info->child(&SAppDatabase::children);
+    SPropertyInformation* childrenExt = info->extendContainedProperty(childInst);
 
-  SPropertyArray::InstanceInformation *childInst = info->child(&SAppDatabase::children);
-  SPropertyInformation* childrenExt = info->extendContainedProperty(childInst);
-
-  childrenExt->add(&SAppDatabase::settings, "settings");
-
-  return info;
+    childrenExt->add(&SAppDatabase::settings, "settings");
+    }
   }
 
 SAppDatabase::SAppDatabase() : SDatabase(), _plugin(0)

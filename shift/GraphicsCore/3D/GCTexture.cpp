@@ -3,11 +3,8 @@
 S_IMPLEMENT_PROPERTY(GCTexture)
 
 
-SPropertyInformation *GCTexture::createTypeInformation()
+void GCTexture::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCTexture>("GCTexture");
-
-  return info;
   }
 
 GCTexture::GCTexture()

@@ -4,9 +4,8 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyContainer)
 
-SPropertyInformation *SPropertyContainer::createTypeInformation()
+void SPropertyContainer::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SPropertyContainer>("SPropertyContainer");
   }
 
 SPropertyContainer::TreeChange::TreeChange(SPropertyContainer *b, SPropertyContainer *a, SProperty *ent, xsize index)

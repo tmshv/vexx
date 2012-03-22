@@ -1,7 +1,7 @@
 #include "mcimage.h"
 #include "QImage"
 
-void MCImage::computeImageOutput(const SPropertyInstanceInformation*, MCImage *image)
+void MCImage::computeImageOutput(const SPropertyInstanceInformation* , MCImage *image)
   {
   QImage imInput(image->filename());
 
@@ -59,20 +59,19 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation*, MCImage *i
 
 S_IMPLEMENT_PROPERTY(MCImage)
 
-SPropertyInformation *MCImage::createTypeInformation()
+void MCImage::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<MCImage>("MCImage");
+  if(data.registerAttributes)
+    {
+    MCMathsOperation::InstanceInformation *outputInst = info->child(&MCImage::output);
+    outputInst->setCompute(computeImageOutput);
 
-  MCMathsOperation::InstanceInformation *outputInst = info->child(&MCImage::output);
-  outputInst->setCompute(computeImageOutput);
+    BoolProperty::InstanceInformation *preMultInst = info->add(&MCImage::premultiply, "premultiply");
+    preMultInst->setAffects(outputInst);
 
-  BoolProperty::InstanceInformation *preMultInst = info->add(&MCImage::premultiply, "premultiply");
-  preMultInst->setAffects(outputInst);
-
-  StringProperty::InstanceInformation *filenameInst = info->add(&MCImage::filename, "filename");
-  filenameInst->setAffects(outputInst);
-
-  return info;
+    StringProperty::InstanceInformation *filenameInst = info->add(&MCImage::filename, "filename");
+    filenameInst->setAffects(outputInst);
+    }
   }
 
 MCImage::MCImage()

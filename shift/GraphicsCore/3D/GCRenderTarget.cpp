@@ -9,25 +9,24 @@ void computeAspectRatio(const SPropertyInstanceInformation *, GCRenderTarget *vp
   }
 
 
-SPropertyInformation *GCRenderTarget::createTypeInformation()
+void GCRenderTarget::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCRenderTarget>("GCRenderTarget");
+  if(data.registerAttributes)
+    {
+    GCRenderablePointer::InstanceInformation *sourceInst = info->add(&GCRenderTarget::source, "source");
+    sourceInst->setMode(SPropertyInstanceInformation::InternalInput);
 
-  GCRenderablePointer::InstanceInformation *sourceInst = info->add(&GCRenderTarget::source, "source");
-  sourceInst->setMode(SPropertyInstanceInformation::InternalInput);
+    FloatProperty::InstanceInformation* aR = info->add(&GCRenderTarget::aspectRatio, "aspectRatio");
+    aR->setCompute(computeAspectRatio);
+    aR->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation* aR = info->add(&GCRenderTarget::aspectRatio, "aspectRatio");
-  aR->setCompute(computeAspectRatio);
-  aR->setDefault(1.0f);
-
-  UnsignedIntProperty::InstanceInformation *width = info->add(&GCRenderTarget::width, "width");
-  width->setAffects(aR);
-  width->setMode(SPropertyInstanceInformation::Output);
-  UnsignedIntProperty::InstanceInformation *height = info->add(&GCRenderTarget::height, "height");
-  height->setAffects(aR);
-  height->setMode(SPropertyInstanceInformation::Output);
-
-  return info;
+    UnsignedIntProperty::InstanceInformation *width = info->add(&GCRenderTarget::width, "width");
+    width->setAffects(aR);
+    width->setMode(SPropertyInstanceInformation::Output);
+    UnsignedIntProperty::InstanceInformation *height = info->add(&GCRenderTarget::height, "height");
+    height->setAffects(aR);
+    height->setMode(SPropertyInstanceInformation::Output);
+    }
   }
 
 GCRenderTarget::GCRenderTarget()

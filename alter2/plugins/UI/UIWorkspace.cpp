@@ -3,9 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(UIWorkspace)
 
-SPropertyInformation *UIWorkspace::createTypeInformation()
+void UIWorkspace::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<UIWorkspace>("UIWorkspace");
   }
 
 UIWorkspace::UIWorkspace()

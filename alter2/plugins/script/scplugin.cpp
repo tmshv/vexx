@@ -168,7 +168,7 @@ void ScPlugin::load()
   include("CoreStartup.js");
   }
 
-void ScPlugin::enableDebugging(bool enable)
+void ScPlugin::enableDebugging(bool)
   {
 //  initDebugger();
 //  emit debuggingStateChanged(enable);

@@ -3,14 +3,13 @@
 
 S_IMPLEMENT_PROPERTY(MCMathsOperation)
 
-SPropertyInformation *MCMathsOperation::createTypeInformation()
+void MCMathsOperation::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<MCMathsOperation>("MCMathsOperation");
-
-  XInterface<MCMathsOperation> *ifc = info->apiInterface<MCMathsOperation>();
-  ifc->addMethod<bool (QString), &MCMathsOperation::saveResultToFile>("saveResultToFile");
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    XInterface<MCMathsOperation> *ifc = info->apiInterface<MCMathsOperation>();
+    ifc->addMethod<bool (QString), &MCMathsOperation::saveResultToFile>("saveResultToFile");
+    }
   }
 
 void MCMathsOperation::assignProperty(const SProperty *f, SProperty *t)
@@ -56,9 +55,9 @@ QImage MCMathsOperation::asQImage(const XVectorI2D &pt, xuint32 scale, xuint32 w
   }
 
 bool MCMathsOperation::saveResultToFile(QString filename)
-  {/*
+  {
   QImage im = asQImage();
-  im.save(filename);*/
+  im.save(filename);
   return true;
   }
 

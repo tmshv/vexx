@@ -8,16 +8,19 @@
 
 S_IMPLEMENT_PROPERTY(SDatabase)
 
-SPropertyInformation *SDatabase::createTypeInformation()
+void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation* info = SPropertyInformation::create<SDatabase>("SDatabase");
-  info->add(&SDatabase::majorVersion, "majorVersion")->setDefault(0);
-  info->add(&SDatabase::minorVersion, "minorVersion")->setDefault(0);
-  info->add(&SDatabase::revision, "revision")->setDefault(0);
+  if(data.registerAttributes)
+    {
+    info->add(&SDatabase::majorVersion, "majorVersion")->setDefault(0);
+    info->add(&SDatabase::minorVersion, "minorVersion")->setDefault(0);
+    info->add(&SDatabase::revision, "revision")->setDefault(0);
+    }
 
-  info->addInheritedInterface<SDatabase, SHandler>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<SDatabase, SHandler>();
+    }
   }
 
 SDatabase::SDatabase()

@@ -3,35 +3,30 @@
 
 S_IMPLEMENT_PROPERTY(SFloatArrayProperty)
 
-SPropertyInformation *SFloatArrayProperty::createTypeInformation()
+void SFloatArrayProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SFloatArrayProperty>("SFloatArrayProperty");
   }
 
 S_IMPLEMENT_PROPERTY(SUIntArrayProperty)
 
-SPropertyInformation *SUIntArrayProperty::createTypeInformation()
+void SUIntArrayProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SUIntArrayProperty>("SUIntArrayProperty");
   }
 
 S_IMPLEMENT_PROPERTY(SVector2ArrayProperty)
 
-SPropertyInformation *SVector2ArrayProperty::createTypeInformation()
+void SVector2ArrayProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SVector2ArrayProperty>("SVector2ArrayProperty");
   }
 
 S_IMPLEMENT_PROPERTY(SVector3ArrayProperty)
 
-SPropertyInformation *SVector3ArrayProperty::createTypeInformation()
+void SVector3ArrayProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SVector3ArrayProperty>("SVector3ArrayProperty");
   }
 
 S_IMPLEMENT_PROPERTY(SVector4ArrayProperty)
 
-SPropertyInformation *SVector4ArrayProperty::createTypeInformation()
+void SVector4ArrayProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SVector4ArrayProperty>("SVector4ArrayProperty");
   }

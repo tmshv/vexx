@@ -65,10 +65,11 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
   STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj)
+SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj, const SPropertyInformationCreateData& data)
   {
   xAssert(obj->_copy);
-  SPropertyInformation *copy = obj->_copy();
+  SPropertyInformation *copy = SPropertyInformation::allocate();
+  obj->_copy(copy, data);
   return copy;
   }
 
@@ -109,8 +110,12 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 
 SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
   {
+  SPropertyInformationCreateData data;
+  data.registerAttributes = true;
+  data.registerInterfaces = false;
+
   const SPropertyInformation *oldInst = inst->childInformation();
-  SPropertyInformation *info = SPropertyInformation::create(oldInst);
+  SPropertyInformation *info = SPropertyInformation::create(oldInst, data);
 
   info->setParentTypeInformation(oldInst);
 
