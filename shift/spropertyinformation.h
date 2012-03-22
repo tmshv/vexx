@@ -404,7 +404,7 @@ public:
   static void recursiveCreateTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
     {
     SPropertyInformationCreateHelper<PropType::ParentType>::recursiveCreateTypeInformation(info, data);
-    PropType::ParentType::createTypeInformation(info, data);
+    PropType::createTypeInformation(info, data);
     }
   };
 
@@ -434,6 +434,7 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->setShouldSave(PropType::shouldSaveProperty);
   info->setShouldSaveValue(PropType::shouldSavePropertyValue);
   info->setAssign(PropType::assignProperty);
+  info->setPostCreate(0);
   info->setPostChildSet(PropType::postChildSet);
   info->setVersion(PropType::Version);
   info->setSize(sizeof(PropType));

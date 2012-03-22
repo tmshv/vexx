@@ -32,7 +32,7 @@ QString formatClassName(const QString &n)
   }
 
 const char *qobjectName = "QObject";
-void XQObjectWrapper::initiate(XScriptContext *c)
+void XQObjectWrapper::initiate(XScriptEngine *c)
   {
   instance()->_context = c;
 

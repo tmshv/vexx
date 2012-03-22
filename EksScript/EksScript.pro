@@ -20,8 +20,7 @@ SOURCES += XScriptGlobal.cpp \
     XScriptObject.cpp \
     XQObjectWrapper.cpp \
     XFunctions.cpp \
-    XScriptEngine.cpp \
-    XScriptContext.cpp
+    XScriptEngine.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \
@@ -47,8 +46,7 @@ HEADERS += XScriptGlobal.h \
     XScriptSource.h \
     XScriptObject.h \
     XQObjectWrapper.h \
-    XScriptEngine.h \
-    XScriptContext.h
+    XScriptEngine.h
 
 LIBS += -lQtV8 -lEksCore
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/qtjsbackend/src/3rdparty/v8/include

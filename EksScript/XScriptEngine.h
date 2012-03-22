@@ -3,6 +3,11 @@
 
 #include "XScriptGlobal.h"
 
+class XScriptValue;
+class XScriptArguments;
+class XScriptObject;
+class XInterfaceBase;
+
 class EKSSCRIPT_EXPORT XScriptEngine
   {
 public:
@@ -14,10 +19,12 @@ public:
   static void initiate();
   static void terminate();
 
-  class Impl;
+  typedef XScriptValue (*Function)( XScriptArguments const & argv );
 
-private:
-  Impl *_impl;
+  void set(const QString& in, const XScriptObject& obj);
+  void set(const QString& in, Function fn);
+
+  void addInterface(const XInterfaceBase *i);
   };
 
 #endif // XSCRIPTENGINE_H

@@ -8,7 +8,7 @@
 #include "XScriptFunction.h"
 #include "UIPlugin.h"
 #include "acore.h"
-#include "XScriptContext.h"
+#include "XScriptEngine.h"
 #include "scshiftentity.h"
 #include "QDir"
 #include "aplugin.h"
@@ -87,7 +87,7 @@ void ScPlugin::pluginAdded(const QString &type)
 
 void ScPlugin::pluginRemoved(const QString &type)
   {
-  _context->set(type, XScriptValue());
+  _engine->set(type, XScriptValue());
 
   if(type == "db")
     {
@@ -118,16 +118,15 @@ void ScPlugin::load()
   {
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new XScriptEngine();
-  _context = new XScriptContext(_engine);
 
-  _context->set("print", printFn);
+  _engine->set("print", printFn);
 
   registerScriptGlobal(this);
 
   APlugin<SPlugin> db(this, "db");
   xAssert(db.isValid());
 
-  _context->set("dbTypes", XScriptValue(XScriptObject::newObject()));
+  _engine->set("dbTypes", XScriptValue(XScriptObject::newObject()));
 
   connect(_types, SIGNAL(typeAdded(QString)), this, SIGNAL(typeAdded(QString)));
   connect(_types, SIGNAL(typeRemoved(QString)), this, SIGNAL(typeRemoved(QString)));
@@ -267,18 +266,18 @@ void ScPlugin::includeFolder(const QString &folder)
 void ScPlugin::registerScriptGlobal(QObject *in)
   {
   XScriptValue objectValue = XScriptConvert::to(in);
-  _context->set(in->objectName(), objectValue);
+  _engine->set(in->objectName(), objectValue);
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, QObject *in)
   {
   XScriptValue objectValue = XScriptConvert::to(in);
-  _context->set(name, objectValue);
+  _engine->set(name, objectValue);
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, const XScriptValue &val)
   {
-  _context->set(name, val);
+  _engine->set(name, val);
   }
 
 bool ScPlugin::executeFile(const QString &filename)

@@ -7,7 +7,6 @@
 #include "styperegistry.h"
 class ScCoreObject;
 class XScriptEngine;
-class XScriptContext;
 class ScObject;
 class ScInputThread;
 class ScSurface;
@@ -69,7 +68,6 @@ private:
   virtual void pluginRemoved(const QString &type);
 
   XScriptEngine *_engine;
-  XScriptContext *_context;
 
   ScSurface *_surface;
 
