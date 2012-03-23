@@ -56,6 +56,12 @@ XScriptEngine::~XScriptEngine()
   v8::V8::LowMemoryNotification();
   }
 
+XScriptObject XScriptEngine::get(const QString& name)
+  {
+  XScriptValue propName = XScriptConvert::to(name);
+  return fromHandle(g_engine->context->Global()->Get(getV8Internal(propName)));
+  }
+
 void XScriptEngine::set(const QString& in, const XScriptObject& obj)
   {
   XScriptValue propName = XScriptConvert::to(in);

@@ -91,6 +91,7 @@ void ScPlugin::pluginRemoved(const QString &type)
 
   if(type == "db")
     {
+    STypeRegistry::removeTypeObserver(this);
     delete _model;
     _model = 0;
     }
@@ -99,6 +100,22 @@ void ScPlugin::pluginRemoved(const QString &type)
     delete _surface;
     _surface = 0;
     }
+  }
+
+void ScPlugin::typeAdded(const SPropertyInformation *info)
+  {
+  _engine->addInterface(info->apiInterface());
+
+  XScriptValue arr = _engine->get("db").get("types");
+
+  XScriptObject obj(arr);
+  xAssert(obj.isValid());
+
+  info->apiInterface()->addClassTo(info->typeName(), obj);
+  }
+
+void ScPlugin::typeRemoved(const SPropertyInformation *)
+  {
   }
 
 XScriptValue printFn(XScriptArguments const &args)
@@ -126,23 +143,21 @@ void ScPlugin::load()
   APlugin<SPlugin> db(this, "db");
   xAssert(db.isValid());
 
-  _engine->set("dbTypes", XScriptValue(XScriptObject::newObject()));
+  //XScriptObject_engine->set("dbTypes", XScriptValue(XScriptObject::newObject()));
 
   connect(_types, SIGNAL(typeAdded(QString)), this, SIGNAL(typeAdded(QString)));
   connect(_types, SIGNAL(typeRemoved(QString)), this, SIGNAL(typeRemoved(QString)));
 
   registerScriptGlobal("db", XScriptConvert::to(&db->db()));
 
-  /*QScriptValue dbObject = _context->set(engine()->globalObject().property("db");
+  STypeRegistry::addTypeObserver(this);
+  XScriptObject dbObject = _engine->get("db");
+  dbObject.set("types", XScriptObject::newObject());
+
   foreach(const SPropertyInformation *t, STypeRegistry::types())
     {
-    QScriptValue type = dbObject.property(t->typeName());
-    if(type.isNull())
-      {
-      type = _engine->newObject();
-      type.setProperty("typeName", t->typeName());
-      }
-    }*/
+    typeAdded(t);
+    }
 
   qmlRegisterType<ScPath>("VexxQMLExtensions", 1, 0, "Path");
   qmlRegisterType<ScEllipse>("VexxQMLExtensions", 1, 0, "Ellipse");

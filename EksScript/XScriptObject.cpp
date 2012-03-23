@@ -103,6 +103,20 @@ XScriptValue XScriptObject::getPrototype() const
   return fromHandle(internal->_object->GetPrototype());
   }
 
+XScriptValue XScriptObject::get(const QString &n)
+  {
+  XScriptValue key = XScriptConvert::to(n);
+  const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);
+  return fromHandle(internal->_object->Get(getV8Internal(key)));
+  }
+
+void XScriptObject::set(const QString &n, const XScriptValue &v)
+  {
+  XScriptValue key = XScriptConvert::to(n);
+  const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);
+  internal->_object->Set(getV8Internal(key), getV8Internal(v));
+  }
+
 bool XScriptObject::isValid() const
   {
   const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);

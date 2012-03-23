@@ -35,7 +35,7 @@ XScriptValue XScriptSource::run(bool *error)
     *error = false;
   }
 
-  if (result.IsEmpty())
+  if (trycatch.HasCaught())
     {
     if(error)
       {

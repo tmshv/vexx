@@ -203,7 +203,7 @@ bool XScriptValue::toBoolean() const
 QString XScriptValue::toString() const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  v8::Handle<v8::String> str =  internal->_object.As<v8::String>();
+  v8::Handle<v8::String> str = internal->_object->ToString();
 
   QString strOut;
   strOut.resize(str->Length());

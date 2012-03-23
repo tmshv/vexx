@@ -3,6 +3,7 @@
 
 #include "scglobal.h"
 #include "aabstractplugin.h"
+#include "styperegistry.h"
 
 #include "styperegistry.h"
 class ScCoreObject;
@@ -14,7 +15,7 @@ class SDatabaseModel;
 class XScriptValue;
 class XScriptFunction;
 
-class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin
+class SCRIPT_EXPORT ScPlugin : public AAbstractPlugin, STypeRegistry::Observer
   {
   Q_OBJECT
 
@@ -66,6 +67,9 @@ private:
 
   virtual void pluginAdded(const QString &type);
   virtual void pluginRemoved(const QString &type);
+
+  virtual void typeAdded(const SPropertyInformation *);
+  virtual void typeRemoved(const SPropertyInformation *);
 
   XScriptEngine *_engine;
 

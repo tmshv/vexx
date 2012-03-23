@@ -26,6 +26,9 @@ public:
   XInterfaceBase *getInterface() const;
   XScriptValue getPrototype() const;
 
+  XScriptValue get(const QString &);
+  void set(const QString &, const XScriptValue &);
+
   bool isValid() const;
 
   typedef void (*WeakDtor)(XPersistentScriptValue object, void* p);
