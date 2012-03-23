@@ -20,6 +20,7 @@ public:
   XScriptValue(const QString &str);
   XScriptValue(const XScriptObject &str);
   XScriptValue(const QVariant& val);
+  XScriptValue(void* val);
   ~XScriptValue();
 
   XScriptValue(const XScriptValue&);

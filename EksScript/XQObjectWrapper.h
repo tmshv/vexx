@@ -46,8 +46,7 @@ template <> struct NativeToJS<QObject>
 
 namespace XScript
 {
-typedef XSignature< QObject (XScript::CtorForwarder<QObject *()> )> QObjectCtors;
-template <> class ClassCreator_Factory<QObject> : public ClassCreatorCopyableFactory<QObject, QObjectCtors> {};
+template <> class ClassCreator_Factory<QObject> : public ClassCreatorConvertableFactory<QObject> {};
 }
 
 #endif // XQOBJECTWRAPPER_H

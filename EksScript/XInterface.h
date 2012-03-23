@@ -79,8 +79,6 @@ public:
   void unwrapInstance(XScriptObject object) const;
 
   XScriptObject newInstance(int argc, XScriptValue argv[]) const;
-  XScriptObject newInstanceBase() const;
-
   XScriptFunction constructorFunction() const;
   void set(const char *name, XScriptValue val);
 
@@ -540,8 +538,8 @@ template <typename T> struct NativeToJSConvertableType
   XScriptValue operator()(T *n) const
     {
     const XInterfaceBase* interface = findInterface<T>(n);
-    XScriptObject self = interface->newInstanceBase();
-    interface->wrapInstance(self, n);
+    XScriptValue vals[1] = { n };
+    XScriptObject self = interface->newInstance(1, vals);
     return self;
     }
   XScriptValue operator()(T &n) const
@@ -556,8 +554,8 @@ template <typename T, typename BASE> struct NativeToJSConvertableTypeInherited
     {
     BASE* base = n;
     const XInterfaceBase* interface = findInterface<T>(n);
-    XScriptObject self = interface->newInstanceBase();
-    interface->wrapInstance(self, base);
+    XScriptValue vals[1] = { base };
+    XScriptObject self = interface->newInstance(1, vals);
     return self;
     }
   XScriptValue operator()(T &n) const
@@ -596,8 +594,10 @@ template <typename T> class ClassCreatorConvertableFactory
 public:
   typedef T* ReturnType;
 
-  static T *Create(XScriptObject &, XScriptArguments const &)
+  static T *Create(XScriptObject &, XScriptArguments const &args)
   {
+    xAssert(args.length() == 1);
+    XScriptValue val = args.at(0);
     /*typedef XScript::CtorArityDispatcher<CTORS> Proxy;
     T *b = Proxy::Call(argv);
     if(b)
@@ -606,8 +606,7 @@ public:
     }
     XScriptEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
     return b;*/
-    xAssertFail();
-    return 0;
+    return (T*)val.toExternal();
   }
 
   static void Delete(T *obj)
@@ -665,7 +664,7 @@ public:
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
   namespace XScriptConvert { namespace internal { \
-  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableTypeInherited<type, base> {}; } } \
   namespace XScript { \
   template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
 
@@ -678,6 +677,7 @@ public:
 
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)
+
 }
 
 #endif // XINTERFACE_H

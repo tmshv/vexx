@@ -3,6 +3,7 @@
 #include "XInterface.h"
 #include "XConvertToScript.h"
 #include "XScriptValueV8Internals.h"
+#include "XQObjectWrapper.h"
 #include "v8.h"
 
 struct StaticEngine
@@ -47,6 +48,7 @@ void XScriptEngine::terminate()
 
 XScriptEngine::XScriptEngine()
   {
+  XQObjectWrapper::initiate(this);
   }
 
 XScriptEngine::~XScriptEngine()
@@ -81,7 +83,7 @@ void XScriptEngine::adjustAmountOfExternalAllocatedMemory(int in)
   v8::V8::AdjustAmountOfExternalAllocatedMemory(in);
   }
 
-v8::Handle<v8::ObjectTemplate> getGlobalTemplate(XScriptEngine *e)
+v8::Handle<v8::ObjectTemplate> getGlobalTemplate(XScriptEngine *)
   {
   return g_engine->globalTemplate;
   }

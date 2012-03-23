@@ -133,6 +133,12 @@ XScriptValue::XScriptValue(const QVariant& val)
     }
   }
 
+XScriptValue::XScriptValue(void* val)
+  {
+  XScriptValueInternal *internal = XScriptValueInternal::init(this);
+  internal->_object = v8::External::New(val);
+  }
+
 XScriptValue::~XScriptValue()
   {
   XScriptValueInternal::term(this);

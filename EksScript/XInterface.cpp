@@ -145,11 +145,6 @@ XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[]) const
   return fromObjectHandle(getV8Internal(constructorFunction())->NewInstance(argc, getV8Internal(argv)));
   }
 
-XScriptObject XInterfaceBase::newInstanceBase() const
-  {
-  return fromObjectHandle((*constructor(_constructor))->InstanceTemplate()->NewInstance());
-  }
-
 void XInterfaceBase::set(const char *name, XScriptValue val)
   {
   (*::prototype(_prototype))->Set(v8::String::NewSymbol(name), getV8Internal(val));

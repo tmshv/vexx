@@ -53,8 +53,8 @@ XScriptObject XQObjectWrapper::wrap(QObject *obj)
   {
   const XInterfaceBase* interface = findInterface(obj->metaObject());
 
-  XScriptObject self = interface->newInstanceBase();
-  interface->wrapInstance(self, obj);
+  XScriptValue vals[1] = { obj };
+  XScriptObject self = interface->newInstance(1, vals);
 
   return self;
   }
