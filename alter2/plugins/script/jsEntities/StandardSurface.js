@@ -1,4 +1,4 @@
-db.addType({
+db.types.registerType({
   "name": "StandardSurface",
   "parent": "GCShader",
   "properties": [

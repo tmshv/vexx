@@ -3,6 +3,7 @@
 
 #include "XScriptTypeInfo.h"
 #include "XScriptValue.h"
+#include "XAssert"
 
 namespace XScriptConvert
 {

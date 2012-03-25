@@ -30,6 +30,10 @@ public:
 
   bool isValid() const;
   bool isObject() const;
+  bool isArray() const;
+
+  xsize length() const;
+  XScriptValue at(xsize id);
 
   void *toExternal() const;
   double toNumber() const;

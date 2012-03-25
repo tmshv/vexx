@@ -44,7 +44,7 @@ public:
   Q_INVOKABLE QWidget *addQMLWindow(const QString &url, const QVariantMap &qmlData=QVariantMap());
   Q_INVOKABLE QObject *addQMLSurface(const QString &name, const QString &type, const QString &url, const QVariantMap &qmlData=QVariantMap());
 
-  static XScriptValue call(XScriptFunction fn, XScriptValue th, const QVector<XScriptValue> &args);
+  static XScriptValue call(XScriptFunction fn, XScriptValue th, const XScriptValue *val, xsize argCount);
 
   void registerScriptGlobal(QObject *);
   void registerScriptGlobal(const QString &, QObject *);

@@ -10,11 +10,17 @@ class XScriptArguments;
 class EKSSCRIPT_EXPORT XScriptFunction
   {
 public:
+  typedef XScriptValue (*Function)( XScriptArguments const & argv );
+  XScriptFunction(Function fn);
+
+  XScriptFunction(const XScriptValue& );
   XScriptFunction();
   ~XScriptFunction();
 
   XScriptFunction(const XScriptFunction&);
   XScriptFunction& operator=(const XScriptFunction&);
+
+  bool isValid() const;
 
   XScriptValue callWithTryCatch(const XScriptObject &thisObject, int argc, const XScriptValue args[], bool *error) const;
   XScriptValue call(const XScriptObject &thisObject, int argc, const XScriptValue args[]) const;

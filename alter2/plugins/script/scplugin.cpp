@@ -28,6 +28,7 @@
 #include "QMLExtensions/scmousearea.h"
 #include "QGLWidget"
 #include "scdeclarativesurface.h"
+#include "scdbutils.h"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -152,7 +153,11 @@ void ScPlugin::load()
 
   STypeRegistry::addTypeObserver(this);
   XScriptObject dbObject = _engine->get("db");
-  dbObject.set("types", XScriptObject::newObject());
+  XScriptObject types = XScriptObject::newObject();
+  dbObject.set("types", types);
+
+  types.set("registerType", XScriptValue(XScriptFunction(registerTypeFn)));
+  types.set("registerExporter", XScriptValue(XScriptFunction(registerExporterFn)));
 
   foreach(const SPropertyInformation *t, STypeRegistry::types())
     {
@@ -317,12 +322,10 @@ XScriptEngine *ScPlugin::engine()
   return _engine;
   }
 
-XScriptValue ScPlugin::call(XScriptFunction fn, XScriptValue th, const QVector<XScriptValue> &args)
+XScriptValue ScPlugin::call(XScriptFunction fn, XScriptValue th, const XScriptValue *val, xsize argCount)
   {
-  const XScriptValue *argPtr = args.size() ? &args.front() : 0;
-
   bool error = false;
-  XScriptValue ret = fn.callWithTryCatch(th, args.size(), argPtr, &error);
+  XScriptValue ret = fn.callWithTryCatch(th, argCount, val, &error);
 
   if(error)
     {

@@ -51,6 +51,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
 
   (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
 
+  (*constructor(_constructor))->Set("typeName", v8::String::New((uint16_t*)typeName.constData(), typeName.length()));
   if(parent)
     {
     inherit(parent);
@@ -179,8 +180,10 @@ void XInterfaceBase::inherit(const XInterfaceBase *parentType)
 
 void XInterfaceBase::addChildInterface(int typeId, UpCastFn fn)
   {
-  xAssert(!_upcasts.contains(typeId));
-  _upcasts.insert(typeId, fn);
+  if(!_upcasts.contains(typeId))
+    {
+    _upcasts.insert(typeId, fn);
+    }
   }
 
 void *XInterfaceBase::prototype()

@@ -99,6 +99,21 @@ struct XAccessorInfoInternal
   };
 xCompileTimeAssert(sizeof(XAccessorInfo) == sizeof(XAccessorInfoInternal));
 
+XScriptFunction::XScriptFunction(Function fn)
+  {
+  XScriptFunctionInternal *internal = XScriptFunctionInternal::init(this);
+
+  v8::Handle<v8::FunctionTemplate> fnTmpl = ::v8::FunctionTemplate::New((v8::InvocationCallback)fn);
+  internal->_object = fnTmpl->GetFunction();
+  }
+
+XScriptFunction::XScriptFunction(const XScriptValue &other)
+  {
+  const v8::Handle<v8::Value> otherInternal = getV8Internal(other);
+  XScriptFunctionInternal *internal = XScriptFunctionInternal::init(this);
+  internal->_object = v8::Handle<v8::Function>(v8::Function::Cast(*otherInternal));
+  }
+
 XScriptFunction::XScriptFunction()
   {
   XScriptFunctionInternal::init(this);
@@ -125,9 +140,16 @@ XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, const XS
   {
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
-  return (func->_object.IsEmpty() || func->_object.IsEmpty())
+  return (func->_object.IsEmpty() || !func->_object->IsFunction())
       ? Toss("Illegal argument: empty v8::Handle<>.")
       : fromHandle(func->_object->Call(getV8Internal(self), argc, getV8Internal(args)));
+  }
+
+bool XScriptFunction::isValid() const
+  {
+  const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
+
+  return (func->_object.IsEmpty() || !func->_object->IsFunction());
   }
 
 XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue args[], bool *error) const

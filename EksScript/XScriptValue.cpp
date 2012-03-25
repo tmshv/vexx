@@ -176,6 +176,26 @@ bool XScriptValue::isObject() const
   return internal->_object->IsObject();
   }
 
+bool XScriptValue::isArray() const
+  {
+  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  return internal->_object->IsArray();
+  }
+
+xsize XScriptValue::length() const
+  {
+  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  v8::Handle<v8::Array> arr = internal->_object.As<v8::Array>();
+  return arr->Length();
+  }
+
+XScriptValue XScriptValue::at(xsize id)
+  {
+  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  v8::Handle<v8::Array> arr = internal->_object.As<v8::Array>();
+  return fromHandle(arr->Get(id));
+  }
+
 void *XScriptValue::toExternal() const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -191,13 +211,21 @@ double XScriptValue::toNumber() const
 xint64 XScriptValue::toInteger() const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  return internal->_object.As<v8::Integer>()->Value();
+  if(internal->_object->IsNumber())
+    {
+    return internal->_object.As<v8::Number>()->Value();
+    }
+  return 0;
   }
 
 bool XScriptValue::toBoolean() const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  return internal->_object->ToBoolean()->Value();
+  if(internal->_object->IsBoolean())
+    {
+    return internal->_object->ToBoolean()->Value();
+    }
+  return false;
   }
 
 QString XScriptValue::toString() const

@@ -62,6 +62,13 @@ XScriptObject::XScriptObject(const XScriptValue &other)
   internal->_object = v8::Handle<v8::Object>(v8::Object::Cast(*otherInternal));
   }
 
+XScriptObject::XScriptObject(const XScriptFunction &other)
+  {
+    v8::Handle<v8::Function> otherInternal = getV8Internal(other);
+  XScriptObjectInternal *internal = XScriptObjectInternal::init(this);
+  internal->_object = otherInternal;
+  }
+
 XScriptObject& XScriptObject::operator=(const XScriptObject &other)
   {
   XScriptObjectInternal::term(this);
@@ -103,7 +110,7 @@ XScriptValue XScriptObject::getPrototype() const
   return fromHandle(internal->_object->GetPrototype());
   }
 
-XScriptValue XScriptObject::get(const QString &n)
+XScriptValue XScriptObject::get(const QString &n) const
   {
   XScriptValue key = XScriptConvert::to(n);
   const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);

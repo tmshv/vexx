@@ -65,11 +65,25 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
   STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj, const SPropertyInformationCreateData& data)
+SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *obj)
   {
-  xAssert(obj->_copy);
+  xAssert(obj->_derive);
   SPropertyInformation *copy = SPropertyInformation::allocate();
-  obj->_copy(copy, data);
+
+
+  SPropertyInformation::initiate<PropType>(info, typeName);
+
+  SPropertyInformationCreateData data;
+  data.registerAttributes = true;
+  data.registerInterfaces = false;
+  SPropertyInformationCreateHelper<PropType::ParentType>::recursiveCreateTypeInformation(info, data);
+
+  copy->setParentTypeInformation(obj);
+
+  obj->_derive(copy, data);
+  //SPropertyInformationCreateHelper<T>::create(copy, name);
+
+  xAssert(copy);
   return copy;
   }
 
@@ -110,14 +124,8 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 
 SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
   {
-  SPropertyInformationCreateData data;
-  data.registerAttributes = true;
-  data.registerInterfaces = false;
-
   const SPropertyInformation *oldInst = inst->childInformation();
-  SPropertyInformation *info = SPropertyInformation::create(oldInst, data);
-
-  info->setParentTypeInformation(oldInst);
+  SPropertyInformation *info = SPropertyInformation::derive(oldInst);
 
   info->setExtendedParent(inst);
   inst->setChildInformation(info);

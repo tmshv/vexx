@@ -39,7 +39,8 @@ SOURCES += scplugin.cpp \
     QMLExtensions/scpropertydisplay.cpp \
     QMLExtensions/scconnectoritem.cpp \
     QMLExtensions/scmousearea.cpp \
-    scdeclarativesurface.cpp
+    scdeclarativesurface.cpp \
+    scdbutils.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -60,7 +61,8 @@ HEADERS += scplugin.h \
     QMLExtensions/scpropertydisplay.h \
     QMLExtensions/scconnectoritem.h \
     QMLExtensions/scmousearea.h \
-    scdeclarativesurface.h
+    scdeclarativesurface.h \
+    scdbutils.h
 
 RESOURCES += \
     ScResources.qrc

@@ -159,6 +159,12 @@ private:
 class SPropertyInformationCreateData
   {
 public:
+  SPropertyInformationCreateData()
+    {
+    registerAttributes = false;
+    registerInterfaces = false;
+    }
+
   bool registerAttributes;
   bool registerInterfaces;
   };
@@ -304,7 +310,7 @@ public:
   template <typename T> XInterface<T> *apiInterface();
   template <typename T> const XInterface<T> *apiInterface() const;
 
-  SPropertyInformation *create(const SPropertyInformation *obj, const SPropertyInformationCreateData& data);
+  static SPropertyInformation *derive(const SPropertyInformation *obj);
   template <typename T> static SPropertyInformation *initiate(SPropertyInformation *info, const QString &typeName);
 
   X_ALIGNED_OPERATOR_NEW
@@ -318,7 +324,7 @@ private:
   void dereference() const;
 
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const QString &name, xsize index, xsize location);
-  void (*_copy)(SPropertyInformation *, const SPropertyInformationCreateData& );
+  void (*_copy)(SPropertyInformation *, const QString & );
   CreateInstanceInformationFunction _createInstanceInformation;
 
   mutable InterfaceHash _interfaceFactories;
@@ -441,7 +447,7 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
   info->_createInstanceInformation = createInstanceInformationHelper<PropType>;
-  info->_copy = PropType::createTypeInformation;
+  info->_derive = SPropertyInformationCreateHelper<PropType>::create;
   info->_instances = 0;
   info->_extendedParent = 0;
 
