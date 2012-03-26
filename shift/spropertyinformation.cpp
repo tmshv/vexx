@@ -65,23 +65,42 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
   STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *obj)
+void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyInformation *from)
   {
-  xAssert(obj->_derive);
+  // update template constructor too
+  info->setCreateProperty(from->createProperty());
+  info->setSave(from->save());
+  info->setLoad(from->load());
+  info->setShouldSave(from->shouldSave());
+  info->setShouldSaveValue(from->shouldSaveValue());
+  info->setAssign(from->assign());
+  info->setPostCreate(from->postCreate());
+  info->setPostChildSet(from->postChildSet());
+  info->setVersion(from->version());
+  info->setSize(from->size());
+  info->setInstanceInformationSize(from->instanceInformationSize());
+
+  info->_createInstanceInformation = from->_createInstanceInformation;
+  info->_derive = from->_derive;
+  info->_instances = 0;
+  info->_extendedParent = 0;
+
+  info->_typeName = from->typeName();
+  }
+
+SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *from)
+  {
+  xAssert(from->_derive);
   SPropertyInformation *copy = SPropertyInformation::allocate();
 
-
-  SPropertyInformation::initiate<PropType>(info, typeName);
+  SPropertyInformation::initiate(copy, from);
 
   SPropertyInformationCreateData data;
   data.registerAttributes = true;
   data.registerInterfaces = false;
-  SPropertyInformationCreateHelper<PropType::ParentType>::recursiveCreateTypeInformation(info, data);
 
-  copy->setParentTypeInformation(obj);
-
-  obj->_derive(copy, data);
-  //SPropertyInformationCreateHelper<T>::create(copy, name);
+  from->_derive(copy, data);
+  copy->setParentTypeInformation(from);
 
   xAssert(copy);
   return copy;

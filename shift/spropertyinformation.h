@@ -311,7 +311,8 @@ public:
   template <typename T> const XInterface<T> *apiInterface() const;
 
   static SPropertyInformation *derive(const SPropertyInformation *obj);
-  template <typename T> static SPropertyInformation *initiate(SPropertyInformation *info, const QString &typeName);
+  template <typename T> static void initiate(SPropertyInformation *info, const QString &typeName);
+  static void initiate(SPropertyInformation *info, const SPropertyInformation *from);
 
   X_ALIGNED_OPERATOR_NEW
 
@@ -324,7 +325,7 @@ private:
   void dereference() const;
 
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const QString &name, xsize index, xsize location);
-  void (*_copy)(SPropertyInformation *, const QString & );
+  void (*_derive)(SPropertyInformation *, const SPropertyInformationCreateData &);
   CreateInstanceInformationFunction _createInstanceInformation;
 
   mutable InterfaceHash _interfaceFactories;
@@ -432,8 +433,9 @@ public:
   };
 }
 
-template <typename PropType> SPropertyInformation *SPropertyInformation::initiate(SPropertyInformation *info, const QString &typeName)
+template <typename PropType> void SPropertyInformation::initiate(SPropertyInformation *info, const QString &typeName)
   {
+  // update copy constructor too
   info->setCreateProperty(CreatePropertyHelper<PropType>::run);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
@@ -447,13 +449,11 @@ template <typename PropType> SPropertyInformation *SPropertyInformation::initiat
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
   info->_createInstanceInformation = createInstanceInformationHelper<PropType>;
-  info->_derive = SPropertyInformationCreateHelper<PropType>::create;
+  info->_derive = SPropertyInformationCreateHelper<PropType>::recursiveCreateTypeInformation;
   info->_instances = 0;
   info->_extendedParent = 0;
 
   info->_typeName = typeName;
-
-  return info;
   }
 
 template <typename T, typename U>

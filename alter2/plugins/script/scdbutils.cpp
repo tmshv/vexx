@@ -43,12 +43,11 @@ bool parseChildProperties(SPropertyInformation *newType, XScriptValue properties
   {
   if(propertiesArray.isArray())
     {
-    // First pass, add basic instance information
-    xuint32 i = 0;
-    for(XScriptObject propertyObject = propertiesArray.at(0);
-        propertyObject.isValid();
-        propertyObject = propertiesArray.at(++i))
+    // First pass, add basic instance information    
+    for(xuint32 i = 0; i < propertiesArray.length(); ++i)
       {
+      XScriptObject propertyObject = propertiesArray.at(i);
+
       // Name
       QString propName = propertyObject.get("name").toString();
       if(!propName.length())
@@ -123,11 +122,9 @@ bool postParseChildProperties(SPropertyInformation *newType, XScriptValue proper
   if(propertiesArray.isArray())
     {
     // Second pass, affects information, default inputs
-    xuint32 i = 0;
-    for(XScriptObject propertyObject = propertiesArray.at(0);
-        propertyObject.isValid();
-        propertyObject = propertiesArray.at(++i))
-      {
+    for(xuint32 i = 0; i < propertiesArray.length(); ++i)
+    {
+      XScriptObject propertyObject = propertiesArray.at(i);
       // Name
       QString propName = propertyObject.get("name").toString();
       if(!propName.length())
@@ -259,7 +256,7 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
 
   xuint32 version = XScriptConvert::from<xuint32>(typeObject.get("version"));
 
-  SPropertyInformation *newType = SPropertyInformation::create(parent);
+  SPropertyInformation *newType = SPropertyInformation::derive(parent);
   newType->setVersion(version);
   newType->typeName() = name;
   newType->setParentTypeInformation(parent);
