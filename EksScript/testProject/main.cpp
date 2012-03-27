@@ -27,18 +27,6 @@ int main(int a, char* b[])
   someTempl->seal();
   //someTempl.addPropertyMap<&SomeClass::getOther, &SomeClass::setOther, SomeClass::getOtherStatic, SomeClass::setOtherStatic>();
 
-  XInterface<QPointF> *ptTempl = XInterface<QPointF>::create("Point");
-  ptTempl->addProperty<qreal, qreal, &QPointF::x, &QPointF::setX>("x");
-  ptTempl->addProperty<qreal, qreal, &QPointF::y, &QPointF::setY>("y");
-  ptTempl->seal();
-
-  XInterface<QRectF> *rectTempl = XInterface<QRectF>::create("Rect");
-  rectTempl->addProperty<qreal, qreal, &QRectF::left, &QRectF::setLeft>("left");
-  rectTempl->addProperty<qreal, qreal, &QRectF::right, &QRectF::setRight>("right");
-  rectTempl->addProperty<qreal, qreal, &QRectF::top, &QRectF::setTop>("top");
-  rectTempl->addProperty<qreal, qreal, &QRectF::bottom, &QRectF::setBottom>("bottom");
-  rectTempl->addProperty<QPointF, const QPointF &, &QRectF::topLeft, &QRectF::setTopLeft>("topLeft");
-  rectTempl->seal();
 
   XInterface<Inheritable> *aTempl = XInterface<Inheritable>::create("Inheritable");
   aTempl->addProperty<int, int, &Inheritable::getA, &Inheritable::setA>("a");

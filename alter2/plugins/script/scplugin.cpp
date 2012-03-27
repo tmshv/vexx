@@ -307,7 +307,7 @@ bool ScPlugin::executeFile(const QString &filename)
   if(file.exists() && file.open( QIODevice::ReadOnly))
     {
     QString data(QString::fromUtf8(file.readAll()));
-    return execute(data);
+    return execute(filename, data);
     }
   return false;
   }
@@ -366,17 +366,18 @@ QObject *ScPlugin::addQMLSurface(const QString &name, const QString &type, const
   return s;
   }
 
-bool ScPlugin::execute(const QString &code)
+bool ScPlugin::execute(const QString &filename, const QString &code)
   {
   ScProfileFunction
-  XScriptSource src(code);
+  XScriptSource src(filename, code);
 
-  bool error = false;
+  XScriptSource::Error error;
   XScriptValue ret = src.run(&error);
 
-  if(error)
+  if(error.hasError())
     {
-    qWarning() << "Error in script at line " << ret.toString();
+    qWarning() << "Error " << ret.toString() << " in script at line " << error.lineNumber();
+    qWarning() << error.trace();
     return false;
     }
   else

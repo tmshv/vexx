@@ -35,7 +35,7 @@ public:
   // find "script.js" somewhere in the apps loaded plugin directories
   Q_INVOKABLE void include(const QString &folder);
 
-  Q_INVOKABLE bool execute(const QString &);
+  Q_INVOKABLE bool execute(const QString &filename, const QString &code);
 
   Q_INVOKABLE bool isDebuggingEnabled();
 

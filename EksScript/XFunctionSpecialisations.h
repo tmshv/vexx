@@ -96,11 +96,11 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
-    typedef ArgCaster<A0> AC0;
+    typedef XScriptConvert::ArgCaster<A0> AC0;
 
-    AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
+    AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
 
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Detail::Unlocker<UnlockV8> const unlocker;
     return (ReturnType)(self.*func)(  arg0 );
     }
   static XScriptValue Call( T  & self, FunctionType func, XScriptArguments const & argv )
@@ -114,7 +114,7 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T  * self = CastFromJS<T>(argv.This());
+    T* self = XScriptConvert::from<T>(argv.calleeThis());
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
@@ -123,7 +123,7 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8> : XMethodSignature<T,Sig>
     try
     {
     CallNative(func, argv);
-    return v8::Undefined();
+    return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -216,9 +216,9 @@ struct CallForwarder<1>
   {
   template < typename A0>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0)
@@ -229,8 +229,8 @@ struct CallForwarder<1>
     }
   template < typename A0>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0
-                                     )
+                            A0 a0
+                            )
     {
     return Call( func, func, a0 );
     }
@@ -500,9 +500,9 @@ struct CallForwarder<2>
   {
   template < typename A0, typename A1>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1)
@@ -513,8 +513,8 @@ struct CallForwarder<2>
     }
   template < typename A0, typename A1>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1
-                                     )
+                            A0 a0, A1 a1
+                            )
     {
     return Call( func, func, a0,a1 );
     }
@@ -803,9 +803,9 @@ struct CallForwarder<3>
   {
   template < typename A0, typename A1, typename A2>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2)
@@ -816,8 +816,8 @@ struct CallForwarder<3>
     }
   template < typename A0, typename A1, typename A2>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2
-                                     )
+                            A0 a0, A1 a1, A2 a2
+                            )
     {
     return Call( func, func, a0,a1,a2 );
     }
@@ -1127,9 +1127,9 @@ struct CallForwarder<4>
   {
   template < typename A0, typename A1, typename A2, typename A3>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3)
@@ -1140,8 +1140,8 @@ struct CallForwarder<4>
     }
   template < typename A0, typename A1, typename A2, typename A3>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3
+                            )
     {
     return Call( func, func, a0,a1,a2,a3 );
     }
@@ -1472,9 +1472,9 @@ struct CallForwarder<5>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4)
@@ -1485,8 +1485,8 @@ struct CallForwarder<5>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4 );
     }
@@ -1838,9 +1838,9 @@ struct CallForwarder<6>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5)
@@ -1851,8 +1851,8 @@ struct CallForwarder<6>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4,a5 );
     }
@@ -2225,9 +2225,9 @@ struct CallForwarder<7>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6)
@@ -2238,8 +2238,8 @@ struct CallForwarder<7>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4,a5,a6 );
     }
@@ -2633,9 +2633,9 @@ struct CallForwarder<8>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7)
@@ -2646,8 +2646,8 @@ struct CallForwarder<8>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4,a5,a6,a7 );
     }
@@ -3062,9 +3062,9 @@ struct CallForwarder<9>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7), CastToJS(a8)
@@ -3075,8 +3075,8 @@ struct CallForwarder<9>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4,a5,a6,a7,a8 );
     }
@@ -3512,9 +3512,9 @@ struct CallForwarder<10>
   {
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
   static XScriptValue Call( XScriptObject const & self,
-                                     XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
-                                     )
+                            XScriptFunction const & func,
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
+                            )
     {
     XScriptValue args[] = {
       CastToJS(a0), CastToJS(a1), CastToJS(a2), CastToJS(a3), CastToJS(a4), CastToJS(a5), CastToJS(a6), CastToJS(a7), CastToJS(a8), CastToJS(a9)
@@ -3525,8 +3525,8 @@ struct CallForwarder<10>
     }
   template < typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
   static XScriptValue Call( XScriptFunction const & func,
-                                     A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
-                                     )
+                            A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
+                            )
     {
     return Call( func, func, a0,a1,a2,a3,a4,a5,a6,a7,a8,a9 );
     }

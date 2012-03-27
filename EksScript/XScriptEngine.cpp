@@ -4,6 +4,7 @@
 #include "XConvertToScript.h"
 #include "XScriptValueV8Internals.h"
 #include "XQObjectWrapper.h"
+#include "XQtWrappers.h"
 #include "v8.h"
 
 struct StaticEngine
@@ -49,6 +50,7 @@ void XScriptEngine::terminate()
 XScriptEngine::XScriptEngine()
   {
   XQObjectWrapper::initiate(this);
+  XQtWrappers::initiate(this);
   }
 
 XScriptEngine::~XScriptEngine()

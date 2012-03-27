@@ -116,7 +116,7 @@ ScSurface::~ScSurface()
 
 void ScSurface::execute()
   {
-  _plugin->execute(_editor->toPlainText());
+  _plugin->execute("ScriptEditor", _editor->toPlainText());
   }
 
 void ScSurface::executeDebugged()
@@ -124,7 +124,7 @@ void ScSurface::executeDebugged()
   bool debugged = _plugin->isDebuggingEnabled();
 
   _plugin->enableDebugging(true);
-  _plugin->execute(_editor->toPlainText());
+  _plugin->execute("ScriptEditor", _editor->toPlainText());
   _plugin->enableDebugging(debugged);
   }
 

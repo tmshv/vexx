@@ -113,6 +113,18 @@ template <> struct JSToNative<v8::Handle<v8::Function> > : JSToNativeV8Type<v8::
 template <> struct JSToNative<v8::Handle<v8::Function> &> : JSToNative<v8::Handle<v8::Function> > {};
 template <> struct JSToNative<v8::Handle<v8::Function> const &> : JSToNative<v8::Handle<v8::Function> > {};
 */
+
+template <> struct JSToNative<XScriptFunction>
+  {
+  typedef XScriptFunction ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    return XScriptFunction(h);
+    }
+  };
+template <> struct JSToNative<XScriptFunction const &> : JSToNative<XScriptFunction> {};
+
 template <> struct JSToNative<void>
   {
   typedef void ResultType;

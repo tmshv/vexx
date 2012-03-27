@@ -73,7 +73,7 @@ public:
     }
 
   QVariant toVariant(const XScriptValue &val, int typeHint);
-  XScriptValue copyValue(const void *) const;
+  XScriptValue copyValue(const QVariant &) const;
 
   void wrapInstance(XScriptObject obj, void *object) const;
   void unwrapInstance(XScriptObject object) const;
@@ -88,6 +88,7 @@ public:
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);
   void addFunction(const char *name, Function);
+  void setCallableAsFunction(Function fn);
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
 
@@ -175,6 +176,15 @@ public:
     Function fn = XScript::FunctionToInCa<SIG, METHOD>::Call;
 
     XInterfaceBase::addFunction(name, fn);
+    }
+
+  template <typename SIG,
+            typename XMethodSignature<T, SIG>::FunctionType METHOD>
+  void setCallableAsFunction()
+    {
+    Function fn = XScript::MethodToInCa<T, SIG, METHOD>::Call;
+
+    XInterfaceBase::setCallableAsFunction(fn);
     }
 
   /**

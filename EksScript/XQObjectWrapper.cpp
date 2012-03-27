@@ -2,6 +2,32 @@
 #include "QMetaProperty"
 #include "XScriptValueV8Internals.h"
 #include "QVarLengthArray"
+#include "XFunctions.h"
+
+class SignalObject
+  {
+public:
+  void connect(XScriptFunction fn)
+    {
+    xAssertFail();
+    }
+
+  void disconnect(XScriptFunction fn)
+    {
+    xAssertFail();
+    }
+
+  static XScriptValue call(XScriptArguments const & argv)
+    {
+    xAssertFail();
+    return XScriptValue();
+    }
+
+  QObject *object;
+  int id;
+  };
+
+X_SCRIPTABLE_TYPE_COPYABLE(SignalObject)
 
 Q_DECLARE_METATYPE(QObjectList)
 
@@ -41,6 +67,14 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   interface->seal();
   c->addInterface(interface);
   instance()->_objects.insert(&QObject::staticMetaObject, interface);
+
+
+  XInterface<SignalObject> *signal = XInterface<SignalObject>::create("Signal");
+  signal->addMethod<void (XScriptFunction), &SignalObject::connect>("connect");
+  signal->addMethod<void (XScriptFunction), &SignalObject::disconnect>("disconnect");
+  signal->XInterfaceBase::setCallableAsFunction(SignalObject::call);
+  signal->seal();
+  c->addInterface(signal);
   }
 
 XQObjectWrapper *XQObjectWrapper::instance()
@@ -55,6 +89,7 @@ XScriptObject XQObjectWrapper::wrap(QObject *obj)
 
   XScriptValue vals[1] = { obj };
   XScriptObject self = interface->newInstance(1, vals);
+  xAssert(self.isValid());
 
   return self;
   }
@@ -395,6 +430,24 @@ private:
 
 struct Utils
   {
+  static v8::Handle<v8::Value> signal(v8::Local<v8::String>, const v8::AccessorInfo& info)
+    {
+    QObject *ths = XScriptConvert::from<QObject>(fromHandle(info.This()));
+    int id = XScriptConvert::from<int>(fromHandle(info.Data()));
+
+    const XInterface<SignalObject> *ifc = XInterface<SignalObject>::lookup();
+
+    XScriptValue val = ifc->newInstance(0, 0);
+    xAssert(val.isValid());
+    SignalObject *sig = XScriptConvert::from<SignalObject>(val);
+    xAssert(sig);
+
+    sig->object = ths;
+    sig->id = id;
+
+    return getV8Internal(val);
+    }
+
   static v8::Handle<v8::Value> read(v8::Local<v8::String>, const v8::AccessorInfo& info)
     {
     QObject *ths = XScriptConvert::from<QObject>(fromHandle(info.This()));
@@ -404,7 +457,15 @@ struct Utils
       }
 
     int id = XScriptConvert::from<int>(fromHandle(info.Data()));
-    QVariant value = ths->metaObject()->property(id).read(ths);
+    QMetaProperty prop(ths->metaObject()->property(id));
+
+#ifdef X_DEBUG
+    xAssert(prop.isValid());
+    const char *name = prop.name();
+    (void)name;
+#endif
+
+    QVariant value = prop.read(ths);
     return getV8Internal(XScriptValue(value));
     }
 
@@ -498,20 +559,32 @@ void XQObjectWrapper::buildInterface(XInterfaceBase *interface, const QMetaObjec
     {
     QMetaMethod method(metaObject->method(i));
 
-    if(method.access() != QMetaMethod::Public)
+    if(method.methodType() != QMetaMethod::Signal)
       {
-      continue;
+      if(method.access() != QMetaMethod::Public)
+        {
+        continue;
+        }
+
+      v8::Handle<v8::Integer> id = v8::Integer::New(i);
+      v8::Handle<v8::FunctionTemplate> data = v8::FunctionTemplate::New(Utils::method);
+      data->Set(v8::String::New("0"), id);
+
+      QString qname = method.signature();
+      int firstBrack = qname.indexOf('(');
+      qname = qname.left(firstBrack);
+
+      v8::Handle<v8::String> name = v8::String::New((xuint16*)qname.constData(), qname.length());
+      templ->Set(name, data);
       }
+    else
+      {
+      QString qname = method.signature();
+      int firstBrack = qname.indexOf('(');
+      qname = qname.left(firstBrack);
 
-    v8::Handle<v8::Integer> id = v8::Integer::New(i);
-    v8::Handle<v8::FunctionTemplate> data = v8::FunctionTemplate::New(Utils::method);
-    data->Set(v8::String::New("0"), id);
-
-    QString qname = method.signature();
-    int firstBrack = qname.indexOf('(');
-    qname = qname.left(firstBrack);
-
-    v8::Handle<v8::String> name = v8::String::New((xuint16*)qname.constData(), qname.length());
-    templ->Set(name, data);
+      v8::Handle<v8::String> name = v8::String::New((xuint16*)qname.constData(), qname.length());
+      templ->SetAccessor(name, Utils::signal, 0, v8::Integer::New(i));
+      }
     }
   }

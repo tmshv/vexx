@@ -556,6 +556,8 @@ template <typename T> void SPropertyInformation::addStaticInterface(T *factory) 
 
 template <typename T> static const SPropertyInformation *SPropertyInformation::findStaticTypeInformation(const char *name)
   {
+  SProfileFunction
+
   static const SPropertyInformation *info = 0;
   if(!info)
     {
@@ -563,6 +565,8 @@ template <typename T> static const SPropertyInformation *SPropertyInformation::f
 
     if(!info)
       {
+      SProfileScopedBlock("Initiate information")
+
       SPropertyInformation *createdInfo = SPropertyInformation::allocate();
       SPropertyInformationCreateHelper<T>::create(createdInfo, name);
 

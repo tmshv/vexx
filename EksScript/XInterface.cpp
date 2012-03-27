@@ -1,6 +1,7 @@
 #include "XInterface.h"
 #include "XScriptValueV8Internals.h"
 #include "XUnorderedMap"
+#include "QUrl"
 
 typedef v8::Persistent<v8::FunctionTemplate> FnTempl;
 typedef v8::Persistent<v8::ObjectTemplate> ObjTempl;
@@ -49,9 +50,12 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
   new(::prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
 
+  v8::Handle<v8::String> typeNameV8 = v8::String::New("typeName");
+  v8::Handle<v8::String> typeNameStrV8 = v8::String::New((uint16_t*)typeName.constData(), typeName.length());
+  (*constructor(_constructor))->Set(typeNameV8, typeNameStrV8);
+
   (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
 
-  (*constructor(_constructor))->Set("typeName", v8::String::New((uint16_t*)typeName.constData(), typeName.length()));
   if(parent)
     {
     inherit(parent);
@@ -91,13 +95,25 @@ QVariant XInterfaceBase::toVariant(const XScriptValue &inp, int typeHint)
   return QVariant();
   }
 
-XScriptValue XInterfaceBase::copyValue(const void *val) const
+XScriptValue XInterfaceBase::copyValue(const QVariant &v) const
   {
+  int type = v.userType();
+  // T Ptr (to either a pointer or the actual type)
+  const void **val = (const void**)v.constData();
   xAssert(val);
 
   if(_toScript)
     {
-    return _toScript(val);
+    if(type == _typeId)
+      {
+      // resolve to T Ptr
+      return _toScript(*val);
+      }
+    else if(type == _nonPointerTypeId)
+      {
+      // already a pointer to T
+      return _toScript(val);
+      }
     }
 
   return XScriptValue();
@@ -162,6 +178,11 @@ void XInterfaceBase::addFunction(const char *name, Function fn)
   (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
   }
 
+void XInterfaceBase::setCallableAsFunction(Function fn)
+  {
+  (*::prototype(_prototype))->SetCallAsFunctionHandler((v8::InvocationCallback)fn);
+  }
+
 void XInterfaceBase::addClassTo(const QString &thisClassName, const XScriptObject &dest) const
   {
   getV8Internal(dest)->Set(v8::String::NewSymbol(thisClassName.toAscii().constData()), getV8Internal(constructorFunction()));
@@ -180,10 +201,8 @@ void XInterfaceBase::inherit(const XInterfaceBase *parentType)
 
 void XInterfaceBase::addChildInterface(int typeId, UpCastFn fn)
   {
-  if(!_upcasts.contains(typeId))
-    {
-    _upcasts.insert(typeId, fn);
-    }
+  xAssert(!_upcasts.contains(typeId));
+  _upcasts.insert(typeId, fn);
   }
 
 void *XInterfaceBase::prototype()
@@ -202,12 +221,20 @@ void registerInterface(XInterfaceBase *interface)
   {
   xAssert(!_interfaces.contains(interface->typeId()));
   _interfaces.insert(interface->typeId(), interface);
+  if(interface->nonPointerTypeId() != QVariant::Invalid)
+    {
+    _interfaces.insert(interface->nonPointerTypeId(), interface);
+    }
   }
 
 XInterfaceBase *findInterface(int id)
   {
+#ifdef X_DEBUG
+  QVariant::Type type = (QVariant::Type)id;
+  (void)type;
+#endif
+
   XInterfaceBase *base = _interfaces[id];
-  xAssert(base);
-  xAssert(base->isSealed());
+  xAssert(!base || base->isSealed());
   return base;
   }

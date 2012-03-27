@@ -102,6 +102,9 @@ SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *f
   from->_derive(copy, data);
   copy->setParentTypeInformation(from);
 
+  copy->_apiInterface = from->_apiInterface;
+  xAssert(copy->_apiInterface);
+
   xAssert(copy);
   return copy;
   }

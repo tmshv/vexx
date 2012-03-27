@@ -4,8 +4,6 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
-
 TARGET = EksScript
 TEMPLATE = lib
 
@@ -20,7 +18,8 @@ SOURCES += XScriptGlobal.cpp \
     XScriptObject.cpp \
     XQObjectWrapper.cpp \
     XFunctions.cpp \
-    XScriptEngine.cpp
+    XScriptEngine.cpp \
+    XQtWrappers.cpp
 
 HEADERS += XScriptGlobal.h \
     XInterface.h \
@@ -46,7 +45,8 @@ HEADERS += XScriptGlobal.h \
     XScriptSource.h \
     XScriptObject.h \
     XQObjectWrapper.h \
-    XScriptEngine.h
+    XScriptEngine.h \
+    XQtWrappers.h
 
 LIBS += -lQtV8 -lEksCore
 INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksScript/qtjsbackend/src/3rdparty/v8/include

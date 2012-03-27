@@ -14,6 +14,9 @@ class EKSSCRIPT_EXPORT Unlock
 public:
   Unlock();
   ~Unlock();
+
+private:
+  void *_impl;
   };
 
 /**

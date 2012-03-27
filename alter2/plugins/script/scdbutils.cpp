@@ -10,22 +10,6 @@
 
 Q_DECLARE_METATYPE(XScriptFunction)
 
-/*ntjs SPropertyInformation
-        if(typeObject.isString())
-          {
-          propType = STypeRegistry::findType(typeObject.toString());
-          }
-        else if(typeObject.isObject())
-          {
-          QScriptValue typeName = typeObject.property("typeName");
-          if(typeName.isString())
-            {
-            propType = STypeRegistry::findType(typeName.toString());
-            }
-          }
-
-  */
-
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
 void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node)
@@ -178,17 +162,21 @@ bool postParseChildProperties(SPropertyInformation *newType, XScriptValue proper
           }
 
         // Default input
-        QString inputPath = propertyObject.get("defaultInput").toString();
-        if(inputPath.length())
+        XScriptValue inputPathVal = propertyObject.get("defaultInput");
+        if(inputPathVal.isValid())
           {
-          const SPropertyInstanceInformation *input = info->resolvePath(inputPath);
-          if(!input)
+          QString inputPath = inputPathVal.toString();
+          if(inputPath.length())
             {
-            error = Toss("Unable to find default input '" + inputPath + "'");
-            return false;
-            }
+            const SPropertyInstanceInformation *input = info->resolvePath(inputPath);
+            if(!input)
+              {
+              error = Toss("Unable to find default input '" + inputPath + "'");
+              return false;
+              }
 
-          info->setDefaultInput(input);
+            info->setDefaultInput(input);
+            }
           }
         }
       else

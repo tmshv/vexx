@@ -115,20 +115,30 @@ XScriptValue::XScriptValue(const QVariant& val)
   {
   XScriptValueInternal::init(this);
 
-  if(val.type() == QVariant::String)
+  switch(val.type())
     {
-    *this = XScriptValue(val.toString());
-    }
-  else
-    {
-    const XInterfaceBase* interface = findInterface(val.userType());
-    if(interface)
+    case QVariant::String:
+      *this = XScriptValue(val.toString());
+      break;
+    case QVariant::Bool:
+      *this = XScriptValue(val.toBool());
+      break;
+    case QVariant::Int:
+      *this = XScriptValue(val.toInt());
+      break;
+    case QVariant::Double:
+      *this = XScriptValue(val.toDouble());
+      break;
+
+    default:
       {
-      *this = interface->copyValue(*(void**)val.data());
-      }
-    else
-      {
-      xAssertFail();
+      const XInterfaceBase* interface = findInterface(val.userType());
+      xAssert(interface);
+      if(interface)
+        {
+        *this = interface->copyValue(val);
+        }
+      break;
       }
     }
   }

@@ -44,6 +44,7 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCTransform::staticTypeInformation());
   STypeRegistry::addType(GCGeometryTransform::staticTypeInformation());
+  STypeRegistry::addType(GCGeometryTransformPointer::staticTypeInformation());
   STypeRegistry::addType(GCGeometryTransformPointerArray::staticTypeInformation());
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
