@@ -17,12 +17,7 @@ public:
     xAssertFail();
     }
 
-  static XScriptValue call(XScriptArguments const & argv)
-    {
-    xAssertFail();
-    return XScriptValue();
-    }
-
+  static XScriptValue call(XScriptArguments const & argv);
   QObject *object;
   int id;
   };
@@ -486,7 +481,11 @@ struct Utils
     QObject *ths = XScriptConvert::from<QObject>(fromHandle(args.This()));
     v8::Local<v8::Value> idVal = args.Callee()->Get(0);
     int id = XScriptConvert::from<int>(fromHandle(idVal));
+    return methodCall(ths, id, args);
+    }
 
+  static v8::Handle<v8::Value> methodCall(QObject *ths, int id, const v8::Arguments& args)
+    {
     QMetaMethod method = ths->metaObject()->method(id);
     QList<QByteArray> types = method.parameterTypes();
     int length = args.Length();
@@ -534,6 +533,22 @@ struct Utils
     return qargs[0].toValue();
     }
   };
+
+
+XScriptValue SignalObject::call(XScriptArguments const &argv)
+  {
+  SignalObject *ths = XScriptConvert::from<SignalObject>(argv.calleeThis());
+  xAssertFail(); // check this works
+
+  union
+    {
+    const XScriptArguments *aIn;
+    const v8::Arguments *aOut;
+    } conv;
+  conv.aIn = &argv;
+
+  return fromHandle(Utils::methodCall(ths->object, ths->id, *conv.aOut));
+  }
 
 void XQObjectWrapper::buildInterface(XInterfaceBase *interface, const QMetaObject *metaObject)
   {
