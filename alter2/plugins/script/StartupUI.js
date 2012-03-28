@@ -67,6 +67,11 @@ setupDebugSurface = function()
       }
     }
   surfaceManager.surface.emitRequest.connect(surfaceManager, surfaceManager.passIn);
+  surfaceManager.surface.emitRequest.disconnect(surfaceManager, surfaceManager.passIn);
+  surfaceManager.surface.emitRequest.connect(surfaceManager, surfaceManager.passIn);
+  print("Calling");
+  surfaceManager.surface.emitRequest("Test", [1, 2, 3]);
+  print("Called");
   }
 
 setupDebugSurface();
