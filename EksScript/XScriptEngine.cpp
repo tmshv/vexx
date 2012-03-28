@@ -95,3 +95,8 @@ v8::Handle<v8::ObjectTemplate> getGlobalTemplate(XScriptEngine *)
   {
   return g_engine->globalTemplate;
   }
+
+v8::Handle<v8::Context> getV8EngineInternal()
+  {
+  return g_engine->context;
+  }

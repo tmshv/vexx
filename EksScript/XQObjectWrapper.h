@@ -6,6 +6,9 @@
 #include "XScriptObject.h"
 #include "XScriptEngine.h"
 
+class XQObjectConnectionList;
+class XSignalObject;
+
 class EKSSCRIPT_EXPORT XQObjectWrapper
   {
 public:
@@ -23,6 +26,9 @@ private:
 
   XScriptEngine *_context;
   XUnorderedMap<const QMetaObject *, XInterfaceBase *> _objects;
+  XUnorderedMap<QObject *, XQObjectConnectionList *> _connections;
+  friend class XQObjectConnectionList;
+  friend class XSignalObject;
   };
 
 namespace XScriptConvert {

@@ -134,10 +134,9 @@ public:
     set(name, XScriptConvert::to(val));
     }
 
-  /*inline void set(char const *name, v8::InvocationCallback val)
-    {
-    set(name, XScriptConvert::to(val));
-    }*/
+  using XInterfaceBase::addProperty;
+  using XInterfaceBase::addFunction;
+  using XInterfaceBase::setCallableAsFunction;
 
   template <typename GETTYPE,
             typename SETTYPE,

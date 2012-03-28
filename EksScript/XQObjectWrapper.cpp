@@ -4,25 +4,187 @@
 #include "QVarLengthArray"
 #include "XFunctions.h"
 
-class SignalObject
+
+class XQObjectConnectionList : public QObject
   {
 public:
-  void connect(XScriptFunction fn)
+  XQObjectConnectionList();
+  ~XQObjectConnectionList();
+
+  struct Connection {
+    Connection()
+      : needsDestroy(false) {}
+    Connection(const Connection &other)
+      : thisObject(other.thisObject), function(other.function), needsDestroy(false) {}
+    Connection &operator=(const Connection &other) {
+      thisObject = other.thisObject;
+      function = other.function;
+      needsDestroy = other.needsDestroy;
+      return *this;
+      }
+
+    v8::Persistent<v8::Object> thisObject;
+    v8::Persistent<v8::Function> function;
+
+    void dispose() {
+      thisObject.Dispose();
+      function.Dispose();
+      }
+
+    bool needsDestroy;
+    };
+
+  struct ConnectionList : public QList<Connection> {
+    ConnectionList() : connectionsInUse(0), connectionsNeedClean(false) {}
+    int connectionsInUse;
+    bool connectionsNeedClean;
+    };
+
+  typedef QHash<int, ConnectionList> SlotHash;
+  SlotHash slotHash;
+  bool needsDestroy;
+  int inUse;
+
+  virtual void objectDestroyed(QObject *);
+  virtual int qt_metacall(QMetaObject::Call, int, void **);
+  };
+
+XQObjectConnectionList::XQObjectConnectionList() : needsDestroy(false), inUse(0)
+  {
+  }
+
+XQObjectConnectionList::~XQObjectConnectionList()
+  {
+  for(SlotHash::Iterator iter = slotHash.begin(); iter != slotHash.end(); ++iter)
     {
-    xAssertFail();
+    QList<Connection> &connections = *iter;
+    for(int ii = 0; ii < connections.count(); ++ii)
+      {
+      connections[ii].thisObject.Dispose();
+      connections[ii].function.Dispose();
+      }
+    }
+  slotHash.clear();
+  }
+
+void XQObjectConnectionList::objectDestroyed(QObject *object)
+  {
+  XQObjectWrapper::instance()->_connections.remove(object);
+
+  if(inUse)
+    {
+    needsDestroy = true;
+    }
+  else
+    {
+    delete this;
+    }
+  }
+
+int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, void **metaArgs)
+  {
+  if (method == QMetaObject::InvokeMetaMethod)
+    {
+    SlotHash::Iterator iter = slotHash.find(index);
+    if (iter == slotHash.end())
+      {
+      return -1;
+      }
+
+    ConnectionList &connectionList = *iter;
+    if (connectionList.isEmpty())
+      {
+      return -1;
+      }
+
+    inUse++;
+
+    connectionList.connectionsInUse++;
+
+    QList<Connection> connections = connectionList;
+
+    QMetaMethod snd = sender()->metaObject()->method(senderSignalIndex());
+    QList<QByteArray> types = snd.parameterTypes();
+
+    v8::Handle<v8::Context> ctxt = getV8EngineInternal();
+
+    v8::HandleScope handle_scope;
+    v8::Context::Scope scope(ctxt);
+
+    int argCount = types.size();
+    QVarLengthArray<XScriptValue, 9> args(argCount);
+
+    for(int ii = 0; ii < argCount; ++ii)
+      {
+      const QByteArray typeStr = types[ii];
+      int type = QVariant::Invalid;
+      if(typeStr.length())
+        {
+        type = QMetaType::type(typeStr.constData());
+        }
+
+      if(type == qMetaTypeId<QVariant>())
+        {
+        args[ii] = XScriptValue(*((QVariant *)metaArgs[ii + 1]));
+        }
+      else
+        {
+        args[ii] = XScriptValue(QVariant(type, metaArgs[ii + 1]));
+        }
+      }
+
+    for(int ii = 0; ii < connections.count(); ++ii)
+      {
+      Connection &connection = connections[ii];
+      if(connection.needsDestroy)
+        {
+        continue;
+        }
+
+      if(connection.thisObject.IsEmpty())
+        {
+        connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
+        }
+      else
+        {
+        connection.function->Call(connection.thisObject, argCount, getV8Internal(args.data()));
+        }
+      }
+
+    connectionList.connectionsInUse--;
+    if (connectionList.connectionsInUse == 0 && connectionList.connectionsNeedClean) {
+      for (QList<Connection>::Iterator iter = connectionList.begin();
+           iter != connectionList.end(); ) {
+        if (iter->needsDestroy) {
+          iter->dispose();
+          iter = connectionList.erase(iter);
+          } else {
+          ++iter;
+          }
+        }
+      }
+
+    inUse--;
+    if (inUse == 0 && needsDestroy)
+      {
+      delete this;
+      }
     }
 
-  void disconnect(XScriptFunction fn)
-    {
-    xAssertFail();
-    }
+  return -1;
+  }
 
+class XSignalObject
+  {
+public:
+  static XScriptValue connect(XScriptArguments const &xArgs);
+  static XScriptValue disconnect(XScriptArguments const &xArgs);
   static XScriptValue call(XScriptArguments const & argv);
   QObject *object;
   int id;
   };
 
-X_SCRIPTABLE_TYPE_COPYABLE(SignalObject)
+X_SCRIPTABLE_TYPE_COPYABLE(XSignalObject)
 
 Q_DECLARE_METATYPE(QObjectList)
 
@@ -64,10 +226,10 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   instance()->_objects.insert(&QObject::staticMetaObject, interface);
 
 
-  XInterface<SignalObject> *signal = XInterface<SignalObject>::create("Signal");
-  signal->addMethod<void (XScriptFunction), &SignalObject::connect>("connect");
-  signal->addMethod<void (XScriptFunction), &SignalObject::disconnect>("disconnect");
-  signal->XInterfaceBase::setCallableAsFunction(SignalObject::call);
+  XInterface<XSignalObject> *signal = XInterface<XSignalObject>::create("Signal");
+  signal->addFunction("connect", XSignalObject::connect);
+  signal->addFunction("disconnect", XSignalObject::disconnect);
+  signal->setCallableAsFunction(XSignalObject::call);
   signal->seal();
   c->addInterface(signal);
   }
@@ -132,20 +294,20 @@ public:
 struct CallArgument
   {
   inline CallArgument()
-  : type(QVariant::Invalid)
-  {
-  }
+    : type(QVariant::Invalid)
+    {
+    }
   inline ~CallArgument()
-  {
-      cleanup();
-  }
+    {
+    cleanup();
+    }
   inline void *dataPtr()
-  {
-      if (type == -1)
-          return qvariantPtr->data();
-      else
-          return (void *)&allocData;
-  }
+    {
+    if (type == -1)
+      return qvariantPtr->data();
+    else
+      return (void *)&allocData;
+    }
 
   void CallArgument::initAsType(int callType)
     {
@@ -158,10 +320,10 @@ struct CallArgument
       type = callType;
       }
     else */if (callType == QMetaType::Int ||
-                 callType == QMetaType::UInt ||
-                 callType == QMetaType::Bool ||
-                 callType == QMetaType::Double ||
-                 callType == QMetaType::Float)
+               callType == QMetaType::UInt ||
+               callType == QMetaType::Bool ||
+               callType == QMetaType::Double ||
+               callType == QMetaType::Float)
       {
       type = callType;
       }
@@ -197,104 +359,104 @@ struct CallArgument
       }
     }
 
-    void CallArgument::fromValue(int callType, v8::Handle<v8::Value> value)
+  void CallArgument::fromValue(int callType, v8::Handle<v8::Value> value)
+    {
+    if (type != 0)
       {
-      if (type != 0)
-        {
-        cleanup();
-        type = 0;
-        }
+      cleanup();
+      type = 0;
+      }
 
-      /*if (callType == qMetaTypeId<QJSValue>()) {
+    /*if (callType == qMetaTypeId<QJSValue>()) {
         qjsValuePtr = new (&allocData) QJSValue(QJSValuePrivate::get(new QJSValuePrivate(engine, value)));
         type = qMetaTypeId<QJSValue>();
         } else */
-      if (callType == QMetaType::Int)
+    if (callType == QMetaType::Int)
+      {
+      intValue = quint32(value->Int32Value());
+      type = callType;
+      }
+    else if (callType == QMetaType::UInt)
+      {
+      intValue = quint32(value->Uint32Value());
+      type = callType;
+      }
+    else if (callType == QMetaType::Bool)
+      {
+      boolValue = value->BooleanValue();
+      type = callType;
+      }
+    else if (callType == QMetaType::Double)
+      {
+      doubleValue = double(value->NumberValue());
+      type = callType;
+      }
+    else if (callType == QMetaType::Float)
+      {
+      floatValue = float(value->NumberValue());
+      type = callType;
+      }
+    else if (callType == QMetaType::QString)
+      {
+      if (value->IsNull() || value->IsUndefined())
         {
-        intValue = quint32(value->Int32Value());
-        type = callType;
+        qstringPtr = new (&allocData) QString();
         }
-      else if (callType == QMetaType::UInt)
+      else
         {
-        intValue = quint32(value->Uint32Value());
-        type = callType;
+        qstringPtr = new (&allocData) QString(XScriptConvert::from<QString>(fromHandle(value)));
         }
-      else if (callType == QMetaType::Bool)
+      type = callType;
+      }
+    else if (callType == QMetaType::QObjectStar)
+      {
+      qobjectPtr = XScriptConvert::from<QObject>(fromHandle(value));
+      type = callType;
+      }
+    else if (callType == qMetaTypeId<QVariant>())
+      {
+      qvariantPtr = new (&allocData) QVariant(fromHandle(value).toVariant());
+      type = callType;
+      }
+    else if (callType == qMetaTypeId<QList<QObject*> >())
+      {
+      qlistPtr = new (&allocData) QList<QObject *>();
+      if (value->IsArray())
         {
-        boolValue = value->BooleanValue();
-        type = callType;
-        }
-      else if (callType == QMetaType::Double)
-        {
-        doubleValue = double(value->NumberValue());
-        type = callType;
-        }
-      else if (callType == QMetaType::Float)
-        {
-        floatValue = float(value->NumberValue());
-        type = callType;
-        }
-      else if (callType == QMetaType::QString)
-        {
-        if (value->IsNull() || value->IsUndefined())
+        v8::Handle<v8::Array> array = v8::Handle<v8::Array>::Cast(value);
+        uint32_t length = array->Length();
+        for (uint32_t ii = 0; ii < length; ++ii)
           {
-          qstringPtr = new (&allocData) QString();
+          qlistPtr->append(XScriptConvert::from<QObject>(fromHandle(array->Get(ii))));
           }
-        else
-          {
-          qstringPtr = new (&allocData) QString(XScriptConvert::from<QString>(fromHandle(value)));
-          }
-        type = callType;
         }
-      else if (callType == QMetaType::QObjectStar)
+      else
         {
-        qobjectPtr = XScriptConvert::from<QObject>(fromHandle(value));
-        type = callType;
+        qlistPtr->append(XScriptConvert::from<QObject>(fromHandle(value)));
         }
-      else if (callType == qMetaTypeId<QVariant>())
-        {
-        qvariantPtr = new (&allocData) QVariant(fromHandle(value).toVariant());
-        type = callType;
-        }
-      else if (callType == qMetaTypeId<QList<QObject*> >())
-        {
-        qlistPtr = new (&allocData) QList<QObject *>();
-        if (value->IsArray())
-          {
-          v8::Handle<v8::Array> array = v8::Handle<v8::Array>::Cast(value);
-          uint32_t length = array->Length();
-          for (uint32_t ii = 0; ii < length; ++ii)
-            {
-            qlistPtr->append(XScriptConvert::from<QObject>(fromHandle(array->Get(ii))));
-            }
-          }
-        else
-          {
-          qlistPtr->append(XScriptConvert::from<QObject>(fromHandle(value)));
-          }
-        type = callType;
-        }
-      /*else if (callType == qMetaTypeId<QQmlV8Handle>())
+      type = callType;
+      }
+    /*else if (callType == qMetaTypeId<QQmlV8Handle>())
         {
         handlePtr = new (&allocData) QQmlV8Handle(QQmlV8Handle::fromHandle(value));
         type = callType;
         }*/
-      else
-        {
-        qvariantPtr = new (&allocData) QVariant();
-        type = -1;
+    else
+      {
+      qvariantPtr = new (&allocData) QVariant();
+      type = -1;
 
-        QVariant v = fromHandle(value).toVariant(callType);
-        if (v.userType() == callType)
-          {
-          *qvariantPtr = v;
-          }
-        else if (v.canConvert((QVariant::Type)callType))
-          {
-          *qvariantPtr = v;
-          qvariantPtr->convert((QVariant::Type)callType);
-          }
-        else /*if (const QMetaObject *mo = ep ? ep->rawMetaObjectForType(callType) : 0)
+      QVariant v = fromHandle(value).toVariant(callType);
+      if (v.userType() == callType)
+        {
+        *qvariantPtr = v;
+        }
+      else if (v.canConvert((QVariant::Type)callType))
+        {
+        *qvariantPtr = v;
+        qvariantPtr->convert((QVariant::Type)callType);
+        }
+      else /*if (const QMetaObject *mo = ep ? ep->rawMetaObjectForType(callType) : 0)
           {
           QObject *obj = ep->toQObject(v);
 
@@ -308,11 +470,11 @@ struct CallArgument
           *qvariantPtr = QVariant(callType, &obj);
           }
         else*/
-          {
-          *qvariantPtr = QVariant(callType, (void *)0);
-          }
+        {
+        *qvariantPtr = QVariant(callType, (void *)0);
         }
       }
+    }
 
   v8::Handle<v8::Value> CallArgument::toValue()
     {
@@ -405,10 +567,10 @@ private:
     QObject *qobjectPtr;
 
     char allocData[MaxSizeOf5<QVariant,
-      QString,
-      QList<QObject *>,
-      void *,
-      void *>::Size];
+    QString,
+    QList<QObject *>,
+    void *,
+    void *>::Size];
 
     qint64 q_for_alignment;
     };
@@ -421,7 +583,7 @@ private:
     };
 
   int type;
-};
+  };
 
 struct Utils
   {
@@ -430,11 +592,11 @@ struct Utils
     QObject *ths = XScriptConvert::from<QObject>(fromHandle(info.This()));
     int id = XScriptConvert::from<int>(fromHandle(info.Data()));
 
-    const XInterface<SignalObject> *ifc = XInterface<SignalObject>::lookup();
+    const XInterface<XSignalObject> *ifc = XInterface<XSignalObject>::lookup();
 
     XScriptValue val = ifc->newInstance(0, 0);
     xAssert(val.isValid());
-    SignalObject *sig = XScriptConvert::from<SignalObject>(val);
+    XSignalObject *sig = XScriptConvert::from<XSignalObject>(val);
     xAssert(sig);
 
     sig->object = ths;
@@ -534,10 +696,209 @@ struct Utils
     }
   };
 
-
-XScriptValue SignalObject::call(XScriptArguments const &argv)
+XScriptValue XSignalObject::connect(XScriptArguments const &xArgs)
   {
-  SignalObject *ths = XScriptConvert::from<SignalObject>(argv.calleeThis());
+  v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
+  if(args.Length() == 0)
+    {
+    return Toss("Function.prototype.connect: no arguments given");
+    }
+
+  XSignalObject *obj = XScriptConvert::from<XSignalObject>(xArgs.calleeThis());
+  int id = obj->id;
+  QObject *object = obj->object;
+
+  if(id == -1)
+    {
+    return Toss("Function.prototype.connect: this object is not a signal");
+    }
+
+  if(!object)
+    {
+    return Toss("Function.prototype.connect: cannot connect to deleted QObject");
+    }
+
+  if(id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
+    {
+    return Toss("Function.prototype.connect: this object is not a signal");
+    }
+
+  v8::Local<v8::Value> functionValue;
+  v8::Local<v8::Value> functionThisValue;
+
+  if (args.Length() == 1)
+    {
+    functionValue = args[0];
+    }
+  else
+    {
+    functionThisValue = args[0];
+    functionValue = args[1];
+    }
+
+  if(!functionValue->IsFunction())
+    {
+    return Toss("Function.prototype.connect: target is not a function");
+    }
+
+  if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
+    {
+    return Toss("Function.prototype.connect: target this is not an object");
+    }
+
+  XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
+  XUnorderedMap<QObject *, XQObjectConnectionList *> &connections = qobjectWrapper->_connections;
+  XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connections.find(object);
+  if(iter == connections.end())
+    {
+    iter = connections.insert(object, new XQObjectConnectionList());
+    }
+
+  XQObjectConnectionList *connectionList = *iter;
+  XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
+  if(slotIter == connectionList->slotHash.end())
+    {
+    slotIter = connectionList->slotHash.insert(id, XQObjectConnectionList::ConnectionList());
+    QMetaObject::connect(object, id, connectionList, id);
+    }
+
+  XQObjectConnectionList::Connection connection;
+  if(!functionThisValue.IsEmpty())
+    {
+    connection.thisObject = v8::Persistent<v8::Object>::New(functionThisValue->ToObject());
+    }
+  connection.function =  v8::Persistent<v8::Function>::New(v8::Handle<v8::Function>::Cast(functionValue));
+
+  slotIter->append(connection);
+
+  return XScriptValue();
+  }
+
+XScriptValue XSignalObject::disconnect(XScriptArguments const &xArgs)
+  {
+  v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
+
+  if(args.Length() == 0)
+    {
+    return Toss("Function.prototype.disconnect: no arguments given");
+    }
+
+  XSignalObject *obj = XScriptConvert::from<XSignalObject>(xArgs.calleeThis());
+  int id = obj->id;
+  QObject *object = obj->object;
+
+  if(id == -1)
+    {
+    return Toss("Function.prototype.disconnect: this object is not a signal");
+    }
+
+  if(!object)
+    {
+    return Toss("Function.prototype.disconnect: cannot disconnect from deleted QObject");
+    }
+
+  if (id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
+    {
+    return Toss("Function.prototype.disconnect: this object is not a signal");
+    }
+
+  v8::Local<v8::Value> functionValue;
+  v8::Local<v8::Value> functionThisValue;
+
+  if(args.Length() == 1)
+    {
+    functionValue = args[0];
+    }
+  else
+    {
+    functionThisValue = args[0];
+    functionValue = args[1];
+    }
+
+  if(!functionValue->IsFunction())
+    {
+    return Toss("Function.prototype.disconnect: target is not a function");
+    }
+
+  if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
+    {
+    return Toss("Function.prototype.disconnect: target this is not an object");
+    }
+
+  XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
+  XUnorderedMap<QObject *, XQObjectConnectionList *> &connectionsList = qobjectWrapper->_connections;
+  XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connectionsList.find(object);
+  if(iter == connectionsList.end())
+    {
+    return XScriptValue(); // Nothing to disconnect from
+    }
+
+  XQObjectConnectionList *connectionList = *iter;
+  XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
+  if(slotIter == connectionList->slotHash.end())
+    {
+    return XScriptValue(); // Nothing to disconnect from
+    }
+
+  XQObjectConnectionList::ConnectionList &connections = *slotIter;
+
+  v8::Local<v8::Function> function = v8::Local<v8::Function>::Cast(functionValue);
+//    QPair<QObject *, int> functionData = ExtractQtMethod(engine, function);
+
+//    if (functionData.second != -1) {
+//      // This is a QObject function wrapper
+//      for (int ii = 0; ii < connections.count(); ++ii) {
+//        QV8QObjectConnectionList::Connection &connection = connections[ii];
+
+//        if (connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
+//            (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue))) {
+
+//          QPair<QObject *, int> connectedFunctionData = ExtractQtMethod(engine, connection.function);
+//          if (connectedFunctionData == functionData) {
+//            // Match!
+//            if (connections.connectionsInUse) {
+//              connection.needsDestroy = true;
+//              connections.connectionsNeedClean = true;
+//              } else {
+//              connection.dispose();
+//              connections.removeAt(ii);
+//              }
+//            return v8::Undefined();
+//            }
+//          }
+//        }
+
+//      } else {
+    // This is a normal JS function
+    for(int ii = 0; ii < connections.count(); ++ii)
+      {
+      XQObjectConnectionList::Connection &connection = connections[ii];
+      if(connection.function->StrictEquals(function) &&
+          connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
+          (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue)))
+        {
+        // Match!
+        if(connections.connectionsInUse)
+          {
+          connection.needsDestroy = true;
+          connections.connectionsNeedClean = true;
+          }
+        else
+          {
+          connection.dispose();
+          connections.removeAt(ii);
+          }
+        return XScriptValue();
+        }
+      }
+    //}
+
+  return XScriptValue();
+  }
+
+XScriptValue XSignalObject::call(XScriptArguments const &argv)
+  {
+  XSignalObject *ths = XScriptConvert::from<XSignalObject>(argv.calleeThis());
   xAssertFail(); // check this works
 
   union
