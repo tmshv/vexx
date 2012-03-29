@@ -59,7 +59,10 @@ XScriptObject::XScriptObject(const XScriptValue &other)
   {
   const v8::Handle<v8::Value> otherInternal = getV8Internal(other);
   XScriptObjectInternal *internal = XScriptObjectInternal::init(this);
-  internal->_object = v8::Handle<v8::Object>(v8::Object::Cast(*otherInternal));
+  if(getV8Internal(other)->IsObject())
+    {
+    internal->_object = v8::Handle<v8::Object>(v8::Object::Cast(*otherInternal));
+    }
   }
 
 XScriptObject::XScriptObject(const XScriptFunction &other)
@@ -129,7 +132,7 @@ void XScriptObject::set(const QString &n, const XScriptValue &v)
 bool XScriptObject::isValid() const
   {
   const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);
-  return !internal->_object.IsEmpty();
+  return !internal->_object.IsEmpty() && internal->_object->IsObject();
   }
 
 void XScriptObject::makeWeak(void *data, WeakDtor cb)

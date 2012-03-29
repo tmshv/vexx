@@ -129,6 +129,16 @@ XScriptValue::XScriptValue(const QVariant& val)
     case QVariant::Double:
       *this = XScriptValue(val.toDouble());
       break;
+    case QVariant::List:
+      {
+      QVariantList list = val.toList();
+      v8::Local<v8::Array> array = v8::Array::New(list.length());
+      for(int i = 0, s = list.size(); i < s; ++i)
+        {
+        array->Set((uint32_t)i, getV8Internal(XScriptValue(list[i])));
+        }
+      }
+      break;
 
     default:
       {
@@ -257,6 +267,16 @@ QVariant XScriptValue::toVariant(int typeHint) const
   if(typeHint == QVariant::String || internal->_object->IsString())
     {
     return toString();
+    }
+  else if(internal->_object->IsArray())
+    {
+    v8::Handle<v8::Array> jsArr = internal->_object.As<v8::Array>();
+    QVariantList list;
+    for(uint32_t i = 0, s = jsArr->Length(); i < s; ++i)
+      {
+      list << fromHandle(jsArr->Get(i)).toVariant(QVariant::Invalid);
+      }
+    return list;
     }
 
   if(internal->_object->IsObject())

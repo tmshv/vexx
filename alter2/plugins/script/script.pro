@@ -83,7 +83,9 @@ OTHER_FILES += \
     NodeCanvasContents/PathItem.qml \
     NodeCanvasContextMenu.qml \
     CreateMenuContents/Menu.qml \
-    NodeCanvasContents/Properties.qml
+    NodeCanvasContents/Properties.qml \
+    jsEntities/StandardSurface.js \
+    jsEntities/FlatSurface.js
 
 
 

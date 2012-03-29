@@ -111,7 +111,10 @@ XScriptFunction::XScriptFunction(const XScriptValue &other)
   {
   const v8::Handle<v8::Value> otherInternal = getV8Internal(other);
   XScriptFunctionInternal *internal = XScriptFunctionInternal::init(this);
-  internal->_object = v8::Handle<v8::Function>(v8::Function::Cast(*otherInternal));
+  if(getV8Internal(other)->IsFunction())
+    {
+    internal->_object = v8::Handle<v8::Function>(v8::Function::Cast(*otherInternal));
+    }
   }
 
 XScriptFunction::XScriptFunction()
@@ -149,7 +152,7 @@ bool XScriptFunction::isValid() const
   {
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
-  return (func->_object.IsEmpty() || !func->_object->IsFunction());
+  return (!func->_object.IsEmpty() && func->_object->IsFunction());
   }
 
 XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue args[], bool *error) const

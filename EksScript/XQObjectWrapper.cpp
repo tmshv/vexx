@@ -141,6 +141,8 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
         continue;
         }
 
+      xAssert(!connection.function.IsEmpty());
+      xAssert(connection.function->IsFunction());
       if(connection.thisObject.IsEmpty())
         {
         connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
