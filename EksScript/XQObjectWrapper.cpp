@@ -174,18 +174,6 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
   return -1;
   }
 
-class XSignalObject
-  {
-public:
-  static XScriptValue connect(XScriptArguments const &xArgs);
-  static XScriptValue disconnect(XScriptArguments const &xArgs);
-  static XScriptValue call(XScriptArguments const & argv);
-  QObject *object;
-  int id;
-  };
-
-X_SCRIPTABLE_TYPE_COPYABLE(XSignalObject)
-
 Q_DECLARE_METATYPE(QObjectList)
 
 XQObjectWrapper::XQObjectWrapper()
@@ -224,14 +212,6 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   interface->seal();
   c->addInterface(interface);
   instance()->_objects.insert(&QObject::staticMetaObject, interface);
-
-
-  XInterface<XSignalObject> *signal = XInterface<XSignalObject>::create("Signal");
-  signal->addFunction("connect", XSignalObject::connect);
-  signal->addFunction("disconnect", XSignalObject::disconnect);
-  signal->setCallableAsFunction(XSignalObject::call);
-  signal->seal();
-  c->addInterface(signal);
   }
 
 XQObjectWrapper *XQObjectWrapper::instance()
@@ -592,17 +572,29 @@ struct Utils
     QObject *ths = XScriptConvert::from<QObject>(fromHandle(info.This()));
     int id = XScriptConvert::from<int>(fromHandle(info.Data()));
 
-    const XInterface<XSignalObject> *ifc = XInterface<XSignalObject>::lookup();
+    v8::Local<v8::String> zeroV8 = v8::String::New("0");
+    v8::Local<v8::String> oneV8 = v8::String::New("1");
 
-    XScriptValue val = ifc->newInstance(0, 0);
-    xAssert(val.isValid());
-    XSignalObject *sig = XScriptConvert::from<XSignalObject>(val);
-    xAssert(sig);
+    v8::Local<v8::External> thsV8 = v8::External::New(ths);
+    v8::Local<v8::Integer> idV8 = v8::Integer::New(id);
 
-    sig->object = ths;
-    sig->id = id;
+    v8::Local<v8::FunctionTemplate> conFn = v8::FunctionTemplate::New((v8::InvocationCallback)connect);
+    conFn->Set(zeroV8, thsV8);
+    conFn->Set(oneV8, idV8);
 
-    return getV8Internal(val);
+    v8::Local<v8::FunctionTemplate> disconFn = v8::FunctionTemplate::New((v8::InvocationCallback)connect);
+    disconFn->Set(zeroV8, thsV8);
+    disconFn->Set(oneV8, idV8);
+
+
+    v8::Local<v8::FunctionTemplate> t = v8::FunctionTemplate::New((v8::InvocationCallback)emitSignal);
+    t->Set("connect", conFn->GetFunction());
+    t->Set("disconnect", conFn->GetFunction());
+
+    t->Set(zeroV8, thsV8);
+    t->Set(oneV8, idV8);
+
+    return t->GetFunction();
     }
 
   static v8::Handle<v8::Value> read(v8::Local<v8::String>, const v8::AccessorInfo& info)
@@ -694,222 +686,223 @@ struct Utils
 
     return qargs[0].toValue();
     }
-  };
 
-XScriptValue XSignalObject::connect(XScriptArguments const &xArgs)
-  {
-  v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
-  if(args.Length() == 0)
+  static XScriptValue connect(XScriptArguments const &xArgs)
     {
-    return Toss("Function.prototype.connect: no arguments given");
-    }
-
-  XSignalObject *obj = XScriptConvert::from<XSignalObject>(xArgs.calleeThis());
-  int id = obj->id;
-  QObject *object = obj->object;
-
-  if(id == -1)
-    {
-    return Toss("Function.prototype.connect: this object is not a signal");
-    }
-
-  if(!object)
-    {
-    return Toss("Function.prototype.connect: cannot connect to deleted QObject");
-    }
-
-  if(id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
-    {
-    return Toss("Function.prototype.connect: this object is not a signal");
-    }
-
-  v8::Local<v8::Value> functionValue;
-  v8::Local<v8::Value> functionThisValue;
-
-  if (args.Length() == 1)
-    {
-    functionValue = args[0];
-    }
-  else
-    {
-    functionThisValue = args[0];
-    functionValue = args[1];
-    }
-
-  if(!functionValue->IsFunction())
-    {
-    return Toss("Function.prototype.connect: target is not a function");
-    }
-
-  if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
-    {
-    return Toss("Function.prototype.connect: target this is not an object");
-    }
-
-  XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
-  XUnorderedMap<QObject *, XQObjectConnectionList *> &connections = qobjectWrapper->_connections;
-  XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connections.find(object);
-  if(iter == connections.end())
-    {
-    iter = connections.insert(object, new XQObjectConnectionList());
-    }
-
-  XQObjectConnectionList *connectionList = *iter;
-  XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
-  if(slotIter == connectionList->slotHash.end())
-    {
-    slotIter = connectionList->slotHash.insert(id, XQObjectConnectionList::ConnectionList());
-    QMetaObject::connect(object, id, connectionList, id);
-    }
-
-  XQObjectConnectionList::Connection connection;
-  if(!functionThisValue.IsEmpty())
-    {
-    connection.thisObject = v8::Persistent<v8::Object>::New(functionThisValue->ToObject());
-    }
-  connection.function =  v8::Persistent<v8::Function>::New(v8::Handle<v8::Function>::Cast(functionValue));
-
-  slotIter->append(connection);
-
-  return XScriptValue();
-  }
-
-XScriptValue XSignalObject::disconnect(XScriptArguments const &xArgs)
-  {
-  v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
-
-  if(args.Length() == 0)
-    {
-    return Toss("Function.prototype.disconnect: no arguments given");
-    }
-
-  XSignalObject *obj = XScriptConvert::from<XSignalObject>(xArgs.calleeThis());
-  int id = obj->id;
-  QObject *object = obj->object;
-
-  if(id == -1)
-    {
-    return Toss("Function.prototype.disconnect: this object is not a signal");
-    }
-
-  if(!object)
-    {
-    return Toss("Function.prototype.disconnect: cannot disconnect from deleted QObject");
-    }
-
-  if (id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
-    {
-    return Toss("Function.prototype.disconnect: this object is not a signal");
-    }
-
-  v8::Local<v8::Value> functionValue;
-  v8::Local<v8::Value> functionThisValue;
-
-  if(args.Length() == 1)
-    {
-    functionValue = args[0];
-    }
-  else
-    {
-    functionThisValue = args[0];
-    functionValue = args[1];
-    }
-
-  if(!functionValue->IsFunction())
-    {
-    return Toss("Function.prototype.disconnect: target is not a function");
-    }
-
-  if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
-    {
-    return Toss("Function.prototype.disconnect: target this is not an object");
-    }
-
-  XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
-  XUnorderedMap<QObject *, XQObjectConnectionList *> &connectionsList = qobjectWrapper->_connections;
-  XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connectionsList.find(object);
-  if(iter == connectionsList.end())
-    {
-    return XScriptValue(); // Nothing to disconnect from
-    }
-
-  XQObjectConnectionList *connectionList = *iter;
-  XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
-  if(slotIter == connectionList->slotHash.end())
-    {
-    return XScriptValue(); // Nothing to disconnect from
-    }
-
-  XQObjectConnectionList::ConnectionList &connections = *slotIter;
-
-  v8::Local<v8::Function> function = v8::Local<v8::Function>::Cast(functionValue);
-//    QPair<QObject *, int> functionData = ExtractQtMethod(engine, function);
-
-//    if (functionData.second != -1) {
-//      // This is a QObject function wrapper
-//      for (int ii = 0; ii < connections.count(); ++ii) {
-//        QV8QObjectConnectionList::Connection &connection = connections[ii];
-
-//        if (connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
-//            (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue))) {
-
-//          QPair<QObject *, int> connectedFunctionData = ExtractQtMethod(engine, connection.function);
-//          if (connectedFunctionData == functionData) {
-//            // Match!
-//            if (connections.connectionsInUse) {
-//              connection.needsDestroy = true;
-//              connections.connectionsNeedClean = true;
-//              } else {
-//              connection.dispose();
-//              connections.removeAt(ii);
-//              }
-//            return v8::Undefined();
-//            }
-//          }
-//        }
-
-//      } else {
-    // This is a normal JS function
-    for(int ii = 0; ii < connections.count(); ++ii)
+    v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
+    if(args.Length() == 0)
       {
-      XQObjectConnectionList::Connection &connection = connections[ii];
-      if(connection.function->StrictEquals(function) &&
-          connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
-          (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue)))
-        {
-        // Match!
-        if(connections.connectionsInUse)
-          {
-          connection.needsDestroy = true;
-          connections.connectionsNeedClean = true;
-          }
-        else
-          {
-          connection.dispose();
-          connections.removeAt(ii);
-          }
-        return XScriptValue();
-        }
+      return Toss("Function.prototype.connect: no arguments given");
       }
-    //}
 
-  return XScriptValue();
-  }
+    v8::Handle<v8::Object> calleeThis = getV8Internal(xArgs.callee());
+    QObject *object = (QObject *)calleeThis->Get(0).As<v8::External>()->Value();
+    int id = calleeThis->Get(1)->Int32Value();
 
-XScriptValue XSignalObject::call(XScriptArguments const &argv)
-  {
-  XSignalObject *ths = XScriptConvert::from<XSignalObject>(argv.calleeThis());
-  xAssertFail(); // check this works
+    if(id == -1)
+      {
+      return Toss("Function.prototype.connect: this object is not a signal");
+      }
 
-  union
+    if(!object)
+      {
+      return Toss("Function.prototype.connect: cannot connect to deleted QObject");
+      }
+
+    if(id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
+      {
+      return Toss("Function.prototype.connect: this object is not a signal");
+      }
+
+    v8::Local<v8::Value> functionValue;
+    v8::Local<v8::Value> functionThisValue;
+
+    if (args.Length() == 1)
+      {
+      functionValue = args[0];
+      }
+    else
+      {
+      functionThisValue = args[0];
+      functionValue = args[1];
+      }
+
+    if(!functionValue->IsFunction())
+      {
+      return Toss("Function.prototype.connect: target is not a function");
+      }
+
+    if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
+      {
+      return Toss("Function.prototype.connect: target this is not an object");
+      }
+
+    XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
+    XUnorderedMap<QObject *, XQObjectConnectionList *> &connections = qobjectWrapper->_connections;
+    XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connections.find(object);
+    if(iter == connections.end())
+      {
+      iter = connections.insert(object, new XQObjectConnectionList());
+      }
+
+    XQObjectConnectionList *connectionList = *iter;
+    XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
+    if(slotIter == connectionList->slotHash.end())
+      {
+      slotIter = connectionList->slotHash.insert(id, XQObjectConnectionList::ConnectionList());
+      QMetaObject::connect(object, id, connectionList, id);
+      }
+
+    XQObjectConnectionList::Connection connection;
+    if(!functionThisValue.IsEmpty())
+      {
+      connection.thisObject = v8::Persistent<v8::Object>::New(functionThisValue->ToObject());
+      }
+    connection.function =  v8::Persistent<v8::Function>::New(v8::Handle<v8::Function>::Cast(functionValue));
+
+    slotIter->append(connection);
+
+    return XScriptValue();
+    }
+
+  static XScriptValue disconnect(XScriptArguments const &xArgs)
     {
-    const XScriptArguments *aIn;
-    const v8::Arguments *aOut;
-    } conv;
-  conv.aIn = &argv;
+    v8::Arguments const &args = *(v8::Arguments const *)&xArgs;
 
-  return fromHandle(Utils::methodCall(ths->object, ths->id, *conv.aOut));
-  }
+    if(args.Length() == 0)
+      {
+      return Toss("Function.prototype.disconnect: no arguments given");
+      }
+
+    v8::Handle<v8::Object> calleeThis = getV8Internal(xArgs.callee());
+    QObject *object = (QObject *)calleeThis->Get(0).As<v8::External>()->Value();
+    int id = calleeThis->Get(1)->Int32Value();
+
+    if(id == -1)
+      {
+      return Toss("Function.prototype.disconnect: this object is not a signal");
+      }
+
+    if(!object)
+      {
+      return Toss("Function.prototype.disconnect: cannot disconnect from deleted QObject");
+      }
+
+    if (id < 0 || object->metaObject()->method(id).methodType() != QMetaMethod::Signal)
+      {
+      return Toss("Function.prototype.disconnect: this object is not a signal");
+      }
+
+    v8::Local<v8::Value> functionValue;
+    v8::Local<v8::Value> functionThisValue;
+
+    if(args.Length() == 1)
+      {
+      functionValue = args[0];
+      }
+    else
+      {
+      functionThisValue = args[0];
+      functionValue = args[1];
+      }
+
+    if(!functionValue->IsFunction())
+      {
+      return Toss("Function.prototype.disconnect: target is not a function");
+      }
+
+    if(!functionThisValue.IsEmpty() && !functionThisValue->IsObject())
+      {
+      return Toss("Function.prototype.disconnect: target this is not an object");
+      }
+
+    XQObjectWrapper *qobjectWrapper = XQObjectWrapper::instance();
+    XUnorderedMap<QObject *, XQObjectConnectionList *> &connectionsList = qobjectWrapper->_connections;
+    XUnorderedMap<QObject *, XQObjectConnectionList *>::Iterator iter = connectionsList.find(object);
+    if(iter == connectionsList.end())
+      {
+      return XScriptValue(); // Nothing to disconnect from
+      }
+
+    XQObjectConnectionList *connectionList = *iter;
+    XQObjectConnectionList::SlotHash::Iterator slotIter = connectionList->slotHash.find(id);
+    if(slotIter == connectionList->slotHash.end())
+      {
+      return XScriptValue(); // Nothing to disconnect from
+      }
+
+    XQObjectConnectionList::ConnectionList &connections = *slotIter;
+
+    v8::Local<v8::Function> function = v8::Local<v8::Function>::Cast(functionValue);
+  //    QPair<QObject *, int> functionData = ExtractQtMethod(engine, function);
+
+  //    if (functionData.second != -1) {
+  //      // This is a QObject function wrapper
+  //      for (int ii = 0; ii < connections.count(); ++ii) {
+  //        QV8QObjectConnectionList::Connection &connection = connections[ii];
+
+  //        if (connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
+  //            (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue))) {
+
+  //          QPair<QObject *, int> connectedFunctionData = ExtractQtMethod(engine, connection.function);
+  //          if (connectedFunctionData == functionData) {
+  //            // Match!
+  //            if (connections.connectionsInUse) {
+  //              connection.needsDestroy = true;
+  //              connections.connectionsNeedClean = true;
+  //              } else {
+  //              connection.dispose();
+  //              connections.removeAt(ii);
+  //              }
+  //            return v8::Undefined();
+  //            }
+  //          }
+  //        }
+
+  //      } else {
+      // This is a normal JS function
+      for(int ii = 0; ii < connections.count(); ++ii)
+        {
+        XQObjectConnectionList::Connection &connection = connections[ii];
+        if(connection.function->StrictEquals(function) &&
+            connection.thisObject.IsEmpty() == functionThisValue.IsEmpty() &&
+            (connection.thisObject.IsEmpty() || connection.thisObject->StrictEquals(functionThisValue)))
+          {
+          // Match!
+          if(connections.connectionsInUse)
+            {
+            connection.needsDestroy = true;
+            connections.connectionsNeedClean = true;
+            }
+          else
+            {
+            connection.dispose();
+            connections.removeAt(ii);
+            }
+          return XScriptValue();
+          }
+        }
+      //}
+
+    return XScriptValue();
+    }
+
+  static XScriptValue emitSignal(XScriptArguments const &xArgs)
+    {
+    v8::Handle<v8::Object> calleeThis = getV8Internal(xArgs.callee());
+    QObject *object = (QObject *)calleeThis->Get(0).As<v8::External>()->Value();
+    int id = calleeThis->Get(1)->Int32Value();
+
+    union
+      {
+      const XScriptArguments *aIn;
+      const v8::Arguments *aOut;
+      } conv;
+    conv.aIn = &xArgs;
+
+    return fromHandle(Utils::methodCall(object, id, *conv.aOut));
+    }
+  };
 
 void XQObjectWrapper::buildInterface(XInterfaceBase *interface, const QMetaObject *metaObject)
   {

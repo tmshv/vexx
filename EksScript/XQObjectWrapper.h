@@ -7,7 +7,6 @@
 #include "XScriptEngine.h"
 
 class XQObjectConnectionList;
-class XSignalObject;
 
 class EKSSCRIPT_EXPORT XQObjectWrapper
   {
@@ -28,7 +27,7 @@ private:
   XUnorderedMap<const QMetaObject *, XInterfaceBase *> _objects;
   XUnorderedMap<QObject *, XQObjectConnectionList *> _connections;
   friend class XQObjectConnectionList;
-  friend class XSignalObject;
+  friend struct Utils;
   };
 
 namespace XScriptConvert {

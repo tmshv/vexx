@@ -99,6 +99,8 @@ XInterfaceBase *XScriptObject::getInterface() const
     tid = (obj.internalFieldCount() != IF::Count)
       ? 0
       : (xsize)obj.internalField(IF::TypeIDIndex);
+
+    proto = obj.getPrototype();
     }
 
   return findInterface(tid);

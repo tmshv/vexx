@@ -180,6 +180,7 @@ void XInterfaceBase::addFunction(const char *name, Function fn)
 
 void XInterfaceBase::setCallableAsFunction(Function fn)
   {
+  xAssertFail();
   (*::prototype(_prototype))->SetCallAsFunctionHandler((v8::InvocationCallback)fn);
   }
 
