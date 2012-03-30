@@ -137,6 +137,7 @@ XScriptValue::XScriptValue(const QVariant& val)
         {
         array->Set((uint32_t)i, getV8Internal(XScriptValue(list[i])));
         }
+      *this = fromHandle(array);
       }
       break;
 
