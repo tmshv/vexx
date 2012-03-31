@@ -141,15 +141,24 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
         continue;
         }
 
+      v8::TryCatch trycatch;
+
       xAssert(!connection.function.IsEmpty());
       xAssert(connection.function->IsFunction());
+      v8::Handle<v8::Value> result;
       if(connection.thisObject.IsEmpty())
         {
-        connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
+        result = connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
         }
       else
         {
-        connection.function->Call(connection.thisObject, argCount, getV8Internal(args.data()));
+        result = connection.function->Call(connection.thisObject, argCount, getV8Internal(args.data()));
+        }
+
+      if(result.IsEmpty())
+        {
+        trycatch.ReThrow();
+        qCritical() << XScriptConvert::from<QString>(fromHandle(trycatch.StackTrace()));
         }
       }
 

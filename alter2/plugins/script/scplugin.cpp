@@ -329,7 +329,7 @@ XScriptValue ScPlugin::call(XScriptFunction fn, XScriptValue th, const XScriptVa
 
   if(error)
     {
-    qWarning() << "Error in script at line " << ret.toString() << endl;
+    qCritical() << "Error in script at line " << ret.toString() << endl;
     return XScriptValue();
     }
 

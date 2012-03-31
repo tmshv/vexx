@@ -13,6 +13,12 @@ void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyI
     SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
     childInst->setMode(SPropertyInstanceInformation::Internal);
     }
+
+  if(data.registerInterfaces)
+    {
+    XInterface<SEntity> *api = info->apiInterface<SEntity>();
+    api->addMethod<SProperty* (const SPropertyInformation *, const QString &), &SEntity::addChild>("addChild");
+    }
   }
 
 SEntity::SEntity()

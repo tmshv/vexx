@@ -368,6 +368,10 @@ template <> struct JSToNative<QString>
     }
   };
 
+template <> struct JSToNative<const QString &> : JSToNative<QString>
+  {
+  };
+
 namespace
 {
 template <typename T> struct UselessConversionTypeToNative
