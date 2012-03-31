@@ -55,7 +55,7 @@ setupDebugSurface = function()
   {
   var surfaceManager =
     {
-    surface: script.addQMLSurface("DebugQMLCanvas", "Dock", "../alter2/plugins/script/NodeCanvas.qml"),
+    surface: script.addQMLSurface("DebugQMLCanvas", "Dock", "../alter2/plugins/script/NodeCanvas.qml", {}),
     passIn: function(name, argsIn)
       {
       assert(this[name]);

@@ -280,6 +280,10 @@ QString XScriptValue::toString() const
 QVariant XScriptValue::toVariant(int typeHint) const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  if(typeHint == QVariant::Bool || internal->_object->IsBoolean())
+    {
+    return toBoolean();
+    }
   if(typeHint == QVariant::String || internal->_object->IsString())
     {
     return toString();
@@ -309,6 +313,25 @@ QVariant XScriptValue::toVariant(int typeHint) const
   if(interface)
     {
     return interface->toVariant(XScriptValue(), typeHint);
+    }
+
+  if(typeHint == QVariant::Map || internal->_object->IsObject())
+    {
+    QVariantMap map;
+    if(internal->_object->IsObject())
+      {
+      v8::Handle<v8::Object> obj = internal->_object.As<v8::Object>();
+      v8::Handle<v8::Array> propertyNames = obj->GetOwnPropertyNames();
+      for(uint32_t i = 0, s = propertyNames->Length(); i < s; ++i)
+        {
+        v8::Handle<v8::Value> key = propertyNames->Get(i);
+        v8::Handle<v8::Value> value = obj->Get(key);
+
+        map.insert(XScriptConvert::from<QString>(fromHandle(key)),
+                   fromHandle(value).toVariant(QVariant::Invalid));
+        }
+      }
+    return map;
     }
 
   xAssert(internal->_object->IsNull());
