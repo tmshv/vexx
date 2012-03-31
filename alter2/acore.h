@@ -9,6 +9,7 @@
 
 class ACorePrivate;
 class AAbstractPlugin;
+class ADebugInterface;
 class QDir;
 
 class ALTER_EXPORT ACore : public QObject
@@ -37,6 +38,9 @@ public:
     QObject *plugin(const QString &pluginID);
 
     bool isDebugUIEnabled() const;
+
+    ADebugInterface *createDebugInterface(const QString &type);
+    void destroyDebugInterface(ADebugInterface *);
 
     int execute();
 private:

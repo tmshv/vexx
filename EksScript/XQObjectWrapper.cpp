@@ -214,6 +214,9 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   interface->seal();
   c->addInterface(interface);
   instance()->_objects.insert(&QObject::staticMetaObject, interface);
+
+  XInterface<QWidget>* widget = XInterface<QWidget>::create("QWidget");
+  widget->seal();
   }
 
 XQObjectWrapper *XQObjectWrapper::instance()
@@ -643,6 +646,10 @@ struct Utils
   static v8::Handle<v8::Value> methodCall(QObject *ths, int id, const v8::Arguments& args)
     {
     QMetaMethod method = ths->metaObject()->method(id);
+#ifdef X_DEBUG
+    const char *name = method.signature();
+    (void)name;
+#endif
     QList<QByteArray> types = method.parameterTypes();
     int length = args.Length();
     if(length < types.size())

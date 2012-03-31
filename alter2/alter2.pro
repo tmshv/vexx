@@ -7,17 +7,19 @@ TEMPLATE = lib
 
 include("../EksCore/GeneralOptions.pri")
 
-QT += xml
+QT += xml network
 INCLUDEPATH += $$ROOT/EksCore/
 LIBS += -lEksCore
 
 SOURCES += acore.cpp \
-    aabstractplugin.cpp
+    aabstractplugin.cpp \
+    adebuginterface.cpp
 
 HEADERS += acore.h \
     aglobal.h \
     aabstractplugin.h \
-    aplugin.h
+    aplugin.h \
+    adebuginterface.h
 
 macx:LIBS += -framework \
     CoreFoundation

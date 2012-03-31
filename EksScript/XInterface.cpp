@@ -73,7 +73,6 @@ QVariant XInterfaceBase::toVariant(const XScriptValue &inp, int typeHint)
   if(_fromScript)
     {
     const void *val = _fromScript(inp);
-    xAssert(val);
 
     if(typeHint == _typeId)
       {
@@ -233,6 +232,8 @@ XInterfaceBase *findInterface(int id)
 #ifdef X_DEBUG
   QVariant::Type type = (QVariant::Type)id;
   (void)type;
+  const char *typeName = QMetaType::typeName(type);
+  (void)typeName;
 #endif
 
   XInterfaceBase *base = _interfaces[id];

@@ -5,6 +5,7 @@
 #include "XInterface.h"
 #include "XScriptObject.h"
 #include "XScriptEngine.h"
+#include "QWidget"
 
 class XQObjectConnectionList;
 
@@ -47,11 +48,24 @@ template <> struct NativeToJS<QObject>
     }
   };
 }
+
+template <> inline QWidget *castFromBase(QObject *ptr)
+  {
+  return qobject_cast<QWidget*>(ptr);
+  }
 }
 
 namespace XScript
 {
 template <> class ClassCreator_Factory<QObject> : public ClassCreatorConvertableFactory<QObject> {};
 }
+
+#define X_SCRIPTABLE_QOBJECT_TYPE(type) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, QObject) \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct NativeToJS<type> : public NativeToJS<QObject> {}; } } \
+  namespace XScript { \
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+
+X_SCRIPTABLE_QOBJECT_TYPE(QWidget)
 
 #endif // XQOBJECTWRAPPER_H

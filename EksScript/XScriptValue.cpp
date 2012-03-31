@@ -140,6 +140,21 @@ XScriptValue::XScriptValue(const QVariant& val)
       *this = fromHandle(array);
       }
       break;
+    case QVariant::Map:
+      {
+      QVariantMap map = val.toMap();
+      v8::Local<v8::Object> obj = v8::Object::New();
+      QVariantMap::const_iterator it = map.begin();
+      QVariantMap::const_iterator end = map.end();
+      for(; it != end; ++it)
+        {
+        QString name = it.key();
+        QVariant val = it.value();
+        obj->Set(getV8Internal(XScriptConvert::to(name)), getV8Internal(XScriptValue(val)));
+        }
+      *this = fromHandle(obj);
+      }
+      break;
 
     default:
       {
@@ -290,7 +305,13 @@ QVariant XScriptValue::toVariant(int typeHint) const
       }
     }
 
-  xAssertFail();
+  XInterfaceBase *interface = findInterface(typeHint);
+  if(interface)
+    {
+    return interface->toVariant(XScriptValue(), typeHint);
+    }
+
+  xAssert(internal->_object->IsNull());
   return QVariant();
   }
 

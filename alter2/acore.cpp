@@ -10,6 +10,9 @@
 #include "QLibrary"
 #include "QDir"
 
+#include "adebuginterface.h"
+#include "QTcpSocket"
+
 #ifdef Q_WS_MAC
 #include "CoreFoundation/CFBundle.h"
 #endif
@@ -285,4 +288,15 @@ QObject *ACore::plugin(const QString &pluginName)
       }
     }
   return 0;
+  }
+
+
+ADebugInterface *ACore::createDebugInterface(const QString &type)
+  {
+  return new ADebugInterface(type);
+  }
+
+void ACore::destroyDebugInterface(ADebugInterface *in)
+  {
+  delete in;
   }
