@@ -175,6 +175,15 @@ XScriptValue::XScriptValue(void* val)
   internal->_object = v8::External::New(val);
   }
 
+
+XScriptValue XScriptValue::newArray()
+  {
+  XScriptValue obj;
+  const XScriptValueInternal *internal = XScriptValueInternal::val(&obj);
+  internal->_object = v8::Array::New();
+  return obj;
+  }
+
 XScriptValue::~XScriptValue()
   {
   XScriptValueInternal::term(this);
@@ -230,6 +239,13 @@ XScriptValue XScriptValue::at(xsize id)
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   v8::Handle<v8::Array> arr = internal->_object.As<v8::Array>();
   return fromHandle(arr->Get(id));
+  }
+
+void XScriptValue::set(xsize id, const XScriptValue &val)
+  {
+  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
+  v8::Handle<v8::Array> arr = internal->_object.As<v8::Array>();
+  arr->Set(id, getV8Internal(val));
   }
 
 void *XScriptValue::toExternal() const

@@ -141,11 +141,11 @@ struct XConstMethodForwarder<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
-    typedef ArgCaster<A0> AC0;
+    typedef XScriptConvert::ArgCaster<A0> AC0;
 
-    AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
+    AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
 
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)(  arg0 );
     }
   static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
@@ -155,13 +155,13 @@ struct XConstMethodForwarder<T, 1,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T const * self = CastFromJS<T>(argv.This());
+    T const * self = XScriptConvert::from<T>(argv.calleeThis());
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
-    try { return CastToJS( CallNative(func, argv) ); }
+    try { return XScriptConvert::to( CallNative(func, argv) ); }
     HANDLE_PROPAGATE_EXCEPTION;
     }
   };

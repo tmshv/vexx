@@ -574,7 +574,7 @@ public:
   typedef typename XSignatureType::ReturnType ReturnType;
   static ReturnType CallNative( Type & self, FunctionType func, XScriptArguments const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)();
     }
   static XScriptValue Call( Type & self, FunctionType func, XScriptArguments const & argv )
@@ -588,7 +588,7 @@ public:
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T * self = CastFromJS<T>(argv.This());
+    T * self = XScriptConvert::from<T>(argv.calleeThis());
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }

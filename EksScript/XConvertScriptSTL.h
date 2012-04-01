@@ -44,11 +44,10 @@ template <typename ListT> struct NativeToJSList
     {
     typedef typename ListT::const_iterator IT;
     IT it = li.begin();
-    const size_t sz = li.size();
-    v8::Handle<v8::Array> rv( v8::Array::New( static_cast<int>(sz) ) );
+    XScriptValue rv = XScriptValue::newArray();
     for( int i = 0; li.end() != it; ++it, ++i )
       {
-      rv->Set( v8::Integer::New(i), CastToJS( *it ) );
+      rv.set(i, XScriptConvert::to(*it));
       }
     return rv;
     }
@@ -56,6 +55,7 @@ template <typename ListT> struct NativeToJSList
 
 template <typename T> struct NativeToJS<std::list<T> > : NativeToJSList< std::list<T> > {};
 template <typename T> struct NativeToJS<std::vector<T> > : NativeToJSList< std::vector<T> > {};
+template <typename T> struct NativeToJS<QVector<T> > : NativeToJSList< QVector<T> > {};
 
 template <typename MapT> struct NativeToJSLookup
   {

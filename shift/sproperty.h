@@ -89,6 +89,7 @@ public:
   // or if this attribute is an entity, get it.
   SEntity *entity() const;
 
+  void setParent(SPropertyContainer *parent);
   SPropertyContainer *parent() const {return _parent;}
 
   SProperty *input() const {return _input;}
@@ -112,6 +113,7 @@ public:
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
+  void setInput(const SProperty *input) { input->connect(this); }
   void connect(const QVector<SProperty*> &) const;
   void disconnect(SProperty *) const;
   void disconnect() const;
@@ -120,6 +122,7 @@ public:
   bool isComputed() const;
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }
+  QVector<SProperty *> affects() const;
 
   template <typename T> T *nextSibling() const
     {
@@ -142,6 +145,8 @@ public:
   const SHandler *handler() const { return _handler; }
   SDatabase *database();
   const SDatabase *database() const;
+  void beginBlock();
+  void endBlock();
 
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
@@ -175,6 +180,10 @@ public:
   bool isDescendedFrom(const SProperty *ent) const;
   SProperty *resolvePath(const QString &path);
   const SProperty *resolvePath(const QString &path) const;
+
+  QVariant value() const;
+  void setValue(const QVariant &);
+  QString valueAsString() const;
 
   // set only works for dynamic properties
   void setName(const QString &);

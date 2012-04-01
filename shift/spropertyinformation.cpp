@@ -613,9 +613,15 @@ JSToNative<SPropertyInformation>::ResultType JSToNative<SPropertyInformation>::o
     }
   }
 
-XScriptValue NativeToJS<SPropertyInformation>::operator()(SPropertyInformation const &x) const
+XScriptValue NativeToJS<SPropertyInformation>::operator()(const SPropertyInformation &x) const
   {
   return x.typeName();
+  }
+
+XScriptValue NativeToJS<SPropertyInformation>::operator()(const SPropertyInformation *x) const
+  {
+  xAssert(x)
+  return x->typeName();
   }
 }
 }

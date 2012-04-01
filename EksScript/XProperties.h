@@ -343,7 +343,7 @@ struct XMethodToSetter : XAccessorSetterType
       XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
 
       bool valid = true;
-      InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(handle, valid);
+      InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
       if(!valid)
         {
         Toss(QString("Native member property setter '%1' could convert input argument!").arg(XScriptConvert::from<QString>(property) ));

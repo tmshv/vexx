@@ -34,6 +34,7 @@ public:
 
   xsize length() const;
   XScriptValue at(xsize id);
+  void set(xsize id, const XScriptValue &);
 
   void *toExternal() const;
   double toNumber() const;
@@ -41,6 +42,8 @@ public:
   bool toBoolean() const;
   QString toString() const;
   QVariant toVariant(int typeHint=0) const;
+
+  static XScriptValue newArray();
 
 private:
   void *_object;

@@ -151,6 +151,15 @@ public:
     }
 
   template <typename GETTYPE,
+            typename XConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD>
+  void addProperty(const char *name)
+    {
+    Getter getter = XScript::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
+
+    XInterfaceBase::addProperty(name, getter, 0);
+    }
+
+  template <typename GETTYPE,
             typename XMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD>
   void addAccessProperty(const char *name)
     {
@@ -164,6 +173,15 @@ public:
   void addMethod(const char *name)
     {
     Function fn = XScript::MethodToInCa<T, SIG, METHOD>::Call;
+
+    XInterfaceBase::addFunction(name, fn);
+    }
+
+  template <typename SIG,
+            typename XConstMethodSignature<T, SIG>::FunctionType METHOD>
+  void addConstMethod(const char *name)
+    {
+    Function fn = XScript::ConstMethodToInCa<T, SIG, METHOD>::Call;
 
     XInterfaceBase::addFunction(name, fn);
     }
@@ -636,7 +654,7 @@ public:
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__)
 
 #define X_SCRIPTABLE_MATCHERS(type) \
-  template <> inline const type& match<const type&, type*>(type *in, bool& valid) { return ptrMatcher<type>(in, valid); }
+  template <> inline const type& match<const type&, type*>(type **in, bool& valid) { return ptrMatcher<type>(in, valid); }
 
 #define X_SCRIPTABLE_TYPE_BASE(type)  \
   namespace XScriptConvert { namespace internal { \

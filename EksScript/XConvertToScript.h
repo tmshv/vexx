@@ -157,6 +157,14 @@ template <> struct NativeToJS<QString>
     }
   };
 
+template <> struct NativeToJS<QVariant>
+  {
+  XScriptValue operator()(QVariant v) const
+    {
+    return XScriptValue(v);
+    }
+  };
+
 // Converts a native std::exception to a JS exception and throws
 // that exception via v8::ThrowException().
 template <> struct NativeToJS<std::exception>

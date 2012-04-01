@@ -141,6 +141,7 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScShiftPropertyBase(eng)
   addMemberProperty("dynamic", dynamic, QScriptValue::PropertyGetter);
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("valueString", valueString, QScriptValue::PropertyGetter);
+
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
   addMemberFunction("pathTo", pathTo);

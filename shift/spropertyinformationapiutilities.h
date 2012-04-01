@@ -42,7 +42,8 @@ template <> struct SHIFT_EXPORT JSToNative<SPropertyInformation>
 
 template <> struct SHIFT_EXPORT NativeToJS<SPropertyInformation>
   {
-  XScriptValue operator()(SPropertyInformation const &x) const;
+  XScriptValue operator()(const SPropertyInformation *x) const;
+  XScriptValue operator()(const SPropertyInformation &x) const;
   };
 }
 }

@@ -372,6 +372,20 @@ template <> struct JSToNative<const QString &> : JSToNative<QString>
   {
   };
 
+template <> struct JSToNative<QVariant>
+  {
+  typedef QVariant ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    return h.toVariant();
+    }
+  };
+
+template <> struct JSToNative<const QVariant &> : JSToNative<QVariant>
+  {
+  };
+
 namespace
 {
 template <typename T> struct UselessConversionTypeToNative
