@@ -6,6 +6,9 @@
 #include "QDebug"
 #include "styperegistry.h"
 
+#include "XQtWrappers.h"
+#include "Serialisation/sjsonio.h"
+
 S_IMPLEMENT_PROPERTY(SDatabase)
 
 void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
@@ -20,6 +23,11 @@ void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropert
   if(data.registerInterfaces)
     {
     info->addInheritedInterface<SDatabase, SHandler>();
+
+    XInterface<SDatabase> *api = info->apiInterface<SDatabase>();
+
+    api->addMethod<QVector<SProperty *> (const QString &, QIODevice *, SPropertyContainer *), &SDatabase::load>("load");
+    api->addMethod<void (const QString &, QIODevice *, SEntity *, bool, bool), &SDatabase::save>("save");
     }
   }
 
@@ -45,6 +53,48 @@ SDatabase::~SDatabase()
     xAssertFail();
     }
 #endif
+  }
+
+QVector<SProperty *> SDatabase::load(const QString &type, QIODevice *device, SPropertyContainer *loadRoot)
+  {
+  xAssert(type == "json");
+  (void)type;
+
+  SJSONLoader s;
+
+  SProperty *p = loadRoot->firstChild();
+  while(p && p->nextSibling())
+    {
+    p = p->nextSibling();
+    }
+
+  s.readFromDevice(device, loadRoot);
+
+  if(!p)
+    {
+    p = loadRoot->firstChild();
+    }
+
+  QVector<SProperty *> ret;
+  SProperty *c = p;
+  while(c)
+    {
+    ret << c;
+    c = c->nextSibling();
+    }
+
+  return ret;
+  }
+
+void SDatabase::save(const QString &type, QIODevice *device, SEntity *saveRoot, bool readable, bool includeRoot)
+  {
+  xAssert(type == "json");
+  (void)type;
+
+  SJSONSaver s;
+  s.setAutoWhitespace(readable);
+
+  s.writeToDevice(device, saveRoot, includeRoot);
   }
 
 SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SPropertyContainer *parentToBe, SPropertyInstanceInformationInitialiser *init)

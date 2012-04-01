@@ -177,6 +177,16 @@ void XInterfaceBase::addFunction(const char *name, Function fn)
   (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
   }
 
+void XInterfaceBase::setIndexAccessor(IndexedGetter g)
+  {
+  (*::prototype(_prototype))->SetIndexedPropertyHandler((v8::IndexedPropertyGetter)g);
+  }
+
+void XInterfaceBase::setNamedAccessor(NamedGetter g)
+  {
+  (*::prototype(_prototype))->SetFallbackPropertyHandler((v8::NamedPropertyGetter)g);
+  }
+
 void XInterfaceBase::setCallableAsFunction(Function fn)
   {
   xAssertFail();

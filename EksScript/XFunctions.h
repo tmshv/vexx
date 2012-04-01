@@ -484,9 +484,9 @@ public:
   typedef typename XSignatureType::ReturnType ReturnType;
   typedef typename XSignatureType::FunctionType FunctionType;
   typedef typename XScriptTypeInfo<T>::Type Type;
-  static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & argv )
+  static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (self.*func)();
     }
   static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
@@ -499,7 +499,7 @@ public:
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T * self = CastFromJS<T>(argv.This());
+    T * self = XScriptConvert::from<T>(argv.calleeThis());
     if( ! self ) throw MissingThisExceptionT<T>();
     return (ReturnType)CallNative(*self, func, argv);
     }
@@ -507,7 +507,7 @@ public:
     {
     try
     {
-    return CastToJS( CallNative( func, argv ) );
+    return XScriptConvert::to( CallNative( func, argv ) );
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }

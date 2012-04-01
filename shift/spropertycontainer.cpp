@@ -4,8 +4,21 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyContainer)
 
-void SPropertyContainer::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void SPropertyContainer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
+  if(data.registerInterfaces)
+    {
+    XInterface<SPropertyContainer> *api = info->apiInterface<SPropertyContainer>();
+
+
+    XInterfaceBase::IndexedGetter indexedGetter = XScript::XMethodToIndexedGetter<SPropertyContainer, SProperty *(xsize i), &SPropertyContainer::at>::Get;
+    api->XInterfaceBase::setIndexAccessor(indexedGetter);
+
+    XInterfaceBase::NamedGetter namedGetter = XScript::XMethodToNamedGetter<SPropertyContainer, SProperty *(const QString &n), &SPropertyContainer::findChild>::Get;
+    api->XInterfaceBase::setNamedAccessor(namedGetter);
+
+    api->addProperty<xsize, &SPropertyContainer::size>("length");
+    }
   }
 
 SPropertyContainer::TreeChange::TreeChange(SPropertyContainer *b, SPropertyContainer *a, SProperty *ent, xsize index)

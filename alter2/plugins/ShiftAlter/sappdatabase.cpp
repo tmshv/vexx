@@ -13,6 +13,13 @@ void SAppDatabase::createTypeInformation(SPropertyInformation *info, const SProp
 
     childrenExt->add(&SAppDatabase::settings, "settings");
     }
+
+  if(data.registerInterfaces)
+    {
+    XInterface<SAppDatabase> *api = info->apiInterface<SAppDatabase>();
+
+    api->addMethod<SDocument *(const SPropertyInformation *), &SAppDatabase::addDocument>("addDocument");
+    }
   }
 
 SAppDatabase::SAppDatabase() : SDatabase(), _plugin(0)

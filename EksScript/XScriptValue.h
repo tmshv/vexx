@@ -49,48 +49,17 @@ private:
   void *_object;
   };
 
-class EKSSCRIPT_EXPORT XPersistentScriptValue : public XScriptValue
+class EKSSCRIPT_EXPORT XPersistentScriptValue
   {
 public:
-  XPersistentScriptValue() : XScriptValue()
+  XPersistentScriptValue(const XScriptValue &val);
+
+  ~XPersistentScriptValue()
     {
+    dispose();
     }
 
-  XPersistentScriptValue(bool x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(xuint32 x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(xint32 x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(xuint64 x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(xint64 x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(double x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(float x) : XScriptValue(x)
-    {
-    }
-
-  XPersistentScriptValue(const QString &str) : XScriptValue(str)
-    {
-    }
-
-  XPersistentScriptValue(const XScriptObject &str) : XScriptValue(str)
-    {
-    }
+  XScriptValue asValue() const;
 
   void dispose();
   };

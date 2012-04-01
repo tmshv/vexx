@@ -288,7 +288,8 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
 
     virtual bool exportFile(const QString &file, SProperty *prop) const
       {
-      XScriptFunction exFn(_v.get("exportFile"));
+      XScriptObject obj(_v.asValue());
+      XScriptFunction exFn(obj.get("exportFile"));
 
       if(!exFn.isValid())
         {
@@ -300,23 +301,25 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
         XScriptConvert::to(prop)
       };
 
-      XScriptValue r = ScPlugin::call(exFn, _v, l, X_SIZEOF_ARRAY(l));
+      XScriptValue r = ScPlugin::call(exFn, obj, l, X_SIZEOF_ARRAY(l));
 
       return r.toBoolean();
       }
 
     virtual QString exporterName() const
       {
-      return _v.get("name").toString();
+      XScriptObject obj(_v.asValue());
+      return obj.get("name").toString();
       }
 
     virtual QString exporterFileType() const
       {
-      return _v.get("fileType").toString();
+      XScriptObject obj(_v.asValue());
+      return obj.get("fileType").toString();
       }
 
   private:
-    XScriptObject _v;
+    XPersistentScriptValue _v;
     };
 
   XScriptObject obj(exp);

@@ -86,8 +86,12 @@ public:
   typedef XScriptValue (*Invocation)(const XScriptArguments& args);
   typedef XScriptValue (*Getter)(XScriptValue property,const XAccessorInfo& info);
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
+  typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
+  typedef XScriptValue (*IndexedGetter)(xuint32, const XAccessorInfo& info);
   void addProperty(const char *name, Getter, Setter);
   void addFunction(const char *name, Function);
+  void setIndexAccessor(IndexedGetter);
+  void setNamedAccessor(NamedGetter);
   void setCallableAsFunction(Function fn);
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
@@ -193,6 +197,22 @@ public:
     Function fn = XScript::FunctionToInCa<SIG, METHOD>::Call;
 
     XInterfaceBase::addFunction(name, fn);
+    }
+
+  template <typename RETTYPE, typename XMethodSignature<T, RETTYPE (xsize i)>::FunctionType METHOD>
+  void setIndexAccessor()
+    {
+    IndexedGetter fn = XScript::XMethodToIndexedGetter<T, RETTYPE (xsize i), METHOD>::Get;
+
+    XInterfaceBase::setIndexAccessor(fn);
+    }
+
+  template <typename RETTYPE, typename XMethodSignature<T, RETTYPE (const QString &name)>::FunctionType METHOD>
+  void setNamedAccessor()
+    {
+    NamedGetter fn = XScript::XMethodToNamedGetter<T, RETTYPE (const QString &name), METHOD>::Get;
+
+    XInterfaceBase::setNamedAccessor(fn);
     }
 
   template <typename SIG,
@@ -369,9 +389,10 @@ private:
 
   static void weak_dtor( XPersistentScriptValue pv, void * )
     {
-    XScriptObject jobj(pv);
+    XScriptValue val = pv.asValue();
+    XScriptObject jobj(val);
     typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NT;
-    NT native = XScriptConvert::from<T>( pv );
+    NT native = XScriptConvert::from<T>( val );
     if( !native )
       {
       /* see: http://code.google.com/p/v8-juice/issues/detail?id=27
@@ -389,7 +410,6 @@ private:
           sign of a problem - the dtor shouldn't be called twice!
           */
       pv.dispose();
-      pv.clear();
 #if 1 /* i believe this problem was fixed. If you are reading this b/c
   you followed an assert() message, please report this as a bug.
   */
@@ -455,7 +475,6 @@ private:
         assertion.
       */
     pv.dispose();
-    pv.clear();
     }
 
   /**
@@ -564,6 +583,10 @@ template <typename T> struct NativeToJSConvertableType
   {
   XScriptValue operator()(T *n) const
     {
+    if(!n)
+      {
+      return XScriptValue();
+      }
     const XInterfaceBase* interface = findInterface<T>(n);
     XScriptValue vals[1] = { n };
     XScriptObject self = interface->newInstance(1, vals);
@@ -602,7 +625,7 @@ public:
     T *b = Proxy::Call(argv);
     if(b)
     {
-      XNativeToJSMap<T>::Insert(jsSelf, b);
+      XNativeToJSMap<T>::Insert(XScriptValue(jsSelf), b);
     }
     XScriptEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
     return b;
@@ -645,7 +668,7 @@ public:
 
 #define X_SCRIPTABLE_CONSTRUCTOR_DEF(variable, type, n) variable,
 
-#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)  typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) XScript::CtorForwarder<type *(const type &)>, XScript::CtorForwarder<type *()> )> name;
+#define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(name, type, ...)typedef XSignature< type (X_EXPAND_ARGS(X_SCRIPTABLE_CONSTRUCTOR_DEF, type, __VA_ARGS__) XScript::CtorForwarder<type *(const type &)>, XScript::CtorForwarder<type *()> )> name;
 
 #define X_SCRIPTABLE_BUILD_CONSTRUCTABLE_COPYABLE(type, ...) \
   X_SCRIPTABLE_BUILD_CONSTRUCTABLE_TYPEDEF(type##Ctors, type, __VA_ARGS__)

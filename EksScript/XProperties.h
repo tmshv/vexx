@@ -488,6 +488,34 @@ PropagateOtherExceptions
 >
   {};
 
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Getter>
+struct XMethodToIndexedGetter : XAccessorGetterType
+  {
+  inline static XScriptValue Get( xuint32 property, const XAccessorInfo &info )
+    {
+    typedef typename XScriptTypeInfo<T>::Type Type;
+    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+    NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
+    return self
+        ? XScriptConvert::to( (self->*Getter)(property) )
+        : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
+    }
+  };
+
+template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionType Getter>
+struct XMethodToNamedGetter : XAccessorGetterType
+  {
+  inline static XScriptValue Get( XScriptValue property, const XAccessorInfo &info )
+    {
+    typedef typename XScriptTypeInfo<T>::Type Type;
+    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+    NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
+    return self
+        ? XScriptConvert::to( (self->*Getter)(XScriptConvert::from<QString>(property)) )
+        : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
+    }
+  };
+
 
 #if 0
 /**

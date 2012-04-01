@@ -43,6 +43,45 @@ struct XScriptValueInternal
   };
 xCompileTimeAssert(sizeof(XScriptValue) == sizeof(XScriptValueInternal));
 
+struct XPersistentScriptValueInternal
+  {
+  static XPersistentScriptValueInternal *init(XPersistentScriptValue *o, const XPersistentScriptValue *other=0)
+    {
+    XPersistentScriptValueInternal *internal = (XPersistentScriptValueInternal*)o;
+    new(internal) XPersistentScriptValueInternal;
+
+    if(other)
+      {
+      const XPersistentScriptValueInternal *otherInternal = (const XPersistentScriptValueInternal*)other;
+      internal->_object = otherInternal->_object;
+      }
+
+    return internal;
+    }
+
+  static void term(XPersistentScriptValue *o)
+    {
+    XPersistentScriptValueInternal *internal = (XPersistentScriptValueInternal*)o;
+    (void)internal;
+    internal->~XPersistentScriptValueInternal();
+    }
+
+  static const XPersistentScriptValueInternal *val(const XPersistentScriptValue *o)
+    {
+    const XPersistentScriptValueInternal *internal = (XPersistentScriptValueInternal*)o;
+    return internal;
+    }
+
+  static XPersistentScriptValueInternal *val(XPersistentScriptValue *o)
+    {
+    XPersistentScriptValueInternal *internal = (XPersistentScriptValueInternal*)o;
+    return internal;
+    }
+
+  mutable v8::Persistent<v8::Value> _object;
+  };
+xCompileTimeAssert(sizeof(XScriptValue) == sizeof(XScriptValueInternal));
+
 XScriptValue::XScriptValue()
   {
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
@@ -368,9 +407,27 @@ v8::Handle<v8::Value> getV8Internal(const XScriptValue &o)
   return internal->_object;
   }
 
+XPersistentScriptValue::XPersistentScriptValue(const XScriptValue &val)
+  {
+  const XPersistentScriptValueInternal *internal = XPersistentScriptValueInternal::init(this);
+
+  const XScriptValueInternal *other = XScriptValueInternal::val(&val);
+  internal->_object = v8::Persistent<v8::Value>::New(other->_object);
+  }
+
+XScriptValue XPersistentScriptValue::asValue() const
+  {
+  XScriptValue val;
+  const XScriptValueInternal *internal = XScriptValueInternal::val(&val);
+  const XPersistentScriptValueInternal *other = XPersistentScriptValueInternal::val(this);
+
+  internal->_object = other->_object;
+  return val;
+  }
+
 void XPersistentScriptValue::dispose()
   {
-  const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  v8::Persistent<v8::Value>* val = (v8::Persistent<v8::Value>*)&internal->_object;
-  val->Dispose();
+  const XPersistentScriptValueInternal *internal = XPersistentScriptValueInternal::val(this);
+  internal->_object.Dispose();
+  internal->_object.Clear();
   }

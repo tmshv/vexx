@@ -3,6 +3,7 @@
 #include "Serialisation/sjsonio.h"
 #include "QMenu"
 #include "splugin.h"
+#include "XQObjectWrapper.h"
 
 void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocument *doc)
   {
@@ -33,6 +34,14 @@ void SDocument::createTypeInformation(SPropertyInformation *info, const SPropert
   if(data.registerInterfaces)
     {
     info->addInheritedInterface<SDocument, SHandler>();
+
+    XInterface<SDocument> *api = info->apiInterface<SDocument>();
+
+    api->addMethod<void(), &SDocument::newFile>("newFile");
+    api->addMethod<void(const QString &), &SDocument::loadFile>("loadFile");
+    api->addMethod<void(const QString &), &SDocument::saveFile>("saveFile");
+
+    api->addMethod<QWidget *(), &SDocument::createEditor>("createEditor");
     }
   }
 

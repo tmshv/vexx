@@ -16,6 +16,15 @@ template <typename T> struct Binder
     templ->seal();
     engine->addInterface(templ);
     }
+
+  template <typename PARENT> static void initWithParent(XScriptEngine *engine, const char *name)
+    {
+    const XInterface<PARENT> *parent = XInterface<PARENT>::lookup();
+    XInterface<T> *templ = XInterface<T>::createWithParent(name, parent);
+    setupBindings<T>(templ);
+    templ->seal();
+    engine->addInterface(templ);
+    }
   };
 
 template <typename T> void setupBindings(XInterface<T> *templ)
@@ -55,6 +64,7 @@ template <> void setupBindings<QRectF>(XInterface<QRectF> *templ)
   templ->addProperty<qreal, qreal, &QRectF::bottom, &QRectF::setBottom>("bottom");
   templ->addProperty<QPointF, const QPointF &, &QRectF::topLeft, &QRectF::setTopLeft>("topLeft");
   }
+
 template <> void setupBindings<QRect>(XInterface<QRect> *templ)
   {
   templ->addProperty<int, int, &QRect::left, &QRect::setLeft>("left");
@@ -64,9 +74,19 @@ template <> void setupBindings<QRect>(XInterface<QRect> *templ)
   templ->addProperty<QPoint, const QPoint &, &QRect::topLeft, &QRect::setTopLeft>("topLeft");
   }
 
+template <> void setupBindings<QFile>(XInterface<QFile> *templ)
+  {
+  }
+
+template <> void setupBindings<QIODevice>(XInterface<QIODevice> *templ)
+  {
+  }
+
 void initiate(XScriptEngine *eng)
   {
 #define BIND(t) Binder<t>::init(eng, #t)
+#define BIND_WITH_PARENT(t, p) Binder<t>::initWithParent<p>(eng, #t)
+
   BIND(QPointF);
   BIND(QRectF);
   BIND(QPoint);
@@ -83,6 +103,10 @@ void initiate(XScriptEngine *eng)
   BIND(QSizePolicy);
   BIND(QPalette);
   BIND(QRegion);
+
+  BIND(QIODevice);
+  BIND_WITH_PARENT(QFile, QIODevice);
 #undef BIND
+#undef BIND_WITH_PARENT
   }
 }

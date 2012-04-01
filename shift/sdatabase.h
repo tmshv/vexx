@@ -22,6 +22,9 @@ public:
   SDatabase();
   ~SDatabase();
 
+  QVector<SProperty *> load(const QString &type, QIODevice *device, SPropertyContainer *loadRoot);
+  void save(const QString &type, QIODevice *device, SEntity *saveRoot, bool readable, bool includeRoot);
+
   static QChar pathSeparator();
 
   XAllocatorBase *persistantAllocator()
