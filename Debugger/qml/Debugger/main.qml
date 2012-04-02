@@ -8,6 +8,8 @@ Window {
 
   width: 300
   height: content.height + 10
+  minimumHeight: content.height + 10
+  maximumHeight: content.height + 10
   visible: true
 
   property bool connected: false
@@ -65,7 +67,7 @@ Window {
         Text {
           width: parent.width
           horizontalAlignment: Text.AlignHCenter
-          text: "Listening for Connection..."
+          text: "Listening for Connection at " + debugEngine.host + ":" + debugEngine.port.toString()
         }
 
         ProgressBar {
