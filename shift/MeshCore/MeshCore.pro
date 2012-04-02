@@ -15,11 +15,12 @@ HEADERS += MeshCore.h \
     MCGeometry.h \
     MCCuboid.h \
     MCDensityShape.h \
+    MCSphere.h \
     MCSphere.h
 
-INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Shift $$ROOT/shift/MeshCore
+INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/EksScript $$ROOT/Shift $$ROOT/shift/MeshCore
 
-LIBS += -lshift -lEksCore -lEks3D -lShiftGraphicsCore
+LIBS += -lshift -lEksCore -lEks3D -lEksScript -lShiftGraphicsCore
 
 SOURCES += \
     MeshCore.cpp \

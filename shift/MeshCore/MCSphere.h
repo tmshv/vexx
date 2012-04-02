@@ -1,5 +1,5 @@
-#ifndef MCCUBOID_H
-#define MCCUBOID_H
+#ifndef MCSPHERE_H
+#define MCSPHERE_H
 
 #include "MCDensityShape.h"
 #include "3D/Manipulators/GCManipulator.h"
