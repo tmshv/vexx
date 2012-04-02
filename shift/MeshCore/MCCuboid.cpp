@@ -6,47 +6,45 @@
 
 S_IMPLEMENT_PROPERTY(MCCuboid)
 
-SPropertyInformation *MCCuboid::createTypeInformation()
+void MCCuboid::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation* info = SPropertyInformation::create<MCCuboid>("MCCuboid");
+  if(data.registerAttributes)
+    {
+    GCGeometry::InstanceInformation *inst = info->child(&MCCuboid::polygons);
+    inst->setCompute(computeGeometry);
 
-  GCGeometry::InstanceInformation *inst = info->add(&MCCuboid::geometry, "geometry");
-  inst->setCompute(computeGeometry);
+    FloatProperty::InstanceInformation *wInfo = info->add(&MCCuboid::width, "width");
+    wInfo->setAffects(inst);
+    wInfo->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation *wInfo = info->add(&MCCuboid::width, "width");
-  wInfo->setAffects(inst);
-  wInfo->setDefault(1.0f);
+    FloatProperty::InstanceInformation *hInfo = info->add(&MCCuboid::height, "height");
+    hInfo->setAffects(inst);
+    hInfo->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation *hInfo = info->add(&MCCuboid::height, "height");
-  hInfo->setAffects(inst);
-  hInfo->setDefault(1.0f);
+    FloatProperty::InstanceInformation *dInfo = info->add(&MCCuboid::depth, "depth");
+    dInfo->setAffects(inst);
+    dInfo->setDefault(1.0f);
+    }
 
-  FloatProperty::InstanceInformation *dInfo = info->add(&MCCuboid::depth, "depth");
-  dInfo->setAffects(inst);
-  dInfo->setDefault(1.0f);
-
-  info->addInheritedInterface<MCCuboid, GCManipulatable>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<MCCuboid, GCManipulatable>();
+    }
   }
 
 MCCuboid::MCCuboid()
   {
   }
 
-MCCuboid::~MCCuboid()
-  {
-  }
-
 void MCCuboid::computeGeometry(const SPropertyInstanceInformation*, MCCuboid* cube)
   {
-  MCGeometry& geo = cube->geometry;
+  MCPolyhedronProperty& geo = cube->polygons;
 
   float x = cube->width() / 2;
   float y = cube->height() / 2;
   float z = cube->depth() / 2;
 
-  MCPolyhedronProperty::ComputeLock l(&geo.polygons);
+  MCPolyhedronProperty::ComputeLock l(&geo);
 
   MCPolyhedron& p = *l.data();
 

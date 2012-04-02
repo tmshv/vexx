@@ -65,4 +65,6 @@ public:
   static void assignProperty(const SProperty *p, SProperty *l );
   };
 
+S_PROPERTY_INTERFACE(MCPolyhedronProperty);
+
 #endif // MCPOLYHEDRON_H

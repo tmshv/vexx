@@ -17,5 +17,6 @@ public:
   void appendTo(XGeometry *geo) const;
   };
 
+S_PROPERTY_INTERFACE(MCGeometry);
 
 #endif // MCGEOMETRY_H

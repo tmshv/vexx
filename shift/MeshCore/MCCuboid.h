@@ -4,22 +4,22 @@
 #include "MCDensityShape.h"
 #include "3D/Manipulators/GCManipulator.h"
 
-class MCSphere : public MCDensityShape, public GCManipulatable
+class MCCuboid : public MCGeometry, public GCManipulatable
   {
-  S_ENTITY(MCSphere, MCDensityShape, 0)
+  S_ENTITY(MCCuboid, MCGeometry, 0)
 
 public:
-  MCSphere();
+  MCCuboid();
 
-  FloatProperty radius;
-
-  virtual float boundingRadius() const { return radius()+0.5f; }
-  virtual float minimumSurfaceAngle() const { return 30.0f; }
-  virtual float maximumApproximateTriangleSize() const { return 0.75f*radius(); }
-  virtual float evaluate(const XVector3D &p) const;
+  FloatProperty width;
+  FloatProperty height;
+  FloatProperty depth;
 
 private:
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
+  static void computeGeometry(const SPropertyInstanceInformation*, MCCuboid* cube);
   };
+
+S_PROPERTY_INTERFACE(MCCuboid);
 
 #endif // MCSPHERE_H

@@ -24,4 +24,6 @@ private:
   static void computeGeometry(const SPropertyInstanceInformation*, MCDensityShape* cube);
   };
 
+S_PROPERTY_INTERFACE(MCDensityShape);
+
 #endif // MCDENSITYSHAPE_H

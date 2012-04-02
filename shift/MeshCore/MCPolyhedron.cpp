@@ -2,10 +2,8 @@
 
 S_IMPLEMENT_PROPERTY(MCPolyhedronProperty)
 
-SPropertyInformation *MCPolyhedronProperty::createTypeInformation()
+void MCPolyhedronProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<MCPolyhedronProperty>("MCPolyhedronProperty");
-  return info;
   }
 
 void MCPolyhedronProperty::assignProperty(const SProperty *, SProperty *)

@@ -9,14 +9,13 @@
 
 S_IMPLEMENT_PROPERTY(MCDensityShape)
 
-SPropertyInformation *MCDensityShape::createTypeInformation()
+void MCDensityShape::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation* info = SPropertyInformation::create<MCDensityShape>("MCDensityShape");
-
-  GCGeometry::InstanceInformation *inst = info->add(&MCDensityShape::geometry, "geometry");
-  inst->setCompute(computeGeometry);
-
-  return info;
+  if(data.registerAttributes)
+    {
+    GCGeometry::InstanceInformation *inst = info->add(&MCDensityShape::geometry, "geometry");
+    inst->setCompute(computeGeometry);
+    }
   }
 
 MCDensityShape::MCDensityShape()
