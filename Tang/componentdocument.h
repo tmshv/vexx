@@ -16,6 +16,8 @@ public:
   QWidget *createEditor();
   };
 
+S_PROPERTY_INTERFACE(ComponentDocument)
+
 class ComponentEditorInterface : public SDefaultPartEditorInterface
   {
 public:

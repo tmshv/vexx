@@ -15,7 +15,6 @@ HEADERS += GCGlobal.h \
     GCShiftRenderModel.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
-    GCGeometry.h \
     GCBaseProperties.h \
     3D/GCTransform.h \
     3D/GCRenderTarget.h \

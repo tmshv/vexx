@@ -14,6 +14,7 @@
 #include "sashaderparteditorinterface.h"
 #include "acore.h"
 #include "mathscore.h"
+#include "meshcore.h"
 #include "GraphicsCore.h"
 #include "XArrayMath"
 
@@ -47,6 +48,7 @@ void SPlugin::load()
 
   initiateMathsCore();
   initiateGraphicsCore();
+  initiateMeshCore();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
   XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope

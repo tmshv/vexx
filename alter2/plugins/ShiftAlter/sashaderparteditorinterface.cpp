@@ -51,7 +51,7 @@ public:
     GCGeometryTransform *transform = vp->addChild<GCGeometryTransform>("Transform");
     group->geometry.addPointer(transform);
 
-    const SPropertyInformation *info = STypeRegistry::findType("MCCuboid");
+    const SPropertyInformation *info = STypeRegistry::findType("MCSphere");
     SProperty *shape = vp->addChild(info, "Cube");
     transform->geometry.setPointed(shape->entity()->findChild("geometry")->castTo<GCGeometry>());
 

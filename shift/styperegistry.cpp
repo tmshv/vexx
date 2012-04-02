@@ -22,6 +22,8 @@ STypeRegistry::STypeRegistry()
 
 void STypeRegistry::initiate()
   {
+  XScriptEngine::initiate();
+
   _internalTypes.allocator = new XBucketAllocator();
 
   addType(SProperty::staticTypeInformation());

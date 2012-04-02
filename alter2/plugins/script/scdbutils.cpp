@@ -303,7 +303,7 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
 
       XScriptValue r = ScPlugin::call(exFn, obj, l, X_SIZEOF_ARRAY(l));
 
-      return r.toBoolean();
+      return r. toBoolean();
       }
 
     virtual QString exporterName() const

@@ -2,11 +2,8 @@
 
 S_IMPLEMENT_PROPERTY(Component);
 
-SPropertyInformation *Component::createTypeInformation()
+void Component::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<Component>("Component");
-
-  return info;
   }
 
 Component::Component()

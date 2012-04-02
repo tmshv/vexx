@@ -2,14 +2,13 @@
 
 S_IMPLEMENT_PROPERTY(ComponentDocument)
 
-SPropertyInformation *ComponentDocument::createTypeInformation()
+void ComponentDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<ComponentDocument>("ComponentDocument");
-
-  StringProperty::InstanceInformation* type = info->child(&ComponentDocument::type);
-  type->setDefault("Component");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    StringProperty::InstanceInformation* type = info->child(&ComponentDocument::type);
+    type->setDefault("Component");
+    }
   }
 
 ComponentDocument::ComponentDocument()

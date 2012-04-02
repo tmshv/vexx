@@ -11,4 +11,6 @@ public:
   Component();
   };
 
+S_PROPERTY_INTERFACE(Component)
+
 #endif // COMPONENT_H

@@ -6,6 +6,7 @@
 #include "QDebug"
 #include "styperegistry.h"
 #include "Serialisation/sjsonio.h"
+#include "xqtwrappers.h"
 
 #ifdef X_DEBUG
 # include "XMemoryTracker"

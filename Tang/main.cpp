@@ -16,8 +16,8 @@ int main( int argc, char **argv )
   ACore app( "vexx.googlecode.com", "Tang", argc, argv );
 
   app.addDirectory(ACore::rootPath());
-  app.load("UI");
   app.load("script");
+  app.load("UI");
 
 #ifdef X_DEBUG
   app.addDirectory(ACore::rootPath() + "../Tang");
