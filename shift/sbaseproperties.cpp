@@ -25,9 +25,8 @@ void StringProperty::createTypeInformation(SPropertyInformation *, const SProper
 
 S_IMPLEMENT_PROPERTY(FilenameProperty)
 
-SPropertyInformation *FilenameProperty::createTypeInformation()
+void FilenameProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<FilenameProperty>("FilenameProperty");
   }
 
 void BoolProperty::assignProperty(const SProperty *f, SProperty *t)

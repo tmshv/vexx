@@ -146,9 +146,6 @@ void ScPlugin::load()
 
   //XScriptObject_engine->set("dbTypes", XScriptValue(XScriptObject::newObject()));
 
-  connect(_types, SIGNAL(typeAdded(QString)), this, SIGNAL(typeAdded(QString)));
-  connect(_types, SIGNAL(typeRemoved(QString)), this, SIGNAL(typeRemoved(QString)));
-
   registerScriptGlobal("db", XScriptConvert::to(&db->db()));
 
   STypeRegistry::addTypeObserver(this);
