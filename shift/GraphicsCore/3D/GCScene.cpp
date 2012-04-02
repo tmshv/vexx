@@ -7,17 +7,16 @@
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
-SPropertyInformation *GCScene::createTypeInformation()
+void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCScene>("GCScene");
+  if(data.registerAttributes)
+    {
+    info->add(&GCScene::activeCamera, "activeCamera");
+    info->add(&GCScene::cameraTransform, "cameraTransform");
+    info->add(&GCScene::cameraProjection, "cameraProjection");
 
-  info->add(&GCScene::activeCamera, "activeCamera");
-  info->add(&GCScene::cameraTransform, "cameraTransform");
-  info->add(&GCScene::cameraProjection, "cameraProjection");
-
-  info->add(&GCScene::shadingGroups, "shadingGroups");
-
-  return info;
+    info->add(&GCScene::shadingGroups, "shadingGroups");
+    }
   }
 
 GCScene::GCScene() : XCameraCanvasController(0)
@@ -54,17 +53,16 @@ void computeManips(const SPropertyInstanceInformation *, GCManipulatableScene *s
   s->refreshManipulators();
   }
 
-SPropertyInformation *GCManipulatableScene::createTypeInformation()
+void GCManipulatableScene::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCManipulatableScene>("GCManipulatableScene");
+  if(data.registerAttributes)
+    {
+    SPropertyArray::InstanceInformation *manInfo = info->add(&GCManipulatableScene::manipulators, "manipulators");
+    manInfo->setCompute(computeManips);
 
-  SPropertyArray::InstanceInformation *manInfo = info->add(&GCManipulatableScene::manipulators, "manipulators");
-  manInfo->setCompute(computeManips);
-
-  PointerArray::InstanceInformation *selInfo = info->add(&GCManipulatableScene::selection, "selection");
-  selInfo->setAffects(manInfo);
-
-  return info;
+    PointerArray::InstanceInformation *selInfo = info->add(&GCManipulatableScene::selection, "selection");
+    selInfo->setAffects(manInfo);
+    }
   }
 
 GCManipulatableScene::GCManipulatableScene() : _currentManipulator(0), _mouseSelecting(false)

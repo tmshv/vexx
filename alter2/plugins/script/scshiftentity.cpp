@@ -1,3 +1,4 @@
+#if 0
 #include "scshiftentity.h"
 #include "sentity.h"
 #include "sdatabase.h"
@@ -58,3 +59,4 @@ QScriptValue ScShiftEntity::addChild(QScriptContext *ctx, QScriptEngine *)
   ctx->throwError(QScriptContext::SyntaxError, "Incorrect arguments to SEntity.addChild(...);");
   return QScriptValue();
   }
+#endif

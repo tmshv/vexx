@@ -9,10 +9,12 @@ include("../EksCore/GeneralOptions.pri")
 
 INCLUDEPATH += $$ROOT/Shift \
     $$ROOT/EksCore \
-    $$ROOT/EksGui
+    $$ROOT/EksGui \
+    $$ROOT/EksScript
 
 LIBS += -lEksCore \
-    -lEksGui
+    -lEksGui \
+    -lEksScript
 
 SOURCES += \
     sentity.cpp \
@@ -70,7 +72,8 @@ HEADERS += \
     Serialisation/sbinaryio.h \
     Serialisation/sjsonio.h \
     shandler.h \
-    sinterfaces.h
+    sinterfaces.h \
+    spropertyinformationapiutilities.h
 
 
 

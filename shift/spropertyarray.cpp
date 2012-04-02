@@ -3,9 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyArray)
 
-SPropertyInformation *SPropertyArray::createTypeInformation()
+void SPropertyArray::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<SPropertyArray>("SPropertyArray");
   }
 
 SPropertyArray::SPropertyArray()

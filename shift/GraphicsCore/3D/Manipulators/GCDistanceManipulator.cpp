@@ -83,21 +83,20 @@ void computeAbsDisp(const SPropertyInstanceInformation *, GCDistanceManipulator 
   d->absoluteDisplacement = d->lockDirection().normalized() * (d->distance() * d->scaleFactor());
   }
 
-SPropertyInformation *GCDistanceManipulator::createTypeInformation()
+void GCDistanceManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCDistanceManipulator>("GCDistanceManipulator");
+  if(data.registerAttributes)
+    {
+    Vector3DProperty::InstanceInformation *absDispInfo = info->add(&GCDistanceManipulator::absoluteDisplacement, "absoluteDisplacement");
+    absDispInfo->setCompute(computeAbsDisp);
 
-  Vector3DProperty::InstanceInformation *absDispInfo = info->add(&GCDistanceManipulator::absoluteDisplacement, "absoluteDisplacement");
-  absDispInfo->setCompute(computeAbsDisp);
-
-  Vector3DProperty::InstanceInformation *dirInfo = info->child(&GCDistanceManipulator::lockDirection);
-  dirInfo->setAffects(absDispInfo);
-  FloatProperty::InstanceInformation *distInfo = info->add(&GCDistanceManipulator::distance, "distance");
-  distInfo->setAffects(absDispInfo);
-  FloatProperty::InstanceInformation *sfInfo = info->add(&GCDistanceManipulator::scaleFactor, "scaleFactor");
-  sfInfo->setAffects(absDispInfo);
-
-  return info;
+    Vector3DProperty::InstanceInformation *dirInfo = info->child(&GCDistanceManipulator::lockDirection);
+    dirInfo->setAffects(absDispInfo);
+    FloatProperty::InstanceInformation *distInfo = info->add(&GCDistanceManipulator::distance, "distance");
+    distInfo->setAffects(absDispInfo);
+    FloatProperty::InstanceInformation *sfInfo = info->add(&GCDistanceManipulator::scaleFactor, "scaleFactor");
+    sfInfo->setAffects(absDispInfo);
+    }
   }
 
 GCDistanceManipulator::GCDistanceManipulator()

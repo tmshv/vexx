@@ -37,9 +37,9 @@ HEADERS += UIPlugin.h \
     UIEventLoggerSurface.h
 
 
-INCLUDEPATH += ../../ $$ROOT/EksCore $$ROOT/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
+INCLUDEPATH += ../../ $$ROOT/EksCore ../../ $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
 
-LIBS += -lEksCore -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
+LIBS += -lEksCore -lEksScript -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
 
 
 

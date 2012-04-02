@@ -65,10 +65,47 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
   STypeRegistry::allocator()->free(d);
   }
 
-SPropertyInformation *SPropertyInformation::create(const SPropertyInformation *obj)
+void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyInformation *from)
   {
-  xAssert(obj->_copy);
-  SPropertyInformation *copy = obj->_copy();
+  // update template constructor too
+  info->setCreateProperty(from->createProperty());
+  info->setSave(from->save());
+  info->setLoad(from->load());
+  info->setShouldSave(from->shouldSave());
+  info->setShouldSaveValue(from->shouldSaveValue());
+  info->setAssign(from->assign());
+  info->setPostCreate(from->postCreate());
+  info->setPostChildSet(from->postChildSet());
+  info->setVersion(from->version());
+  info->setSize(from->size());
+  info->setInstanceInformationSize(from->instanceInformationSize());
+
+  info->_createInstanceInformation = from->_createInstanceInformation;
+  info->_derive = from->_derive;
+  info->_instances = 0;
+  info->_extendedParent = 0;
+
+  info->_typeName = from->typeName();
+  }
+
+SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *from)
+  {
+  xAssert(from->_derive);
+  SPropertyInformation *copy = SPropertyInformation::allocate();
+
+  SPropertyInformation::initiate(copy, from);
+
+  SPropertyInformationCreateData data;
+  data.registerAttributes = true;
+  data.registerInterfaces = false;
+
+  from->_derive(copy, data);
+  copy->setParentTypeInformation(from);
+
+  copy->_apiInterface = from->_apiInterface;
+  xAssert(copy->_apiInterface);
+
+  xAssert(copy);
   return copy;
   }
 
@@ -110,9 +147,7 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
   {
   const SPropertyInformation *oldInst = inst->childInformation();
-  SPropertyInformation *info = SPropertyInformation::create(oldInst);
-
-  info->setParentTypeInformation(oldInst);
+  SPropertyInformation *info = SPropertyInformation::derive(oldInst);
 
   info->setExtendedParent(inst);
   inst->setChildInformation(info);
@@ -561,11 +596,32 @@ void SPropertyInformation::dereference() const
   --((SPropertyInformation*)this)->_instances;
   }
 
-void SPropertyInformation::addAPIMemberFunction(const QString &s, WrappedFunction fn, xuint32 expectedArguments)
+namespace XScriptConvert
+{
+namespace internal
+{
+JSToNative<SPropertyInformation>::ResultType JSToNative<SPropertyInformation>::operator()(XScriptValue const &h) const
   {
-  WrappedMember m;
-  m.memberName = s;
-  m.expectedArguments = expectedArguments;
-  m.function = fn;
-  _wrappedMembers.insert(s, m);
+  if(h.isObject())
+    {
+    XScriptObject obj(h);
+    return STypeRegistry::findType(obj.get("typeName").toString());
+    }
+  else
+    {
+    return STypeRegistry::findType(h.toString());
+    }
   }
+
+XScriptValue NativeToJS<SPropertyInformation>::operator()(const SPropertyInformation &x) const
+  {
+  return x.typeName();
+  }
+
+XScriptValue NativeToJS<SPropertyInformation>::operator()(const SPropertyInformation *x) const
+  {
+  xAssert(x)
+  return x->typeName();
+  }
+}
+}

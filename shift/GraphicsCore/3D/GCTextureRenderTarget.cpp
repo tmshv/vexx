@@ -3,10 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(GCTextureRenderTarget)
 
-SPropertyInformation *GCTextureRenderTarget::createTypeInformation()
+void GCTextureRenderTarget::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCTextureRenderTarget>("GCTextureRenderTarget");
-  return info;
   }
 
 GCTextureRenderTarget::GCTextureRenderTarget()

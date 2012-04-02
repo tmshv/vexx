@@ -12,4 +12,6 @@ public:
   GCTextureRenderTarget();
   };
 
+S_PROPERTY_INTERFACE(GCTextureRenderTarget)
+
 #endif // GCRENDERTOTEXTURE_H

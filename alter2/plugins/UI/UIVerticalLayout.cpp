@@ -3,9 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(UIVerticalLayout)
 
-SPropertyInformation *UIVerticalLayout::createTypeInformation()
+void UIVerticalLayout::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  return SPropertyInformation::create<UIVerticalLayout>("UIVerticalLayout");
   }
 
 UIVerticalLayout::UIVerticalLayout()

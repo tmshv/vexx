@@ -19,6 +19,8 @@ public:
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
+S_PROPERTY_INTERFACE(GCGeometryTransform)
+
 S_TYPED_POINTER_TYPE(GCGeometryTransformPointer, GCGeometryTransform)
 
 S_TYPED_POINTER_ARRAY_TYPE(GCGeometryTransformPointerArray, GCGeometryTransformPointer)

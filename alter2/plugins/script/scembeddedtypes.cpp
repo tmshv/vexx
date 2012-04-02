@@ -1,3 +1,4 @@
+#if 0
 #include "scembeddedtypes.h"
 #include "spropertyinformation.h"
 #include "sproperty.h"
@@ -104,3 +105,4 @@ QScriptValue ScEmbeddedTypes::packValue(SProperty *prop)
   v.setPrototype(proto);
   return v;
   }
+#endif

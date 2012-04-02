@@ -113,7 +113,7 @@ var jsFileExporter = {
 
           var fileContents = JSON.stringify(nodeObject, null, "  ");
 
-          file.write("db.addType(");
+          file.write("db.types.registerType(");
           file.write(fileContents);
           file.write(");");
           file.close();
@@ -123,4 +123,4 @@ var jsFileExporter = {
         }
     };
 
-db.types.SPartDocument.registerExporter(jsFileExporter);
+db.types.registerExporter(db.types.SPartDocument, jsFileExporter);

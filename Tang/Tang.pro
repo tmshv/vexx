@@ -18,6 +18,7 @@ SOURCES += main.cpp \
     object.cpp
 
 LIBS += -lEksCore \
+    -lEksScript \
     -lEks3D \
     -lshift \
     -lalter \
@@ -28,6 +29,7 @@ LIBS += -lEksCore \
 
 INCLUDEPATH += ../include \
     $$ROOT/EksCore \
+    $$ROOT/EksScript \
     $$ROOT/Eks3D/include \
     $$ROOT/Shift \
     $$ROOT/Shift/GraphicsCore \

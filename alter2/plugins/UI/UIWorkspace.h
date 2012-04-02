@@ -11,4 +11,6 @@ public:
   UIWorkspace();
   };
 
+S_PROPERTY_INTERFACE(UIWorkspace)
+
 #endif // UILAYOUT_H

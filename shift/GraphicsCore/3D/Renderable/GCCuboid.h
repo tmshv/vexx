@@ -22,4 +22,6 @@ public:
   void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
+S_PROPERTY_INTERFACE(GCCuboid)
+
 #endif // GCCUBOID_H

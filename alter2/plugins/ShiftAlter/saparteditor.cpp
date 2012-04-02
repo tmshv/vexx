@@ -11,13 +11,12 @@
 
 S_IMPLEMENT_PROPERTY(SPartDocument)
 
-SPropertyInformation *SPartDocument::createTypeInformation()
+void SPartDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<SPartDocument>("SPartDocument");
-
-  info->add(&SPartDocument::type, "type");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&SPartDocument::type, "type");
+    }
   }
 
 SPartDocument::SPartDocument()

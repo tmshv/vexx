@@ -87,6 +87,7 @@ bool SProcessManager::isMainThread()
 
 void SProcessManager::preCompute(const SPropertyInstanceInformation *info, SPropertyContainer *ent)
   {
+  return;
   xAssert(g_manager);
 
 

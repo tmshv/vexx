@@ -22,6 +22,7 @@ public:
   GCGeometryTransformPointerArray geometry;
   };
 
+S_PROPERTY_INTERFACE(GCShadingGroup)
 
 S_TYPED_POINTER_TYPE(GCShadingGroupPointer, GCShadingGroup);
 

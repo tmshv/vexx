@@ -282,14 +282,14 @@ public: class InstanceInformation : public SPODProperty<type, name>::InstanceInf
   static void assignProperty(const SProperty *p, SProperty *l ); }; \
 template <> class SPODInterface <type> { public: typedef name Type; \
   static void assign(name* s, const type& val) { s->assign(val); } \
-  static const type& value(const name* s) { return s->value(); } };
+  static const type& value(const name* s) { return s->value(); } }; \
+S_PROPERTY_INTERFACE(name)
 
 #define IMPLEMENT_POD_PROPERTY(name, type) \
   S_IMPLEMENT_PROPERTY(name) \
-  SPropertyInformation *name::createTypeInformation() { \
-    SPropertyInformation *info = SPropertyInformation::create<name>(#name); \
-    info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); \
-    return info; } \
+  void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
+    if(data.registerInterfaces) { \
+    info->addStaticInterface(new PODPropertyVariantInterface<name, type>()); } } \
   name::name() { }
 
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, BoolProperty, xuint8, 0, 100);
@@ -333,6 +333,8 @@ public:
     }
   };
 
+S_PROPERTY_INTERFACE(StringProperty)
+
 class SHIFT_EXPORT FilenameProperty : public StringProperty
   {
   S_PROPERTY(StringProperty, StringPropertyBase, 0);
@@ -342,6 +344,8 @@ public:
     {
     }
   };
+  
+S_PROPERTY_INTERFACE(FilenameProperty)
 
 #define EnumProperty IntProperty
 

@@ -7,17 +7,19 @@
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 
-SPropertyInformation *GCShadingGroup::createTypeInformation()
+void GCShadingGroup::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCShadingGroup>("GCShadingGroup");
+  if(data.registerAttributes)
+    {
+    info->add(&GCShadingGroup::shader, "shader");
 
-  info->addInheritedInterface<GCShadingGroup, GCManipulatable>();
+    info->add(&GCShadingGroup::geometry, "geometry");
+    }
 
-  info->add(&GCShadingGroup::shader, "shader");
-
-  info->add(&GCShadingGroup::geometry, "geometry");
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<GCShadingGroup, GCManipulatable>();
+    }
   }
 
 GCShadingGroup::GCShadingGroup()

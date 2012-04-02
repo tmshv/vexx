@@ -5,15 +5,14 @@
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualManipulator)
 
-SPropertyInformation *GCVisualManipulator::createTypeInformation()
+void GCVisualManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCVisualManipulator>("GCVisualManipulator");
-
-  info->add(&GCVisualManipulator::show, "show");
-  info->add(&GCVisualManipulator::worldCentre, "worldCentre");
-  info->add(&GCVisualManipulator::manipulatorsDisplayScale, "manipulatorsDisplayScale");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&GCVisualManipulator::show, "show");
+    info->add(&GCVisualManipulator::worldCentre, "worldCentre");
+    info->add(&GCVisualManipulator::manipulatorsDisplayScale, "manipulatorsDisplayScale");
+    }
   }
 
 GCVisualManipulator::GCVisualManipulator() : _delegate(0)
@@ -57,11 +56,8 @@ bool GCVisualManipulator::hitTest(
 
 S_IMPLEMENT_PROPERTY(GCVisualCompoundManipulator)
 
-SPropertyInformation *GCVisualCompoundManipulator::createTypeInformation()
+void GCVisualCompoundManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCVisualCompoundManipulator>("GCVisualCompoundManipulator");
-
-  return info;
   }
 
 GCVisualCompoundManipulator::GCVisualCompoundManipulator()
@@ -125,11 +121,8 @@ void GCVisualCompoundManipulator::onMouseRelease(const MouseEvent &)
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualDragManipulator)
 
-SPropertyInformation *GCVisualDragManipulator::createTypeInformation()
+void GCVisualDragManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCVisualDragManipulator>("GCVisualDragManipulator");
-
-  return info;
   }
 
 GCVisualDragManipulator::GCVisualDragManipulator()
@@ -156,11 +149,8 @@ void GCVisualDragManipulator::onMouseRelease(const MouseEvent &)
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualClickManipulator)
 
-SPropertyInformation *GCVisualClickManipulator::createTypeInformation()
+void GCVisualClickManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCVisualClickManipulator>("GCVisualClickManipulator");
-
-  return info;
   }
 
 GCVisualClickManipulator::GCVisualClickManipulator()
@@ -187,14 +177,13 @@ void GCVisualClickManipulator::onMouseRelease(const MouseEvent &)
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCLinearDragManipulator)
 
-SPropertyInformation *GCLinearDragManipulator::createTypeInformation()
+void GCLinearDragManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCLinearDragManipulator>("GCLinearDragManipulator");
-
-  info->add(&GCLinearDragManipulator::lockMode, "lockMode");
-  info->add(&GCLinearDragManipulator::lockDirection, "lockDirection");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&GCLinearDragManipulator::lockMode, "lockMode");
+    info->add(&GCLinearDragManipulator::lockDirection, "lockDirection");
+    }
   }
 
 GCLinearDragManipulator::GCLinearDragManipulator()

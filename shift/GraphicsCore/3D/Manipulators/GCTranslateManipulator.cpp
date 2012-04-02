@@ -161,11 +161,8 @@ private:
 
 S_IMPLEMENT_PROPERTY(GCSingularTranslateManipulator)
 
-SPropertyInformation *GCSingularTranslateManipulator::createTypeInformation()
+void GCSingularTranslateManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCSingularTranslateManipulator>("GCSingularTranslateManipulator");
-
-  return info;
   }
 
 GCSingularTranslateManipulator::GCSingularTranslateManipulator()
@@ -220,16 +217,15 @@ void postCreateTranslateManip(GCTranslateManipulator *m)
   m->central.setDelegate(new CentralTranslateDelegate());
   }
 
-SPropertyInformation *GCTranslateManipulator::createTypeInformation()
+void GCTranslateManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCTranslateManipulator>("GCTranslateManipulator", postCreateTranslateManip);
-
-  info->add(&GCTranslateManipulator::x, "x");
-  info->add(&GCTranslateManipulator::y, "y");
-  info->add(&GCTranslateManipulator::z, "z");
-  info->add(&GCTranslateManipulator::central, "central");
-
-  return info;
+  if(data.registerAttributes)
+    {
+    info->add(&GCTranslateManipulator::x, "x");
+    info->add(&GCTranslateManipulator::y, "y");
+    info->add(&GCTranslateManipulator::z, "z");
+    info->add(&GCTranslateManipulator::central, "central");
+    }
   }
 
 GCTranslateManipulator::GCTranslateManipulator()

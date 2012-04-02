@@ -8,12 +8,37 @@
 #include "sprocessmanager.h"
 #include "XProfiler"
 #include "styperegistry.h"
+#include "XConvertScriptSTL.h"
 
 S_IMPLEMENT_PROPERTY(SProperty)
 
-SPropertyInformation *SProperty::createTypeInformation()
+void SProperty::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  return SPropertyInformation::createNoParent<SProperty>("SProperty");
+  if(data.registerInterfaces)
+    {
+    XInterface<SProperty> *api = info->apiInterface<SProperty>();
+    api->addProperty<const SPropertyInformation *, &SProperty::typeInformation>("typeInformation");
+    api->addProperty<SProperty *, const SProperty *, &SProperty::input, &SProperty::setInput>("input");
+    api->addProperty<SPropertyContainer *, SPropertyContainer *, &SProperty::parent, &SProperty::setParent>("parent");
+
+    api->addProperty<SProperty *, &SProperty::output>("firstOutput");
+    api->addProperty<SProperty *, &SProperty::nextOutput>("nextOutput");
+
+    api->addProperty<bool, &SProperty::isDynamic>("dynamic");
+    api->addProperty<const QString &, const QString &, &SProperty::name, &SProperty::setName>("name");
+
+    api->addProperty<QVariant, const QVariant &, &SProperty::value, &SProperty::setValue>("value");
+    api->addProperty<QString, &SProperty::valueAsString>("valueString");
+
+    api->addProperty<QVector<SProperty*>, &SProperty::affects>("affects");
+
+    // add a method, cant use helper method for this because it struggles to resolve the method overload
+    XInterfaceBase::Function fn = XScript::ConstMethodToInCa<SProperty, QString (const SProperty *), &SProperty::path>::Call;
+    api->addFunction("pathTo", fn);
+
+    api->addMethod<void(), &SProperty::beginBlock>("beginBlock");
+    api->addMethod<void(), &SProperty::endBlock>("endBlock");
+    }
   }
 
 void SProperty::setDependantsDirty()
@@ -107,6 +132,17 @@ SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
     _handler(0), _parent(0), _info(0), _instanceInfo(0), _userData(0), _entity(0),
     _flags(Dirty)
   {
+  }
+
+SProperty::SProperty(const SProperty &) : _flags(Dirty)
+  {
+  xAssertFail();
+  }
+
+SProperty& SProperty::operator =(const SProperty &)
+  {
+  xAssertFail();
+  return *this;
   }
 
 SProperty::~SProperty()
@@ -410,6 +446,16 @@ const SDatabase *SProperty::database() const
   return handler()->database();
   }
 
+void SProperty::beginBlock()
+  {
+  handler()->beginBlock();
+  }
+
+void SProperty::endBlock()
+  {
+  handler()->endBlock();
+  }
+
 bool SProperty::shouldSavePropertyValue(const SProperty *p)
   {
   if(p->hasInput())
@@ -458,6 +504,16 @@ bool SProperty::shouldSaveProperty(const SProperty *p)
     }
 
   return false;
+  }
+
+const XInterfaceBase *SProperty::apiInterface() const
+  {
+  return typeInformation()->apiInterface();
+  }
+
+const XInterfaceBase *SProperty::staticApiInterface()
+  {
+  return staticTypeInformation()->apiInterface();
   }
 
 bool SProperty::inheritsFromType(const SPropertyInformation *type) const
@@ -509,6 +565,11 @@ SEntity *SProperty::entity() const
   return _entity;
   }
 
+void SProperty::setParent(SPropertyContainer *newParent)
+  {
+  parent()->moveProperty(newParent, this);
+  }
+
 void SProperty::connect(SProperty *prop) const
   {
   SProfileFunction
@@ -557,6 +618,29 @@ void SProperty::disconnect() const
     {
     disconnect(_output);
     }
+  }
+
+QVector<SProperty *> SProperty::affects() const
+  {
+  QVector<SProperty *> ret;
+
+  const SPropertyInstanceInformation *info = instanceInformation();
+  xsize *affects = info->affects();
+  if(!affects)
+    {
+    return ret;
+    }
+
+  const SPropertyInformation *parentInfo = parent()->typeInformation();
+  while(*affects)
+    {
+    const SPropertyInstanceInformation *affected = parentInfo->child(*affects);
+
+    ret << affected->locateProperty(parent());
+    affects++;
+    }
+
+  return ret;
   }
 
 bool SProperty::ConnectionChange::apply()
@@ -863,6 +947,38 @@ SProperty *SProperty::resolvePath(const QString &path)
 const SProperty *SProperty::resolvePath(const QString &path) const
   {
   return const_cast<SProperty*>(this)->resolvePath(path);
+  }
+
+QVariant SProperty::value() const
+  {
+  const SPropertyVariantInterface *varInt = interface<SPropertyVariantInterface>();
+
+  if(varInt)
+    {
+    return varInt->asVariant(this);
+    }
+  return QString();
+  }
+
+void SProperty::setValue(const QVariant &val)
+  {
+  const SPropertyVariantInterface *varInt = interface<SPropertyVariantInterface>();
+
+  if(varInt)
+    {
+    varInt->setVariant(this, val);
+    }
+  }
+
+QString SProperty::valueAsString() const
+  {
+  const SPropertyVariantInterface *varInt = interface<SPropertyVariantInterface>();
+
+  if(varInt)
+    {
+    return varInt->asString(this);
+    }
+  return QString();
   }
 
 void SProperty::internalSetName(const QString &name)

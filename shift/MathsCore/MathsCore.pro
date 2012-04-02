@@ -15,9 +15,9 @@ HEADERS += \
     mcimage.h \
     mcsource.h
 
-INCLUDEPATH += $$ROOT/shift/MathsCore $$ROOT/EksCore $$ROOT/Shift
+INCLUDEPATH += $$ROOT/shift/MathsCore $$ROOT/EksCore $$ROOT/EksScript $$ROOT/Shift
 
-LIBS += -lshift -lEksCore
+LIBS += -lshift -lEksCore -lEksScript
 
 SOURCES += \
     mathscore.cpp \

@@ -55,7 +55,7 @@ setupDebugSurface = function()
   {
   var surfaceManager =
     {
-    surface: script.addQMLSurface("DebugQMLCanvas", "Dock", "../alter2/plugins/script/NodeCanvas.qml"),
+    surface: script.addQMLSurface("DebugQMLCanvas", "Dock", "../alter2/plugins/script/NodeCanvas.qml", {}),
     passIn: function(name, argsIn)
       {
       assert(this[name]);
@@ -70,3 +70,10 @@ setupDebugSurface = function()
   }
 
 setupDebugSurface();
+
+var document = db.addDocument(db.types.SPartDocument);
+document.type.value = "GCShader";
+document.newFile();
+
+document.editor = document.createEditor();
+document.editor.show();

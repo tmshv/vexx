@@ -91,28 +91,30 @@ void computeCube(const SPropertyInstanceInformation *, GCCuboid *cube)
     }
   }
 
-SPropertyInformation *GCCuboid::createTypeInformation()
+void GCCuboid::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCCuboid>("GCCuboid");
+  if(data.registerAttributes)
+    {
+    GCGeometry::InstanceInformation *geoInfo = info->add(&GCCuboid::geometry, "geometry");
+    geoInfo->setCompute(computeCube);
 
-  GCGeometry::InstanceInformation *geoInfo = info->add(&GCCuboid::geometry, "geometry");
-  geoInfo->setCompute(computeCube);
+    FloatProperty::InstanceInformation *wInfo = info->add(&GCCuboid::width, "width");
+    wInfo->setAffects(geoInfo);
+    wInfo->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation *wInfo = info->add(&GCCuboid::width, "width");
-  wInfo->setAffects(geoInfo);
-  wInfo->setDefault(1.0f);
+    FloatProperty::InstanceInformation *hInfo = info->add(&GCCuboid::height, "height");
+    hInfo->setAffects(geoInfo);
+    hInfo->setDefault(1.0f);
 
-  FloatProperty::InstanceInformation *hInfo = info->add(&GCCuboid::height, "height");
-  hInfo->setAffects(geoInfo);
-  hInfo->setDefault(1.0f);
+    FloatProperty::InstanceInformation *dInfo = info->add(&GCCuboid::depth, "depth");
+    dInfo->setAffects(geoInfo);
+    dInfo->setDefault(1.0f);
+    }
 
-  FloatProperty::InstanceInformation *dInfo = info->add(&GCCuboid::depth, "depth");
-  dInfo->setAffects(geoInfo);
-  dInfo->setDefault(1.0f);
-
-  info->addInheritedInterface<GCCuboid, GCManipulatable>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<GCCuboid, GCManipulatable>();
+    }
   }
 
 GCCuboid::GCCuboid()

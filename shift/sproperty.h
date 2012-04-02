@@ -5,6 +5,7 @@
 #include "XObject"
 #include "schange.h"
 #include "XFlags"
+#include "XInterface.h"
 
 class SEntity;
 class SProperty;
@@ -19,7 +20,7 @@ class SDatabase;
   private:
 
 #define S_REGISTER_TYPE_FUNCTION() \
-  public: static SPropertyInformation *createTypeInformation(); \
+  public: static void createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data); \
   static const SPropertyInformation *staticTypeInformation();
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
@@ -38,30 +39,18 @@ class SDatabase;
   typedef void ParentType; \
   S_REGISTER_TYPE_FUNCTION()
 
-#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
-  TEMPL const SPropertyInformation *myName::staticTypeInformation() { \
-  static const SPropertyInformation *info = 0; \
-  if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
-  return info;}
-
-
-#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  const SPropertyInformation *myName::staticTypeInformation() { \
-  static const SPropertyInformation *info = 0; \
-  if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
-  return info;}
-
 #define S_IMPLEMENT_PROPERTY(myName) \
   const SPropertyInformation *myName::staticTypeInformation() { return SPropertyInformation::findStaticTypeInformation<myName>(#myName); }
 
+#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
+  TEMPL S_IMPLEMENT_PROPERTY(myName)
+
+
+#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
+  S_IMPLEMENT_PROPERTY(myName)
+
 #define S_IMPLEMENT_INLINE_PROPERTY(myName) \
-  inline const SPropertyInformation *myName::staticTypeInformation() { \
-  static const SPropertyInformation *info = 0; \
-  if(!info) { info = STypeRegistry::findType(#myName); \
-  if(!info) { info = createTypeInformation(); xAssert(info); STypeRegistry::internalAddType(info); } } \
-  return info;}
+  inline S_IMPLEMENT_PROPERTY(myName)
 
 #define S_PROPERTY(myName, superName, version) \
   public: \
@@ -79,6 +68,7 @@ class SDatabase;
 
 class SPropertyInstanceInformation;
 class SPropertyInformation;
+class SPropertyInformationCreateData;
 class SSaver;
 class SLoader;
 class SInterfaceBase;
@@ -99,6 +89,7 @@ public:
   // or if this attribute is an entity, get it.
   SEntity *entity() const;
 
+  void setParent(SPropertyContainer *parent);
   SPropertyContainer *parent() const {return _parent;}
 
   SProperty *input() const {return _input;}
@@ -122,6 +113,7 @@ public:
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
+  void setInput(const SProperty *input) { input->connect(this); }
   void connect(const QVector<SProperty*> &) const;
   void disconnect(SProperty *) const;
   void disconnect() const;
@@ -130,6 +122,7 @@ public:
   bool isComputed() const;
   bool hasInput() const { return _input; }
   bool hasOutputs() const { return _output; }
+  QVector<SProperty *> affects() const;
 
   template <typename T> T *nextSibling() const
     {
@@ -152,6 +145,8 @@ public:
   const SHandler *handler() const { return _handler; }
   SDatabase *database();
   const SDatabase *database() const;
+  void beginBlock();
+  void endBlock();
 
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
@@ -185,6 +180,10 @@ public:
   bool isDescendedFrom(const SProperty *ent) const;
   SProperty *resolvePath(const QString &path);
   const SProperty *resolvePath(const QString &path) const;
+
+  QVariant value() const;
+  void setValue(const QVariant &);
+  QString valueAsString() const;
 
   // set only works for dynamic properties
   void setName(const QString &);
@@ -325,9 +324,13 @@ public:
   // but the above can be false when this is true.
   static bool shouldSaveProperty(const SProperty *);
 
+  const XInterfaceBase *apiInterface() const;
+  static const XInterfaceBase *staticApiInterface();
+
   X_ALIGNED_OPERATOR_NEW
 
 private:
+  X_DISABLE_COPY(SProperty);
   void setDirty();
   void internalSetName(const QString &name);
 
@@ -358,5 +361,29 @@ private:
   friend class SPropertyContainer;
   friend class SProcessManager;
   };
+
+template <typename T> inline const XInterfaceBase *findPropertyInterface(const T* prop)
+  {
+  if(prop)
+    {
+    return prop->apiInterface();
+    }
+  return prop->staticApiInterface();
+  }
+
+#define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE_INHERITS(name, SProperty) \
+  template <> inline const XInterfaceBase *findInterface<name>(const name *p) { \
+    return findPropertyInterface<SProperty>(p); }
+
+#define S_PROPERTY_ABSTRACT_INTERFACE(name) X_SCRIPTABLE_ABSTRACT_TYPE_INHERITS(name, SProperty) \
+  template <> inline const XInterfaceBase *findInterface<name>(const name *p) { \
+    return findPropertyInterface<SProperty>(p); }
+
+X_SCRIPTABLE_TYPE(SProperty)
+
+template <> inline const XInterfaceBase *findInterface<SProperty>(const SProperty* p)
+  {
+  return findPropertyInterface<SProperty>(p);
+  }
 
 #endif // SPROPERTY_H

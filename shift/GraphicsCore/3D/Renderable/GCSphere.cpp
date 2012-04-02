@@ -124,27 +124,29 @@ void computeSphere(const SPropertyInstanceInformation *, GCSphere *sph)
     }
   }
 
-SPropertyInformation *GCSphere::createTypeInformation()
+void GCSphere::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCSphere>("GCSphere");
+  if(data.registerAttributes)
+    {
+    GCGeometry::InstanceInformation *geoInfo = info->add(&GCSphere::geometry, "geometry");
+    geoInfo->setCompute(computeSphere);
 
-  GCGeometry::InstanceInformation *geoInfo = info->add(&GCSphere::geometry, "geometry");
-  geoInfo->setCompute(computeSphere);
+    FloatProperty::InstanceInformation *wInfo = info->add(&GCSphere::radius, "radius");
+    wInfo->setAffects(geoInfo);
+    wInfo->setDefault(1.0f);
+    }
 
-  FloatProperty::InstanceInformation *wInfo = info->add(&GCSphere::radius, "radius");
-  wInfo->setAffects(geoInfo);
-  wInfo->setDefault(1.0f);
-
-  info->addInheritedInterface<GCSphere, GCManipulatable>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<GCSphere, GCManipulatable>();
+    }
   }
 
 GCSphere::GCSphere()
   {
   }
 
-void GCSphere::addManipulators(SPropertyArray *a, const GCTransform *tr)
+void GCSphere::addManipulators(SPropertyArray *, const GCTransform *)
   {
   /*
   // X

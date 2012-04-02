@@ -11,4 +11,6 @@ public:
   UIHorizontalLayout();
   };
 
+S_PROPERTY_INTERFACE(UIHorizontalLayout)
+
 #endif // UIHORIZONTALLAYOUT_H

@@ -84,6 +84,8 @@ public:
   virtual void onMouseDrag(const MouseMoveEvent &) = 0;
   virtual void onMouseRelease(const MouseEvent &) = 0;
   };
+
+S_PROPERTY_INTERFACE(GCVisualManipulator);
   
 class GRAPHICSCORE_EXPORT GCVisualCompoundManipulator : public GCVisualManipulator
   {
@@ -107,6 +109,7 @@ public:
   virtual void onMouseRelease(const MouseEvent &);
   };
 
+S_PROPERTY_INTERFACE(GCVisualCompoundManipulator);
 
 class GRAPHICSCORE_EXPORT GCVisualDragManipulator : public GCVisualManipulator
   {
@@ -123,6 +126,8 @@ public:
   virtual void onMouseRelease(const MouseEvent &);
   };
 
+S_PROPERTY_INTERFACE(GCVisualDragManipulator);
+
 class GRAPHICSCORE_EXPORT GCVisualClickManipulator : public GCVisualManipulator
   {
   S_ABSTRACT_PROPERTY_CONTAINER(GCVisualClickManipulator, GCVisualManipulator, 0)
@@ -137,6 +142,8 @@ public:
   virtual void onMouseDrag(const MouseMoveEvent &);
   virtual void onMouseRelease(const MouseEvent &);
   };
+
+S_PROPERTY_INTERFACE(GCVisualClickManipulator);
 
 class GRAPHICSCORE_EXPORT GCLinearDragManipulator : public GCVisualDragManipulator
   {
@@ -157,5 +164,7 @@ public:
 
   void onDrag(const MouseMoveEvent &, XVector3D &rel);
   };
+
+S_PROPERTY_INTERFACE(GCLinearDragManipulator);
 
 #endif // GCMANIPULATOR_H

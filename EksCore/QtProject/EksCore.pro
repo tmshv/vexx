@@ -140,7 +140,8 @@ HEADERS += ../XObject \
     ../XMacroHelpers \
     ../XMathHelpers \
     ../XCodeLocation \
-    ../XArrayMath
+    ../XArrayMath \
+    ../XTemplateHelpers
 
 
 

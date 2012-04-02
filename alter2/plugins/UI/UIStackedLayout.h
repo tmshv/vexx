@@ -11,4 +11,6 @@ public:
   UIStackedLayout();
   };
 
+S_PROPERTY_INTERFACE(UIStackedLayout)
+
 #endif // UISTACKEDLLAYOUT_H

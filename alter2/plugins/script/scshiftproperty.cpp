@@ -1,3 +1,4 @@
+#if 0
 #include "scshiftproperty.h"
 #include "sproperty.h"
 #include "scembeddedtypes.h"
@@ -140,6 +141,7 @@ ScShiftProperty::ScShiftProperty(QScriptEngine *eng) : ScShiftPropertyBase(eng)
   addMemberProperty("dynamic", dynamic, QScriptValue::PropertyGetter);
   addMemberProperty("name", name, QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
   addMemberProperty("valueString", valueString, QScriptValue::PropertyGetter);
+
   addMemberFunction("value", value);
   addMemberFunction("setValue", setValue);
   addMemberFunction("pathTo", pathTo);
@@ -571,3 +573,4 @@ QScriptValue ScShiftProperty::endBlock(QScriptContext *ctx, QScriptEngine *)
   return QScriptValue();
   }
 
+#endif

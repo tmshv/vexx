@@ -1,8 +1,6 @@
 #include "GraphicsCore.h"
 #include "styperegistry.h"
 
-#include "GCImage.h"
-
 #include "3D/GCGeometry.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/GCTextureRenderTarget.h"
@@ -33,7 +31,6 @@
 
 void initiateGraphicsCore()
   {
-  STypeRegistry::addType(GCImage::staticTypeInformation());
   STypeRegistry::addType(GCQImage::staticTypeInformation());
   STypeRegistry::addType(TransformProperty::staticTypeInformation());
   STypeRegistry::addType(ComplexTransformProperty::staticTypeInformation());
@@ -43,18 +40,24 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCGeometryAttribute::staticTypeInformation());
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
+  STypeRegistry::addType(GCGeometryPointer::staticTypeInformation());
 
   STypeRegistry::addType(GCTransform::staticTypeInformation());
   STypeRegistry::addType(GCGeometryTransform::staticTypeInformation());
+  STypeRegistry::addType(GCGeometryTransformPointer::staticTypeInformation());
+  STypeRegistry::addType(GCGeometryTransformPointerArray::staticTypeInformation());
 
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
+  STypeRegistry::addType(GCRenderablePointer::staticTypeInformation());
 
   STypeRegistry::addType(GCTexture::staticTypeInformation());
+  STypeRegistry::addType(GCTexturePointer::staticTypeInformation());
 
 
   STypeRegistry::addType(GCViewableTransform::staticTypeInformation());
   STypeRegistry::addType(GCCamera::staticTypeInformation());
   STypeRegistry::addType(GCPerspectiveCamera::staticTypeInformation());
+  STypeRegistry::addType(GCCameraPointer::staticTypeInformation());
 
 
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());
@@ -62,15 +65,21 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCTextureRenderTarget::staticTypeInformation());
   STypeRegistry::addType(GCViewport::staticTypeInformation());
 
-  STypeRegistry::addType(GCScene::staticTypeInformation());
-  STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
+  STypeRegistry::addType(GCShaderComponent::staticTypeInformation());
+  STypeRegistry::addType(GCShaderComponentPointer::staticTypeInformation());
+  STypeRegistry::addType(GCShaderComponentPointerArray::staticTypeInformation());
 
   STypeRegistry::addType(GCShader::staticTypeInformation());
+  STypeRegistry::addType(GCShaderPointer::staticTypeInformation());
 
-  STypeRegistry::addType(GCShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCFragmentShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCVertexShaderComponent::staticTypeInformation());
   STypeRegistry::addType(GCShadingGroup::staticTypeInformation());
+  STypeRegistry::addType(GCShadingGroupPointer::staticTypeInformation());
+  STypeRegistry::addType(GCShadingGroupPointerArray::staticTypeInformation());
+
+  STypeRegistry::addType(GCScene::staticTypeInformation());
+  STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
 
   STypeRegistry::addType(GCCuboid::staticTypeInformation());
   STypeRegistry::addType(GCSphere::staticTypeInformation());

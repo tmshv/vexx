@@ -90,6 +90,8 @@ private:
   xuint32 _checkpoint;
   };
 
+S_PROPERTY_INTERFACE(SDocument)
+
 class SHIFTALTER_EXPORT SDocumentEditor : public QWidget
   {
   Q_OBJECT

@@ -11,4 +11,6 @@ public:
   UIVerticalLayout();
   };
 
+S_PROPERTY_INTERFACE(UIVerticalLayout)
+
 #endif // UIVERTICALLAYOUT_H

@@ -132,3 +132,4 @@ db.types.SProperty.inheritsFrom = function(type)
 
 script.include("JSPartExporter.js");
 script.includeFolder("jsEntities");
+

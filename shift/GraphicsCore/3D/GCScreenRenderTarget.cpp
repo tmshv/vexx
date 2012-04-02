@@ -3,10 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(GCScreenRenderTarget)
 
-SPropertyInformation *GCScreenRenderTarget::createTypeInformation()
+void GCScreenRenderTarget::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCScreenRenderTarget>("GCScreenRenderTarget");
-  return info;
   }
 
 GCScreenRenderTarget::GCScreenRenderTarget()

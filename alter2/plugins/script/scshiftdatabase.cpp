@@ -1,3 +1,4 @@
+#if 0
 #include "scshiftdatabase.h"
 #include "sdatabase.h"
 #include "styperegistry.h"
@@ -314,7 +315,7 @@ bool ScShiftDatabase::postParseChildProperties(QScriptContext *ctx, SPropertyInf
         return false;
         }
       QString propName = nameObject.toString();
-      
+
       SPropertyInstanceInformation *info =  newType->childFromName(propName);
       xAssert(info);
 
@@ -497,3 +498,4 @@ void ScShiftDatabase::computeNode(const SPropertyInstanceInformation *instanceIn
   // call with this as the node being computed, and no arguments.
   compute.call(ScEmbeddedTypes::packValue(node));
   }
+#endif

@@ -20,6 +20,7 @@ public:
     }
   };
 
+S_PROPERTY_INTERFACE(GCTexture)
 
 S_TYPED_POINTER_TYPE(GCTexturePointer, GCTexture);
 

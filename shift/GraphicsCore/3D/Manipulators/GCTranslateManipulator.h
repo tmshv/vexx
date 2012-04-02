@@ -20,6 +20,8 @@ private:
   QVector <TransformProperty *> _driven;
   };
 
+S_PROPERTY_INTERFACE(GCSingularTranslateManipulator);
+
 class GCTranslateManipulator : public GCVisualCompoundManipulator
   {
   S_PROPERTY_CONTAINER(GCTranslateManipulator, GCVisualCompoundManipulator, 0);
@@ -34,5 +36,7 @@ public:
 
   void addDriven(TransformProperty *in);
   };
+
+S_PROPERTY_INTERFACE(GCTranslateManipulator);
 
 #endif // GCDISTANCEMANIPULATOR_H

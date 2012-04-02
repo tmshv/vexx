@@ -3,15 +3,17 @@
 
 S_IMPLEMENT_PROPERTY(GCGeometryTransform)
 
-SPropertyInformation *GCGeometryTransform::createTypeInformation()
+void GCGeometryTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCGeometryTransform>("GCGeometryTransform");
+  if(data.registerAttributes)
+    {
+    info->add(&GCGeometryTransform::geometry, "geometry");
+    }
 
-  info->add(&GCGeometryTransform::geometry, "geometry");
-
-  info->addInheritedInterface<GCGeometryTransform, GCManipulatable>();
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<GCGeometryTransform, GCManipulatable>();
+    }
   }
 
 GCGeometryTransform::GCGeometryTransform()

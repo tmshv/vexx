@@ -20,4 +20,6 @@ public:
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
   };
 
+S_PROPERTY_INTERFACE(GCTransform)
+
 #endif // GCTRANSFORM3D_H

@@ -2,13 +2,12 @@
 
 S_IMPLEMENT_PROPERTY(Pointer)
 
-SPropertyInformation *Pointer::createTypeInformation()
+void Pointer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<Pointer>("Pointer");
-
-  assignPointerInformation(info, SProperty::staticTypeInformation());
-
-  return info;
+  if(data.registerInterfaces)
+    {
+    assignPointerInformation(info, SProperty::staticTypeInformation());
+    }
   }
 
 void Pointer::setPointed(const SProperty *prop)

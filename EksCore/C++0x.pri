@@ -4,7 +4,7 @@ win32-g++ {
 }
 
 win32-msvc2010 {
-  DEFINES += X_CPPOX_SUPPORT
+  DEFINES += X_CPPOX_SUPPORT X_HAS_LONG_LONG
 }
 
 HEADERS +=

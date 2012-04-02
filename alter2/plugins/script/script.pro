@@ -7,15 +7,17 @@ TEMPLATE = lib
 
 include("../../../EksCore/GeneralOptions.pri")
 
-QT += script scripttools declarative opengl
+QT += declarative opengl
 INCLUDEPATH += ../../ \
     $$ROOT/EksCore \
+    $$ROOT/EksScript \
     $$ROOT/shift \
     $$ROOT/alter2/plugins/UI/ \
     $$ROOT/alter2/plugins/ShiftAlter/
 
 LIBS += -lalter \
     -lEksCore \
+    -lEksScript \
     -lUI \
     -lshift \
     -lShiftAlter
@@ -37,7 +39,8 @@ SOURCES += scplugin.cpp \
     QMLExtensions/scpropertydisplay.cpp \
     QMLExtensions/scconnectoritem.cpp \
     QMLExtensions/scmousearea.cpp \
-    scdeclarativesurface.cpp
+    scdeclarativesurface.cpp \
+    scdbutils.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -58,7 +61,8 @@ HEADERS += scplugin.h \
     QMLExtensions/scpropertydisplay.h \
     QMLExtensions/scconnectoritem.h \
     QMLExtensions/scmousearea.h \
-    scdeclarativesurface.h
+    scdeclarativesurface.h \
+    scdbutils.h
 
 RESOURCES += \
     ScResources.qrc
@@ -79,7 +83,9 @@ OTHER_FILES += \
     NodeCanvasContents/PathItem.qml \
     NodeCanvasContextMenu.qml \
     CreateMenuContents/Menu.qml \
-    NodeCanvasContents/Properties.qml
+    NodeCanvasContents/Properties.qml \
+    jsEntities/StandardSurface.js \
+    jsEntities/FlatSurface.js
 
 
 

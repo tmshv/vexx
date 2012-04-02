@@ -1,4 +1,4 @@
-#ifndef SCSHIFTPROPERTYCONTAINER_H
+#if 0 //ndef SCSHIFTPROPERTYCONTAINER_H
 #define SCSHIFTPROPERTYCONTAINER_H
 
 #include "scshiftproperty.h"

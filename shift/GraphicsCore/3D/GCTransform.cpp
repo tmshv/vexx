@@ -5,14 +5,13 @@
 
 S_IMPLEMENT_PROPERTY(GCTransform)
 
-SPropertyInformation *GCTransform::createTypeInformation()
+void GCTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<GCTransform>("GCTransform");
-
-  TransformProperty::InstanceInformation* trInfo = info->add(&GCTransform::transform, "transform");
-  trInfo->setDefault(XTransform::Identity());
-
-  return info;
+  if(data.registerAttributes)
+    {
+    TransformProperty::InstanceInformation* trInfo = info->add(&GCTransform::transform, "transform");
+    trInfo->setDefault(XTransform::Identity());
+    }
   }
 
 GCTransform::GCTransform()

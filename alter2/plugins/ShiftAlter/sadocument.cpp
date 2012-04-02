@@ -3,6 +3,7 @@
 #include "Serialisation/sjsonio.h"
 #include "QMenu"
 #include "splugin.h"
+#include "XQObjectWrapper.h"
 
 void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocument *doc)
   {
@@ -11,30 +12,37 @@ void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocumen
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument)
 
-SPropertyInformation *SDocument::createTypeInformation()
+void SDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
-  SPropertyInformation *info = SPropertyInformation::create<SDocument>("SDocument");
+  if(data.registerAttributes)
+    {
+    SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
+    transientInst->setMode(SPropertyInstanceInformation::Internal);
 
-  SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
-  transientInst->setMode(SPropertyInstanceInformation::Internal);
+    StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
+    filenameInst->setMode(SPropertyInstanceInformation::Internal);
 
-  StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
-  filenameInst->setMode(SPropertyInstanceInformation::Internal);
+    UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
+    rev->setCompute(incrementRevision);
+    rev->setMode(SPropertyInstanceInformation::Internal);
 
+    PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
+    fCS->setAffects(rev);
+    fCS->setMode(SPropertyInstanceInformation::Internal);
+    }
 
-  UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
-  rev->setCompute(incrementRevision);
-  rev->setMode(SPropertyInstanceInformation::Internal);
+  if(data.registerInterfaces)
+    {
+    info->addInheritedInterface<SDocument, SHandler>();
 
+    XInterface<SDocument> *api = info->apiInterface<SDocument>();
 
-  PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
-  fCS->setAffects(rev);
-  fCS->setMode(SPropertyInstanceInformation::Internal);
+    api->addMethod<void(), &SDocument::newFile>("newFile");
+    api->addMethod<void(const QString &), &SDocument::loadFile>("loadFile");
+    api->addMethod<void(const QString &), &SDocument::saveFile>("saveFile");
 
-
-  info->addInheritedInterface<SDocument, SHandler>();
-
-  return info;
+    api->addMethod<QWidget *(), &SDocument::createEditor>("createEditor");
+    }
   }
 
 SDocument::SDocument()

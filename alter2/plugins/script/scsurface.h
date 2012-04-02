@@ -5,6 +5,7 @@
 #include "QFile"
 #include "QObject"
 
+class ADebugInterface;
 class ScPlugin;
 class QTextEdit;
 
@@ -32,6 +33,7 @@ signals:
   void threadSafeLogSignal(int t, const QString &);
 
 private:
+  ADebugInterface *_debugger;
   QTextEdit *_editor;
   QTextEdit *_log;
   QFile _logFile;

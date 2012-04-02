@@ -12,6 +12,8 @@
 #include "acore.h"
 #include <iostream>
 
+#include "adebuginterface.h"
+
 ScSurface *g_surface = 0;
 QtMsgHandler g_oldHandler = 0;
 
@@ -107,16 +109,19 @@ ScSurface::ScSurface(ScPlugin *plugin) : UISurface("Script", new QWidget(), UISu
   _logFile.setFileName(localData.absolutePath() + "/log.txt");
   bool open = _logFile.open(QIODevice::WriteOnly);
   xAssert(open);
+
+  _debugger = plugin->core()->createDebugInterface("Log");
   }
 
 ScSurface::~ScSurface()
   {
+  _plugin->core()->destroyDebugInterface(_debugger);
   g_surface = 0;
   }
 
 void ScSurface::execute()
   {
-  _plugin->execute(_editor->toPlainText());
+  _plugin->execute("ScriptEditor", _editor->toPlainText());
   }
 
 void ScSurface::executeDebugged()
@@ -124,7 +129,7 @@ void ScSurface::executeDebugged()
   bool debugged = _plugin->isDebuggingEnabled();
 
   _plugin->enableDebugging(true);
-  _plugin->execute(_editor->toPlainText());
+  _plugin->execute("ScriptEditor", _editor->toPlainText());
   _plugin->enableDebugging(debugged);
   }
 
@@ -133,12 +138,21 @@ void ScSurface::threadSafeLog(int t, const QString &message)
   emit threadSafeLogSignal(t, message);
   }
 
+static QString g_types[] = {
+  "Debug",
+  "Warning",
+  "Critical",
+  "Fatal"
+};
+
 void ScSurface::appendToLog(int t, const QString &message)
   {
   QString finalMessage = message + "\n";
 
   QString htmlMessage = finalMessage;
   htmlMessage.replace('\n', "<br>\n");
+
+  QString jsonMessage;
 
   if(t == QtWarningMsg)
     {
@@ -148,6 +162,8 @@ void ScSurface::appendToLog(int t, const QString &message)
     {
     htmlMessage = QString("<b><font color=\"red\">%1</font></b>").arg(htmlMessage);
     }
+
+  _debugger->device()->write(QString("{ type: %1, message: %2 }").arg(g_types[t]).arg(message).toUtf8());
 
   _log->moveCursor(QTextCursor::End);
   _log->insertHtml(htmlMessage);

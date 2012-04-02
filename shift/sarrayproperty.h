@@ -187,11 +187,15 @@ class SHIFT_EXPORT SFloatArrayProperty : public SArrayProperty<float, SFloatArra
 public:
   };
 
+S_PROPERTY_INTERFACE(SFloatArrayProperty)
+
 class SHIFT_EXPORT SUIntArrayProperty : public SArrayProperty<xuint32, SUIntArrayProperty>
   {
   S_PROPERTY(SUIntArrayProperty, SProperty, 0)
 public:
   };
+
+S_PROPERTY_INTERFACE(SUIntArrayProperty)
 
 class SHIFT_EXPORT SVector2ArrayProperty : public SArrayProperty<XVector2D, SVector2ArrayProperty>
   {
@@ -199,17 +203,23 @@ class SHIFT_EXPORT SVector2ArrayProperty : public SArrayProperty<XVector2D, SVec
 public:
   };
 
+S_PROPERTY_INTERFACE(SVector2ArrayProperty)
+
 class SHIFT_EXPORT SVector3ArrayProperty : public SArrayProperty<XVector3D, SVector3ArrayProperty>
   {
   S_PROPERTY(SVector3ArrayProperty, SProperty, 0)
 public:
   };
 
+S_PROPERTY_INTERFACE(SVector3ArrayProperty)
+
 class SHIFT_EXPORT SVector4ArrayProperty : public SArrayProperty<XVector4D, SVector4ArrayProperty>
   {
   S_PROPERTY(SVector4ArrayProperty, SProperty, 0)
 public:
   };
+
+S_PROPERTY_INTERFACE(SVector4ArrayProperty)
 
 
 

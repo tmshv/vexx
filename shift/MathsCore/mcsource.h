@@ -14,4 +14,6 @@ public:
   MCMathsOperation output;
   };
 
+S_PROPERTY_INTERFACE(MCSource)
+
 #endif // MCSOURCE_H
