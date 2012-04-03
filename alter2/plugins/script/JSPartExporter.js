@@ -3,6 +3,8 @@ var jsFileExporter = {
     fileType: "Javascript Source (*.js)",
     exportFile: function(filename, entity)
       {
+      print(entity instanceof db.types.SEntity)
+      print(entity.input)
                   entity.toString()
       print(filename, " .... ", entity.toString());
       entity.cancelBlock(function()
