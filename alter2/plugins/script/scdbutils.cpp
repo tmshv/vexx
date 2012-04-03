@@ -286,6 +286,11 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
       {
       }
 
+    ~ScriptExporter()
+      {
+      _v.dispose();
+      }
+
     virtual bool exportFile(const QString &file, SProperty *prop) const
       {
       XScriptObject obj(_v.asValue());
@@ -298,13 +303,12 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
 
       XScriptValue l[] = {
         file,
-        XScriptObject::newObject()
-        //XScriptConvert::to(prop)
+        XScriptConvert::to(prop)
       };
 
       XScriptValue r = ScPlugin::call(exFn, obj, l, X_SIZEOF_ARRAY(l));
 
-      return r. toBoolean();
+      return r.toBoolean();
       }
 
     virtual QString exporterName() const

@@ -56,12 +56,17 @@ public:
 
   ~XPersistentScriptValue()
     {
-    dispose();
     }
 
   XScriptValue asValue() const;
 
+  typedef void (*WeakDtor)(XPersistentScriptValue object, void* p);
+  void makeWeak(void *data, WeakDtor cb);
+
   void dispose();
+
+private:
+  void *_object;
   };
 
 #endif // XSCRIPTVALUE_H

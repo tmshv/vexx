@@ -521,35 +521,36 @@ private:
       return jobj /* assume exception*/;
       }
 
-    //Persistent<Object> self( Persistent<Object>::New(jobj) );
+    XPersistentScriptValue persistent(jobj);
+    XScriptObject self(persistent.asValue());
     T * nobj = NULL;
     try
     {
-    WeakWrap::PreWrap( jobj, argv  );
-    nobj = Factory::Create( jobj, argv );
+    WeakWrap::PreWrap( self, argv  );
+    nobj = Factory::Create( self, argv );
     if( ! nobj )
       {
       return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
       }
-    WeakWrap::Wrap( jobj, nobj );
-    jobj.makeWeak( nobj, weak_dtor );
-    findInterface<T>(nobj)->wrapInstance(jobj, nobj);
+    WeakWrap::Wrap( self, nobj );
+    persistent.makeWeak( nobj, weak_dtor );
+    findInterface<T>(nobj)->wrapInstance(self, nobj);
     }
     catch(std::exception const &ex)
     {
-      WeakWrap::Unwrap( jobj, nobj );
+      WeakWrap::Unwrap( self, nobj );
       if( nobj ) Factory::Delete( nobj );
-      jobj = XScriptObject();
+      persistent.dispose();
       return Toss(ex.what());
       }
     catch(...)
     {
-    WeakWrap::Unwrap( jobj, nobj );
+    WeakWrap::Unwrap( self, nobj );
     if( nobj ) Factory::Delete( nobj );
-    jobj = XScriptObject();
+    persistent.dispose();
     return Toss("Native constructor threw an unknown exception!");
     }
-    return jobj;
+    return self;
     }
   };
 
@@ -588,7 +589,7 @@ template <typename T> struct NativeToJSConvertableType
       return XScriptValue();
       }
     const XInterfaceBase* interface = findInterface<T>(n);
-    XScriptValue vals[1] = { n };
+    XScriptValue vals[1] = { XScriptValue(n) };
     XScriptObject self = interface->newInstance(1, vals);
     return self;
     }

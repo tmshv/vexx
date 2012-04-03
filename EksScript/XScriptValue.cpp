@@ -80,7 +80,7 @@ struct XPersistentScriptValueInternal
 
   mutable v8::Persistent<v8::Value> _object;
   };
-xCompileTimeAssert(sizeof(XScriptValue) == sizeof(XScriptValueInternal));
+xCompileTimeAssert(sizeof(XPersistentScriptValue) == sizeof(XPersistentScriptValueInternal));
 
 XScriptValue::XScriptValue()
   {
@@ -432,6 +432,12 @@ XScriptValue XPersistentScriptValue::asValue() const
 
   internal->_object = other->_object;
   return val;
+  }
+
+void XPersistentScriptValue::makeWeak(void *data, WeakDtor cb)
+  {
+  const XPersistentScriptValueInternal *internal = XPersistentScriptValueInternal::val(this);
+  internal->_object.MakeWeak(data, (v8::WeakReferenceCallback)cb);
   }
 
 void XPersistentScriptValue::dispose()

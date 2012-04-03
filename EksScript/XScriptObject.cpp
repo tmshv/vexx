@@ -135,13 +135,6 @@ bool XScriptObject::isValid() const
   return !internal->_object.IsEmpty() && internal->_object->IsObject();
   }
 
-void XScriptObject::makeWeak(void *data, WeakDtor cb)
-  {
-  const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);
-  v8::Persistent<v8::Object> self( v8::Persistent<v8::Object>::New(internal->_object) );
-  self.MakeWeak(data, (v8::WeakReferenceCallback)cb);
-  }
-
 XScriptObject XScriptObject::newObject()
   {
   XScriptObject obj;

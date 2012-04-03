@@ -31,9 +31,6 @@ public:
 
   bool isValid() const;
 
-  typedef void (*WeakDtor)(XPersistentScriptValue object, void* p);
-  void makeWeak(void *data, WeakDtor cb);
-
   template <typename T>
   static XScriptObject newInstance(XInterface<T>* i);
 
