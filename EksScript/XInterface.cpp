@@ -207,6 +207,8 @@ void XInterfaceBase::inherit(const XInterfaceBase *parentType)
   FnTempl* templ = constructor(_constructor);
   const FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );
+
+  (*::prototype(_prototype))->Set
   }
 
 void XInterfaceBase::addChildInterface(int typeId, UpCastFn fn)
