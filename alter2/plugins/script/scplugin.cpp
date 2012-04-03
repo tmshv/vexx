@@ -319,7 +319,7 @@ XScriptEngine *ScPlugin::engine()
   return _engine;
   }
 
-XScriptValue ScPlugin::call(XScriptFunction fn, XScriptValue th, const XScriptValue *val, xsize argCount)
+XScriptValue ScPlugin::call(const XScriptFunction &fn, const XScriptObject &th, const XScriptValue *val, xsize argCount)
   {
   bool error = false;
   XScriptValue ret = fn.callWithTryCatch(th, argCount, val, &error);

@@ -70,10 +70,3 @@ setupDebugSurface = function()
   }
 
 setupDebugSurface();
-
-var document = db.addDocument(db.types.SPartDocument);
-document.type.value = "GCShader";
-document.newFile();
-
-document.editor = document.createEditor();
-document.editor.show();

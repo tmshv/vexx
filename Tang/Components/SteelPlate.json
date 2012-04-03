@@ -50,7 +50,7 @@
                 {
                   "__T":"GCGeometryPointer",
                   "name":"geometry",
-                  "input":"..\/..\/1\/geometry"
+                  "input":"..\/..\/1"
                 },
                 {
                   "__T":"Vector3DProperty",

@@ -64,9 +64,5 @@ int main( int argc, char **argv )
 
   ui->show();
 
-  ComponentDocument *part = db->db().addDocument<ComponentDocument>();
-  part->newFile();
-  part->createEditor()->show();
-
   return app.execute();
   }

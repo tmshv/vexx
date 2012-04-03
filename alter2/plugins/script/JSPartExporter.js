@@ -3,6 +3,8 @@ var jsFileExporter = {
     fileType: "Javascript Source (*.js)",
     exportFile: function(filename, entity)
       {
+                  entity.toString()
+      print(filename, " .... ", entity.toString());
       entity.cancelBlock(function()
         {
         var file = io.createFile(filename);

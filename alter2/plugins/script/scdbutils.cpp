@@ -27,7 +27,7 @@ bool parseChildProperties(SPropertyInformation *newType, XScriptValue properties
   {
   if(propertiesArray.isArray())
     {
-    // First pass, add basic instance information    
+    // First pass, add basic instance information
     for(xuint32 i = 0; i < propertiesArray.length(); ++i)
       {
       XScriptObject propertyObject = propertiesArray.at(i);
@@ -298,7 +298,8 @@ XScriptValue registerExporterFn(XScriptArguments const &args)
 
       XScriptValue l[] = {
         file,
-        XScriptConvert::to(prop)
+        XScriptObject::newObject()
+        //XScriptConvert::to(prop)
       };
 
       XScriptValue r = ScPlugin::call(exFn, obj, l, X_SIZEOF_ARRAY(l));

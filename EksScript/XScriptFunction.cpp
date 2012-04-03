@@ -155,7 +155,7 @@ bool XScriptFunction::isValid() const
   return (!func->_object.IsEmpty() && func->_object->IsFunction());
   }
 
-XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue args[], bool *error) const
+XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue *args, bool *error) const
   {
   v8::TryCatch trycatch;
   if(error)
