@@ -496,9 +496,11 @@ struct XMethodToIndexedGetter : XAccessorGetterType
     typedef typename XScriptTypeInfo<T>::Type Type;
     typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
     NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
-    return self
-        ? XScriptConvert::to( (self->*Getter)(property) )
-        : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
+    if(self)
+      {
+      return XScriptConvert::to( (self->*Getter)(property) );
+      }
+    return XScriptValue();
     }
   };
 
@@ -510,9 +512,15 @@ struct XMethodToNamedGetter : XAccessorGetterType
     typedef typename XScriptTypeInfo<T>::Type Type;
     typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
     NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
-    return self
-        ? XScriptConvert::to( (self->*Getter)(XScriptConvert::from<QString>(property)) )
-        : Toss( QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)) );
+    if(self)
+      {
+      XMethodSignature<T,Sig>::ReturnType rt = (self->*Getter)(XScriptConvert::from<QString>(property));
+      if(rt)
+        {
+        return XScriptConvert::to(rt);
+        }
+      }
+    return XScriptValue();
     }
   };
 

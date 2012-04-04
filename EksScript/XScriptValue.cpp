@@ -322,21 +322,24 @@ bool XScriptValue::toBoolean() const
 QString XScriptValue::toString() const
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  v8::Handle<v8::String> str = internal->_object->ToString();
-  if(!str.IsEmpty())
+  if(!internal->_object.IsEmpty())
     {
-    QString strOut;
-    strOut.resize(str->Length());
+    v8::Handle<v8::String> str = internal->_object->ToString();
+    if(!str.IsEmpty())
+      {
+      QString strOut;
+      strOut.resize(str->Length());
 
-    xCompileTimeAssert(sizeof(QChar) == sizeof(uint16_t));
-    str->Write((uint16_t*)strOut.data(), 0, strOut.length());
-    return strOut;
-    }
-  else
-    {
-    //xAssertFail();
-    //v8::String::AsciiValue exception_str(internal->_object);
-    //return *exception_str;
+      xCompileTimeAssert(sizeof(QChar) == sizeof(uint16_t));
+      str->Write((uint16_t*)strOut.data(), 0, strOut.length());
+      return strOut;
+      }
+    else
+      {
+      //xAssertFail();
+      //v8::String::AsciiValue exception_str(internal->_object);
+      //return *exception_str;
+      }
     }
   return QString();
   }

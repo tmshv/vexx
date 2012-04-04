@@ -158,7 +158,13 @@ void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
 
 XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[]) const
   {
-  return fromObjectHandle(getV8Internal(constructorFunction())->NewInstance(argc, getV8Internal(argv)));
+  v8::Handle<v8::Object> newObj = getV8Internal(constructorFunction())->NewInstance(argc, getV8Internal(argv));
+
+  v8::Handle<v8::Value> proto = newObj->GetPrototype();
+  xAssert(!proto.IsEmpty());
+  xAssert(proto->IsObject());
+
+  return fromObjectHandle(newObj);
   }
 
 void XInterfaceBase::set(const char *name, XScriptValue val)
@@ -207,8 +213,6 @@ void XInterfaceBase::inherit(const XInterfaceBase *parentType)
   FnTempl* templ = constructor(_constructor);
   const FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );
-
-  (*::prototype(_prototype))->Set
   }
 
 void XInterfaceBase::addChildInterface(int typeId, UpCastFn fn)
