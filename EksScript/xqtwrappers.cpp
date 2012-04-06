@@ -2,6 +2,32 @@
 #include "XScriptEngine.h"
 #include "XInterface.h"
 
+namespace XScriptConvert
+{
+namespace internal
+{
+template <> struct JSToNative<QIODevice::OpenMode>
+  {
+  typedef QIODevice::OpenMode ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    QString n = XScriptConvert::from<QString>(h);
+    if(n == "write")
+      {
+      return QIODevice::WriteOnly;
+      }
+    else if(n == "read")
+      {
+      return QIODevice::ReadOnly;
+      }
+    return QIODevice::ReadWrite;
+    }
+  };
+}
+}
+
+
 namespace XQtWrappers
 {
 
@@ -80,32 +106,38 @@ template <> void setupBindings<QFile>(XInterface<QFile> *templ)
 
 template <> void setupBindings<QIODevice>(XInterface<QIODevice> *templ)
   {
+  templ->addMethod<bool(QIODevice::OpenMode), &QIODevice::open>("open");
+
+  XInterfaceBase::Function fn = XScript::MethodToInCa<QIODevice, qint64(const QByteArray &), &QIODevice::write>::Call;
+  templ->addFunction("write", fn);
+
+  templ->addMethod<void(), &QIODevice::close>("close");
   }
 
 void initiate(XScriptEngine *eng)
   {
-#define BIND(t) Binder<t>::init(eng, #t)
-#define BIND_WITH_PARENT(t, p) Binder<t>::initWithParent<p>(eng, #t)
+#define BIND(t) Binder<Q##t>::init(eng, #t)
+#define BIND_WITH_PARENT(t, p) Binder<Q##t>::initWithParent<Q##p>(eng, #t)
 
-  BIND(QPointF);
-  BIND(QRectF);
-  BIND(QPoint);
-  BIND(QRect);
-  BIND(QUrl);
-  BIND(QBrush);
-  BIND(QPen);
-  BIND(QLocale);
-  BIND(QSizeF);
-  BIND(QSize);
-  BIND(QFont);
-  BIND(QIcon);
-  BIND(QCursor);
-  BIND(QSizePolicy);
-  BIND(QPalette);
-  BIND(QRegion);
+  BIND(PointF);
+  BIND(RectF);
+  BIND(Point);
+  BIND(Rect);
+  BIND(Url);
+  BIND(Brush);
+  BIND(Pen);
+  BIND(Locale);
+  BIND(SizeF);
+  BIND(Size);
+  BIND(Font);
+  BIND(Icon);
+  BIND(Cursor);
+  BIND(SizePolicy);
+  BIND(Palette);
+  BIND(Region);
 
-  BIND(QIODevice);
-  BIND_WITH_PARENT(QFile, QIODevice);
+  BIND(IODevice);
+  BIND_WITH_PARENT(File, IODevice);
 #undef BIND
 #undef BIND_WITH_PARENT
   }

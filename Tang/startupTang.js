@@ -7,5 +7,3 @@ document.newFile();
 
 document.editor = document.createEditor();
 document.editor.show();
-
-//document.saveFile();

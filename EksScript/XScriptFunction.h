@@ -22,7 +22,7 @@ public:
 
   bool isValid() const;
 
-  XScriptValue callWithTryCatch(const XScriptObject &thisObject, int argc, const XScriptValue args[], bool *error) const;
+  XScriptValue callWithTryCatch(const XScriptObject &thisObject, int argc, const XScriptValue args[], bool *error, QString *) const;
   XScriptValue call(const XScriptObject &thisObject, int argc, const XScriptValue args[]) const;
   XScriptValue callAsConstructor(const XScriptArguments&);
 

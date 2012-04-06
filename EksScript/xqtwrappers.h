@@ -42,6 +42,7 @@ X_SCRIPTABLE_TYPE_COPYABLE(QSizePolicy)
 X_SCRIPTABLE_TYPE_COPYABLE(QPalette)
 X_SCRIPTABLE_TYPE_COPYABLE(QRegion)
 
+
 X_SCRIPTABLE_ABSTRACT_TYPE(QIODevice)
 X_SCRIPTABLE_TYPE_BASE_INHERITED(QFile, QIODevice)
 
@@ -52,7 +53,7 @@ template <> struct NativeToJS<QFile> : public XScript::NativeToJSConvertableType
 }
 
 namespace XScript {
-typedef XSignature< QFile (XScript::CtorForwarder<QFile *()> )> QFileCtors;
+typedef XSignature< QFile (XScript::CtorForwarder<QFile *()>, XScript::CtorForwarder<QFile *(const QString &)>)> QFileCtors;
 template <> class ClassCreator_Factory<QFile> : public ClassCreatorCopyableFactory<QFile, QFileCtors> {};
 }
 

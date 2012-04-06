@@ -372,6 +372,20 @@ template <> struct JSToNative<const QString &> : JSToNative<QString>
   {
   };
 
+template <> struct JSToNative<QByteArray>
+  {
+  typedef QByteArray ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    return h.toString().toUtf8();
+    }
+  };
+
+template <> struct JSToNative<const QByteArray &> : JSToNative<QByteArray>
+  {
+  };
+
 template <> struct JSToNative<QVariant>
   {
   typedef QVariant ResultType;

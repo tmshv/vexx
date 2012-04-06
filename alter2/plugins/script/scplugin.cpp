@@ -15,7 +15,6 @@
 #include "QDebug"
 #include "QMainWindow"
 #include "XScriptSource.h"
-#include "scio.h"
 #include "sdatabasemodel.h"
 #include "QGraphicsObject"
 #include "qdeclarative.h"
@@ -322,11 +321,12 @@ XScriptEngine *ScPlugin::engine()
 XScriptValue ScPlugin::call(const XScriptFunction &fn, const XScriptObject &th, const XScriptValue *val, xsize argCount)
   {
   bool error = false;
-  XScriptValue ret = fn.callWithTryCatch(th, argCount, val, &error);
+  QString message;
+  XScriptValue ret = fn.callWithTryCatch(th, argCount, val, &error, &message);
 
   if(error)
     {
-    qCritical() << "Error in script at line " << ret.toString() << endl;
+    qCritical() << "Error in script at line " << message << endl;
     return XScriptValue();
     }
 

@@ -24,12 +24,7 @@ LIBS += -lalter \
 
 SOURCES += scplugin.cpp \
     scsurface.cpp \
-    scshiftproperty.cpp \
     scembeddedtypes.cpp \
-    scshiftpropertycontainer.cpp \
-    scshiftentity.cpp \
-    scshiftdatabase.cpp \
-    scio.cpp \
     QMLExtensions/scpath.cpp \
     QMLExtensions/scellipse.cpp \
     QMLExtensions/scbrush.cpp \
@@ -45,13 +40,7 @@ SOURCES += scplugin.cpp \
 HEADERS += scplugin.h \
     scglobal.h \
     scsurface.h \
-    scshiftproperty.h \
     scembeddedtypes.h \
-    scwrappedclass.h \
-    scshiftpropertycontainer.h \
-    scshiftentity.h \
-    scshiftdatabase.h \
-    scio.h \
     QMLExtensions/scpath.h \
     QMLExtensions/scellipse.h \
     QMLExtensions/scbrush.h \

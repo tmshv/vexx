@@ -155,7 +155,7 @@ bool XScriptFunction::isValid() const
   return (!func->_object.IsEmpty() && func->_object->IsFunction());
   }
 
-XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue *args, bool *error) const
+XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue *args, bool *error, QString *message) const
   {
   v8::TryCatch trycatch;
   if(error)
@@ -172,8 +172,12 @@ XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int ar
       {
       *error = true;
       }
-    v8::String::AsciiValue exception_str(trycatch.Exception());
-    return XScriptValue(*exception_str);
+    v8::String::Value exception_str(trycatch.Exception());
+    if(message)
+      {
+      *message = QString((QChar*)*exception_str, exception_str.length());
+      }
+    return XScriptValue::empty();
     }
 
   return fromHandle(result);

@@ -9,7 +9,7 @@ var jsFileExporter = {
       print(filename, " .... ", entity.toString());
       entity.cancelBlock(function()
         {
-        var file = io.createFile(filename);
+        var file = new File(filename);
         if(!file.open("write"))
           {
           print("Couldn't open file " + filename + " for writing.");
