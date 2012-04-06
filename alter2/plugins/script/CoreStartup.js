@@ -99,12 +99,12 @@ db.addType({
 
   */
 
-db.types.SProperty.cancelBlock = function(fn)
+db.types.SProperty.prototype.cancelBlock = function(fn)
   {
   this.beginBlock();
   try
     {
-    fn()
+    fn();
     }
   catch(e)
     {
@@ -114,7 +114,7 @@ db.types.SProperty.cancelBlock = function(fn)
   this.endBlock(true);
   }
 
-db.types.SProperty.inheritsFrom = function(type)
+db.types.SProperty.prototype.inheritsFrom = function(type)
   {
   var parent = this.__proto__;
   while(parent && parent.typeName)

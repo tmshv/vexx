@@ -223,6 +223,14 @@ XScriptValue XScriptValue::newArray()
   return obj;
   }
 
+XScriptValue XScriptValue::empty()
+  {
+  XScriptValue obj;
+  const XScriptValueInternal *internal = XScriptValueInternal::val(&obj);
+  internal->_object = v8::Handle<v8::Value>();
+  return obj;
+  }
+
 XScriptValue::~XScriptValue()
   {
   XScriptValueInternal::term(this);

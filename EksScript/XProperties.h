@@ -500,7 +500,7 @@ struct XMethodToIndexedGetter : XAccessorGetterType
       {
       return XScriptConvert::to( (self->*Getter)(property) );
       }
-    return XScriptValue();
+    return XScriptValue::empty();
     }
   };
 
@@ -520,7 +520,7 @@ struct XMethodToNamedGetter : XAccessorGetterType
         return XScriptConvert::to(rt);
         }
       }
-    return XScriptValue();
+    return XScriptValue::empty();
     }
   };
 

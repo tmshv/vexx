@@ -44,6 +44,7 @@ public:
   QVariant toVariant(int typeHint=0) const;
 
   static XScriptValue newArray();
+  static XScriptValue empty();
 
 private:
   void *_object;

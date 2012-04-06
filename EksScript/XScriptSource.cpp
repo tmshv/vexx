@@ -36,6 +36,13 @@ XScriptValue XScriptSource::run(Error *error)
   v8::TryCatch trycatch;
   // Run the script to get the result.
   XScriptSourceImpl *i = XScriptSourceImpl::impl(this);
+  if(i->_script.IsEmpty())
+    {
+    error->setHasError(true);
+    error->setTrace("Running invalid script");
+    return XScriptValue();
+    }
+
   v8::Handle<v8::Value> result = i->_script->Run();
 
   if(error)
