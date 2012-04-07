@@ -181,6 +181,8 @@ public:
   SProperty *resolvePath(const QString &path);
   const SProperty *resolvePath(const QString &path) const;
 
+  QString mode() const;
+
   QVariant value() const;
   void setValue(const QVariant &);
   QString valueAsString() const;

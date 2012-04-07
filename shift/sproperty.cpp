@@ -24,6 +24,7 @@ void SProperty::createTypeInformation(SPropertyInformation *info, const SPropert
     api->addProperty<SProperty *, &SProperty::output>("firstOutput");
     api->addProperty<SProperty *, &SProperty::nextOutput>("nextOutput");
 
+    api->addProperty<QString, &SProperty::mode>("mode");
     api->addProperty<bool, &SProperty::isDynamic>("dynamic");
     api->addProperty<const QString &, const QString &, &SProperty::name, &SProperty::setName>("name");
 
@@ -865,6 +866,11 @@ QString SProperty::path(const SProperty *from) const
     }
   xAssert(0);
   return "";
+  }
+
+QString SProperty::mode() const
+  {
+  return instanceInformation()->modeString();
   }
 
 bool SProperty::isDescendedFrom(const SProperty *in) const

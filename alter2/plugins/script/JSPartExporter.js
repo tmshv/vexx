@@ -67,7 +67,6 @@ var jsFileExporter = {
               obj["extend"] = true;
               }
 
-            print(subProp.name, " ", mode);
             if(dynamic || subProp.input !== null)
               {
               doExport = true;

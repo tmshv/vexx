@@ -5,7 +5,7 @@
 TARGET = Tang
 TEMPLATE = app
 
-include("../EksCore/GeneralOptions.pri")
+include("../Eks/EksCore/GeneralOptions.pri")
 
 QT += opengl \
     xml \
@@ -32,9 +32,9 @@ LIBS += -lEksCore \
     -lUI
 
 INCLUDEPATH += ../include \
-    $$ROOT/EksCore \
-    $$ROOT/EksScript \
-    $$ROOT/Eks3D/include \
+    $$ROOT/Eks/EksCore \
+    $$ROOT/Eks/EksScript \
+    $$ROOT/Eks/Eks3D/include \
     $$ROOT/Shift \
     $$ROOT/Shift/GraphicsCore \
     $$ROOT/Shift/MeshCore \

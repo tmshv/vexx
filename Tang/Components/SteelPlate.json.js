@@ -1,57 +1,56 @@
-db.addType({
+db.types.addType({
   "name": "SteelPlate",
-  "parent": "Component",
   "properties": [
     {
       "name": "RenderGroups",
-      "type": "PointerArray",
+      "affects": [],
       "properties": [
         {
           "name": "0",
-          "type": "Pointer",
-          "defaultInput": "../../3"
+          "affects": [],
+          "defaultInput": "../RenderGroups/0"
         }
       ]
     },
     {
       "name": "Thickness",
-      "type": "FloatProperty",
+      "affects": [],
       "defaultValue": "0"
     },
     {
       "name": "Size",
-      "type": "FloatProperty",
+      "affects": [],
       "defaultValue": "0"
     },
     {
       "name": "1",
-      "type": "MCCuboid",
+      "affects": [],
       "properties": [
         {
           "name": "width",
           "extend": true,
-          "defaultInput": "../../Size"
+          "defaultInput": "../1/width"
         },
         {
           "name": "height",
           "extend": true,
-          "defaultInput": "../../Size"
+          "defaultInput": "../1/height"
         },
         {
           "name": "depth",
           "extend": true,
-          "defaultInput": "../../Thickness"
+          "defaultInput": "../1/depth"
         }
       ]
     },
     {
       "name": "3",
-      "type": "GCGeometryTransform",
+      "affects": [],
       "properties": [
         {
           "name": "geometry",
           "extend": true,
-          "defaultInput": "../../1/geometry"
+          "defaultInput": "../3/geometry"
         }
       ]
     }

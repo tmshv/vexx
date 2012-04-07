@@ -6,7 +6,7 @@
 TARGET = ShiftMathsCore
 TEMPLATE = lib
 
-include("../../EksCore/GeneralOptions.pri")
+include("../../Eks/EksCore/GeneralOptions.pri")
 
 HEADERS += \
     mcglobal.h \
@@ -15,7 +15,7 @@ HEADERS += \
     mcimage.h \
     mcsource.h
 
-INCLUDEPATH += $$ROOT/shift/MathsCore $$ROOT/EksCore $$ROOT/EksScript $$ROOT/Shift
+INCLUDEPATH += $$ROOT/shift/MathsCore $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript $$ROOT/Shift
 
 LIBS += -lshift -lEksCore -lEksScript
 

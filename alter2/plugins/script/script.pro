@@ -5,12 +5,12 @@
 TARGET = script
 TEMPLATE = lib
 
-include("../../../EksCore/GeneralOptions.pri")
+include("../../../Eks/EksCore/GeneralOptions.pri")
 
 QT += declarative opengl
 INCLUDEPATH += ../../ \
-    $$ROOT/EksCore \
-    $$ROOT/EksScript \
+    $$ROOT/Eks/EksCore \
+    $$ROOT/Eks/EksScript \
     $$ROOT/shift \
     $$ROOT/alter2/plugins/UI/ \
     $$ROOT/alter2/plugins/ShiftAlter/

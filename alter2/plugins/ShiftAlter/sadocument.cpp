@@ -99,7 +99,11 @@ void SDocument::loadFile(const QString &f)
 
 void SDocument::saveFile(const QString &f)
   {
-  QFile file(f);
+  if(!f.isEmpty())
+    {
+    filename = f;
+    }
+  QFile file(filename());
   if(!file.open(QIODevice::WriteOnly))
     {
     qWarning() << "Failed to open file for writing '" << filename() << "'";

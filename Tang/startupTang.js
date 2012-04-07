@@ -7,3 +7,6 @@ document.newFile();
 
 document.editor = document.createEditor();
 document.editor.show();
+
+document.loadFile("C:\\Users\\Jorj\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
+document.saveFile("");

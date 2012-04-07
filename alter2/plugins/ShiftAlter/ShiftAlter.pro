@@ -7,7 +7,7 @@
 TARGET = ShiftAlter
 TEMPLATE = lib
 
-include("../../../EksCore/GeneralOptions.pri")
+include("../../../Eks/EksCore/GeneralOptions.pri")
 
 
 SOURCES += splugin.cpp \
@@ -27,7 +27,7 @@ HEADERS += splugin.h \
     saviewport.h \
     sadocument.h
 
-INCLUDEPATH += $$ROOT/EksCore $$ROOT/EksGui $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore $$ROOT/Shift/MeshCore
+INCLUDEPATH += $$ROOT/Eks/EksCore $$ROOT/Eks/EksGui $$ROOT/Eks/EksScript $$ROOT/Eks/Eks3D/include $$ROOT/Shift ../../ $$ROOT/Shift/GraphicsCore $$ROOT/Shift/MathsCore $$ROOT/Shift/MeshCore
 
 QT += opengl
 LIBS += -lshift -lEksCore -lEksGui -lEksScript -lEks3D -lalter -lShiftGraphicsCore -lShiftMathsCore -lShiftMeshCore

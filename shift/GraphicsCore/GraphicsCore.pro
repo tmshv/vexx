@@ -8,7 +8,7 @@ TEMPLATE = lib
 
 QT += opengl
 
-include("../../EksCore/GeneralOptions.pri")
+include("../../Eks/EksCore/GeneralOptions.pri")
 
 HEADERS += GCGlobal.h \
     GraphicsCore.h \
@@ -36,7 +36,7 @@ HEADERS += GCGlobal.h \
     3D/GCShaderDataBindings.h \
     3D/GCTexture.h
 
-INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/EksCore $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Shift
+INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript $$ROOT/Eks/Eks3D/include $$ROOT/Shift
 
 LIBS += -lshift -lEksCore -lEks3D -lEksScript
 

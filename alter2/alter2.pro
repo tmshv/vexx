@@ -5,10 +5,10 @@
 TARGET = alter
 TEMPLATE = lib
 
-include("../EksCore/GeneralOptions.pri")
+include("../Eks/EksCore/GeneralOptions.pri")
 
 QT += xml network
-INCLUDEPATH += $$ROOT/EksCore/
+INCLUDEPATH += $$ROOT/Eks/EksCore/
 LIBS += -lEksCore
 
 SOURCES += acore.cpp \

@@ -16,9 +16,9 @@ ComponentDocument::ComponentDocument()
   }
 
 #define JS_EXPORTER_NAME "Javascript Entity Export"
-void ComponentDocument::saveFile(const QString &filename)
+void ComponentDocument::saveFile(const QString &file)
   {
-  SPartDocument::saveFile(filename);
+  SPartDocument::saveFile(file);
 
   const SPropertyInformation *info = typeInformation();
   const SExportableInterface *ifc = 0;
@@ -48,7 +48,7 @@ void ComponentDocument::saveFile(const QString &filename)
 
   if(exp)
     {
-    exp->exportFile(filename + ".js", this);
+    exp->exportFile(filename() + ".js", this);
     }
   }
 

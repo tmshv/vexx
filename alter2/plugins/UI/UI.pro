@@ -7,7 +7,7 @@
 TARGET = UI
 TEMPLATE = lib
 
-include("../../../EksCore/GeneralOptions.pri")
+include("../../../Eks/EksCore/GeneralOptions.pri")
 
 SOURCES += UIPlugin.cpp \
     UISurface.cpp \
@@ -37,7 +37,7 @@ HEADERS += UIPlugin.h \
     UIEventLoggerSurface.h
 
 
-INCLUDEPATH += ../../ $$ROOT/EksCore ../../ $$ROOT/EksScript $$ROOT/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
+INCLUDEPATH += ../../ $$ROOT/Eks/EksCore ../../ $$ROOT/Eks/EksScript $$ROOT/Eks/Eks3D/include $$ROOT/Alter2/plugins/ShiftAlter $$ROOT/Shift $$ROOT/Shift/GraphicsCore
 
 LIBS += -lEksCore -lEksScript -lEks3D -lalter -lShiftAlter -lShift -lShiftGraphicsCore
 

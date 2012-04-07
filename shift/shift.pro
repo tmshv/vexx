@@ -5,12 +5,12 @@
 TARGET = shift
 TEMPLATE = lib
 
-include("../EksCore/GeneralOptions.pri")
+include("../Eks/EksCore/GeneralOptions.pri")
 
 INCLUDEPATH += $$ROOT/Shift \
-    $$ROOT/EksCore \
-    $$ROOT/EksGui \
-    $$ROOT/EksScript
+    $$ROOT/Eks/EksCore \
+    $$ROOT/Eks/EksGui \
+    $$ROOT/Eks/EksScript
 
 LIBS += -lEksCore \
     -lEksGui \
