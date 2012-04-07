@@ -110,12 +110,11 @@ void SDocument::saveFile(const QString &f)
     return;
     }
 
-   SJSONSaver saver;
-   saver.setAutoWhitespace(true);
+  SJSONSaver saver;
+  saver.setAutoWhitespace(true);
 
-   saver.writeToDevice(&file, &children, false);
+  saver.writeToDevice(&file, &children, false);
 
-  filename = f;
   setCheckpoint();
   }
 
