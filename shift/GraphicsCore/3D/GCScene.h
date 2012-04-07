@@ -6,9 +6,9 @@
 #include "GCCamera.h"
 #include "XFrustum.h"
 
-class GRAPHICSCORE_EXPORT GCScene : public GCRenderable, public XCameraCanvasController
+class GRAPHICSCORE_EXPORT GCScene : public GCRenderArray, public XCameraCanvasController
   {
-  S_ENTITY(GCScene, GCRenderable, 0);
+  S_ENTITY(GCScene, GCRenderArray, 0);
 
 public:
   GCScene();
@@ -20,8 +20,6 @@ public:
   void render(XRenderer *) const;
 
   virtual CameraInterface *camera();
-
-  GCShadingGroupPointerArray shadingGroups;
   };
 
 S_PROPERTY_INTERFACE(GCScene)

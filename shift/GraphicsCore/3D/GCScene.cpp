@@ -14,8 +14,6 @@ void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyI
     info->add(&GCScene::activeCamera, "activeCamera");
     info->add(&GCScene::cameraTransform, "cameraTransform");
     info->add(&GCScene::cameraProjection, "cameraProjection");
-
-    info->add(&GCScene::shadingGroups, "shadingGroups");
     }
   }
 
@@ -34,14 +32,7 @@ void GCScene::render(XRenderer *r) const
 
   r->pushTransform(cameraTransform());
 
-  for(const GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCShadingGroupPointer>())
-    {
-    const GCShadingGroup* group = groupPtr->pointed();
-    if(group)
-      {
-      group->render(r);
-      }
-    }
+  GCRenderArray::render(r);
 
   r->popTransform();
   }
@@ -80,16 +71,16 @@ void GCManipulatableScene::refreshManipulators()
 
   clearManipulators();
 
-  for(GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCShadingGroupPointer>())
+  for(GCRenderablePointer* groupPtr = renderGroup.firstChild<GCRenderablePointer>(); groupPtr; groupPtr = groupPtr->nextSibling<GCRenderablePointer>())
     {
     SProperty* inp = groupPtr->input();
 
     if(inp)
       {
-      GCShadingGroup* group = inp->uncheckedCastTo<GCShadingGroup>(); // pointer() only returns const...
+      GCRenderable* group = inp->uncheckedCastTo<GCRenderable>(); // pointer() only returns const...
       if(group)
         {
-        group->addManipulators(&manipulators);
+        //group->addManipulators(&manipulators);
         }
       }
     }

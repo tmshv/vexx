@@ -40,8 +40,8 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
   GCShadingGroup *group2 = msc->addChild<GCShadingGroup>("Groups");
-  msc->shadingGroups.addPointer(group);
-  msc->shadingGroups.addPointer(group2);
+  msc->renderGroup.addPointer(group);
+  msc->renderGroup.addPointer(group2);
 
   const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
   SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
@@ -59,8 +59,8 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   XTransform tr = XTransform::Identity();
   tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
 
-  GCGeometryTransform *transform = msc->addChild<GCGeometryTransform>("Transform");
-  group->geometry.addPointer(transform);
+  GCTransform *transform = msc->addChild<GCTransform>("Transform");
+  group->renderGroup.addPointer(transform);
   transform->transform = tr;
 
 
@@ -68,7 +68,7 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
   const SPropertyInformation *info = STypeRegistry::findType("MCCuboid");
   SProperty *shape = vp->addChild(info, "Cube");
-  transform->geometry.setPointed(shape->castTo<SPropertyContainer>()->findChild("polygons")->castTo<GCGeometry>());
+  transform->renderGroup.addPointer(shape->castTo<GCRenderable>());
 
   vp->source.setPointed(msc);
   }

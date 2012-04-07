@@ -2,15 +2,15 @@
 #define GCSHADINGGROUP_H
 
 #include "GCGlobal.h"
-#include "sentity.h"
+#include "GCRenderable.h"
 #include "sbasepointerproperties.h"
 #include "GCShader.h"
-#include "GCGeometryTransform.h"
 #include "Manipulators/GCManipulator.h"
 
-class GRAPHICSCORE_EXPORT GCShadingGroup : public SEntity, public GCManipulatable
+class GRAPHICSCORE_EXPORT GCShadingGroup : public GCRenderArray, public GCManipulatable
   {
-  S_ENTITY(GCShadingGroup, SEntity, 0)
+  S_ENTITY(GCShadingGroup, GCRenderArray, 0)
+
 public:
   GCShadingGroup();
 
@@ -19,7 +19,6 @@ public:
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
 
   GCShaderPointer shader;
-  GCGeometryTransformPointerArray geometry;
   };
 
 S_PROPERTY_INTERFACE(GCShadingGroup)

@@ -12,8 +12,6 @@ void GCShadingGroup::createTypeInformation(SPropertyInformation *info, const SPr
   if(data.registerAttributes)
     {
     info->add(&GCShadingGroup::shader, "shader");
-
-    info->add(&GCShadingGroup::geometry, "geometry");
     }
 
   if(data.registerInterfaces)
@@ -36,18 +34,11 @@ void GCShadingGroup::render(XRenderer *r) const
     s->bind(r);
     }
 
-  for(const GCGeometryTransformPointer* geoPtr = geometry.firstChild<GCGeometryTransformPointer>(); geoPtr; geoPtr = geoPtr->nextSibling<GCGeometryTransformPointer>())
-    {
-    const GCGeometryTransform* geo = geoPtr->pointed();
-    if(geo)
-      {
-      geo->render(r);
-      }
-    }
+  GCRenderArray::render(r);
   }
 
 void GCShadingGroup::addManipulators(SPropertyArray *a, const GCTransform *tr)
-  {
+  {/*
   xAssert(tr == 0);
   //a->add<GCButtonManipulator>();
 
@@ -59,5 +50,5 @@ void GCShadingGroup::addManipulators(SPropertyArray *a, const GCTransform *tr)
       {
       geo->addManipulators(a);
       }
-    }
+    }*/
   }

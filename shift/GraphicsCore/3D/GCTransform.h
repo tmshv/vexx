@@ -2,15 +2,15 @@
 #define GCTRANSFORM_H
 
 #include "GCGlobal.h"
-#include "sentity.h"
+#include "GCRenderable.h"
 #include "XTransform.h"
 #include "sbaseproperties.h"
 #include "3D/Manipulators/GCManipulator.h"
 #include "GCBaseProperties.h"
 
-class GRAPHICSCORE_EXPORT GCTransform : public SEntity, public GCManipulatable
+class GRAPHICSCORE_EXPORT GCTransform : public GCRenderArray, public GCManipulatable
   {
-  S_ENTITY(GCTransform, SEntity, 0)
+  S_ENTITY(GCTransform, GCRenderArray, 0)
 
 public:
   GCTransform();

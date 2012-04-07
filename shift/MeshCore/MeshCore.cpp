@@ -12,6 +12,7 @@ void initiateMeshCore()
   STypeRegistry::addType(MCPolyhedronProperty::staticTypeInformation());
   STypeRegistry::addType(MCGeometry::staticTypeInformation());
 
+  STypeRegistry::addType(MCShape::staticTypeInformation());
   STypeRegistry::addType(MCDensityShape::staticTypeInformation());
 
   STypeRegistry::addType(MCCuboid::staticTypeInformation());

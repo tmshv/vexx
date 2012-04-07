@@ -36,13 +36,12 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
   STypeRegistry::addType(GCGeometryPointer::staticTypeInformation());
 
-  STypeRegistry::addType(GCTransform::staticTypeInformation());
-  STypeRegistry::addType(GCGeometryTransform::staticTypeInformation());
-  STypeRegistry::addType(GCGeometryTransformPointer::staticTypeInformation());
-  STypeRegistry::addType(GCGeometryTransformPointerArray::staticTypeInformation());
-
   STypeRegistry::addType(GCRenderable::staticTypeInformation());
   STypeRegistry::addType(GCRenderablePointer::staticTypeInformation());
+  STypeRegistry::addType(GCRenderablePointerArray::staticTypeInformation());
+  STypeRegistry::addType(GCRenderArray::staticTypeInformation());
+  
+  STypeRegistry::addType(GCTransform::staticTypeInformation());
 
   STypeRegistry::addType(GCTexture::staticTypeInformation());
   STypeRegistry::addType(GCTexturePointer::staticTypeInformation());

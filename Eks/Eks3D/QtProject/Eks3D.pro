@@ -5,7 +5,7 @@
 TARGET = Eks3D
 TEMPLATE = lib
 
-include("../../Eks/EksCore/GeneralOptions.pri")
+include("../../EksCore/GeneralOptions.pri")
 
 QT += opengl \
     xml

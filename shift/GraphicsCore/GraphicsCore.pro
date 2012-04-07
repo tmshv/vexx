@@ -27,7 +27,6 @@ HEADERS += GCGlobal.h \
     3D/GCViewport.h \
     3D/GCShadingGroup.h \
     3D/GCShader.h \
-    3D/GCGeometryTransform.h \
     3D/Manipulators/GCManipulator.h \
     3D/Manipulators/GCButtonManipulator.h \
     3D/Manipulators/GCDistanceManipulator.h \
@@ -57,7 +56,6 @@ SOURCES += \
     3D/GCViewport.cpp \
     3D/GCShadingGroup.cpp \
     3D/GCShader.cpp \
-    3D/GCGeometryTransform.cpp \
     3D/Manipulators/GCManipulator.cpp \
     3D/Manipulators/GCButtonManipulator.cpp \
     3D/Manipulators/GCDistanceManipulator.cpp \

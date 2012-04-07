@@ -44,16 +44,16 @@ public:
     setController(msc);
 
     GCShadingGroup *group = vp->addChild<GCShadingGroup>("Groups");
-    msc->shadingGroups.addPointer(group);
+    msc->renderGroup.addPointer(group);
 
     group->shader.setPointed(sha);
 
-    GCGeometryTransform *transform = vp->addChild<GCGeometryTransform>("Transform");
-    group->geometry.addPointer(transform);
+    GCTransform *transform = vp->addChild<GCTransform>("Transform");
+    group->renderGroup.addPointer(transform);
 
     const SPropertyInformation *info = STypeRegistry::findType("MCSphere");
     SProperty *shape = vp->addChild(info, "Cube");
-    transform->geometry.setPointed(shape->entity()->findChild("geometry")->castTo<GCGeometry>());
+    transform->renderGroup.addPointer(shape->castTo<GCRenderable>());
 
     vp->source.setPointed(msc);
     }

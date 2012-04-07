@@ -10,7 +10,7 @@ void MCCuboid::createTypeInformation(SPropertyInformation *info, const SProperty
   {
   if(data.registerAttributes)
     {
-    GCGeometry::InstanceInformation *inst = info->child(&MCCuboid::polygons);
+    MCGeometry::InstanceInformation *inst = info->child(&MCShape::geometry);
     inst->setCompute(computeGeometry);
 
     FloatProperty::InstanceInformation *wInfo = info->add(&MCCuboid::width, "width");
@@ -38,7 +38,7 @@ MCCuboid::MCCuboid()
 
 void MCCuboid::computeGeometry(const SPropertyInstanceInformation*, MCCuboid* cube)
   {
-  MCPolyhedronProperty& geo = cube->polygons;
+  MCPolyhedronProperty& geo = cube->geometry.polygons;
 
   float x = cube->width() / 2;
   float y = cube->height() / 2;

@@ -1,12 +1,12 @@
 #ifndef MCCUBOID_H
 #define MCCUBOID_H
 
-#include "MCDensityShape.h"
+#include "MCShape.h"
 #include "3D/Manipulators/GCManipulator.h"
 
-class MCCuboid : public MCGeometry, public GCManipulatable
+class MCCuboid : public MCShape, public GCManipulatable
   {
-  S_ENTITY(MCCuboid, MCGeometry, 0)
+  S_ENTITY(MCCuboid, MCShape, 0)
 
 public:
   MCCuboid();
