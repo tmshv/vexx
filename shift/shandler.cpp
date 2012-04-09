@@ -69,7 +69,7 @@ void SHandler::undoTo(xsize p)
     {
     SChange *c = _done[i];
 
-    bool result = c->unApply() && c->inform();
+    bool result = c->unApply() && c->inform(true);
     xAssert(result);
 
     // todo dont need this here, when undo fully implemented.B

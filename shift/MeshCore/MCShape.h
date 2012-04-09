@@ -6,7 +6,7 @@
 
 class MCShape : public GCRenderable
   {
-  S_ENTITY(MCShape, SEntity, 0)
+  S_ENTITY(MCShape, GCRenderable, 0)
 
 public:
   MCShape();

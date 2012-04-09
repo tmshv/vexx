@@ -66,7 +66,7 @@ ScNodeItem *ScNodeDisplay::outputItem()
   return _outputItem;
   }
 
-void ScNodeDisplay::onTreeChange(const SChange *c)
+void ScNodeDisplay::onTreeChange(const SChange *c, bool backwards)
   {
   if(!_rootIndex)
     {
@@ -79,15 +79,20 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
     SEntity *ent = tC->property()->castTo<SEntity>();
     if(ent)
       {
-      if(tC->before() == &_rootIndex->children)
+      if(tC->before(backwards) == &_rootIndex->children)
         {
         removeNode(ent);
         ent->removeConnectionObserver(this);
         return;
         }
-      if(tC->after() == &_rootIndex->children)
+      if(tC->after(backwards) == &_rootIndex->children)
         {
         addNode(_node, ent);
+
+        // root
+        addConnector(ent, true);
+        // children
+        addConnectors(ent, true);
         ent->addConnectionObserver(this);
         return;
         }
@@ -98,11 +103,11 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
       foreach(ScNodeItem *i, _nodes)
         {
         SProperty *p = i->property();
-        if(p->isDescendedFrom(tC->before()))
+        if(p->isDescendedFrom(tC->before(backwards)))
           {
-          removed |= i->onPropertyRemoved(tC->before(), p);
+          removed |= i->onPropertyRemoved(tC->before(backwards), p);
           }
-        if(p->isDescendedFrom(tC->after()))
+        if(p->isDescendedFrom(tC->after(backwards)))
           {
           added |= i->onPropertyAdded(p);
           }
@@ -116,13 +121,13 @@ void ScNodeDisplay::onTreeChange(const SChange *c)
     }
   }
 
-void ScNodeDisplay::onConnectionChange(const SChange *change)
+void ScNodeDisplay::onConnectionChange(const SChange *change, bool backwards)
   {
   const SProperty::ConnectionChange *c = change->castTo<SProperty::ConnectionChange>();
   xAssert(c);
   if(c)
     {
-    if(c->mode() == SProperty::ConnectionChange::Connect)
+    if(c->mode(backwards) == SProperty::ConnectionChange::Connect)
       {
       addConnector(c->driven());
       }
@@ -139,6 +144,22 @@ void ScNodeDisplay::onConnectionChange(const SChange *change)
           break;
           }
         }
+      }
+    }
+  }
+
+void ScNodeDisplay::removeConnector(ScConnectorItem *connector)
+  {
+  for(xsize i = 0, s = _connectors.size(); i < s; ++i)
+    {
+    ScConnectorItem *conn = _connectors[i];
+    if(conn == connector)
+      {
+      conn->driver()->removeDriver(conn);
+      conn->driven()->removeDriven(conn);
+      conn->deleteLater();
+      _connectors.remove(i);
+      break;
       }
     }
   }
@@ -396,12 +417,33 @@ void ScNodeDisplay::removeNode(SEntity *e)
     ScNodeItem *item = _nodes[i];
     if(item->property() == e)
       {
+      recursiveRemoveConnections(item);
       item->deleteLater();
       _nodes.erase(_nodes.begin() + i);
       return;
       }
     }
   xAssertFail();
+  }
+
+void ScNodeDisplay::recursiveRemoveConnections(ScPropertyItem *item)
+  {
+  foreach(ScConnectorItem *d, item->drivers())
+    {
+    removeConnector(d);
+    }
+  foreach(ScConnectorItem *d, item->drivens())
+    {
+    removeConnector(d);
+    }
+
+  if(item->display())
+    {
+    foreach(ScPropertyItem *i, item->display()->properties())
+      {
+      recursiveRemoveConnections(i);
+      }
+    }
   }
 
 ScPropertyItem *ScNodeDisplay::findProperty(const SProperty *p, bool driver)
@@ -458,11 +500,11 @@ ScPropertyItem *ScNodeDisplay::findProperty(const SProperty *p, bool driver)
   return 0;
   }
 
-void ScNodeDisplay::addConnectors(SPropertyContainer *e)
+void ScNodeDisplay::addConnectors(SPropertyContainer *e, bool outputs)
   {
   for(SProperty *c=e->firstChild(); c; c=c->nextSibling())
     {
-    addConnector(c);
+    addConnector(c, outputs);
 
     SPropertyContainer *cont = c->castTo<SPropertyContainer>();
     if(cont)
@@ -472,7 +514,7 @@ void ScNodeDisplay::addConnectors(SPropertyContainer *e)
     }
   }
 
-void ScNodeDisplay::addConnector(const SProperty *c)
+void ScNodeDisplay::addConnector(const SProperty *c, bool outputs)
   {
   const SProperty *input = c->input();
   if(input && input != _rootIndex)
@@ -483,6 +525,19 @@ void ScNodeDisplay::addConnector(const SProperty *c)
     if(driven && driver)
       {
       addConnector(c, input, driven, driver);
+      }
+    }
+  if(outputs)
+    {
+    for(SProperty *output = c->output(); output; output = output->nextOutput())
+      {
+      ScPropertyItem *driven = findProperty(output, false);
+      ScPropertyItem *driver = findProperty(c, true);
+
+      if(driven && driver)
+        {
+        addConnector(output, c, driven, driver);
+        }
       }
     }
   }
@@ -551,12 +606,10 @@ void ScNodeDisplay::changeItemInput(QDeclarativeItem *item, QDeclarativeItem *ne
     }
 
   SProperty *drivenProp = prop->property();
-  PointerArray *pointerArray = drivenProp->castTo<PointerArray>();
-  if(pointerArray)
+  const SPropertyConnectionInterface *interface = drivenProp->interface<SPropertyConnectionInterface>();
+  if(interface)
     {
-    SBlock b(pointerArray->database());
-
-    pointerArray->addPointer(input->property());
+    interface->connect(drivenProp, input->property());
     }
   else
     {

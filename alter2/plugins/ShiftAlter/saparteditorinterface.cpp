@@ -25,7 +25,7 @@ PropertyNameEditor::~PropertyNameEditor()
     }
   }
 
-void PropertyNameEditor::onTreeChange(const SChange *c)
+void PropertyNameEditor::onTreeChange(const SChange *c, bool)
   {
   const SProperty::NameChange *n = c->castTo<SProperty::NameChange>();
   if(n && n->property() == property())

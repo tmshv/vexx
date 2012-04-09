@@ -39,36 +39,11 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
   setController(msc);
 
   GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
-  GCShadingGroup *group2 = msc->addChild<GCShadingGroup>("Groups");
   msc->renderGroup.addPointer(group);
-  msc->renderGroup.addPointer(group2);
 
   const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
   SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
   group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
-
-  const SPropertyInformation *flatSurfaceInfo = STypeRegistry::findType("FlatSurface");
-  SProperty *shader2 = msc->addChild(flatSurfaceInfo, "Shader");
-  GCShader *shaderS = shader2->uncheckedCastTo<GCShader>();
-  group2->shader.setPointed(shaderS);
-
-  GCTexture *t = msc->addChild<GCTexture>("Texture");
-  shaderS->findChild("texture")->uncheckedCastTo<GCTexturePointer>()->setPointed(t);
-
-
-  XTransform tr = XTransform::Identity();
-  tr.translation() = XVector3D(1.0f, 0.0f, 0.0f);
-
-  GCTransform *transform = msc->addChild<GCTransform>("Transform");
-  group->renderGroup.addPointer(transform);
-  transform->transform = tr;
-
-
-  tr.translation() = XVector3D(-1.0f, 0.0f, 0.0f);
-
-  const SPropertyInformation *info = STypeRegistry::findType("MCCuboid");
-  SProperty *shape = vp->addChild(info, "Cube");
-  transform->renderGroup.addPointer(shape->castTo<GCRenderable>());
 
   vp->source.setPointed(msc);
   }

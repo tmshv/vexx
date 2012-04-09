@@ -59,7 +59,7 @@ public:
   PropertyNameEditor(SProperty *e, SPartEditorInterfaceFeedbacker *f=0, CallbackFn callback=0);
   virtual ~PropertyNameEditor();
 
-  virtual void onTreeChange(const SChange *);
+  virtual void onTreeChange(const SChange *, bool back);
 
 public slots:
   void editName();

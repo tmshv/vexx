@@ -146,7 +146,7 @@ public:
   SDatabase *database();
   const SDatabase *database() const;
   void beginBlock();
-  void endBlock();
+  void endBlock(bool cancel);
 
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
@@ -268,8 +268,22 @@ public:
     NameChange(const QString &b, const QString &a, SProperty *ent)
       : _before(b), _after(a), _property(ent)
       { }
-    const QString &before() const {return _before;}
-    const QString &after() const {return _after;}
+    const QString &before(bool back) const
+      {
+      if(back)
+        {
+        return _after;
+        }
+      return _before;
+      }
+    const QString &after(bool back) const
+      {
+      if(back)
+        {
+        return _before;
+        }
+      return _after;
+      }
     SProperty *property() {return _property;}
     const SProperty *property() const {return _property;}
   private:
@@ -278,7 +292,7 @@ public:
     SProperty *_property;
     bool apply();
     bool unApply();
-    bool inform();
+    bool inform(bool back);
     };
 
   class ConnectionChange : public SChange
@@ -298,7 +312,14 @@ public:
     SProperty *driven() { return _driven; }
     const SProperty *driver() const { return _driver; }
     const SProperty *driven() const { return _driven; }
-    Mode mode() const { return _mode; }
+    Mode mode(bool back=false) const
+      {
+      if(back)
+        {
+        return (Mode)(_mode - Disconnect);
+        }
+      return _mode;
+      }
 
     static void setParentHasInputConnection(SProperty *);
     static void setParentHasOutputConnection(SProperty *);
@@ -311,7 +332,7 @@ public:
     Mode _mode;
     bool apply();
     bool unApply();
-    bool inform();
+    bool inform(bool back);
     };
 
   static void assignProperty(const SProperty *, SProperty *);

@@ -75,8 +75,8 @@ private slots:
   void updatePath();
 
 private:
-  void onTreeChange(const SChange *);
-  void onConnectionChange(const SChange *);
+  void onTreeChange(const SChange *, bool backwards);
+  void onConnectionChange(const SChange *, bool backwards);
 
   enum Mode
     {
@@ -89,9 +89,11 @@ private:
 
   ScPropertyItem *findProperty(const SProperty *, bool driver);
 
-  void addConnectors(SPropertyContainer *);
-  void addConnector(const SProperty *);
+  void addConnectors(SPropertyContainer *, bool outputs = false);
+  void addConnector(const SProperty *, bool outputs = false);
   void addConnector(const SProperty *dvnProp, const SProperty *dvrProp, ScPropertyItem *driven, ScPropertyItem *driver);
+  void removeConnector(ScConnectorItem *connector);
+  void recursiveRemoveConnections(ScPropertyItem *item);
 
   QDeclarativeComponent *_input;
   QDeclarativeComponent *_output;

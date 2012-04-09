@@ -128,7 +128,7 @@ protected:
       xAssertFail();
       return true;
       }
-    bool inform()
+    bool inform(bool)
       {
       if(property()->entity())
         {
@@ -248,7 +248,7 @@ private:
       xAssertFail();
       return true;
       }
-    bool inform()
+    bool inform(bool)
       {
       if(property()->entity())
         {
@@ -286,7 +286,7 @@ private:
       return true;
       }
 
-    bool inform()
+    bool inform(bool)
       {
       if(property()->entity())
         {

@@ -130,7 +130,7 @@ var jsFileExporter = {
 
         var fileContents = JSON.stringify(nodeObject, null, "  ");
 
-          file.write("db.types.addType(");
+          file.write("db.types.registerType(");
           file.write(fileContents);
           file.write(");");
           file.close();

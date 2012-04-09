@@ -138,7 +138,7 @@ private:
       property()->postSet();
       return true;
       }
-    bool inform()
+    bool inform(bool)
       {
       xAssert(property()->entity());
       property()->entity()->informDirtyObservers(property());

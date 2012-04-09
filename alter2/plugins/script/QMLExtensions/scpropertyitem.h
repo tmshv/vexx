@@ -52,6 +52,8 @@ public:
 
   void addDriver(ScConnectorItem *);
   void addDriven(ScConnectorItem *);
+  void removeDriver(ScConnectorItem *);
+  void removeDriven(ScConnectorItem *);
   void removeDriver(int i);
   void removeDriven(int i);
   void addDrivers(const QVector<ScConnectorItem *> &);

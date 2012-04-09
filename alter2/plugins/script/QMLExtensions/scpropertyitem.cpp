@@ -152,6 +152,25 @@ void ScPropertyItem::removeDriven(int i)
   _drivens.erase(_drivens.begin() + i);
   }
 
+
+void ScPropertyItem::removeDriver(ScConnectorItem *a)
+  {
+  QVector <ScConnectorItem *>::iterator it = qFind(_drivers.begin(), _drivers.end(), a);
+  if(it != _drivers.end())
+    {
+    _drivers.erase(it);
+    }
+  }
+
+void ScPropertyItem::removeDriven(ScConnectorItem *a)
+  {
+  QVector <ScConnectorItem *>::iterator it = qFind(_drivens.begin(), _drivens.end(), a);
+  if(it != _drivens.end())
+    {
+    _drivens.erase(it);
+    }
+  }
+
 void ScPropertyItem::addDrivers(const QVector<ScConnectorItem *> &a)
   {
   foreach(ScConnectorItem *c, a)

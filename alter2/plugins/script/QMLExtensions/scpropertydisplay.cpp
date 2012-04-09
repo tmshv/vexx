@@ -71,7 +71,7 @@ void ScPropertyDisplay::updateConnectionParenting()
         {
         foreach(ScPropertyItem *childProp, _properties)
           {
-          if(prop->isDescendedFrom(childProp->property()))
+          if(prop && prop->isDescendedFrom(childProp->property()))
             {
             _parentItem->removeDriven(i);
             childProp->addDriven(driven);

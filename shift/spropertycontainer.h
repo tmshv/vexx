@@ -26,10 +26,39 @@ public:
   public:
     TreeChange(SPropertyContainer *b, SPropertyContainer *a, SProperty *ent, xsize index);
     ~TreeChange();
-    SPropertyContainer *before() {return _before;}
-    const SPropertyContainer *before() const {return _before;}
-    SPropertyContainer *after() {return _after;}
-    const SPropertyContainer *after() const {return _after;}
+    SPropertyContainer *before(bool back=false)
+      {
+      if(back)
+        {
+        return _after;
+        }
+      return _before;
+      }
+    const SPropertyContainer *before(bool back=false) const
+      {
+      if(back)
+        {
+        return _after;
+        }
+      return _before;
+      }
+    SPropertyContainer *after(bool back=false)
+      {
+      if(back)
+        {
+        return _before;
+        }
+      return _after;
+      }
+    const SPropertyContainer *after(bool back=false) const
+      {
+      if(back)
+        {
+        return _before;
+        }
+      return _after;
+      }
+
     SProperty *property() const {return _property;}
     xsize index() const { return _index; }
   private:
@@ -40,7 +69,7 @@ public:
     bool _owner;
     bool apply();
     bool unApply();
-    bool inform();
+    bool inform(bool back);
     };
 
   SPropertyContainer();

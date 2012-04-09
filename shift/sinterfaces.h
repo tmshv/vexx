@@ -33,6 +33,15 @@ public:
   virtual void setOutputsPosition(SProperty *, const XVector3D &) const = 0;
   };
 
+class SPropertyConnectionInterface : public SStaticInterfaceBase
+  {
+  S_STATIC_INTERFACE_TYPE(SPropertyConnectionInterface, PropertyConnectionInterface);
+
+public:
+  SPropertyConnectionInterface(bool d) : SStaticInterfaceBase(d) { }
+  virtual void connect(SProperty *driven, const SProperty *driver) const = 0;
+  };
+
 class SBasicPositionInterface : public SPropertyPositionInterface
   {
 public:

@@ -31,9 +31,6 @@ void GCRenderArray::render(XRenderer *renderer) const
   for(GCRenderablePointer* r = renderGroup.firstChild<GCRenderablePointer>(); r; r = r->nextSibling<GCRenderablePointer>())
     {
     GCRenderable* ptd = r->pointed();
-    if(ptd)
-      {
-      ptd->render(renderer);
-      }
+    ptd->render(renderer);
     }
   }

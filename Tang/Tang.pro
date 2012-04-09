@@ -52,7 +52,9 @@ HEADERS += \
     component.h
 
 OTHER_FILES += \
-    startupTang.js
+    startupTang.js \
+    Components/SteelPlate.json.js \
+    Components/SteelPlate.json
 
 
 

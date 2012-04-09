@@ -30,13 +30,13 @@ SPropertyContainer::TreeChange::~TreeChange()
   {
   if(_owner)
     {
-    if(after())
+    if(after(false))
       {
-      after()->database()->deleteDynamicProperty(_property);
+      after(false)->database()->deleteDynamicProperty(_property);
       }
-    else if(before())
+    else if(before(false))
       {
-      before()->database()->deleteDynamicProperty(_property);
+      before(false)->database()->deleteDynamicProperty(_property);
       }
     else
       {
@@ -48,14 +48,14 @@ SPropertyContainer::TreeChange::~TreeChange()
 bool SPropertyContainer::TreeChange::apply()
   {
   SProfileFunction
-  if(before())
+  if(before(false))
     {
     _owner = true;
     before()->internalRemoveProperty(property());
     before()->postSet();
     }
 
-  if(after())
+  if(after(false))
     {
     _owner = false;
     after()->internalInsertProperty(false, property(), _index);
@@ -83,18 +83,18 @@ bool SPropertyContainer::TreeChange::unApply()
   return true;
   }
 
-bool SPropertyContainer::TreeChange::inform()
+bool SPropertyContainer::TreeChange::inform(bool back)
   {
   SProfileFunction
-  if(after())
+  if(after() && (!before() || !before()->isDescendedFrom(after())))
     {
     xAssert(property()->entity());
-    property()->entity()->informTreeObservers(this);
+    property()->entity()->informTreeObservers(this, back);
     }
 
-  if(before())
+  if(before() && (!after() || !after()->isDescendedFrom(before())))
     {
-    before()->entity()->informTreeObservers(this);
+    before()->entity()->informTreeObservers(this, back);
     }
   return true;
   }
@@ -188,7 +188,7 @@ void SPropertyContainer::internalClear()
   while(prop)
     {
     SProperty *next = prop->_nextSibling;
-    if(prop->index() >= _containedProperties)
+    if(prop->isDynamic())
       {
       if(previous)
         {

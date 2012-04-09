@@ -77,7 +77,7 @@ public:
   Q_INVOKABLE bool setData(const QModelIndex & index, const QString &role, const QVariant & value);
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-  virtual void onTreeChange(const SChange *);
+  virtual void onTreeChange(const SChange *, bool back);
   virtual void actOnChanges();
 
   void setOptions(Options options);

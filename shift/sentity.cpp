@@ -196,7 +196,7 @@ void SEntity::informDirtyObservers(SProperty *prop)
     }
   }
 
-void SEntity::informTreeObservers(const SChange *event)
+void SEntity::informTreeObservers(const SChange *event, bool backwards)
   {
   SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
@@ -204,7 +204,7 @@ void SEntity::informTreeObservers(const SChange *event)
     if(obs.mode == ObserverStruct::Tree)
       {
       STreeObserver *observer = ((STreeObserver*)obs.observer);
-      observer->onTreeChange(event);
+      observer->onTreeChange(event, backwards);
       handler()->currentBlockObserverList() << observer;
       }
     }
@@ -212,11 +212,11 @@ void SEntity::informTreeObservers(const SChange *event)
   SEntity *parentEnt = parentEntity();
   if(parentEnt)
     {
-    parentEnt->informTreeObservers(event);
+    parentEnt->informTreeObservers(event, backwards);
     }
   }
 
-void SEntity::informConnectionObservers(const SChange *event)
+void SEntity::informConnectionObservers(const SChange *event, bool backwards)
   {
   SProfileFunction
   foreach(const ObserverStruct &obs, _observers)
@@ -224,7 +224,7 @@ void SEntity::informConnectionObservers(const SChange *event)
     if(obs.mode == ObserverStruct::Connection)
       {
       SConnectionObserver *observer = ((SConnectionObserver*)obs.observer);
-      observer->onConnectionChange(event);
+      observer->onConnectionChange(event, backwards);
       handler()->currentBlockObserverList() << observer;
       }
     }

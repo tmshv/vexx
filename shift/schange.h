@@ -16,7 +16,7 @@ public:
   virtual ~SChange() { }
   virtual bool apply() = 0;
   virtual bool unApply() = 0;
-  virtual bool inform() = 0;
+  virtual bool inform(bool backwards) = 0;
   };
 
 #endif // SCHANGE_H

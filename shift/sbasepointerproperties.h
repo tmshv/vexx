@@ -3,6 +3,7 @@
 
 #include "sproperty.h"
 #include "sdatabase.h"
+#include "sinterfaces.h"
 
 class SHIFT_EXPORT Pointer : public SProperty
   {
@@ -43,7 +44,7 @@ public:
 template <typename PTR> class TypedPointerArray : public STypedPropertyArray<PTR>
   {
 public:
-  PTR* addPointer(typename PTR::Type *prop)
+  PTR* addPointer(const typename PTR::Type *prop)
     {
     SHandler* db = SProperty::handler();
     xAssert(db);
@@ -56,7 +57,7 @@ public:
     return p;
     }
 
-  void removePointer(typename PTR::Type *ptr)
+  void removePointer(const typename PTR::Type *ptr)
     {
     SProperty *c = SPropertyContainer::firstChild();
     while(c)
@@ -74,7 +75,7 @@ public:
       }
     }
 
-  bool hasPointer(typename PTR::Type *ptr)
+  bool hasPointer(const typename PTR::Type *ptr)
     {
     SProperty *child = SPropertyContainer::firstChild();
     while(child)
@@ -88,6 +89,7 @@ public:
     return false;
     }
   };
+
 
 class SPointerComputeLock
   {
@@ -110,13 +112,60 @@ S_PROPERTY_INTERFACE(Pointer)
     assignPointerInformation(info, type::staticTypeInformation()); } } \
   S_PROPERTY_INTERFACE(name)
 
+template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+  {
+  if(data.registerInterfaces)
+    {
+    typedef TYPE::Type PtrType;
+
+    class PointerArrayConnectionInterface : public SPropertyConnectionInterface
+      {
+    public:
+      PointerArrayConnectionInterface() : SPropertyConnectionInterface(true) { }
+      virtual void connect(SProperty *driven, const SProperty *driver) const
+        {
+        SBlock b(driven->database());
+
+        T* arr = driven->castTo<T>();
+        xAssert(arr);
+
+        const PtrType* ptr = driver->castTo<PtrType>();
+        if(ptr)
+          {
+          arr->addPointer(ptr);
+          }
+        else
+          {
+          arr->setInput(driver);
+          }
+        }
+      };
+
+    info->addStaticInterface(new PointerArrayConnectionInterface);
+
+    XInterface<T>* api = info->apiInterface<T>();
+
+
+    XInterfaceBase::Function fn;
+    fn = XScript::MethodToInCa<TypedPointerArray<TYPE>, TYPE *(const PtrType *), &T::addPointer>::Call;
+    api->addFunction("addPointer", fn);
+
+    fn = XScript::MethodToInCa<TypedPointerArray<TYPE>, bool (const PtrType *), &T::hasPointer>::Call;
+    api->addFunction("hasPointer", fn);
+
+    fn = XScript::MethodToInCa<TypedPointerArray<TYPE>, void (const PtrType *), &T::removePointer>::Call;
+    api->addFunction("removePointer", fn);
+    }
+  }
+
 #define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
   class name : public TypedPointerArray<type> { \
   S_PROPERTY_CONTAINER(PointerArray, SPropertyContainer, 0); }; \
   S_IMPLEMENT_INLINE_PROPERTY(name) \
-  inline void name::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &) { } \
-  S_PROPERTY_INTERFACE(name)
-
+  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { createTypedPointerArray<name, type>(info, data); } \
+  S_PROPERTY_INTERFACE(name) \
+  S_PROPERTY_INTERFACE(TypedPointerArray<type>)
 
 S_TYPED_POINTER_ARRAY_TYPE(PointerArray, Pointer)
+
 #endif // SBASEPOINTERPROPERTIES_H

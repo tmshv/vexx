@@ -81,12 +81,12 @@ public:
     if(!oldStateStorageEnabled) { \
       CLS change(__VA_ARGS__); \
       ((SChange&)change).apply(); \
-      ((SChange&)change).inform(); \
+      ((SChange&)change).inform(false); \
     }else { \
       QMutexLocker l(&_doChange); \
       void *mem = changeAllocator()->alloc(sizeof(CLS)); \
       SChange* change = new(mem) CLS(__VA_ARGS__); \
-      bool result = change->apply() && change->inform(); \
+      bool result = change->apply() && change->inform(false); \
       if(result) { \
         _done << change; \
       } else { \

@@ -38,7 +38,7 @@ void SProperty::createTypeInformation(SPropertyInformation *info, const SPropert
     api->addFunction("pathTo", fn);
 
     api->addMethod<void(), &SProperty::beginBlock>("beginBlock");
-    api->addMethod<void(), &SProperty::endBlock>("endBlock");
+    api->addMethod<void(bool), &SProperty::endBlock>("endBlock");
     }
   }
 
@@ -110,22 +110,22 @@ void SProperty::setDependantsDirty()
 bool SProperty::NameChange::apply()
   {
   SProfileFunction
-  property()->internalSetName(after());
+  property()->internalSetName(after(false));
   return true;
   }
 
 bool SProperty::NameChange::unApply()
   {
   SProfileFunction
-  property()->internalSetName(before());
+  property()->internalSetName(before(false));
   return true;
   }
 
-bool SProperty::NameChange::inform()
+bool SProperty::NameChange::inform(bool backwards)
   {
   SProfileFunction
   xAssert(property()->entity());
-  property()->entity()->informTreeObservers(this);
+  property()->entity()->informTreeObservers(this, backwards );
   return true;
   }
 
@@ -452,9 +452,9 @@ void SProperty::beginBlock()
   handler()->beginBlock();
   }
 
-void SProperty::endBlock()
+void SProperty::endBlock(bool cancel)
   {
-  handler()->endBlock();
+  handler()->endBlock(cancel);
   }
 
 bool SProperty::shouldSavePropertyValue(const SProperty *p)
@@ -688,16 +688,16 @@ bool SProperty::ConnectionChange::unApply()
   return true;
   }
 
-bool SProperty::ConnectionChange::inform()
+bool SProperty::ConnectionChange::inform(bool back)
   {
   SProfileFunction
   if(_driver->entity())
     {
-    _driver->entity()->informConnectionObservers(this);
+    _driver->entity()->informConnectionObservers(this, back);
     }
   if(_driven->entity())
     {
-    _driven->entity()->informConnectionObservers(this);
+    _driven->entity()->informConnectionObservers(this, back);
     }
   return true;
   }

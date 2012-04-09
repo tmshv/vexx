@@ -546,7 +546,7 @@ Qt::ItemFlags SDatabaseModel::flags(const QModelIndex &index) const
   return QAbstractItemModel::flags(index);
   }
 
-void SDatabaseModel::onTreeChange(const SChange *c)
+void SDatabaseModel::onTreeChange(const SChange *c, bool back)
   {
   const SEntity::TreeChange *tC = c->castTo<SEntity::TreeChange>();
   if(tC)
@@ -554,18 +554,18 @@ void SDatabaseModel::onTreeChange(const SChange *c)
     xAssert(!_currentTreeChange);
     _currentTreeChange = tC;
 
-    if(tC->property() == _root && tC->after() == 0)
+    if(tC->property() == _root && tC->after(back) == 0)
       {
       _root = 0;
       }
 
     emit layoutAboutToBeChanged();
 
-    if(tC->after() == 0)
+    if(tC->after(back) == 0)
       {
       changePersistentIndex(createIndex(tC->index(), 0, (void*)tC->property()), QModelIndex());
 
-      const SPropertyContainer *parent = tC->before();
+      const SPropertyContainer *parent = tC->before(back);
       xAssert(parent);
 
       xsize i = tC->index();
@@ -575,7 +575,7 @@ void SDatabaseModel::onTreeChange(const SChange *c)
       }
     else
       {
-      const SPropertyContainer *parent = tC->after();
+      const SPropertyContainer *parent = tC->after(back);
       xAssert(parent);
 
       xsize i = xMin(parent->size()-1, tC->index());

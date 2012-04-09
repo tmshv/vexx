@@ -76,8 +76,8 @@ public:
   void removeConnectionObserver(SConnectionObserver *);
 
   void informDirtyObservers(SProperty *prop);
-  void informTreeObservers(const SChange *event);
-  void informConnectionObservers(const SChange *event);
+  void informTreeObservers(const SChange *event, bool backwards);
+  void informConnectionObservers(const SChange *event, bool backwards);
 
   SEntity *findChildEntity(const QString &);
   const SEntity *findChildEntity(const QString &) const;
