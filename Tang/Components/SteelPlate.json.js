@@ -1,5 +1,6 @@
 db.types.registerType({
   "name": "SteelPlate",
+  "parent": "Component",
   "properties": [
     {
       "name": "renderGroup",
@@ -7,6 +8,7 @@ db.types.registerType({
       "properties": [
         {
           "name": "1",
+          "type": "GCRenderablePointer",
           "affects": [],
           "defaultInput": "../renderGroup/1"
         }
@@ -14,21 +16,25 @@ db.types.registerType({
     },
     {
       "name": "Thickness",
+      "type": "FloatProperty",
       "affects": [],
       "defaultValue": "0"
     },
     {
       "name": "Width",
+      "type": "FloatProperty",
       "affects": [],
       "defaultValue": "0"
     },
     {
       "name": "Height",
+      "type": "FloatProperty",
       "affects": [],
       "defaultValue": "0"
     },
     {
       "name": "undefined",
+      "type": "MCCuboid",
       "affects": [],
       "properties": [
         {

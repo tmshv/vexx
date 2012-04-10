@@ -268,7 +268,7 @@ public:
     NameChange(const QString &b, const QString &a, SProperty *ent)
       : _before(b), _after(a), _property(ent)
       { }
-    const QString &before(bool back) const
+    const QString &before(bool back=false) const
       {
       if(back)
         {
@@ -276,7 +276,7 @@ public:
         }
       return _before;
       }
-    const QString &after(bool back) const
+    const QString &after(bool back=false) const
       {
       if(back)
         {

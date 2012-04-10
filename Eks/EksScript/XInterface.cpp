@@ -53,6 +53,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   v8::Handle<v8::String> typeNameV8 = v8::String::New("typeName");
   v8::Handle<v8::String> typeNameStrV8 = v8::String::New((uint16_t*)typeName.constData(), typeName.length());
   (*constructor(_constructor))->Set(typeNameV8, typeNameStrV8);
+  (*::prototype(_prototype))->Set(typeNameV8, typeNameStrV8);
 
   (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
 

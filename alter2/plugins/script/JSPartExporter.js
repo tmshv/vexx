@@ -3,10 +3,6 @@ var jsFileExporter = {
     fileType: "Javascript Source (*.js)",
     exportFile: function(filename, entity)
       {
-      print(entity instanceof db.types.SEntity)
-      print(entity.input)
-                  entity.toString()
-      print(filename, " .... ", entity.toString());
       entity.cancelBlock(function()
         {
         var file = new File(filename);
@@ -72,7 +68,7 @@ var jsFileExporter = {
               doExport = true;
               if(dynamic)
                 {
-                obj["type"] = subProp.typeInformation.typeName;
+                obj["type"] = subProp.typeName;
 
                 if(doAffects)
                   {
@@ -114,7 +110,7 @@ var jsFileExporter = {
         var nodeObject =
           {
           name: part.name,
-          parent: part.typeInformation.typeName,
+          parent: part.typeName,
           properties: []
           }
 

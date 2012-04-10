@@ -34,8 +34,7 @@ LIBS += -lshift -lEksCore -lEksGui -lEksScript -lEks3D -lalter -lShiftGraphicsCo
 
 FORMS +=
 
-RESOURCES += \
-    Resources.qrc
+RESOURCES +=
 
 
 
