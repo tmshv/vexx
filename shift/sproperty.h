@@ -397,7 +397,7 @@ template <typename T> inline const XInterfaceBase *findPropertyInterface(const T
     {
     return prop->apiInterface();
     }
-  return prop->staticApiInterface();
+  return T::staticApiInterface();
   }
 
 #define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE_INHERITS(name, SProperty) \

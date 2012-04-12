@@ -69,11 +69,12 @@ void STypeRegistry::initiate()
   }
 
 void STypeRegistry::terminate()
-  {
+{
+  // script engine needs to access type info.
+  XScriptEngine::terminate();
+
   delete _internalTypes.allocator;
   _internalTypes.allocator = 0;
-
-  XScriptEngine::terminate();
   }
 
 XAllocatorBase *STypeRegistry::allocator()

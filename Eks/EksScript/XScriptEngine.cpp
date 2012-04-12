@@ -43,6 +43,7 @@ void XScriptEngine::initiate()
 
 void XScriptEngine::terminate()
   {
+  v8::V8::LowMemoryNotification();
   g_engine->context.Dispose();
   delete g_engine;
   }
@@ -55,7 +56,6 @@ XScriptEngine::XScriptEngine()
 
 XScriptEngine::~XScriptEngine()
   {
-  v8::V8::LowMemoryNotification();
   }
 
 XScriptObject XScriptEngine::get(const QString& name)
