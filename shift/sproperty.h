@@ -174,6 +174,12 @@ public:
   bool isDynamic() const;
   xsize index() const;
 
+  // find a path from this to that
+  QString pathTo(const SProperty *that) const
+    {
+    return that->path(this);
+    }
+
   QString path() const;
   QString path(const SProperty *from) const;
 

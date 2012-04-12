@@ -10,7 +10,9 @@ XFloatWidget::XFloatWidget( qreal val, QWidget *parent ) : QWidget( parent ),
         _layout( new QHBoxLayout( this ) ),
         _spinner( new QDoubleSpinBox( this ) ),
         _slider( new QSlider( Qt::Horizontal, this ) ),
-        _setting( false )
+        _setting(false),
+        _settingValue(false),
+        _settingSlider(false)
     {
     _layout->addWidget( _slider );
     _layout->addWidget( _spinner );
@@ -30,17 +32,23 @@ XFloatWidget::XFloatWidget( qreal val, QWidget *parent ) : QWidget( parent ),
     _spinner->setDecimals( 4 );
     _spinner->setMinimumWidth( 40 );
 
+    this->blockSignals(true);
+
     setMaximum( HUGE_VAL );
     setMinimum( -HUGE_VAL );
     setValue( val );
     updateUsed();
+
+    this->blockSignals(false);
     }
 
 XFloatWidget::XFloatWidget( qreal val, qreal min, qreal max, QWidget *parent ) : QWidget( parent ),
         _layout( new QHBoxLayout( this ) ),
         _spinner( new QDoubleSpinBox( this ) ),
         _slider( new QSlider( Qt::Horizontal, this ) ),
-        _setting( false )
+        _setting(false),
+        _settingValue(false),
+        _settingSlider(false)
     {
     _layout->addWidget( _slider );
     _layout->addWidget( _spinner );
@@ -63,10 +71,14 @@ XFloatWidget::XFloatWidget( qreal val, qreal min, qreal max, QWidget *parent ) :
         max = val;
         }
 
+    this->blockSignals(true);
+
     setMaximum( max );
     setMinimum( min );
     setValue( val );
     updateUsed();
+
+    this->blockSignals(false);
     }
 
 void XFloatWidget::setValueFromSpinner( double in )

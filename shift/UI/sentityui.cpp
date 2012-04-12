@@ -48,7 +48,8 @@ QWidget *SEntityUI::createControlWidget(SEntity *ent, QWidget *parent, bool *add
   SProperty *child = ent->firstChild();
   while(child)
     {
-    if(child->instanceInformation()->mode() == SPropertyInstanceInformation::UserSettable)
+    // this was too restricting, is it really what we want?
+    //if(child->instanceInformation()->mode() == SPropertyInstanceInformation::UserSettable)
       {
       QWidget *widget = createControlWidget(child);
       if(widget)

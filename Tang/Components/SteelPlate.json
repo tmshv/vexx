@@ -19,19 +19,19 @@
                   "__T":"FloatProperty",
                   "name":"width",
                   "input":"..\/..\/..\/Width",
-                  "__V":"0"
+                  "__V":"1.2"
                 },
                 {
                   "__T":"FloatProperty",
                   "name":"height",
                   "input":"..\/..\/..\/Height",
-                  "__V":"0"
+                  "__V":"0.8"
                 },
                 {
                   "__T":"FloatProperty",
                   "name":"depth",
                   "input":"..\/..\/..\/Thickness",
-                  "__V":"0"
+                  "__V":"0.01"
                 },
                 {
                   "__T":"Vector3DProperty",
@@ -60,26 +60,26 @@
           "__T":"FloatProperty",
           "name":"Thickness",
           "dynamic":"1",
-          "__V":"0"
+          "__V":"0.01"
         },
         {
           "__T":"FloatProperty",
           "name":"Width",
           "dynamic":"1",
-          "__V":"0"
+          "__V":"1.2"
         },
         {
           "__T":"FloatProperty",
           "name":"Height",
           "dynamic":"1",
-          "__V":"0"
+          "__V":"0.8"
         },
         {
           "__T":"Vector3DProperty",
           "name":"__position",
           "dynamic":"1",
           "mode":"internal",
-          "__V":"360 123 0"
+          "__V":"187 107 0"
         },
         {
           "__T":"Vector3DProperty",

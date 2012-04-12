@@ -9,8 +9,10 @@ db.types.Component.prototype.addInstance = function(shaderGroup)
 var document = db.addDocument(db.types.ComponentDocument);
 document.newFile();
 
+
+document.loadFile("F:\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
+var shaderGroup = db.children[1].children.Scene.children.Groups;
+document.children[0].addInstance(shaderGroup);
+
 document.editor = document.createEditor();
 document.editor.show();
-
-//var shaderGroup = db.children[1].children.Scene.children.Groups
-//db.children[2].children.Component1.addInstance(shaderGroup)

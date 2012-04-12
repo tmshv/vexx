@@ -33,9 +33,7 @@ void SProperty::createTypeInformation(SPropertyInformation *info, const SPropert
 
     api->addProperty<QVector<SProperty*>, &SProperty::affects>("affects");
 
-    // add a method, cant use helper method for this because it struggles to resolve the method overload
-    XInterfaceBase::Function fn = XScript::ConstMethodToInCa<SProperty, QString (const SProperty *), &SProperty::path>::Call;
-    api->addFunction("pathTo", fn);
+    api->addConstMethod<QString (const SProperty *), &SProperty::pathTo>("pathTo");
 
     api->addMethod<void(), &SProperty::beginBlock>("beginBlock");
     api->addMethod<void(bool), &SProperty::endBlock>("endBlock");

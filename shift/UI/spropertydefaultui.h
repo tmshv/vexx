@@ -169,7 +169,10 @@ public:
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
+
+    blockSignals(true);
     syncGUI();
+    blockSignals(false);
     }
 
   Q_SLOT void guiChanged( double val ) { propertyValue()->assign((float)val); }
@@ -184,7 +187,10 @@ public:
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
+
+    blockSignals(true);
     syncGUI();
+    blockSignals(false);
     }
 
   Q_SLOT void guiChanged( double val ) { propertyValue()->assign(val); }

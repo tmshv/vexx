@@ -168,7 +168,6 @@ NodeItem {
               propertiesSection.x = (function() { return node.width; });
               }
 
-
             propertiesSection.visible = true;
             }
 
