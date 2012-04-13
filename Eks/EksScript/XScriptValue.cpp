@@ -132,6 +132,7 @@ XScriptValue::XScriptValue(float x)
 
 XScriptValue::XScriptValue(const QString &str)
   {
+  v8::Locker l;
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
 
   if(str.length())
