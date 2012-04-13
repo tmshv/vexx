@@ -11,7 +11,7 @@ class XInterfaceBase;
 class EKSSCRIPT_EXPORT XScriptEngine
   {
 public:
-  XScriptEngine();
+  XScriptEngine(bool enableDebugging);
   ~XScriptEngine();
 
   static void adjustAmountOfExternalAllocatedMemory(int in);

@@ -17,6 +17,7 @@ xCompileTimeAssert(sizeof(XScriptSourceImpl) == sizeof(XScriptSource));
 
 XScriptSource::XScriptSource(const QString &filename, const QString &data)
   {
+  v8::Locker locker;
   // Create a string containing the JavaScript source code.
   v8::Handle<v8::String> source = v8::String::New((xuint16*)data.constData(), data.length());
 
@@ -33,6 +34,7 @@ XScriptSource::Error::Error() : _hasError(false)
 
 XScriptValue XScriptSource::run(Error *error)
   {
+  v8::Locker locker;
   v8::TryCatch trycatch;
   // Run the script to get the result.
   XScriptSourceImpl *i = XScriptSourceImpl::impl(this);

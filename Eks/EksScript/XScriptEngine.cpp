@@ -6,6 +6,7 @@
 #include "XQObjectWrapper.h"
 #include "XQtWrappers.h"
 #include "v8.h"
+#include "v8-debug.h"
 
 struct StaticEngine
   {
@@ -16,10 +17,12 @@ struct StaticEngine
     context->AllowCodeGenerationFromStrings(false);
     }
 
+  v8::Locker locker;
   v8::HandleScope scope;
   v8::Handle<v8::ObjectTemplate> globalTemplate;
   v8::Persistent<v8::Context> context;
   v8::Context::Scope contextScope;
+  v8::Unlocker unlocker;
   };
 
 StaticEngine *g_engine = 0;
@@ -48,10 +51,37 @@ void XScriptEngine::terminate()
   delete g_engine;
   }
 
-XScriptEngine::XScriptEngine()
+
+void debugHandler() {
+  // We are in some random thread. We should already have v8::Locker acquired
+  // (we requested this when registered this callback). We was called
+  // because new debug messages arrived; they may have already been processed,
+  // but we shouldn't worry about this.
+  //
+  // All we have to do is to set context and call ProcessDebugMessages.
+  //
+  // We should decide which V8 context to use here. This is important for
+  // "evaluate" command, because it must be executed some context.
+  // In our sample we have only one context, so there is nothing really to
+  // think about.
+
+  v8::HandleScope scope;
+
+  //v8::Context::Scope contextScope(g_engine->context);
+
+  //v8::Debug::ProcessDebugMessages();
+}
+
+XScriptEngine::XScriptEngine(bool debugging)
   {
   XQObjectWrapper::initiate(this);
   XQtWrappers::initiate(this);
+
+  if(debugging)
+    {
+    v8::Debug::EnableAgent("XScriptAgent", 9222, false);
+    v8::Debug::SetDebugMessageDispatchHandler(debugHandler, true);
+    }
   }
 
 XScriptEngine::~XScriptEngine()

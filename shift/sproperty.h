@@ -402,11 +402,17 @@ template <typename T> inline const XInterfaceBase *findPropertyInterface(const T
 
 #define S_PROPERTY_INTERFACE(name) X_SCRIPTABLE_TYPE_INHERITS(name, SProperty) \
   template <> inline const XInterfaceBase *findInterface<name>(const name *p) { \
-    return findPropertyInterface<SProperty>(p); }
+    return findPropertyInterface<SProperty>(p); } \
+  namespace XScriptConvert { \
+  template <> inline name *castFromBase<name, SProperty>(SProperty *ptr) { \
+    return ptr->castTo<name>(); } }
 
 #define S_PROPERTY_ABSTRACT_INTERFACE(name) X_SCRIPTABLE_ABSTRACT_TYPE_INHERITS(name, SProperty) \
   template <> inline const XInterfaceBase *findInterface<name>(const name *p) { \
-    return findPropertyInterface<SProperty>(p); }
+    return findPropertyInterface<SProperty>(p); } \
+  namespace XScriptConvert { \
+  template <> inline name *castFromBase<name, SProperty>(SProperty *ptr) { \
+    return ptr->castTo<name>(); } }
 
 X_SCRIPTABLE_TYPE(SProperty)
 

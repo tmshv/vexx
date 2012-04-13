@@ -106,6 +106,7 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
     QMetaMethod snd = sender()->metaObject()->method(senderSignalIndex());
     QList<QByteArray> types = snd.parameterTypes();
 
+    v8::Locker l;
     v8::Handle<v8::Context> ctxt = getV8EngineInternal();
 
     v8::HandleScope handle_scope;

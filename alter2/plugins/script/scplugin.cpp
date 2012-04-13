@@ -134,7 +134,7 @@ XScriptValue printFn(XScriptArguments const &args)
 void ScPlugin::load()
   {
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
-  _engine = new XScriptEngine();
+  _engine = new XScriptEngine(true);
 
   _engine->set("print", printFn);
 

@@ -141,6 +141,7 @@ XScriptFunction& XScriptFunction::operator=(const XScriptFunction &other)
 
 XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, const XScriptValue args[]) const
   {
+  v8::Locker locker;
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
   return (func->_object.IsEmpty() || !func->_object->IsFunction())
@@ -157,6 +158,7 @@ bool XScriptFunction::isValid() const
 
 XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int argc, const XScriptValue *args, bool *error, QString *message) const
   {
+  v8::Locker locker;
   v8::TryCatch trycatch;
   if(error)
   {

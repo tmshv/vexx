@@ -147,6 +147,7 @@ void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
 
 void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
   {
+  v8::Locker l;
   v8::Handle<v8::Object> object = getV8Internal(scObj);
   xAssert(_nativeField < (xsize)object->InternalFieldCount());
   object->SetInternalField(_nativeField, v8::Null());
@@ -159,6 +160,7 @@ void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
 
 XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[]) const
   {
+  v8::Locker l;
   v8::Handle<v8::Object> newObj = getV8Internal(constructorFunction())->NewInstance(argc, getV8Internal(argv));
 
   v8::Handle<v8::Value> proto = newObj->GetPrototype();
