@@ -1,5 +1,6 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
+#if 0
 
 #include "UISurface.h"
 #include "sentityweakpointer.h"
@@ -33,5 +34,5 @@ private:
   QWebView *_webView;
   SPropertyArray *_objectParent;
   };
-
+#endif
 #endif // WEBVIEW_H

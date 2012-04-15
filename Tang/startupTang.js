@@ -6,13 +6,17 @@ db.types.Component.prototype.addInstance = function(shaderGroup)
   }
 
 // create a new component document and pop it up.
-var document = db.addDocument(db.types.ComponentDocument);
-document.newFile();
+var area = db.addDocument(db.types.AreaDocument);
+area.newFile();
+
+// create a new component document and pop it up.
+var component = db.addDocument(db.types.ComponentDocument);
+component.newFile();
 
 
-document.loadFile("F:\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
+component.loadFile("F:\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
 var shaderGroup = db.children[1].children.Scene.children.Groups;
-document.children[0].addInstance(shaderGroup);
+component.children[0].addInstance(shaderGroup);
 
-document.editor = document.createEditor();
-document.editor.show();
+component.editor = component.createEditor();
+component.editor.show();

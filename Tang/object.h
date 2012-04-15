@@ -15,14 +15,4 @@ public:
 
 S_PROPERTY_INTERFACE(Object)
 
-class Area : public Object
-  {
-  S_ENTITY(Area, Object, 0)
-
-public:
-  Area();
-  };
-
-S_PROPERTY_INTERFACE(Area)
-
 #endif // OBJECTID_H

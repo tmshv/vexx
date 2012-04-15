@@ -9,13 +9,3 @@ void Object::createTypeInformation(SPropertyInformation *, const SPropertyInform
 Object::Object()
   {
   }
-
-S_IMPLEMENT_PROPERTY(Area)
-
-void Area::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
-  {
-  }
-
-Area::Area()
-  {
-  }

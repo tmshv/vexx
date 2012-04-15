@@ -10,6 +10,8 @@
 #include "component.h"
 #include "componentdocument.h"
 #include "saparteditor.h"
+#include "area.h"
+#include "areadocument.h"
 
 int main( int argc, char **argv )
   {
@@ -43,21 +45,23 @@ int main( int argc, char **argv )
 
   initiateMeshCore();
 
-  SPropertyArray *objectParent = &db->db().children;
+  //SPropertyArray *objectParent = &db->db().children;
 
-  WebView *webData = new WebView(objectParent);
-  script->registerScriptGlobal(webData);
+  //WebView *webData = new WebView(objectParent);
+  //script->registerScriptGlobal(webData);
 
   Viewport *vp = new Viewport(*db);
   ui->addSurface(vp);
 
-  QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));
+  //QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));
 
-  ui->addSurface(webData);
+  //ui->addSurface(webData);
 
 
   STypeRegistry::addType(Component::staticTypeInformation());
   STypeRegistry::addType(ComponentDocument::staticTypeInformation());
+  STypeRegistry::addType(Area::staticTypeInformation());
+  STypeRegistry::addType(AreaDocument::staticTypeInformation());
   Component::staticTypeInformation()->addStaticInterface(new ComponentEditorInterface);
 
   script->include("startupTang.js");

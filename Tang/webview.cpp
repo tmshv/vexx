@@ -1,8 +1,10 @@
+#if 0
 #include "webview.h"
 #include "QWebView"
 #include "QNetworkAccessManager"
 #include "QNetworkRequest"
 #include "object.h"
+#include "area.h"
 
 #define PERMANENT_ADDRESS "http://goo.gl/DWBZJ"
 
@@ -88,3 +90,4 @@ void WebView::updateArea()
   _webView->load(request, QNetworkAccessManager::PostOperation, content);
 #undef BOUNDARY
   }
+#endif

@@ -17,7 +17,9 @@ SOURCES += main.cpp \
     webview.cpp \
     object.cpp \
     componentdocument.cpp \
-    component.cpp
+    component.cpp \
+    area.cpp \
+    areadocument.cpp
 
 LIBS += -lEksCore \
     -lEksScript \
@@ -49,7 +51,9 @@ HEADERS += \
     webview.h \
     object.h \
     componentdocument.h \
-    component.h
+    component.h \
+    area.h \
+    areadocument.h
 
 OTHER_FILES += \
     startupTang.js \
