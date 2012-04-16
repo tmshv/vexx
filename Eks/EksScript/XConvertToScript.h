@@ -86,15 +86,6 @@ template <> struct NativeToJS< XIfElse< XSameType<long, xint64>::Value,
   {
   };
 
-#ifdef X_HAS_LONG_LONG
-template <> struct JSToNative< XIfElse<
-    XSameType<long long int,int64_t>::Value,
-    Detail::UselessConversionType<long long>,
-    long long int >::Type > : JSToNative<int64_t>
-  {
-  };
-#endif
-
 template <> struct NativeToJS<bool>
   {
   XScriptValue operator()( bool v ) const

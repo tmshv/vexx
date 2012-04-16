@@ -28,8 +28,8 @@ public:
   SDatabase *database() { xAssert(_database); return _database; }
   const SDatabase *database() const { xAssert(_database); return _database; }
 
-#ifdef X_CPPOX_SUPPORT
-  template <typename CLS, typename ...CLSARGS> void doChange(CLSARGS&&... params)
+#ifdef X_CPPOX_VARIADIC_TEMPLATES_SUPPORT
+  template <typename CLS, typename... CLSARGS> void doChange(CLSARGS&&... params)
     {
     bool oldStateStorageEnabled = database()->stateStorageEnabled();
     database()->setStateStorageEnabled(false);

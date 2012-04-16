@@ -421,16 +421,6 @@ template <> struct JSToNative< XIfElse<
     long >::Type > : JSToNative<xint64>
   {
   };
-
-#if X_HAS_LONG_LONG
-template <> struct NativeToJS< XIfElse< tmp::SameType<long long int,int64_t>::Value,
-    Detail::UselessConversionType<long long>,
-    long long int >::Type >
-    : Detail::NativeToJS_int_big<int64_t>
-  {
-  };
-#endif
-
 }
 
 template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScriptValue const &h)
