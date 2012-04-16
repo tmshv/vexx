@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     componentdocument.cpp \
     component.cpp \
     area.cpp \
-    areadocument.cpp
+    areadocument.cpp \
+    tangmanager.cpp
 
 LIBS += -lEksCore \
     -lEksScript \
@@ -53,7 +54,8 @@ HEADERS += \
     componentdocument.h \
     component.h \
     area.h \
-    areadocument.h
+    areadocument.h \
+    tangmanager.h
 
 OTHER_FILES += \
     startupTang.js \

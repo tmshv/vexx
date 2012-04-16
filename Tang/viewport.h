@@ -20,17 +20,23 @@ class GCScreenRenderTarget;
 class EnvironmentEntity;
 
 class Object;
+class GCScene;
+class GCViewableTransform;
 
 class Viewport : public SViewport, public UISurface
   {
   Q_OBJECT
 
+XProperties:
+  XROProperty(SEntityWeakPointer, scene);
+
 public:
   Viewport(SPlugin &);
   ~Viewport();
 
-public slots:
-  void setObject(Object *id);
+  Q_INVOKABLE GCViewport *viewport();
+
+  Q_INVOKABLE void setScene(GCScene *);
   };
 
 #endif // VIEWPORT_H

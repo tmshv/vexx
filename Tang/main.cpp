@@ -12,6 +12,7 @@
 #include "saparteditor.h"
 #include "area.h"
 #include "areadocument.h"
+#include "tangmanager.h"
 
 int main( int argc, char **argv )
   {
@@ -45,13 +46,15 @@ int main( int argc, char **argv )
 
   initiateMeshCore();
 
+  script->registerScriptGlobal("tang", new TangManager(&app));
+
   //SPropertyArray *objectParent = &db->db().children;
 
   //WebView *webData = new WebView(objectParent);
   //script->registerScriptGlobal(webData);
 
-  Viewport *vp = new Viewport(*db);
-  ui->addSurface(vp);
+  //Viewport *vp = new Viewport(*db);
+  //ui->addSurface(vp);
 
   //QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));
 
@@ -65,8 +68,6 @@ int main( int argc, char **argv )
   Component::staticTypeInformation()->addStaticInterface(new ComponentEditorInterface);
 
   script->include("startupTang.js");
-
-  ui->show();
 
   return app.execute();
   }

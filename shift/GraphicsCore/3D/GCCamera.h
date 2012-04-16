@@ -31,8 +31,10 @@ public:
 
   TransformProperty viewTransform;
 
+  void setPosition(float x, float y, float z) {setPosition(XVector3D(x, y, z)); }
   void setPosition(const XVector3D &point);
 
+  void setFocalPoint(float x, float y, float z) {setFocalPoint(XVector3D(x, y, z)); }
   void setFocalPoint(const XVector3D &point);
   XVector3D focalPoint() const;
 

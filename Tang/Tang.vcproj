@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="Tang"
-	ProjectGUID="{8E70261D-487D-38B9-A25D-B78985D18DC0}"
+	ProjectGUID="{76354261-8CE8-3538-A8B9-E133661A25A9}"
 	Keyword="Qt4VSv1.0"
 	TargetFrameworkVersion="0"
 	>
@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\Eks\EksCore&quot;;&quot;.\..\Eks\EksScript&quot;;&quot;.\..\Eks\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Shift\MeshCore&quot;;&quot;.\..\Alter2&quot;;c:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\debug&quot;;&quot;.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\Eks\EksCore&quot;;&quot;.\..\Eks\EksScript&quot;;&quot;.\..\Eks\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Shift\MeshCore&quot;;&quot;.\..\Alter2&quot;;f:\CodeVexxLocal\Eks\EksCore\..\..\EksCore;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\debug&quot;;&quot;$(QTDIR)\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TANG_BUILD,QT_DLL,QT_WEBKIT_LIB,QT_XML_LIB,QT_OPENGL_LIB,QT_GUI_LIB,QT_NETWORK_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -75,10 +75,10 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
-				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmaind.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\EksCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\EksScript.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\Eks3D.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\shift.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\alter.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\script.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftAlter.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftGraphicsCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMathsCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMeshCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\UI.lib $(QTDIR)\lib\QtWebKitd4.lib $(QTDIR)\lib\QtXmld4.lib $(QTDIR)\lib\QtOpenGLd4.lib $(QTDIR)\lib\QtGuid4.lib $(QTDIR)\lib\QtNetworkd4.lib $(QTDIR)\lib\QtCored4.lib"
+				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmaind.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\EksCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\EksScript.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\Eks3D.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\shift.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\alter.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\script.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftAlter.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftGraphicsCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMathsCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMeshCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\UI.lib $(QTDIR)\lib\QtWebKitd4.lib $(QTDIR)\lib\QtXmld4.lib $(QTDIR)\lib\QtOpenGLd4.lib $(QTDIR)\lib\QtGuid4.lib $(QTDIR)\lib\QtNetworkd4.lib $(QTDIR)\lib\QtCored4.lib"
 				OutputFile="$(OutDir)\Tang.exe"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(QTDIR)\lib,c:\QtSDK\Desktop\Qt\4.8.1\msvc2008\lib,C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/"
+				AdditionalLibraryDirectories="$(QTDIR)\lib,$(QTDIR)\lib,F:/CodeVexxLocal/Eks/EksCore/../..//bin/"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=""
 				SubSystem="2"
@@ -136,7 +136,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189"
 				Optimization="2"
-				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\Eks\EksCore&quot;;&quot;.\..\Eks\EksScript&quot;;&quot;.\..\Eks\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Shift\MeshCore&quot;;&quot;.\..\Alter2&quot;;c:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\release&quot;;&quot;.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
+				AdditionalIncludeDirectories="&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;&quot;$(QTDIR)\include\QtXml&quot;;&quot;$(QTDIR)\include\QtWebKit&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\..\include&quot;;&quot;.\..\Eks\EksCore&quot;;&quot;.\..\Eks\EksScript&quot;;&quot;.\..\Eks\Eks3D\include&quot;;&quot;.\..\Shift&quot;;&quot;.\..\Shift\GraphicsCore&quot;;&quot;.\..\Shift\MeshCore&quot;;&quot;.\..\Alter2&quot;;f:\CodeVexxLocal\Eks\EksCore\..\..\EksCore;&quot;.\..\Alter2\Plugins\UI&quot;;&quot;.\..\Alter2\Plugins\Script&quot;;&quot;.\..\Alter2\Plugins\ShiftAlter&quot;;&quot;$(QTDIR)\include\ActiveQt&quot;;&quot;.\release&quot;;&quot;$(QTDIR)\mkspecs\default&quot;;&quot;.\GeneratedFiles&quot;"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,TANG_BUILD,QT_DLL,QT_NO_DEBUG,QT_WEBKIT_LIB,QT_XML_LIB,QT_OPENGL_LIB,QT_GUI_LIB,QT_NETWORK_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT,NDEBUG"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
@@ -166,11 +166,11 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
-				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmain.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\EksCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\EksScript.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\Eks3D.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\shift.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\alter.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\script.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftAlter.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftGraphicsCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMathsCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMeshCore.lib C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/\UI.lib $(QTDIR)\lib\QtWebKit4.lib $(QTDIR)\lib\QtXml4.lib $(QTDIR)\lib\QtOpenGL4.lib $(QTDIR)\lib\QtGui4.lib $(QTDIR)\lib\QtNetwork4.lib $(QTDIR)\lib\QtCore4.lib"
+				AdditionalDependencies="glu32.lib opengl32.lib gdi32.lib user32.lib $(QTDIR)\lib\qtmain.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\EksCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\EksScript.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\Eks3D.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\shift.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\alter.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\script.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftAlter.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftGraphicsCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMathsCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\ShiftMeshCore.lib F:/CodeVexxLocal/Eks/EksCore/../..//bin/\UI.lib $(QTDIR)\lib\QtWebKit4.lib $(QTDIR)\lib\QtXml4.lib $(QTDIR)\lib\QtOpenGL4.lib $(QTDIR)\lib\QtGui4.lib $(QTDIR)\lib\QtNetwork4.lib $(QTDIR)\lib\QtCore4.lib"
 				OutputFile="$(OutDir)\Tang.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(QTDIR)\lib,c:\QtSDK\Desktop\Qt\4.8.1\msvc2008\lib,C:/Users/Jorj/CodeVexxLocal/Eks/EksCore/../..//bin/"
+				AdditionalLibraryDirectories="$(QTDIR)\lib,$(QTDIR)\lib,F:/CodeVexxLocal/Eks/EksCore/../..//bin/"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="2"
@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath="tangmanager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="viewport.cpp"
 				>
 			</File>
@@ -266,6 +270,32 @@
 				>
 			</File>
 			<File
+				RelativePath="tangmanager.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Moc&apos;ing tangmanager.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Moc&apos;ing tangmanager.h..."
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
+						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="viewport.h"
 				>
 				<FileConfiguration
@@ -274,7 +304,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing viewport.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-Ic:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -285,7 +315,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing viewport.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-Ic:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -300,7 +330,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing webview.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-Ic:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\debug&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -311,7 +341,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing webview.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-Ic:\Users\Jorj\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I.\..\..\..\..\QtSDK\Desktop\Qt\4.8.1\msvc2008\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -D_WINDOWS -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DTANG_BUILD -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -DNDEBUG  &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I$(QTDIR)\include\QtXml&quot; &quot;-I$(QTDIR)\include\QtWebKit&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\..\include&quot; &quot;-I.\..\Eks\EksCore&quot; &quot;-I.\..\Eks\EksScript&quot; &quot;-I.\..\Eks\Eks3D\include&quot; &quot;-I.\..\Shift&quot; &quot;-I.\..\Shift\GraphicsCore&quot; &quot;-I.\..\Shift\MeshCore&quot; &quot;-I.\..\Alter2&quot; &quot;-If:\CodeVexxLocal\Eks\EksCore\..\..\EksCore&quot; &quot;-I.\..\Alter2\Plugins\UI&quot; &quot;-I.\..\Alter2\Plugins\Script&quot; &quot;-I.\..\Alter2\Plugins\ShiftAlter&quot; &quot;-I$(QTDIR)\include\ActiveQt&quot; &quot;-I.\release&quot; &quot;-I$(QTDIR)\mkspecs\default&quot; &quot;-I.\GeneratedFiles&quot; &quot;$(InputPath)&quot; -o &quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -328,6 +358,18 @@
 				Filter="cpp;moc"
 				SourceControlFiles="false"
 				>
+				<File
+					RelativePath=".\Debug\moc_tangmanager.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath=".\Debug\moc_viewport.cpp"
 					>
@@ -358,6 +400,18 @@
 				Filter="cpp;moc"
 				SourceControlFiles="false"
 				>
+				<File
+					RelativePath=".\Release\moc_tangmanager.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath=".\Release\moc_viewport.cpp"
 					>

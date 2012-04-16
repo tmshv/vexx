@@ -6,6 +6,8 @@
 #include "GCCamera.h"
 #include "XFrustum.h"
 
+class GCViewableTransform;
+
 class GRAPHICSCORE_EXPORT GCScene : public GCRenderArray, public XCameraCanvasController
   {
   S_ENTITY(GCScene, GCRenderArray, 0);
@@ -19,6 +21,7 @@ public:
 
   void render(XRenderer *) const;
 
+  void setCamera(GCViewableTransform *e);
   virtual CameraInterface *camera();
   };
 

@@ -21,37 +21,22 @@
 
 Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeScene")), UISurface("Viewport", this, UISurface::Dock)
   {
-  GCViewport *vp = viewport();
-
-  GCPerspectiveCamera* cam = vp->addChild<GCPerspectiveCamera>("Camera");
-  vp->x.connect(&cam->viewportX);
-  vp->y.connect(&cam->viewportY);
-  vp->width.connect(&cam->viewportWidth);
-  vp->height.connect(&cam->viewportHeight);
-
-  cam->setPosition(XVector3D(0.0f, 0.0f, 10.0f));
-  cam->setFocalPoint(XVector3D(0.0f, 0.0f, 0.0f));
-
-  GCManipulatableScene* msc = vp->addChild<GCManipulatableScene>("Scene");
-  cam->projection.connect(&msc->cameraProjection);
-  cam->viewTransform.connect(&msc->cameraTransform);
-  cam->connect(&msc->activeCamera);
-  setController(msc);
-
-  GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
-  msc->renderGroup.addPointer(group);
-
-  const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
-  SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
-  group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
-
-  vp->source.setPointed(msc);
   }
 
 Viewport::~Viewport()
   {
   }
 
-void Viewport::setObject(Object *)
+void Viewport::setScene(GCScene *s)
   {
+  GCViewport *vp = viewport();
+  vp->source.setPointed(s);
+  _scene = s;
+  setController(s);
   }
+
+GCViewport *Viewport::viewport()
+  {
+  return SViewport::viewport();
+  }
+
