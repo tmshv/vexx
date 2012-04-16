@@ -7,6 +7,7 @@ void Area::createTypeInformation(SPropertyInformation *info, const SPropertyInfo
   if(data.registerAttributes)
     {
     info->add(&Area::shaders, "shaders");
+    info->add(&Area::shadingGroups, "shaderGroups");
     }
   }
 

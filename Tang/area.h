@@ -2,16 +2,18 @@
 #define AREA_H
 
 #include "sentity.h"
-#include "3D/GCScene.h"
+#include "3D/GCRenderable.h"
+#include "spropertyarray.h"
 
-class Area : public GCManipulatableScene
+class Area : public SEntity
   {
-  S_ENTITY(Area, GCManipulatableScene, 0)
+  S_ENTITY(Area, SEntity, 0)
 
 public:
   Area();
 
-  PointerArray shaders;
+  SPropertyArray shaders;
+  SPropertyArray shadingGroups;
   };
 
 S_PROPERTY_INTERFACE(Area)

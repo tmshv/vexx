@@ -15,6 +15,12 @@ void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyI
     info->add(&GCScene::cameraTransform, "cameraTransform");
     info->add(&GCScene::cameraProjection, "cameraProjection");
     }
+
+  if(data.registerInterfaces)
+    {
+    XInterface<GCScene>* ifc = info->apiInterface<GCScene>();
+    ifc->addMethod<void(GCViewableTransform*), &GCScene::setCamera>("setCamera");
+    }
   }
 
 GCScene::GCScene() : XCameraCanvasController(0)
@@ -35,6 +41,13 @@ void GCScene::render(XRenderer *r) const
   GCRenderArray::render(r);
 
   r->popTransform();
+  }
+
+void GCScene::setCamera(GCViewableTransform *e)
+  {
+  cameraProjection.setInput(&e->projection);
+  cameraTransform.setInput(&e->viewTransform);
+  activeCamera.setInput(e);
   }
 
 S_IMPLEMENT_PROPERTY(GCManipulatableScene)

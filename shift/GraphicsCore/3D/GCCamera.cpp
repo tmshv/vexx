@@ -54,6 +54,18 @@ void GCViewableTransform::createTypeInformation(SPropertyInformation *info, cons
     TransformProperty::InstanceInformation* transformInfo = info->child(&GCViewableTransform::transform);
     transformInfo->setAffects(viewInfo);
     }
+
+  if(data.registerInterfaces)
+    {
+    XInterface<GCViewableTransform> *ifc = info->apiInterface<GCViewableTransform>();
+
+    XInterfaceBase::Function fn;
+    fn = XScript::MethodToInCa<GCViewableTransform, void(float, float, float), &GCViewableTransform::setFocalPoint>::Call;
+    ifc->addFunction("setFocalPoint", fn);
+
+    fn = XScript::MethodToInCa<GCViewableTransform, void(float, float, float), &GCViewableTransform::setPosition>::Call;
+    ifc->addFunction("setPosition", fn);
+    }
   }
 
 GCViewableTransform::GCViewableTransform() : _rotateEnabled(true)

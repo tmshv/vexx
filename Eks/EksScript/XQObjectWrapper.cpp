@@ -402,12 +402,17 @@ struct CallArgument
         qstringPtr = new (&allocData) QString(XScriptConvert::from<QString>(fromHandle(value)));
         }
       type = callType;
-      }
+    }
     else if (callType == QMetaType::QObjectStar)
-      {
+    {
       qobjectPtr = XScriptConvert::from<QObject>(fromHandle(value));
       type = callType;
-      }
+    }
+    else if (callType == QMetaType::QWidgetStar)
+    {
+      qobjectPtr = XScriptConvert::from<QWidget>(fromHandle(value));
+      type = callType;
+    }
     else if (callType == qMetaTypeId<QVariant>())
       {
       qvariantPtr = new (&allocData) QVariant(fromHandle(value).toVariant());
