@@ -43,10 +43,11 @@ template <typename T> struct Binder
     engine->addInterface(templ);
     }
 
-  template <typename PARENT> static void initWithParent(XScriptEngine *engine, const char *name)
+  template <typename PARENT, typename BASE> static void initWithParent(XScriptEngine *engine, const char *name)
     {
     const XInterface<PARENT> *parent = XInterface<PARENT>::lookup();
-    XInterface<T> *templ = XInterface<T>::createWithParent(name, parent);
+    const XInterface<BASE> *base = XInterface<BASE>::lookup();
+    XInterface<T> *templ = XInterface<T>::createWithParent(name, parent, base);
     setupBindings<T>(templ);
     templ->seal();
     engine->addInterface(templ);
@@ -117,7 +118,7 @@ template <> void setupBindings<QIODevice>(XInterface<QIODevice> *templ)
 void initiate(XScriptEngine *eng)
   {
 #define BIND(t) Binder<Q##t>::init(eng, #t)
-#define BIND_WITH_PARENT(t, p) Binder<Q##t>::initWithParent<Q##p>(eng, #t)
+#define BIND_WITH_PARENT(t, p, b) Binder<Q##t>::initWithParent<Q##p, Q##b>(eng, #t)
 
   BIND(PointF);
   BIND(RectF);
@@ -137,7 +138,7 @@ void initiate(XScriptEngine *eng)
   BIND(Region);
 
   BIND(IODevice);
-  BIND_WITH_PARENT(File, IODevice);
+  BIND_WITH_PARENT(File, IODevice, IODevice);
 #undef BIND
 #undef BIND_WITH_PARENT
   }

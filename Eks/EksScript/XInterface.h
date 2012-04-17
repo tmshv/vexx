@@ -291,8 +291,8 @@ public:
     return &bob;
     }
 
-  template <typename PARENT>
-  static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *constParent)
+  template <typename PARENT, typename BASE>
+  static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *constParent, const XInterface<BASE> *constBase)
     {
     xsize id = constParent->typeId();
     xsize nonPointerId = (xsize)constParent->nonPointerTypeId();
@@ -303,9 +303,9 @@ public:
 
     UpCastFn fn = (UpCastFn)typedFn;
 
-    XInterface<PARENT>* parent = const_cast<XInterface<PARENT>*>(constParent);
-    parent->addChildInterface(qMetaTypeId<T*>(), fn);
-    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), parent);
+    XInterface<BASE>* base = const_cast<XInterface<BASE>*>(constBase);
+    base->addChildInterface(qMetaTypeId<T*>(), fn);
+    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), base);
 
     xAssert(!bob.isSealed());
     return &bob;

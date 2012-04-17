@@ -7,7 +7,8 @@
 template <typename T, typename PARENT> XInterfaceBase *initiateApiInterfaceWithParent(const SPropertyInformation *info)
   {
   const XInterface<PARENT> *parentTempl = PARENT::staticTypeInformation()->apiInterface<PARENT>();
-  XInterface<T> *templ = XInterface<T>::createWithParent(info->typeName(), parentTempl);
+  const XInterface<SProperty> *baseTempl = SProperty::staticTypeInformation()->apiInterface<SProperty>();
+  XInterface<T> *templ = XInterface<T>::createWithParent(info->typeName(), parentTempl, baseTempl);
 
   return templ;
   }
