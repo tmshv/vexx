@@ -305,7 +305,8 @@ public:
 
     XInterface<BASE>* base = const_cast<XInterface<BASE>*>(constBase);
     base->addChildInterface(qMetaTypeId<T*>(), fn);
-    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), base);
+
+    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), &bob);
 
     xAssert(!bob.isSealed());
     return &bob;
