@@ -32,6 +32,7 @@ bool defaultFire(const XAssert &a)
   recursion = true;
 
   QMessageBox msgBox;
+  msgBox.setWindowModality(Qt::ApplicationModal);
   QPushButton *breakButton = msgBox.addButton("Break Now", QMessageBox::YesRole);
   msgBox.addButton("Dont Break", QMessageBox::NoRole);
   QPushButton *neverBreakButton = msgBox.addButton("Never Break", QMessageBox::NoRole);

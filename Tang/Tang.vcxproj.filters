@@ -14,12 +14,12 @@
       <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{cf355258-4407-4e1e-b40a-878d73466563}</UniqueIdentifier>
+      <UniqueIdentifier>{6b0d82df-b2bc-43e2-a294-f2e64ea2348e}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{c83d44fb-d013-409a-9df1-41f8ed292570}</UniqueIdentifier>
+      <UniqueIdentifier>{0d3e1ad5-f3d9-41ae-ac15-19637a76bede}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -43,17 +43,26 @@
     <ClCompile Include="object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tangmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="webview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Debug\moc_tangmanager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
     <ClCompile Include="Debug\moc_viewport.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Debug\moc_webview.cpp">
       <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_tangmanager.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_viewport.cpp">
       <Filter>Generated Files\Release</Filter>
@@ -80,6 +89,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="tangmanager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="viewport.h">
       <Filter>Header Files</Filter>
     </CustomBuild>

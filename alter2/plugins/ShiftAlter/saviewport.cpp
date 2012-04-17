@@ -10,7 +10,7 @@
 
 SViewport::SViewport(GCViewport *viewpoint)
   {
-  _timer = new QTimer;
+  _timer = new QTimer(this);
   connect(_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
   _timer->start( 40 );
 

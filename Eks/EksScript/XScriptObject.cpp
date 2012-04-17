@@ -106,7 +106,7 @@ XInterfaceBase *XScriptObject::getInterface() const
     proto = obj.getPrototype();
     }
 
-  return findInterface(tid);
+  return tid != 0 ? findInterface(tid) : 0;
   }
 
 XScriptValue XScriptObject::getPrototype() const

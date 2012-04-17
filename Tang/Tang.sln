@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tang", "Tang.vcxproj", "{8E70261D-487D-38B9-A25D-B78985D18DC0}"
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tang", "Tang.vcxproj", "{76354261-8CE8-3538-A8B9-E133661A25A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,12 +10,12 @@ Global
 		Template|Win32 = Template|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Debug|Win32.Build.0 = Debug|Win32
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Release|Win32.ActiveCfg = Release|Win32
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Release|Win32.Build.0 = Release|Win32
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Template|Win32.ActiveCfg = Template|Win32
-		{8E70261D-487D-38B9-A25D-B78985D18DC0}.Template|Win32.Build.0 = Template|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Debug|Win32.Build.0 = Debug|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Release|Win32.ActiveCfg = Release|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Release|Win32.Build.0 = Release|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Template|Win32.ActiveCfg = Template|Win32
+		{76354261-8CE8-3538-A8B9-E133661A25A9}.Template|Win32.Build.0 = Template|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

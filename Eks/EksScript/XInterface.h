@@ -112,6 +112,7 @@ template <typename T> const XInterfaceBase* findInterface(const T*);
 
 EKSSCRIPT_EXPORT XInterfaceBase *findInterface(int qMetaTypeId);
 EKSSCRIPT_EXPORT void registerInterface(XInterfaceBase *interface);
+EKSSCRIPT_EXPORT void registerInterface(int qMetaTypeId, int qMetaTypeIdNonPtr, XInterfaceBase *interface);
 
 
 #include "XConvertToScript.h"
@@ -291,19 +292,20 @@ public:
     }
 
   template <typename PARENT>
-  static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *parent)
+  static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *constParent)
     {
-    xsize id = parent->typeId();
-    xsize nonPointerId = (xsize)XQMetaTypeIdOrInvalid<T>::id();
-    XInterface &bob = instance(name, id, nonPointerId, parent);
+    xsize id = constParent->typeId();
+    xsize nonPointerId = (xsize)constParent->nonPointerTypeId();
+    XInterface &bob = instance(name, id, nonPointerId, constParent);
 
     typedef T* (*TCastFn)(PARENT *ptr);
     TCastFn typedFn = XScriptConvert::castFromBase<T, PARENT>;
 
     UpCastFn fn = (UpCastFn)typedFn;
 
-
-    const_cast<XInterface<PARENT>*>(parent)->addChildInterface(qMetaTypeId<T*>(), fn);
+    XInterface<PARENT>* parent = const_cast<XInterface<PARENT>*>(constParent);
+    parent->addChildInterface(qMetaTypeId<T*>(), fn);
+    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), parent);
 
     xAssert(!bob.isSealed());
     return &bob;

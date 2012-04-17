@@ -238,11 +238,19 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
 XUnorderedMap<int, XInterfaceBase*> _interfaces;
 void registerInterface(XInterfaceBase *interface)
   {
-  xAssert(!_interfaces.contains(interface->typeId()));
-  _interfaces.insert(interface->typeId(), interface);
-  if(interface->nonPointerTypeId() != QVariant::Invalid)
+  registerInterface(interface->typeId(), interface->nonPointerTypeId(), interface);
+  }
+
+void registerInterface(int id, int nonPtrId, XInterfaceBase *interface)
+  {
+  xAssert(!_interfaces.contains(id));
+  xAssert(!_interfaces.contains(nonPtrId));
+  xAssert(id != QVariant::Invalid);
+
+  _interfaces.insert(id, interface);
+  if(nonPtrId != QVariant::Invalid)
     {
-    _interfaces.insert(interface->nonPointerTypeId(), interface);
+    _interfaces.insert(nonPtrId, interface);
     }
   }
 
@@ -255,7 +263,8 @@ XInterfaceBase *findInterface(int id)
   (void)typeName;
 #endif
 
-  XInterfaceBase *base = _interfaces[id];
+  xAssert(id != QVariant::Invalid);
+  XInterfaceBase *base = _interfaces.value(id);
   xAssert(!base || base->isSealed());
   return base;
   }
