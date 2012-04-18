@@ -107,7 +107,6 @@ void ScPlugin::typeAdded(const SPropertyInformation *info)
   _engine->addInterface(info->apiInterface());
 
   XScriptValue arr = _engine->get("db").get("types");
-
   XScriptObject obj(arr);
   xAssert(obj.isValid());
 

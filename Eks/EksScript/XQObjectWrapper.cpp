@@ -263,7 +263,7 @@ XInterfaceBase *XQObjectWrapper::findInterface(const QMetaObject *object)
 
 
   XInterfaceBase* qobject = ::findInterface(qMetaTypeId<QObject*>());
-  base = new XInterface<QObject>(qobject->typeId(), 0, formatClassName(object->className()), parentInterface);
+  base = new XInterface<QObject>(qobject->typeId(), 0, qobject->typeId(), qobject->nonPointerTypeId(), formatClassName(object->className()), parentInterface);
 
   _objects.insert(object, base);
 

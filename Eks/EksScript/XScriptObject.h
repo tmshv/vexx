@@ -25,6 +25,7 @@ public:
 
   XInterfaceBase *getInterface() const;
   XScriptValue getPrototype() const;
+  void setPrototype(XScriptValue proto);
 
   XScriptValue get(const QString &) const;
   void set(const QString &, const XScriptValue &);

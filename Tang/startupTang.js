@@ -12,29 +12,35 @@ area.newFile();
 var viewportWidget = tang.createViewport();
 ui.addDock("Viewport", viewportWidget);
 
-var dbViewport = viewportWidget.viewport();
+var createBasicScene = function(viewportWidget)
+  {
+  var dbViewport = viewportWidget.viewport();
 
-var cam = dbViewport.addChild(db.types.GCPerspectiveCamera, "Camera");
-cam.viewportX.input = vp.x;
-cam.viewportY.input = vp.y;
-cam.viewportWidth.input = vp.width;
-cam.viewportHeight.input = vp.height;
+  var cam = dbViewport.addChild(db.types.GCPerspectiveCamera, "Camera");
+  cam.viewportX.input = dbViewport.x;
+  cam.viewportY.input = dbViewport.y;
+  cam.viewportWidth.input = dbViewport.width;
+  cam.viewportHeight.input = dbViewport.height;
 
-cam.setPosition(0.0, 0.0, 10.0);
-cam.setFocalPoint(0.0, 0.0, 0.0);
+  cam.setPosition(0.0, 0.0, 10.0);
+  cam.setFocalPoint(0.0, 0.0, 0.0);
 
-var msc = vp.addChild(db.types.GCManipulatableScene,"Scene");
+  var msc = dbViewport.addChild(db.types.GCManipulatableScene,"Scene");
 
-msc.setCamera(cam);
+  msc.setCamera(cam);
+  viewportWidget.setScene(msc);
 
-//GCShadingGroup *group = msc->addChild<GCShadingGroup>("Groups");
-//msc->renderGroup.addPointer(group);
+  return msc;
+  }
 
-//const SPropertyInformation *standardSurfaceInfo = STypeRegistry::findType("StandardSurface");
-//SProperty *shader = msc->addChild(standardSurfaceInfo, "Shader");
-//group->shader.setPointed(shader->uncheckedCastTo<GCShader>());
+var msc = createBasicScene(viewportWidget);
 
-vp.source.setPointed(msc);
+
+var shadingGroup = msc.addChild(db.types.GCShadingGroup, "Groups");
+msc.renderGroup.addPointer(shadingGroup);
+
+var shader = msc.addChild(db.types.FlatSurface, "Shader");
+shadingGroup.shader.input = shader;
 
 
 // create a new component document and pop it up.
@@ -43,8 +49,7 @@ component.newFile();
 
 
 component.loadFile("F:\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
-var shaderGroup = db.children[1].children.Scene.children.Groups;
-component.children[0].addInstance(shaderGroup);
+component.children[0].addInstance(shadingGroup);
 
 component.editor = component.createEditor();
 component.editor.show();

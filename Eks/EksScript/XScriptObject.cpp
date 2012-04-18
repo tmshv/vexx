@@ -115,6 +115,12 @@ XScriptValue XScriptObject::getPrototype() const
   return fromHandle(internal->_object->GetPrototype());
   }
 
+void XScriptObject::setPrototype(XScriptValue proto)
+  {
+  const XScriptObjectInternal *internal = XScriptObjectInternal::val(this);
+  internal->_object->SetPrototype(getV8Internal(proto));
+  }
+
 XScriptValue XScriptObject::get(const QString &n) const
   {
   XScriptValue key = XScriptConvert::to(n);

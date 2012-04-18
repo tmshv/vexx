@@ -249,6 +249,14 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
   newType->typeName() = name;
   newType->setParentTypeInformation(parent);
 
+  XInterfaceBase* pAPI = parent->apiInterface();
+  XInterfaceBase* api = new XInterfaceBase(pAPI->typeId(),
+                                           pAPI->nonPointerTypeId(),
+                                           name,
+                                           pAPI);
+
+  newType->setApiInterface(api);
+
   XScriptObject propertiesObject(typeObject.get("properties"));
   XScriptValue error;
   if(!parseChildProperties(newType, propertiesObject, error) ||

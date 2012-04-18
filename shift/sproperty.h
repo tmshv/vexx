@@ -113,7 +113,7 @@ public:
 
   // connect this property (driver) to the passed property (driven)
   void connect(SProperty *) const;
-  void setInput(const SProperty *input) { input->connect(this); }
+  void setInput(const SProperty *inp) { if(inp) { inp->connect(this); } else if(input()) { this->disconnect(input()); } }
   void connect(const QVector<SProperty*> &) const;
   void disconnect(SProperty *) const;
   void disconnect() const;

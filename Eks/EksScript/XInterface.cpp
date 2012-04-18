@@ -26,10 +26,46 @@ const ObjTempl *prototype(const void *& b)
   return (const ObjTempl*)&b;
   }
 
+XInterfaceBase::XInterfaceBase(xsize typeID,
+               xsize nonPointerTypeID,
+               const QString &typeName,
+               const XInterfaceBase *parent)
+  : _typeName(typeName),
+    _typeId(typeID),
+    _nonPointerTypeId(nonPointerTypeID),
+    _internalFieldCount(parent->_internalFieldCount),
+    _baseTypeId(parent->_baseTypeId),
+    _baseNonPointerTypeId(parent->_baseNonPointerTypeId),
+    _typeIdField(parent->_typeIdField),
+    _nativeField(parent->_nativeField),
+    _isSealed(true),
+    _parent(parent),
+    _toScript(parent->_toScript),
+    _fromScript(parent->_fromScript)
+  {
+  xAssert(_typeName.length());
+  new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)parent->_nativeCtor)));
+  new(::prototype(_prototype)) ObjTempl(ObjTempl::New((*constructor(_constructor))->PrototypeTemplate()));
+
+  v8::Handle<v8::String> typeNameV8 = v8::String::New("typeName");
+  v8::Handle<v8::String> typeNameStrV8 = v8::String::New((uint16_t*)typeName.constData(), typeName.length());
+  (*constructor(_constructor))->Set(typeNameV8, typeNameStrV8);
+  (*::prototype(_prototype))->Set(typeNameV8, typeNameStrV8);
+
+  (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(_internalFieldCount);
+
+  if(parent)
+    {
+    inherit(parent);
+    }
+  }
+
 XInterfaceBase::XInterfaceBase(xsize typeId,
                                xsize nonPointerTypeId,
+                               xsize baseTypeId,
+                               xsize baseNonPointerTypeId,
                                const QString &typeName,
-                               XScriptValue ctor(XScriptArguments const &argv),
+                               NativeCtor ctor,
                                xsize typeIdField,
                                xsize nativeField,
                                xsize internalFieldCount,
@@ -39,12 +75,16 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   : _typeName(typeName),
     _typeId(typeId),
     _nonPointerTypeId(nonPointerTypeId),
+    _internalFieldCount(internalFieldCount),
+    _baseTypeId(baseTypeId),
+    _baseNonPointerTypeId(baseNonPointerTypeId),
     _typeIdField(typeIdField),
     _nativeField(nativeField),
     _isSealed(false),
     _parent(parent),
     _toScript(tScr),
-    _fromScript(fScr)
+    _fromScript(fScr),
+    _nativeCtor(ctor)
   {
   xAssert(_typeName.length());
   new(constructor(_constructor)) FnTempl(FnTempl::New(v8::FunctionTemplate::New((v8::InvocationCallback)ctor)));
@@ -55,7 +95,7 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
   (*constructor(_constructor))->Set(typeNameV8, typeNameStrV8);
   (*::prototype(_prototype))->Set(typeNameV8, typeNameStrV8);
 
-  (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(internalFieldCount);
+  (*constructor(_constructor))->InstanceTemplate()->SetInternalFieldCount(_internalFieldCount);
 
   if(parent)
     {
@@ -134,12 +174,12 @@ XScriptFunction XInterfaceBase::constructorFunction() const
 
 void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
   {
-  xAssert(findInterface(_typeId));
+  xAssert(findInterface(_baseTypeId));
   v8::Handle<v8::Object> obj = getV8Internal(scObj);
   if( 0 <= _typeIdField )
     {
     xAssert(_typeIdField < (xsize)obj->InternalFieldCount());
-    obj->SetPointerInInternalField(_typeIdField, (void*)_typeId);
+    obj->SetPointerInInternalField(_typeIdField, (void*)_baseTypeId);
     }
   xAssert(_nativeField < (xsize)obj->InternalFieldCount());
   obj->SetPointerInInternalField(_nativeField, object);
@@ -236,11 +276,6 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
   }
 
 XUnorderedMap<int, XInterfaceBase*> _interfaces;
-void registerInterface(XInterfaceBase *interface)
-  {
-  registerInterface(interface->typeId(), interface->nonPointerTypeId(), interface);
-  }
-
 void registerInterface(int id, int nonPtrId, XInterfaceBase *interface)
   {
   xAssert(!_interfaces.contains(id));
@@ -252,6 +287,11 @@ void registerInterface(int id, int nonPtrId, XInterfaceBase *interface)
     {
     _interfaces.insert(nonPtrId, interface);
     }
+  }
+
+void registerInterface(XInterfaceBase *interface)
+  {
+  registerInterface(interface->typeId(), interface->nonPointerTypeId(), interface);
   }
 
 XInterfaceBase *findInterface(int id)

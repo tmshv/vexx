@@ -42,6 +42,9 @@ XProperties:
   XROProperty(QString, typeName);
   XROProperty(xsize, typeId);
   XROProperty(xsize, nonPointerTypeId);
+  XROProperty(xsize, baseTypeId);
+  XROProperty(xsize, baseNonPointerTypeId);
+  XROProperty(xsize, internalFieldCount);
 
   XROProperty(xsize, typeIdField);
   XROProperty(xsize, nativeField);
@@ -54,16 +57,24 @@ XProperties:
   XRORefProperty(UpCastMap, upcasts);
 
 public:
+  typedef XScriptValue (*NativeCtor)(XScriptArguments const &argv);
   XInterfaceBase(xsize typeID,
                  xsize nonPointerTypeID,
+                 xsize baseTypeID,
+                 xsize baseNonPointerTypeID,
                  const QString &typeName,
-                 XScriptValue ctor(XScriptArguments const &argv),
+                 NativeCtor ctor,
                  xsize typeIdField,
                  xsize nativeField,
                  xsize internalFieldCount,
                  const XInterfaceBase *parent,
                  ToScriptFn convertTo=0,
                  FromScriptFn convertFrom=0);
+
+  XInterfaceBase(xsize typeID,
+                 xsize nonPointerTypeID,
+                 const QString &typeName,
+                 const XInterfaceBase *parent);
   ~XInterfaceBase();
 
   void seal();
@@ -104,6 +115,7 @@ protected:
   void inherit(const XInterfaceBase* parentType);
 
   mutable bool _isSealed;
+  NativeCtor _nativeCtor;
   void *_constructor;
   void *_prototype;
   };
@@ -112,7 +124,6 @@ template <typename T> const XInterfaceBase* findInterface(const T*);
 
 EKSSCRIPT_EXPORT XInterfaceBase *findInterface(int qMetaTypeId);
 EKSSCRIPT_EXPORT void registerInterface(XInterfaceBase *interface);
-EKSSCRIPT_EXPORT void registerInterface(int qMetaTypeId, int qMetaTypeIdNonPtr, XInterfaceBase *interface);
 
 
 #include "XConvertToScript.h"
@@ -284,7 +295,7 @@ public:
     xsize id = (xsize)qMetaTypeId<T*>();
     xsize nonPointerId = (xsize)XQMetaTypeIdOrInvalid<T>::id();
 
-    XInterface &bob = instance(name, id, nonPointerId, 0);
+    XInterface &bob = instance(name, id, nonPointerId, id, nonPointerId, 0);
     registerInterface(&bob);
 
     xAssert(!bob.isSealed());
@@ -294,9 +305,9 @@ public:
   template <typename PARENT, typename BASE>
   static XInterface *createWithParent(const QString &name, const XInterface<PARENT> *constParent, const XInterface<BASE> *constBase)
     {
-    xsize id = constParent->typeId();
-    xsize nonPointerId = (xsize)constParent->nonPointerTypeId();
-    XInterface &bob = instance(name, id, nonPointerId, constParent);
+    xsize id = constBase->typeId();
+    xsize nonPointerId = (xsize)constBase->nonPointerTypeId();
+    XInterface &bob = instance(name, qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), id, nonPointerId, constParent);
 
     typedef T* (*TCastFn)(PARENT *ptr);
     TCastFn typedFn = XScriptConvert::castFromBase<T, PARENT>;
@@ -306,7 +317,7 @@ public:
     XInterface<BASE>* base = const_cast<XInterface<BASE>*>(constBase);
     base->addChildInterface(qMetaTypeId<T*>(), fn);
 
-    registerInterface(qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), &bob);
+    registerInterface(&bob);
 
     xAssert(!bob.isSealed());
     return &bob;
@@ -314,12 +325,18 @@ public:
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance("", 0, 0, 0);
+    const XInterface &bob = instance("", 0, 0, 0, 0, 0);
     xAssert(bob.isSealed());
     return &bob;
     }
 
-  XInterface(xsize typeId, xsize nonPointerTypeId, const QString &name, const XInterfaceBase* parent) : XInterfaceBase(typeId, nonPointerTypeId,
+  XInterface(xsize typeId,
+    xsize nonPointerTypeId,
+    xsize baseTypeId,
+    xsize baseNonPointerTypeId,
+    const QString &name,
+    const XInterfaceBase* parent)
+    : XInterfaceBase(typeId, nonPointerTypeId, baseTypeId, baseNonPointerTypeId,
                                 name,
                                 ctor_proxy,
                                 InternalFields::TypeIDIndex,
@@ -349,9 +366,9 @@ private:
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
-  static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, const XInterfaceBase* parent)
+  static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, xsize baseId, xsize baseNonPointerId, const XInterfaceBase* parent)
     {
-    static XInterface bob(id, nonPointerId, name, parent);
+    static XInterface bob(id, nonPointerId, baseId, baseNonPointerId,name, parent);
     return bob;
     }
 
