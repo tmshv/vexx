@@ -2,7 +2,7 @@
 
 S_IMPLEMENT_PROPERTY(Component);
 
-void Component::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void Component::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 

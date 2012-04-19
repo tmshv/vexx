@@ -3,7 +3,7 @@
 
 S_IMPLEMENT_PROPERTY(AreaDocument)
 
-void AreaDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void AreaDocument::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 
