@@ -39,7 +39,7 @@ var msc = createBasicScene(viewportWidget);
 var shadingGroup = msc.addChild(db.types.GCShadingGroup, "Groups");
 msc.renderGroup.addPointer(shadingGroup);
 
-var shader = msc.addChild(db.types.FlatSurface, "Shader");
+var shader = msc.addChild(db.types.StandardSurface, "Shader");
 shadingGroup.shader.input = shader;
 
 
@@ -48,7 +48,7 @@ var component = db.addDocument(db.types.ComponentDocument);
 component.newFile();
 
 
-component.loadFile("F:\\CodeVexxLocal\\Tang\\Components\\SteelPlate.json");
+component.loadFile("..\\Tang\\Components\\SteelPlate.json");
 component.children[0].addInstance(shadingGroup);
 
 component.editor = component.createEditor();

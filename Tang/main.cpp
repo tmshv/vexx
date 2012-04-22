@@ -48,19 +48,6 @@ int main( int argc, char **argv )
 
   script->registerScriptGlobal("tang", new TangManager(&app));
 
-  //SPropertyArray *objectParent = &db->db().children;
-
-  //WebView *webData = new WebView(objectParent);
-  //script->registerScriptGlobal(webData);
-
-  //Viewport *vp = new Viewport(*db);
-  //ui->addSurface(vp);
-
-  //QObject::connect(webData, SIGNAL(objectChanged(Object *)), vp, SLOT(setObject(Object *)));
-
-  //ui->addSurface(webData);
-
-
   STypeRegistry::addType(Component::staticTypeInformation());
   STypeRegistry::addType(ComponentDocument::staticTypeInformation());
   STypeRegistry::addType(Area::staticTypeInformation());
