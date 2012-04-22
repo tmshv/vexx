@@ -5,10 +5,6 @@ db.types.Component.prototype.addInstance = function(shaderGroup)
   shaderGroup.renderGroup.addPointer(this);
   }
 
-// create a new component document and pop it up.
-var area = db.addDocument(db.types.AreaDocument);
-area.newFile();
-
 var viewportWidget = tang.createViewport();
 ui.addDock("Viewport", viewportWidget);
 
@@ -36,22 +32,33 @@ var createBasicScene = function(viewportWidget)
 var msc = createBasicScene(viewportWidget);
 
 
-var shadingGroup = msc.addChild(db.types.GCShadingGroup, "Groups");
+// create a new component document and pop it up.
+var areaDocument = db.addDocument(db.types.AreaDocument);
+areaDocument.newFile();
+
+// get the area from the doc
+var area = areaDocument.children[0];
+var shadingGroup = area.shaderGroups.add(db.types.GCShadingGroup, "Groups");
 msc.renderGroup.addPointer(shadingGroup);
 
-var shader = msc.addChild(db.types.StandardSurface, "Shader");
+var shader = area.shaders.add(db.types.StandardSurface, "Shader");
 shadingGroup.shader.input = shader;
 
 
+
 // create a new component document and pop it up.
-var component = db.addDocument(db.types.ComponentDocument);
-component.newFile();
+var componentDocument = db.addDocument(db.types.ComponentDocument);
+componentDocument.newFile();
 
+componentDocument.loadFile("..\\Tang\\Components\\SteelPlate.json");
 
-component.loadFile("..\\Tang\\Components\\SteelPlate.json");
-component.children[0].addInstance(shadingGroup);
+/*var component = componentDocument.children[0];
+component.addInstance(shadingGroup);*/
 
-component.editor = component.createEditor();
-component.editor.show();
+componentDocument.editor = componentDocument.createEditor();
+componentDocument.editor.show();
+
+var steelPlate = area.addChild(db.types.SteelPlate, "Plate");
+steelPlate.addInstance(shadingGroup);
 
 ui.show();
