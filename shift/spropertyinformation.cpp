@@ -442,6 +442,8 @@ void SPropertyInstanceInformation::initiateProperty(SProperty *propertyToInitiat
 
     const SProperty *inputProperty = (SProperty*)inputPropertyData;
 
+    xAssert(inputProperty->isDirty());
+    xAssert(propertyToInitiate->isDirty());
     inputProperty->connect(propertyToInitiate);
     }
   }

@@ -133,7 +133,9 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   xAssert(_handler);
 
   initiateProperty(prop);
+  xAssert(prop->isDirty());
   postInitiateProperty(prop);
+  xAssert(prop->isDirty());
   return prop;
   }
 
@@ -220,11 +222,20 @@ void SDatabase::initiateProperty(SProperty *prop)
     initiatePropertyFromMetaData(container, metaData);
     }
 
+
+  if(prop->instanceInformation()->name() == "width")
+  {
+    xAssert(prop->isDirty());
+  }
   xAssert(prop->handler());
   }
 
 void SDatabase::postInitiateProperty(SProperty *prop)
   {
+  if(prop->instanceInformation()->name() == "width")
+  {
+    xAssert(prop->isDirty());
+  }
   SPropertyContainer *container = prop->castTo<SPropertyContainer>();
   if(container)
     {
@@ -242,6 +253,10 @@ void SDatabase::postInitiateProperty(SProperty *prop)
 
   const SPropertyInstanceInformation *inst = prop->instanceInformation();
   xAssert(inst);
+  if(inst->name() == "width")
+  {
+    xAssert(prop->isDirty());
+  }
   inst->initiateProperty(prop);
 
   const SPropertyInformation *info = prop->typeInformation();

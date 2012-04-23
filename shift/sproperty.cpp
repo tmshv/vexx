@@ -727,7 +727,7 @@ void SProperty::ConnectionChange::setParentHasOutputConnection(SProperty *prop)
   SPropertyContainer *cont = prop->castTo<SPropertyContainer>();
   if(cont)
     {
-    SProperty *child = cont->firstChild();
+    SProperty *child = cont->_child;
     while(child)
       {
       if(!child->_flags.hasFlag(SProperty::ParentHasOutput))
@@ -735,7 +735,7 @@ void SProperty::ConnectionChange::setParentHasOutputConnection(SProperty *prop)
         child->_flags.setFlag(SProperty::ParentHasOutput);
         setParentHasOutputConnection(child);
         }
-      child = child->nextSibling();
+      child = child->_nextSibling;
       }
     }
   }

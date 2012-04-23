@@ -40,9 +40,8 @@ bool parseChildProperties(SPropertyInformation *newType, XScriptValue properties
         return false;
         }
 
-      // Extending a current child?
-      XScriptValue extendingObject = propertyObject.get("extend");
-      if(!extendingObject.isValid() || !extendingObject.toBoolean())
+      SPropertyInstanceInformation *inst = newType->childFromName(propName);
+      if(!inst)
         {
         // Type
         const SPropertyInformation *propType = XScriptConvert::from<SPropertyInformation>(propertyObject.get("type"));
@@ -53,41 +52,36 @@ bool parseChildProperties(SPropertyInformation *newType, XScriptValue properties
           return false;
           }
 
-        // Default value
-        XScriptValue valueObject = propertyObject.get("defaultValue");
-        QString valueStr;
-        if(valueObject.isValid())
-          {
-          valueStr = valueObject.toString();
-          }
-
         // add the described child
-        SPropertyInstanceInformation *info = newType->add(propType, propName);
-
-        if(!valueStr.isEmpty())
-          {
-          info->setDefaultValue(valueStr);
-          }
-
-        // Compute function
-        XScriptFunction computeObject(propertyObject.get("compute"));
-        if(computeObject.isValid())
-          {
-          info->setCompute(computeNode);
-          info->setData(g_computeKey, qVariantFromValue(computeObject));
-          }
-
-        info->setExtra(true);
+        inst = newType->add(propType, propName);
+        inst->setExtra(true);
         }
-      else
-        {
-        SPropertyInstanceInformation *inst = newType->childFromName(propName);
-        if(!inst)
-          {
-          error = Toss("Attempting to extend non-defined child '" + propName + "'.");
-          return false;
-          }
 
+      // Default value
+      XScriptValue valueObject = propertyObject.get("defaultValue");
+      QString valueStr;
+      if(valueObject.isValid())
+        {
+        valueStr = valueObject.toString();
+        }
+
+      if(!valueStr.isEmpty())
+        {
+        inst->setDefaultValue(valueStr);
+        }
+
+      // Compute function
+      XScriptFunction computeObject(propertyObject.get("compute"));
+      if(computeObject.isValid())
+        {
+        inst->setCompute(computeNode);
+        inst->setData(g_computeKey, qVariantFromValue(computeObject));
+        }
+
+      // Extending a current child?
+      XScriptValue extendingObject = propertyObject.get("extend");
+      if(extendingObject.isValid() && extendingObject.toBoolean())
+        {
         SPropertyInformation *extended = newType->extendContainedProperty(inst);
         // Extending known type:
         XScriptValue properties = propertyObject.get("properties");
@@ -120,66 +114,64 @@ bool postParseChildProperties(SPropertyInformation *newType, XScriptValue proper
       SPropertyInstanceInformation *info =  newType->childFromName(propName);
       xAssert(info);
 
-      // Extending a current child?
-      XScriptValue extendingObject = propertyObject.get("extend");
-      if(!extendingObject.isValid() || !extendingObject.toBoolean())
+      // Affects
+      XScriptValue affectsObject = propertyObject.get("affects");
+      if(affectsObject.isArray())
         {
-        // Affects
-        XScriptValue affectsObject = propertyObject.get("affects");
-        if(affectsObject.isArray())
+        xsize *affects = 0;
+        bool affectsIsValid = true;
+        xuint32 length = affectsObject.length();
+        affects = new xsize [length+1];
+        affects[length] = 0;
+        for(xuint32 affectIdx=0; affectIdx<length; ++affectIdx)
           {
-          xsize *affects = 0;
-          bool affectsIsValid = true;
-          xuint32 length = affectsObject.length();
-          affects = new xsize [length+1];
-          affects[length] = 0;
-          for(xuint32 affectIdx=0; affectIdx<length; ++affectIdx)
+          affects[affectIdx] = 0;
+          QString name = affectsObject.at(affectIdx).toString();
+
+          SPropertyInstanceInformation *inst = newType->childFromName(name);
+          if(inst)
             {
-            affects[affectIdx] = 0;
-            QString name = affectsObject.at(affectIdx).toString();
-
-            SPropertyInstanceInformation *inst = newType->childFromName(name);
-            if(inst)
-              {
-              affects[affectIdx] = inst->location();
-              }
-
-            if(!affects[affectIdx])
-              {
-              affectsIsValid = false;
-              error = Toss("Defined sibling property name expected for affectedBy members.");
-              return false;
-              }
+            affects[affectIdx] = inst->location();
             }
 
-          if(!affectsIsValid)
+          if(!affects[affectIdx])
             {
-            delete [] affects;
-            affects = 0;
+            affectsIsValid = false;
+            error = Toss("Defined sibling property name expected for affectedBy members.");
+            return false;
             }
-
-          info->setAffects(affects);
           }
 
-        // Default input
-        XScriptValue inputPathVal = propertyObject.get("defaultInput");
-        if(inputPathVal.isValid())
+        if(!affectsIsValid)
           {
-          QString inputPath = inputPathVal.toString();
-          if(inputPath.length())
-            {
-            const SPropertyInstanceInformation *input = info->resolvePath(inputPath);
-            if(!input)
-              {
-              error = Toss("Unable to find default input '" + inputPath + "'");
-              return false;
-              }
+          delete [] affects;
+          affects = 0;
+          }
 
-            info->setDefaultInput(input);
+        info->setAffects(affects);
+        }
+
+      // Default input
+      XScriptValue inputPathVal = propertyObject.get("defaultInput");
+      if(inputPathVal.isValid())
+        {
+        QString inputPath = inputPathVal.toString();
+        if(inputPath.length())
+          {
+          const SPropertyInstanceInformation *input = info->resolvePath(inputPath);
+          if(!input)
+            {
+            error = Toss("Unable to find default input '" + inputPath + "'");
+            return false;
             }
+
+          info->setDefaultInput(input);
           }
         }
-      else
+
+      // Extending a current child?
+      XScriptValue extendingObject = propertyObject.get("extend");
+      if(extendingObject.isValid() && extendingObject.toBoolean())
         {
         SPropertyInstanceInformation *inst = newType->childFromName(propName);
         if(!inst)
