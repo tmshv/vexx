@@ -7,6 +7,7 @@
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
 #include "XInterface.h"
+#include "XScriptObject.h"
 
 namespace XScriptConvert
 {
@@ -124,6 +125,17 @@ template <> struct JSToNative<XScriptFunction>
     }
   };
 template <> struct JSToNative<XScriptFunction const &> : JSToNative<XScriptFunction> {};
+
+template <> struct JSToNative<XScriptObject>
+  {
+  typedef XScriptObject ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    return XScriptObject(h);
+    }
+  };
+template <> struct JSToNative<XScriptObject const &> : JSToNative<XScriptObject> {};
 
 template <> struct JSToNative<void>
   {

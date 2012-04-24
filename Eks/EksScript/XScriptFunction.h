@@ -2,6 +2,7 @@
 #define XSCRIPTFUNCTION_H
 
 #include "XScriptGlobal.h"
+#include "QMetaType"
 
 class XScriptObject;
 class XScriptValue;
@@ -64,5 +65,8 @@ private:
   int _length;
   bool _isConstructCall;
   };
+
+Q_DECLARE_METATYPE(XScriptFunction*);
+Q_DECLARE_METATYPE(XScriptFunction);
 
 #endif // XSCRIPTFUNCTION_H

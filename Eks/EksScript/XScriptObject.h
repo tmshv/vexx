@@ -62,4 +62,7 @@ template <typename T> const T *XScriptObject::castTo() const
   return XScriptConvert::from<T>(*this);
   }
 
+Q_DECLARE_METATYPE(XScriptObject);
+Q_DECLARE_METATYPE(XScriptObject*);
+
 #endif // XScriptObject_H

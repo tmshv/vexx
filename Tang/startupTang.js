@@ -5,7 +5,14 @@ db.types.Component.prototype.addInstance = function(shaderGroup)
   shaderGroup.renderGroup.addPointer(this);
   }
 
+var obj = { }
+var fn = function(pos)
+  {
+  print("WOOO CLOCKED!");
+  }
+
 var viewportWidget = tang.createViewport();
+viewportWidget.setContextMenuHandler(obj, fn);
 ui.addDock("Viewport", viewportWidget);
 
 var createBasicScene = function(viewportWidget)

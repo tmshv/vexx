@@ -53,6 +53,7 @@ private:
 class EKSSCRIPT_EXPORT XPersistentScriptValue
   {
 public:
+  XPersistentScriptValue();
   XPersistentScriptValue(const XScriptValue &val);
 
   ~XPersistentScriptValue()

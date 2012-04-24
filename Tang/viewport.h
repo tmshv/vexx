@@ -36,7 +36,15 @@ public:
 
   Q_INVOKABLE GCViewport *viewport();
 
+  Q_INVOKABLE void setContextMenuHandler(const XScriptObject &thisObject, const XScriptFunction &callFunction);
+  virtual void contextMenuEvent(QContextMenuEvent *event);
+
   Q_INVOKABLE void setScene(GCScene *);
+
+private:
+
+  XPersistentScriptValue _contextMenuThisObject;
+  XPersistentScriptValue _contextMenuFunction;
   };
 
 #endif // VIEWPORT_H

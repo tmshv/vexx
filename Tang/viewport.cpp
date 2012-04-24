@@ -25,6 +25,8 @@ Viewport::Viewport(SPlugin &db) : SViewport(db.db().addChild<GCViewport>("SomeSc
 
 Viewport::~Viewport()
   {
+  _contextMenuThisObject.dispose();
+  _contextMenuFunction.dispose();
   }
 
 void Viewport::setScene(GCScene *s)
@@ -40,3 +42,23 @@ GCViewport *Viewport::viewport()
   return SViewport::viewport();
   }
 
+void Viewport::setContextMenuHandler(const XScriptObject &thisObject, const XScriptFunction &callFunction)
+  {
+  _contextMenuThisObject = XScriptValue(thisObject);
+  _contextMenuFunction = XScriptValue(callFunction);
+  }
+
+void Viewport::contextMenuEvent(QContextMenuEvent *event)
+  {
+  XScriptFunction fn(_contextMenuFunction.asValue());
+  XScriptObject ths(_contextMenuThisObject.asValue());
+
+  if(ths.isValid() && fn.isValid())
+    {
+    XScriptValue vals[] = {
+      event->globalPos()
+    };
+
+    fn.call(ths, X_ARRAY_COUNT(vals), vals);
+    }
+  }

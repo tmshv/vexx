@@ -2,6 +2,7 @@
 #include "XScriptValueV8Internals.h"
 #include "XScriptObject.h"
 #include "XUnorderedMap"
+#include "XConvertFromScript.h"
 #include "XAssert"
 
 struct XScriptValueInternal
@@ -364,6 +365,14 @@ QVariant XScriptValue::toVariant(int typeHint) const
     {
     return toString();
     }
+  else if (typeHint == qMetaTypeId<XScriptObject>())
+    {
+    return QVariant::fromValue(XScriptConvert::from<XScriptObject>(fromHandle(internal->_object)));
+    }
+  else if (typeHint == qMetaTypeId<XScriptFunction>())
+    {
+    return QVariant::fromValue(XScriptConvert::from<XScriptFunction>(fromHandle(internal->_object)));
+    }
   else if(internal->_object->IsArray())
     {
     v8::Handle<v8::Array> jsArr = internal->_object.As<v8::Array>();
@@ -385,7 +394,7 @@ QVariant XScriptValue::toVariant(int typeHint) const
       }
     }
 
-  XInterfaceBase *interface = findInterface(typeHint);
+  XInterfaceBase *interface = typeHint != QVariant::Invalid ? findInterface(typeHint) : 0;
   if(interface)
     {
     return interface->toVariant(XScriptValue(), typeHint);
@@ -426,6 +435,11 @@ v8::Handle<v8::Value> getV8Internal(const XScriptValue &o)
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(&o);
   return internal->_object;
+  }
+
+XPersistentScriptValue::XPersistentScriptValue()
+  {
+  XPersistentScriptValueInternal::init(this);
   }
 
 XPersistentScriptValue::XPersistentScriptValue(const XScriptValue &val)

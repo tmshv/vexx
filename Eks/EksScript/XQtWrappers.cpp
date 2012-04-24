@@ -101,7 +101,7 @@ template <> void setupBindings<QRect>(XInterface<QRect> *templ)
   templ->addProperty<QPoint, const QPoint &, &QRect::topLeft, &QRect::setTopLeft>("topLeft");
   }
 
-template <> void setupBindings<QFile>(XInterface<QFile> *templ)
+template <> void setupBindings<QFile>(XInterface<QFile> *)
   {
   }
 

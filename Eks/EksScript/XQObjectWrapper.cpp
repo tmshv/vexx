@@ -217,6 +217,9 @@ QString formatClassName(const QString &n)
 const char *qobjectName = "QObject";
 void XQObjectWrapper::initiate(XScriptEngine *c)
   {
+  qRegisterMetaType<XScriptObject>("XScriptObject");
+  qRegisterMetaType<XScriptFunction>("XScriptFunction");
+
   instance()->_context = c;
 
   XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName);
