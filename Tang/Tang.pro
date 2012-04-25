@@ -60,7 +60,8 @@ HEADERS += \
 OTHER_FILES += \
     startupTang.js \
     Components/SteelPlate.json.js \
-    Components/SteelPlate.json
+    Components/SteelPlate.json \
+    ViewportContextMenu.js
 
 
 

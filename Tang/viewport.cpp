@@ -59,6 +59,13 @@ void Viewport::contextMenuEvent(QContextMenuEvent *event)
       event->globalPos()
     };
 
-    fn.call(ths, X_ARRAY_COUNT(vals), vals);
+    bool error = false;
+    QString errorStr;
+    fn.callWithTryCatch(ths, X_ARRAY_COUNT(vals), vals, &error, &errorStr);
+
+    if(error)
+      {
+      qCritical() << errorStr;
+      }
     }
   }

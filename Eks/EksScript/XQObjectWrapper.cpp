@@ -1,4 +1,5 @@
 #include "XQObjectWrapper.h"
+#include "XQtWrappers.h"
 #include "QMetaProperty"
 #include "XScriptValueV8Internals.h"
 #include "QVarLengthArray"
@@ -222,14 +223,23 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
 
   instance()->_context = c;
 
+  // build up custom QObject wrapper
   XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName);
   buildInterface(interface, &QObject::staticMetaObject);
   interface->seal();
   c->addInterface(interface);
   instance()->_objects.insert(&QObject::staticMetaObject, interface);
 
+
+  // build up custom QWidget wrapper
   XInterface<QWidget>* widget = XInterface<QWidget>::create("QWidget");
+
+  widget->addConstMethod<QPoint (QWidget*, const QPoint&), &QWidget::mapTo>("mapTo");
+
+  buildInterface(widget, &QWidget::staticMetaObject);
   widget->seal();
+
+  instance()->_objects.insert(&QWidget::staticMetaObject, widget);
   }
 
 XQObjectWrapper *XQObjectWrapper::instance()

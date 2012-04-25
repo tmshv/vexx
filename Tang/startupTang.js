@@ -1,18 +1,14 @@
 script.includeFolder("Components")
+script.include("ViewportContextMenu.js")
 
 db.types.Component.prototype.addInstance = function(shaderGroup)
   {
   shaderGroup.renderGroup.addPointer(this);
   }
 
-var obj = { }
-var fn = function(pos)
-  {
-  print("WOOO CLOCKED!");
-  }
 
 var viewportWidget = tang.createViewport();
-viewportWidget.setContextMenuHandler(obj, fn);
+viewportWidget.setContextMenuHandler(viewportWidget, function(pos) { popupViewportContextMenu(pos, this) });
 ui.addDock("Viewport", viewportWidget);
 
 var createBasicScene = function(viewportWidget)
