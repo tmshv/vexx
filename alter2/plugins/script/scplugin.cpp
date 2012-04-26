@@ -372,7 +372,7 @@ bool ScPlugin::execute(const QString &filename, const QString &code)
 
   if(error.hasError())
     {
-    qWarning() << "Error " << ret.toString() << " in script at line " << error.lineNumber();
+    qWarning() << "Error " << error.message() << " in script at line " << error.lineNumber();
     qWarning() << error.trace();
     return false;
     }

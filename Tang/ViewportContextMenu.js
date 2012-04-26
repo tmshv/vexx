@@ -1,13 +1,17 @@
 function popupViewportContextMenu(pos, window)
   {
-  inherits = function(obj, parent)
+  isComponent = function(obj)
     {
-    var proto = obj;
+    if(!obj.prototype)
+      {
+      return false;
+      }
+    var proto = obj.prototype.__proto__;
+
     while(proto)
       {
-      if(proto.typeName === parent.typeName)
+      if(proto.typeName === db.types.Component.typeName)
         {
-        print(proto.typeName)
         return true;
         }
 
@@ -24,18 +28,18 @@ function popupViewportContextMenu(pos, window)
   var typesData = {
     "Cube": {
       description: "",
-      request: "create",
+      request: "instanceComponent",
       requestData: [ "MCCuboid" ]
     }
   };
   for(name in db.types)
     {
     var type = db.types[name];
-    if(inherits(type, db.types.Component))
+    if(isComponent(type))
       {
       typesData[type.typeName] = {
         description: "",
-        request: "create",
+        request: "instanceComponent",
         requestData: [ type.typeName ]
         }
       }
@@ -58,6 +62,16 @@ function popupViewportContextMenu(pos, window)
       assert(this[name]);
       this[name].apply(this, argsIn);
       },
+    instanceComponent: function(data)
+      {
+      if(tang.mainArea.shaderGroups.length)
+        {
+        var shadingGroup = tang.mainArea.shaderGroups[0];
+        var comp = tang.mainArea.addChild(data, "NewComponent");
+        comp.addInstance(shadingGroup);
+        }
+      },
+
     create: function(data)
       {
       var parent = db;
