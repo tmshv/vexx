@@ -36,7 +36,7 @@ XFrustum::IntersectionResult XFrustum::intersects( const XCuboid &cuboid ) const
   {
   XFrustum::IntersectionResult ret = Inside;
   XVector3D vec;
-  for( size_t i=0; i<6; ++i )
+  for(xsize i=0; i<6; ++i)
     {
     vec.x() = (_planes[i].normal().x() >= 0.0f) ? cuboid.maximum().x() : cuboid.minimum().x();
     vec.y() = (_planes[i].normal().y() >= 0.0f) ? cuboid.maximum().y() : cuboid.minimum().y();
@@ -57,4 +57,12 @@ XFrustum::IntersectionResult XFrustum::intersects( const XCuboid &cuboid ) const
       }
     }
   return ret;
+  }
+
+void XFrustum::transform( const XTransform &tx )
+  {
+  for(xsize i=0; i<6; ++i)
+    {
+    _planes[i].transform(tx);
+    }
   }

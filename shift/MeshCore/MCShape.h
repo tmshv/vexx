@@ -14,6 +14,9 @@ public:
   MCGeometry geometry;
 
   void render(XRenderer *) const;
+
+  virtual void intersect(const XLine& line, Selector *) const;
+  virtual void intersect(const XFrustum& frus, Selector *) const;
   };
 
 S_PROPERTY_INTERFACE(MCShape)

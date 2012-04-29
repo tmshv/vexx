@@ -293,7 +293,7 @@ int main(int argc, char ** argv)
     Debugger* dbg = new Debugger;
     globalViewer->rootContext()->setContextProperty("debugEngine", dbg);
 
-    openFile("qml/Debugger/main.qml");
+    openFile("../Debugger/qml/Debugger/main.qml");
 
     QObject::connect(&app, SIGNAL(lastWindowClosed()), globalViewer, SLOT(quit()));
 

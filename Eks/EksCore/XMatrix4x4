@@ -16,21 +16,37 @@ template <typename Derived> QDebug operator <<(QDebug str, const Eigen::DenseBas
   xsize cols = data.cols();
   xsize rows = data.rows();
 
-  for (xsize r = 0; r < rows; ++r)
+  if(cols == 1)
     {
     str << "[ ";
-    for(xsize c = 0; c < cols; ++c)
+    for (xsize r = 0; r < rows; ++r)
       {
-      str << data(c, r);
-      if((c < cols-1)) // while not last element
+      str << data(r, 0);
+      if((r < rows-1)) // while not last element
         {
         str << ", "; // separate each element with space
         }
       }
     str << " ]";
-    if(r < (rows-1))
+    }
+  else
+    {
+    for (xsize r = 0; r < rows; ++r)
       {
-      str << "\n";
+      str << "[ ";
+      for(xsize c = 0; c < cols; ++c)
+        {
+        str << data(r, c);
+        if((c < cols-1)) // while not last element
+          {
+          str << ", "; // separate each element with space
+          }
+        }
+      str << " ]";
+      if(r < (rows-1))
+        {
+        str << "\n";
+        }
       }
     }
   return str;

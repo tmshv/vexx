@@ -32,6 +32,8 @@ public:
 
   IntersectionResult intersects(const XCuboid &) const;
 
+  void transform( const XTransform &tx );
+
 private:
   XPlane _planes[6];
   };

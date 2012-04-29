@@ -4,6 +4,7 @@
 #include "X3DGlobal.h"
 #include "XProperty"
 #include "XVector3D"
+#include "XTransform.h"
 
 class XLine;
 
@@ -25,6 +26,12 @@ public:
 
   float distanceToPlane( const XVector3D & ) const;
   float intersection( const XLine & ) const;
+
+  void transform( const XTransform &tx );
+
+  float a() const;
+  float b() const;
+  float c() const;
   };
 
 #endif // XPLANE_H

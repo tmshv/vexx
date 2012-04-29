@@ -29,6 +29,7 @@ public:
   UnsignedIntProperty viewportWidth;
   UnsignedIntProperty viewportHeight;
 
+  // inverse of transform
   TransformProperty viewTransform;
 
   void setPosition(float x, float y, float z) {setPosition(XVector3D(x, y, z)); }

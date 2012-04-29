@@ -216,7 +216,6 @@ void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, floa
   if(_rotateEnabled)
     {
     XTransform t = transform();
-    XTransform v = viewTransform();
 
     // old translation vector
     float length = (t.translation() - point).norm();

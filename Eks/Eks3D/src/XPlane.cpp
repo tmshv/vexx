@@ -31,6 +31,21 @@ XVector3D XPlane::position() const
   return normal() * d();
   }
 
+float XPlane::a() const
+  {
+  return _normal.x();
+  }
+
+float XPlane::b() const
+  {
+  return _normal.y();
+  }
+
+float XPlane::c() const
+  {
+  return _normal.z();
+  }
+
 void XPlane::set( const XVector3D &point, const XVector3D &n )
   {
   setNormal(n);
@@ -55,4 +70,12 @@ float XPlane::intersection( const XLine &a ) const
     return normal().dot(position() - a.position()) / denominator;
     }
   return HUGE_VAL;
+  }
+
+void XPlane::transform(const XTransform &tx)
+  {
+  XVector3D p = tx * position();
+  XVector3D n = tx.linear() * normal();
+
+  *this = XPlane(p, n);
   }

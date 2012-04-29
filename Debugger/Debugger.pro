@@ -35,6 +35,7 @@ SOURCES += main.cpp \
 
 # Please do not modify the following two lines. Required for deployment.
 include("qmldesktopviewer/qmldesktopviewer.pro")
+include("../Eks/EksCore/GeneralOptions.pri")
 
 OTHER_FILES += \
     qml/Debugger/main.qml \

@@ -163,7 +163,10 @@ void ScSurface::appendToLog(int t, const QString &message)
     htmlMessage = QString("<b><font color=\"red\">%1</font></b>").arg(htmlMessage);
     }
 
-  _debugger->device()->write(QString("{ type: %1, message: %2 }").arg(g_types[t]).arg(message).toUtf8());
+  if(_debugger->readyForData())
+    {
+    _debugger->device()->write(QString("{ type: %1, message: %2 }").arg(g_types[t]).arg(message).toUtf8());
+    }
 
   _log->moveCursor(QTextCursor::End);
   _log->insertHtml(htmlMessage);

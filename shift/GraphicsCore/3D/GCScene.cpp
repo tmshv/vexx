@@ -4,6 +4,8 @@
 #include "XMatrix4x4"
 #include "siterator.h"
 #include "sprocessmanager.h"
+#include "XLine.h"
+#include "QVarLengthArray"
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
@@ -238,7 +240,7 @@ void GCManipulatableScene::endMouseSelection(const XVector3D &sel)
   if(_hasMouseMoved)
     {
     //marqueeSelect();
-    raySelect(_initialRay);
+    raySelect(_finalRay);
     }
   else
     {
@@ -251,14 +253,35 @@ bool GCManipulatableScene::isMouseSelecting() const
   return _mouseSelecting;
   }
 
-void GCManipulatableScene::raySelect(const XVector3D &)
+void GCManipulatableScene::raySelect(const XVector3D &dir)
   {
-  /*GCShadingGroupPointer* groupPtr = shadingGroups.firstChild<GCShadingGroupPointer>();
-  GCShadingGroup* g = groupPtr->input()->uncheckedCastTo<GCShadingGroup>();
-  GCGeometryTransform *t = g->geometry.firstChild()->input()->castTo<GCGeometryTransform>();*/
+  const float farDist = 1000.0f;
+  const XVector3D& camPos = cameraTransform().inverse().translation();
+  XLine line(camPos, camPos + (dir * farDist));
 
-  // todo, fill this in.
-  xAssertFail();
+  class InternalSelector : public GCRenderable::Selector
+    {
+  public:
+    struct Hit
+      {
+      XVector3D pos;
+      XVector3D normal;
+      };
+    typedef QVarLengthArray<Hit, 64> HitArray;
+
+  XProperties:
+    XROProperty(HitArray, hits);
+
+  public:
+    void onHit(const XVector3D& pos, const XVector3D& normal)
+      {
+      Hit h = { pos, normal };
+      _hits << h;
+      }
+    };
+
+  InternalSelector interface;
+  GCRenderArray::intersect(line, &interface);
   }
 
 void GCManipulatableScene::marqueeSelect(const XFrustum &)

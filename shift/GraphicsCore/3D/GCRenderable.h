@@ -6,6 +6,8 @@
 #include "sbasepointerproperties.h"
 
 class XRenderer;
+class XLine;
+class XFrustum;
 
 class GRAPHICSCORE_EXPORT GCRenderable : public SEntity
   {
@@ -15,6 +17,14 @@ public:
   GCRenderable();
 
   virtual void render(XRenderer *) const = 0;
+
+  class Selector
+    {
+    virtual void onHit(const XVector3D& pos, const XVector3D& normal) = 0;
+    };
+
+  virtual void intersect(const XLine &line, Selector *) const;
+  virtual void intersect(const XFrustum &frus, Selector *) const;
   };
 
 S_PROPERTY_INTERFACE(GCRenderable)
@@ -31,6 +41,9 @@ public:
   GCRenderablePointerArray renderGroup;
 
   virtual void render(XRenderer *) const;
+
+  virtual void intersect(const XLine &line, Selector *) const;
+  virtual void intersect(const XFrustum &frus, Selector *) const;
   };
 
 S_PROPERTY_INTERFACE(GCRenderArray)

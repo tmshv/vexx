@@ -10,6 +10,14 @@ GCRenderable::GCRenderable()
   {
   }
 
+void GCRenderable::intersect(const XLine &, Selector *) const
+  {
+  }
+
+void GCRenderable::intersect(const XFrustum &, Selector *) const
+  {
+  }
+
 
 S_IMPLEMENT_PROPERTY(GCRenderArray)
 
@@ -31,5 +39,23 @@ void GCRenderArray::render(XRenderer *renderer) const
     {
     GCRenderable* ptd = r->pointed();
     ptd->render(renderer);
+    }
+  }
+
+void GCRenderArray::intersect(const XLine &line, Selector *s) const
+  {
+  for(const GCRenderablePointer* r = renderGroup.firstChild<GCRenderablePointer>(); r; r = r->nextSibling<GCRenderablePointer>())
+    {
+    const GCRenderable* ptd = r->pointed();
+    ptd->intersect(line, s);
+    }
+  }
+
+void GCRenderArray::intersect(const XFrustum &frus, Selector *s) const
+  {
+  for(const GCRenderablePointer* r = renderGroup.firstChild<GCRenderablePointer>(); r; r = r->nextSibling<GCRenderablePointer>())
+    {
+    const GCRenderable* ptd = r->pointed();
+    ptd->intersect(frus, s);
     }
   }

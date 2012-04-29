@@ -31,24 +31,61 @@ template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Ke
   typedef CGAL::Iso_rectangleC2<Kernel>               Iso_rectangle_2;
   typedef CGAL::Aff_transformationC2<Kernel>          Aff_transformation_2;
 
+  typedef const xReal * Cartesian_const_iterator_3;
+  typedef xReal * Cartesian_iterator_3;
 
   class Point_3 : public XVector3D
     {
   public:
-    Point_3() : XVector3D(XVector3D::Zero()) { }
-    Point_3(float x, float y, float z) : XVector3D(x, y, z) { }
-    Point_3(const XVector3D &p) : XVector3D(p) { }
-    Point_3(const F3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
-    Point_3(const D3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
-    Point_3(const EPICK3 &p) : XVector3D(p.x(), p.y(), p.z()) { }
-    Point_3(CGAL::Origin) : XVector3D(XVector3D::Zero()) { }
+    Point_3() : XVector3D(XVector3D::Zero()), _w(1.0f) { }
+    Point_3(float x, float y, float z) : XVector3D(x, y, z), _w(1.0f) { }
+    Point_3(float x, float y, float z, float w) : XVector3D(x, y, z), _w(w) { }
+    Point_3(const XVector3D &p) : XVector3D(p), _w(1.0f) { }
+    Point_3(const F3 &p) : XVector3D(p.x(), p.y(), p.z()), _w(1.0f) { }
+    Point_3(const D3 &p) : XVector3D(p.x(), p.y(), p.z()), _w(1.0f) { }
+    Point_3(const EPICK3 &p) : XVector3D(p.x(), p.y(), p.z()), _w(1.0f) { }
+    Point_3(CGAL::Origin) : XVector3D(XVector3D::Zero()), _w(1.0f) { }
+    Point_3(const Point_3 &p) : XVector3D(p), _w(p._w) { }
     Point_3& operator=(const XVector3D& p) { *((XVector3D*)this) = p; return *this; }
-    Point_3(const Point_3 &p) : XVector3D(p) { }
+
+    const xReal *cartesian_begin() const { return data(); }
+    const xReal *cartesian_end() const { return data() + 3; }
+
+    xReal *cartesian_begin() { return data(); }
+    xReal *cartesian_end() { return data() + 3; }
+
+    const xReal &hx() const { return x(); }
+    const xReal &hy() const { return y(); }
+    const xReal &hz() const { return z(); }
+
+  private:
+    xReal _w;
     };
 
-  typedef XVector3D                                   Vector_3;
-  typedef XVector3D                                   Direction_3;
+  class Vector_3 : public XVector3D
+    {
+  public:
+    Vector_3() : XVector3D(XVector3D::Zero()) { }
+    Vector_3(float x, float y, float z) : XVector3D(x, y, z) { }
+    Vector_3(const XVector3D &p) : XVector3D(p) { }
+
+    xReal squared_length() const { return squaredNorm(); }
+    };
+
   typedef CGAL::LineC3<Kernel>                        Line_3;
+  class Direction_3 : public XVector3D
+    {
+  public:
+    Direction_3() : XVector3D(XVector3D::Zero()) { }
+    Direction_3(float x, float y, float z) : XVector3D(x, y, z) { }
+    Direction_3(const XVector3D &p) : XVector3D(p) { }
+    Direction_3(const Line_3 &p) : XVector3D(p.direction()) { }
+
+    const xReal &dx() const { return x(); }
+    const xReal &dy() const { return y(); }
+    const xReal &dz() const { return z(); }
+    };
+
   typedef XPlane                                      Plane_3;
   typedef CGAL::RayC3<Kernel>                         Ray_3;
   typedef CGAL::SegmentC3<Kernel>                     Segment_3;
