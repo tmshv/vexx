@@ -43,6 +43,7 @@ public:
     void setLines( const XVector<unsigned int> & );
     void setTriangles( const XVector<unsigned int> & );
 
+    void setLines(const xuint32 *, xsize size);
     void setTriangles(const xuint32 *, xsize size);
 
     void setAttribute( const QString &, const XList<xReal> & );

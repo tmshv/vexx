@@ -19,8 +19,8 @@ public:
 
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
 
-  virtual void intersect(const XLine& line, Selector *) const;
-  virtual void intersect(const XFrustum& frus, Selector *) const;
+  virtual void intersect(const XLine& line, Selector *);
+  virtual void intersect(const XFrustum& frus, Selector *);
   };
 
 S_PROPERTY_INTERFACE(GCTransform)

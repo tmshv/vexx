@@ -61,6 +61,16 @@ private:
   bool _hasMouseMoved;
   XVector3D _initialRay;
   XVector3D _finalRay;
+
+  struct Hit
+    {
+    XVector3D position;
+    XVector3D normal;
+    GCRenderable *object;
+    };
+
+  XShader _boundsShader;
+  XGeometry _bounds;
   };
 
 S_PROPERTY_INTERFACE(GCManipulatableScene)

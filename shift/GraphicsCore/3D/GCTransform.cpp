@@ -31,19 +31,43 @@ void GCTransform::addManipulators(SPropertyArray *a, const GCTransform *tr)
   transform.connect(&manip->worldCentre);
   }
 
-void GCTransform::intersect(const XLine& line, Selector *s) const
+class InternalSelector : public GCRenderable::Selector
   {
-  XLine lineCpy(line);
-  lineCpy.transform(transform());
+public:
+  InternalSelector(const XTransform &tr, Selector *parent)
+      : _parent(parent), _transform(tr)
+    {
+    }
 
-  GCRenderArray::intersect(lineCpy, s);
+  void onHit(const XVector3D &point, const XVector3D &normal, GCRenderable *renderable)
+    {
+    _parent->onHit(_transform * point, _transform.linear() * normal, renderable);
+    }
+
+private:
+  GCRenderable::Selector *_parent;
+  XTransform _transform;
+  };
+
+void GCTransform::intersect(const XLine& line, Selector *s)
+  {
+  const XTransform &tr = transform();
+
+  XLine lineCpy(line);
+  lineCpy.transform(tr.inverse());
+
+  InternalSelector sel(tr, s);
+  GCRenderArray::intersect(lineCpy, &sel);
   }
 
-void GCTransform::intersect(const XFrustum& frus, Selector *s) const
+void GCTransform::intersect(const XFrustum& frus, Selector *s)
   {
-  XFrustum frusCpy(frus);
-  frusCpy.transform(transform());
+  const XTransform &tr = transform();
 
-  GCRenderArray::intersect(frusCpy, s);
+  XFrustum frusCpy(frus);
+  frusCpy.transform(tr.inverse());
+
+  InternalSelector sel(tr, s);
+  GCRenderArray::intersect(frusCpy, &sel);
   }
 

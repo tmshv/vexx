@@ -12,6 +12,17 @@ class SHIFT_EXPORT Pointer : public SProperty
 public:
   typedef SProperty Type;
 
+  template <typename T>
+  const T *pointed() const
+    {
+    const SProperty *p = pointed();
+    if(p)
+      {
+      return p->castTo<T>();
+      }
+    return 0;
+    }
+
   const SProperty *pointed() const { preGet(); return input(); }
   const SProperty *operator()() const { preGet(); return pointed(); }
 

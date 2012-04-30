@@ -180,6 +180,14 @@ bool XCuboid::isInside( const XVector3D &in ) const
             in.z() < _minimum.z() && in.z() > _maximum.z();
     }
 
+void XCuboid::expand(float amount)
+  {
+  XVector3D vec(amount, amount, amount);
+
+  _minimum -= vec;
+  _maximum += vec;
+  }
+
 
 QDataStream &operator<<(QDataStream &stream, const XCuboid &cuboid)
   {

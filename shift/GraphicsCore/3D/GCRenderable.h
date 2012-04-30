@@ -20,11 +20,12 @@ public:
 
   class Selector
     {
-    virtual void onHit(const XVector3D& pos, const XVector3D& normal) = 0;
+  public:
+    virtual void onHit(const XVector3D &point, const XVector3D& normal, GCRenderable *renderable) = 0;
     };
 
-  virtual void intersect(const XLine &line, Selector *) const;
-  virtual void intersect(const XFrustum &frus, Selector *) const;
+  virtual void intersect(const XLine &line, Selector *);
+  virtual void intersect(const XFrustum &frus, Selector *);
   };
 
 S_PROPERTY_INTERFACE(GCRenderable)
@@ -42,8 +43,8 @@ public:
 
   virtual void render(XRenderer *) const;
 
-  virtual void intersect(const XLine &line, Selector *) const;
-  virtual void intersect(const XFrustum &frus, Selector *) const;
+  virtual void intersect(const XLine &line, Selector *);
+  virtual void intersect(const XFrustum &frus, Selector *);
   };
 
 S_PROPERTY_INTERFACE(GCRenderArray)

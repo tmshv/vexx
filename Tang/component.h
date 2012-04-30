@@ -9,6 +9,9 @@ class Component : public GCRenderArray
 
 public:
   Component();
+
+  void intersect(const XLine &line, Selector *) X_OVERRIDE;
+  void intersect(const XFrustum &frus, Selector *) X_OVERRIDE;
   };
 
 S_PROPERTY_INTERFACE(Component)

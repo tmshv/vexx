@@ -6,6 +6,7 @@
 #include "sprocessmanager.h"
 #include "XLine.h"
 #include "QVarLengthArray"
+#include "XCuboid.h"
 
 S_IMPLEMENT_PROPERTY(GCScene)
 
@@ -73,6 +74,39 @@ void GCManipulatableScene::createTypeInformation(SPropertyInformation *info, con
 
 GCManipulatableScene::GCManipulatableScene() : _currentManipulator(0), _mouseSelecting(false)
   {
+  XVector3D points[] = {
+    XVector3D(0, 0, 0),
+    XVector3D(1, 0, 0),
+    XVector3D(0, 1, 0),
+    XVector3D(1, 1, 0),
+    XVector3D(0, 0, 1),
+    XVector3D(1, 0, 1),
+    XVector3D(0, 1, 1),
+    XVector3D(1, 1, 1)
+  };
+  _bounds.setAttribute("vertex", points, X_ARRAY_COUNT(points));
+
+
+  xuint32 lines[] = {
+    0, 1,
+    2, 3,
+    4, 5,
+    6, 7,
+
+    0, 2,
+    1, 3,
+    4, 6,
+    5, 7,
+
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7
+  };
+  _bounds.setLines(lines, X_ARRAY_COUNT(lines));
+
+  _boundsShader.setToDefinedType("plainColour");
+  _boundsShader.getVariable("colour")->setValue(XColour(1.0f, 1.0f, 1.0f));
   }
 
 void GCManipulatableScene::clearManipulators()
@@ -109,14 +143,39 @@ void GCManipulatableScene::render(XRenderer *x) const
 
   const GCCamera *cam = activeCamera();
   xAssert(cam);
-  if(cam && manipulators.firstChild())
+  if(cam)
     {
-    x->clear(XRenderer::ClearDepth);
-
     x->pushTransform(cameraTransform());
-    for(GCVisualManipulator* m = manipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
+
+    x->setShader(&_boundsShader);
+    for(Pointer* m = selection.firstChild<Pointer>(); m; m = m->nextSibling<Pointer>())
       {
-      m->render(cam, x);
+      const GCRenderable* ren = m->pointed<GCRenderable>();
+
+      if(ren)
+        {
+        XCuboid bounds(XVector3D::Zero(), XVector3D(1,1,1));
+
+        bounds.expand(0.05f);
+
+        XTransform trans = XTransform::Identity();
+        trans.scale(bounds.size().toVector3D());
+        trans.translate(bounds.minimum());
+
+        x->pushTransform(trans);
+        x->drawGeometry(_bounds);
+        x->popTransform();
+        }
+      }
+
+    if(manipulators.firstChild())
+      {
+      x->clear(XRenderer::ClearDepth);
+
+      for(GCVisualManipulator* m = manipulators.firstChild<GCVisualManipulator>(); m; m = m->nextSibling<GCVisualManipulator>())
+        {
+        m->render(cam, x);
+        }
       }
     x->popTransform();
     }
@@ -261,27 +320,42 @@ void GCManipulatableScene::raySelect(const XVector3D &dir)
 
   class InternalSelector : public GCRenderable::Selector
     {
-  public:
-    struct Hit
-      {
-      XVector3D pos;
-      XVector3D normal;
-      };
-    typedef QVarLengthArray<Hit, 64> HitArray;
-
   XProperties:
-    XROProperty(HitArray, hits);
+    XROProperty(Hit, hit);
 
   public:
-    void onHit(const XVector3D& pos, const XVector3D& normal)
+    InternalSelector(const XVector3D &cP) : camPos(cP), oldDistSq(HUGE_VAL)
       {
-      Hit h = { pos, normal };
-      _hits << h;
+      Hit h = { XVector3D::Zero(), XVector3D::Zero(), 0x0 };
+      _hit = h;
       }
+
+    void onHit(const XVector3D& pos, const XVector3D& normal, GCRenderable *r)
+      {
+      float newDistSq = (pos - camPos).squaredNorm();
+
+      if(newDistSq < oldDistSq)
+        {
+        Hit h = { pos, normal, r };
+        _hit = h;
+        }
+      }
+
+  private:
+    float oldDistSq;
+    XVector3D camPos;
     };
 
-  InternalSelector interface;
+  InternalSelector interface(camPos);
   GCRenderArray::intersect(line, &interface);
+  
+  SBlock b(database());
+  selection.clear();
+
+  if(interface.hit().object)
+    {
+    selection.addPointer(interface.hit().object);
+    }
   }
 
 void GCManipulatableScene::marqueeSelect(const XFrustum &)

@@ -35,6 +35,8 @@ public:
     void setMinimum( const XVector3D & );
     void setMaximum( const XVector3D & );
 
+    void expand(float amount);
+
     XSize size() const;
 
     xReal maximumDistanceSquared() const;

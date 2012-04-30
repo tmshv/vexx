@@ -93,6 +93,13 @@ void XGeometry::setLines( const XVector<unsigned int> &v )
   _changedL = true;
   }
 
+void XGeometry::setLines(const xuint32 *in, xsize size)
+  {
+  _lines.resize(size);
+  memcpy(_lines.data(), in, size*sizeof(xuint32));
+  _changedL = true;
+  }
+
 void XGeometry::setTriangles( const XVector<unsigned int> &v )
   {
   _triangles = v;
