@@ -8,8 +8,6 @@
 #include "sadocument.h"
 #include "scplugin.h"
 
-Q_DECLARE_METATYPE(XScriptFunction)
-
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
 void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node)

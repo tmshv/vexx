@@ -37,6 +37,7 @@ void MCShape::intersect(const XLine& line, Selector *s) const
 
   // constructs AABB tree
   Tree tree(polyhedron.facets_begin(), polyhedron.facets_end());
+  tree.accelerate_distance_queries();
 
   MCKernel::Point_3 start = line.position();
   MCKernel::Point_3 end = XVector3D(line.position() + line.direction());
@@ -47,22 +48,40 @@ void MCShape::intersect(const XLine& line, Selector *s) const
   class Inserter
     {
   public:
-    Inserter(Selector *s) : _s(s) { }
-    Object_and_primitive_id &operator*()
+    Inserter(Selector *s) : _s(s), _hit(0), _assign(0) { }
+    Inserter &operator*()
       {
-      static Object_and_primitive_id a;
-      return a;
+      return *this;
+      }
+    Inserter& operator=(const Object_and_primitive_id& object)
+      {
+      ++_assign;
+      xAssert(_assign == _hit);
+
+      if(object.first.is<MCKernel::Point_3>())
+        {
+        const MCKernel::Point_3& pt4D = CGAL::object_cast<MCKernel::Point_3>(object.first);
+        const MCPolyhedron::Face& prim = *object.second;
+        const XVector3D pt = pt4D / pt4D.hw();
+        const XVector3D normal = prim.plane().normal();
+        }
+
+      return *this;
       }
     Inserter operator++()
       {
+      ++_hit;
       return *this;
       }
     Inserter operator++(int)
       {
+      ++_hit;
       return *this;
       }
   private:
     Selector *_s;
+    xsize _hit;
+    xsize _assign;
     };
   Inserter insertor(s);
 

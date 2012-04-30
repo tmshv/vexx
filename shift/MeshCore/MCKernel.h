@@ -57,6 +57,7 @@ template <typename Kernel_> struct MCKernelBase : public CGAL::Cartesian_base<Ke
     const xReal &hx() const { return x(); }
     const xReal &hy() const { return y(); }
     const xReal &hz() const { return z(); }
+    const xReal &hw() const { return _w; }
 
   private:
     xReal _w;
