@@ -16,7 +16,19 @@ IMPLEMENT_POD_PROPERTY(ComplexTransformProperty);
 IMPLEMENT_POD_PROPERTY(GCRuntimeShader)
 IMPLEMENT_POD_PROPERTY(GCQImage)
 IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry)
+IMPLEMENT_POD_PROPERTY(GCBoundingBox)
 
+void GCBoundingBox::assignProperty(const SProperty *f, SProperty *t)
+  {
+  GCBoundingBox *to = t->uncheckedCastTo<GCBoundingBox>();
+
+  const GCBoundingBox *sProp = f->castTo<GCBoundingBox>();
+  if(sProp)
+    {
+    to->assign(sProp->value());
+    return;
+    }
+  }
 void GCRuntimeGeometry::assignProperty(const SProperty *f, SProperty *t)
   {
   GCRuntimeGeometry *to = t->uncheckedCastTo<GCRuntimeGeometry>();

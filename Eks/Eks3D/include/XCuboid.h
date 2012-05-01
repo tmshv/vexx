@@ -21,6 +21,9 @@ public:
     XCuboid( XVector3D minimum, XVector3D maximum );
     XCuboid( XVector3D minimum, XSize );
 
+    bool operator==(const XCuboid& oth) const;
+    bool operator!=(const XCuboid& oth) const;
+
     XVector3D centre() const;
 
     void unite( const XVector3D & );
@@ -47,7 +50,11 @@ public:
 
     friend EKS3D_EXPORT QDataStream &operator<<(QDataStream &stream, const XCuboid &itemRequest);
     friend EKS3D_EXPORT QDataStream &operator>>(QDataStream &stream, XCuboid &itemRequest);
+    friend EKS3D_EXPORT QTextStream &operator<<(QTextStream &stream, const XCuboid &itemRequest);
+    friend EKS3D_EXPORT QTextStream &operator>>(QTextStream &stream, XCuboid &itemRequest);
     };
+
+Q_DECLARE_METATYPE(XCuboid)
 
 inline XCuboid operator *( const XTransform &mat, const XCuboid &cub )
   {

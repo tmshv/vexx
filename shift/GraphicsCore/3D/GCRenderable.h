@@ -4,6 +4,7 @@
 #include "GCGlobal.h"
 #include "sentity.h"
 #include "sbasepointerproperties.h"
+#include "GCBaseProperties.h"
 
 class XRenderer;
 class XLine;
@@ -15,6 +16,8 @@ class GRAPHICSCORE_EXPORT GCRenderable : public SEntity
 
 public:
   GCRenderable();
+
+  GCBoundingBox bounds;
 
   virtual void render(XRenderer *) const = 0;
 

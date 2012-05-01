@@ -255,7 +255,7 @@ void XGeometry::removeAttribute( const QString &in )
 
 XCuboid XGeometry::computeBounds() const
   {
-  const XVector<XVector3D> &vtxList = _attr3["XVector"];
+  const XVector<XVector3D> &vtxList = _attr3["vertex"];
 
   XCuboid ret;
   foreach( const XVector3D &vtx, vtxList )

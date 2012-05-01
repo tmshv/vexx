@@ -154,13 +154,12 @@ void GCManipulatableScene::render(XRenderer *x) const
 
       if(ren)
         {
-        XCuboid bounds(XVector3D::Zero(), XVector3D(1,1,1));
-
-        bounds.expand(0.05f);
+        XCuboid bounds = ren->bounds();
+        bounds.expand(0.015f);
 
         XTransform trans = XTransform::Identity();
         trans.scale(bounds.size().toVector3D());
-        trans.translate(bounds.minimum());
+        trans.pretranslate(bounds.minimum());
 
         x->pushTransform(trans);
         x->drawGeometry(_bounds);
@@ -348,7 +347,7 @@ void GCManipulatableScene::raySelect(const XVector3D &dir)
 
   InternalSelector interface(camPos);
   GCRenderArray::intersect(line, &interface);
-  
+
   SBlock b(database());
   selection.clear();
 

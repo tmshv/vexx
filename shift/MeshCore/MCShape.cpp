@@ -7,11 +7,23 @@
 
 S_IMPLEMENT_PROPERTY(MCShape)
 
+void unionBounds(const SPropertyInstanceInformation*, MCShape* shape)
+  {
+  GCBoundingBox::ComputeLock l(&shape->bounds);
+  XCuboid *data = l.data();
+
+  *data = shape->geometry.runtimeGeometry().computeBounds();
+  }
+
 void MCShape::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    info->add(&MCShape::geometry, "geometry");
+    GCBoundingBox::InstanceInformation* bInst = info->child(&GCRenderArray::bounds);
+    bInst->setCompute(unionBounds);
+
+    MCGeometry::InstanceInformation* geoInst = info->add(&MCShape::geometry, "geometry");
+    geoInst->setAffects(bInst);
     }
   }
 

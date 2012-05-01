@@ -225,7 +225,7 @@ public:
     }
 
   void assign(const T &in);
-  
+
 private:
   class ComputeChange : public SProperty::DataChange
     {
@@ -376,7 +376,7 @@ public:
     {
     }
   };
-  
+
 S_PROPERTY_INTERFACE(FilenameProperty)
 
 #define EnumProperty IntProperty

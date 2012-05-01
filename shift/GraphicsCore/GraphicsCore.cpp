@@ -32,6 +32,7 @@ void initiateGraphicsCore()
   STypeRegistry::addType(ComplexTransformProperty::staticTypeInformation());
   STypeRegistry::addType(GCRuntimeGeometry::staticTypeInformation());
   STypeRegistry::addType(GCRuntimeShader::staticTypeInformation());
+  STypeRegistry::addType(GCBoundingBox::staticTypeInformation());
 
   STypeRegistry::addType(GCGeometry::staticTypeInformation());
   STypeRegistry::addType(GCGeometryPointer::staticTypeInformation());
@@ -40,7 +41,7 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCRenderablePointer::staticTypeInformation());
   STypeRegistry::addType(GCRenderablePointerArray::staticTypeInformation());
   STypeRegistry::addType(GCRenderArray::staticTypeInformation());
-  
+
   STypeRegistry::addType(GCTransform::staticTypeInformation());
 
   STypeRegistry::addType(GCTexture::staticTypeInformation());

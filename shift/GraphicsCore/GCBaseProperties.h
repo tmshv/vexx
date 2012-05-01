@@ -7,6 +7,7 @@
 #include "QImage"
 #include "XShader.h"
 #include "XGeometry.h"
+#include "XCuboid.h"
 
 namespace
 {
@@ -51,5 +52,6 @@ DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, ComplexTransformProperty, XComplexTrans
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeShader, XShader, XShader(), 152)
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCQImage, QImage, QImage(), 153)
 DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCRuntimeGeometry, XGeometry, XGeometry(), 154)
+DEFINE_POD_PROPERTY(GRAPHICSCORE_EXPORT, GCBoundingBox, XCuboid, XCuboid(), 155)
 
 #endif // GCBASEPROPERTIES_H
