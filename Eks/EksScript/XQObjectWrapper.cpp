@@ -145,22 +145,30 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
 
       v8::TryCatch trycatch;
 
-      xAssert(!connection.function.IsEmpty());
-      xAssert(connection.function->IsFunction());
       v8::Handle<v8::Value> result;
-      if(connection.thisObject.IsEmpty())
+      try
         {
-        result = connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
-        }
-      else
-        {
-        result = connection.function->Call(connection.thisObject, argCount, getV8Internal(args.data()));
-        }
+        xAssert(!connection.function.IsEmpty());
+        xAssert(connection.function->IsFunction());
+        if(connection.thisObject.IsEmpty())
+          {
+          result = connection.function->Call(ctxt->Global(), argCount, getV8Internal(args.data()));
+          }
+        else
+          {
+          result = connection.function->Call(connection.thisObject, argCount, getV8Internal(args.data()));
+          }
 
-      if(result.IsEmpty())
+        if(result.IsEmpty())
+          {
+          trycatch.ReThrow();
+          qCritical() << XScriptConvert::from<QString>(fromHandle(trycatch.StackTrace()));
+          qCritical() << XScriptConvert::from<QString>(fromHandle(trycatch.Exception()));
+          }
+        }
+      catch(...)
         {
-        trycatch.ReThrow();
-        qCritical() << XScriptConvert::from<QString>(fromHandle(trycatch.StackTrace()));
+        xAssertFail();
         }
       }
 
@@ -237,6 +245,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   XInterface<QWidget>* widget = XInterface<QWidget>::create("QWidget");
 
   widget->addConstMethod<QPoint (QWidget*, const QPoint&), &QWidget::mapTo>("mapTo");
+  widget->addConstMethod<QPoint (const QPoint&), &QWidget::mapToGlobal>("mapToGlobal");
 
   buildInterface(widget, &QWidget::staticMetaObject);
   widget->seal();

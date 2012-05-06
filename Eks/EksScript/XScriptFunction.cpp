@@ -144,9 +144,18 @@ XScriptValue XScriptFunction::call(const XScriptObject &self, int argc, const XS
   v8::Locker locker;
   const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
 
-  return (func->_object.IsEmpty() || !func->_object->IsFunction())
-      ? Toss("Illegal argument: empty v8::Handle<>.")
-      : fromHandle(func->_object->Call(getV8Internal(self), argc, getV8Internal(args)));
+  try
+    {
+    return (func->_object.IsEmpty() || !func->_object->IsFunction())
+        ? Toss("Illegal argument: empty v8::Handle<>.")
+        : fromHandle(func->_object->Call(getV8Internal(self), argc, getV8Internal(args)));
+    }
+  catch(...)
+    {
+    xAssertFail();
+    }
+
+  return XScriptValue();
   }
 
 bool XScriptFunction::isValid() const
@@ -165,24 +174,33 @@ XScriptValue XScriptFunction::callWithTryCatch(const XScriptObject &self, int ar
     *error = false;
   }
 
-  const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
-  v8::Handle<v8::Value> result = func->_object->Call(getV8Internal(self), argc, getV8Internal(args));
-
-  if (result.IsEmpty())
+  try
     {
-    if(error)
+    const XScriptFunctionInternal* func = XScriptFunctionInternal::val(this);
+    v8::Handle<v8::Value> result = func->_object->Call(getV8Internal(self), argc, getV8Internal(args));
+
+    if (result.IsEmpty())
       {
-      *error = true;
+      if(error)
+        {
+        *error = true;
+        }
+      v8::String::Value exception_str(trycatch.Exception());
+      if(message)
+        {
+        *message = QString((QChar*)*exception_str, exception_str.length());
+        }
+      return XScriptValue::empty();
       }
-    v8::String::Value exception_str(trycatch.Exception());
-    if(message)
-      {
-      *message = QString((QChar*)*exception_str, exception_str.length());
-      }
-    return XScriptValue::empty();
+
+    return fromHandle(result);
+    }
+  catch(...)
+    {
+    xAssertFail();
     }
 
-  return fromHandle(result);
+  return XScriptValue();
   }
 
 XScriptValue XScriptFunction::callAsConstructor(const XScriptArguments &argv)

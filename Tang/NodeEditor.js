@@ -1,3 +1,4 @@
+script.include("ViewportContextMenu.js")
 
 setupNodeEditor = function(topLevel)
   {
@@ -11,7 +12,7 @@ setupNodeEditor = function(topLevel)
       },
     contextMenu: function(x, y, path)
       {
-      //popupViewportContextMenu(new PointF(pos), this, path);
+      popupViewportContextMenu(new Point(x, y), this.surface, path);
       }
     }
   surfaceManager.surface.emitRequest.connect(surfaceManager, surfaceManager.passIn);

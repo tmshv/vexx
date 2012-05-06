@@ -49,21 +49,6 @@ ScDeclarativeWindow::ScDeclarativeWindow(const QString &s, SDatabaseModel *model
     }
   }
 
-QVariantMap ScDeclarativeWindow::mapTo(QWidget *w, const float x, const float y) const
-  {
-  QPoint g = QWidget::mapToGlobal(QPoint(x, y));
-
-  if(w)
-    {
-    g = w->mapFromGlobal(g);
-    }
-
-  QVariantMap v;
-  v["x"] = g.x();
-  v["y"] = g.y();
-  return v;
-  }
-
 void ScDeclarativeWindow::destroyWindow()
   {
   deleteLater();

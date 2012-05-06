@@ -1,4 +1,3 @@
-script.include("ViewportContextMenu.js")
 
 function popupViewportContextMenu(pos, window)
   {
@@ -50,7 +49,7 @@ function popupViewportContextMenu(pos, window)
   var menuContents =
     {
     "Create": {
-      description: "Instance a Component",
+      description: "Create an object",
       children: typesData
       }
     }
@@ -90,7 +89,7 @@ function popupViewportContextMenu(pos, window)
       }
     }
   contextMenu.surface.emitRequest.connect(contextMenu, contextMenu.passIn);
-  var mapped = window.mapTo(null, pos);
+  var mapped = window.mapToGlobal(pos);
   contextMenu.surface.setPosition(mapped.x, mapped.y);
   contextMenu.surface.show();
   }

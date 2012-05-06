@@ -56,7 +56,7 @@ void Viewport::contextMenuEvent(QContextMenuEvent *event)
   if(ths.isValid() && fn.isValid())
     {
     XScriptValue vals[] = {
-      event->globalPos()
+      event->pos()
     };
 
     bool error = false;

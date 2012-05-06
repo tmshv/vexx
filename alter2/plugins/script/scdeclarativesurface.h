@@ -13,7 +13,6 @@ class ScDeclarativeWindow : public QDeclarativeView
 public:
   ScDeclarativeWindow(const QString &s, SDatabaseModel *model, const QVariantMap &);
 
-  Q_INVOKABLE QVariantMap mapTo(QWidget *, const float x, const float y) const;
   Q_INVOKABLE void destroyWindow();
 
   Q_INVOKABLE void setPosition(int x, int y);
