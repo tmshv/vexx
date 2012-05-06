@@ -131,7 +131,7 @@ NodeItem {
 
           property bool shouldSelect: false
 
-          onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y)
+          onCreateConnection: nodecanvas.startCreatingConnection(item, mode, x, y, header.color)
 
           onClose: {
             nodeItem.remove();

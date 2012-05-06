@@ -2,24 +2,26 @@ var userCreatableEntities = [ ];
 
 function doContextMenu(window, x, y, path)
   {
-  var typesData = { };
+  var typesData = [ ];
   for(var i = 0; i < userCreatableEntities.length; ++i)
     {
     var type = userCreatableEntities[i];
-    typesData[type.typeName] = {
+    typesData.push({
+      name: type.typeName,
       description: "Some Type",
       request: "create",
       requestData: [ type.typeName ]
-      }
+      });
     }
 
   var menuContents =
-    {
-    "Create": {
+    [
+      {
+      name: "Create",
       description: "Add new nodes",
       children: typesData
       }
-    }
+    ];
 
   var contextMenu =
     {

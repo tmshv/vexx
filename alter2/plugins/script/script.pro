@@ -74,7 +74,9 @@ OTHER_FILES += \
     CreateMenuContents/Menu.qml \
     NodeCanvasContents/Properties.qml \
     jsEntities/StandardSurface.js \
-    jsEntities/FlatSurface.js
+    jsEntities/FlatSurface.js \
+    NodeCanvasContents/PropertyInterfaceMouseArea.qml \
+    NodeCanvasContents/PropertyHover.qml
 
 
 

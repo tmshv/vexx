@@ -255,7 +255,7 @@ Rectangle
   property variant currentInputDraggingItem: null
   property variant destroyOnConnectionComplete: null
   property string currentInputBeginMode: ""
-  function startCreatingConnection(thing, mode, x, y)
+  function startCreatingConnection(thing, mode, x, y, colour)
     {
     if(currentInputDragging != null)
       {
@@ -277,7 +277,7 @@ Rectangle
       return;
       }
 
-    currentInputDragging = component.createObject(display, { firstColour: currentInputDraggingItem.color, lastColour: currentInputDraggingItem.color } );
+    currentInputDragging = component.createObject(display, { firstColour: colour, lastColour: colour } );
 
     var pos = display.mapFromItem(null, x, y);
 
@@ -403,9 +403,6 @@ Rectangle
 
   function setTopRootIndex(idx)
     {
-    print("1", display)
-    print("2", display.setTopRootIndex);
-    print("IDX>> ", idx);
     display.setTopRootIndex(idx);
     }
 

@@ -80,6 +80,14 @@ PropertyItem {
     }
   ]
 
+  PropertyHover {
+    hovered: inpArea.containsMouse || outArea.containsMouse
+    anchors.left: inputBlob.horizontalCenter
+    anchors.right: outputBlob.horizontalCenter
+    anchors.top: inputBlob.top
+    anchors.bottom: inputBlob.bottom
+  }
+
   PropertyInterface {
     id: inputBlob
     y: 1.0
@@ -88,8 +96,18 @@ PropertyItem {
     size: 12
     color: propertyContainer.colour
     visible: mode !== "computed" && mode !== "output"
+  }
 
-    onStartDrag: nodecanvas.startCreatingConnection(inputBlob, "input", x, y)
+  PropertyInterfaceMouseArea {
+    id: inpArea
+    attachPointX: inputBlob.size/2
+    hoverEnabled: true
+    enabled: inputBlob.visible
+    anchors.left: inputBlob.left
+    anchors.right: propertyContainer.horizontalCenter
+    anchors.top: inputBlob.top
+    anchors.bottom: inputBlob.bottom
+    onStartDrag: nodecanvas.startCreatingConnection(inpArea, "input", x, y, inputBlob.color)
   }
 
   PropertyInterface {
@@ -100,8 +118,18 @@ PropertyItem {
     color: inputBlob.color
     size: inputBlob.size
     visible: mode !== "input" && mode !== "internalinput"
+  }
 
-    onStartDrag: nodecanvas.startCreatingConnection(outputBlob, "output", x, y)
+  PropertyInterfaceMouseArea {
+    id: outArea
+    attachPointX: outArea.width - outputBlob.size/2
+    hoverEnabled: true
+    enabled: outputBlob.visible
+    anchors.left: propertyContainer.horizontalCenter
+    anchors.right: outputBlob.right
+    anchors.top: outputBlob.top
+    anchors.bottom: outputBlob.bottom
+    onStartDrag: nodecanvas.startCreatingConnection(outArea, "output", x, y, inputBlob.color)
   }
 
   Column {

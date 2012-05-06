@@ -26,33 +26,49 @@ function popupViewportContextMenu(pos, window)
     return false;
     }
 
-  var typesData = {
-    "Cube": {
+  var typesData = [
+    {
+      name: "Cube",
       description: "",
       request: "instanceComponent",
       requestData: [ "MCCuboid" ]
     }
-  };
+  ];
+
   for(name in db.types)
     {
     var type = db.types[name];
     if(isComponent(type))
       {
-      typesData[type.typeName] = {
+      typesData.push({
+        name: type.typeName,
         description: "",
         request: "instanceComponent",
         requestData: [ type.typeName ]
-        }
+        });
       }
     }
 
   var menuContents =
-    {
-    "Create": {
+    [
+      {
+      name: "Create",
       description: "Create an object",
       children: typesData
+      },
+      {
+      name: "New File",
+      request: "newFile"
+      },
+      {
+      name: "Save File",
+      request: "saveFile"
+      },
+      {
+      name: "Load File",
+      request: "loadFile"
       }
-    }
+    ];
 
   var contextMenu =
     {
@@ -71,6 +87,20 @@ function popupViewportContextMenu(pos, window)
         var comp = tang.mainArea.addChild(data, "NewComponent");
         comp.addInstance(shadingGroup);
         }
+      },
+    newFile: function()
+      {
+      tang.mainAreaDocument.newFile();
+      },
+    saveFile: function()
+      {
+                var filename = "";
+      tang.mainAreaDocument.saveFile(filename);
+      },
+    loadFile: function()
+      {
+                var filename = "";
+      tang.mainAreaDocument.loadFile(filename);
       },
 
     create: function(data)

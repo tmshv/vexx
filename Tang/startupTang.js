@@ -39,11 +39,11 @@ tang.mainScene = createBasicScene(viewportWidget);
 
 
 // create a new component document and pop it up.
-var areaDocument = db.addDocument(db.types.AreaDocument);
-areaDocument.newFile();
+tang.mainAreaDocument = db.addDocument(db.types.AreaDocument);
+tang.mainAreaDocument.newFile();
 
 // get the area from the doc
-tang.mainArea = areaDocument.children[0];
+tang.mainArea = tang.mainAreaDocument.children[0];
 var shadingGroup = tang.mainArea.shaderGroups.add(db.types.GCShadingGroup, "Groups");
 tang.mainScene.renderGroup.addPointer(shadingGroup);
 

@@ -19,10 +19,15 @@ Rectangle {
   onMenuItemsChanged:
     {
     contentsModel.clear();
-    for (var prop in menuItems)
+    for (var i in menuItems)
       {
-      var data = menuItems[prop];
-      contentsModel.append({"name": prop, "description":data.description, hasSubMenu: data.children !== undefined })
+      var data = menuItems[i];
+      contentsModel.append(
+        {
+          "name": data.name,
+          "description": data.description,
+          hasSubMenu: data.children !== undefined
+        });
       }
     }
 
@@ -262,7 +267,7 @@ Rectangle {
             }
           Text {
             x: 2
-            text: description
+            text: description ? description : ""
             font.pixelSize: 9
             color: "white"
             }
