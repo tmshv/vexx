@@ -240,8 +240,18 @@ void ScNodeDisplay::setRootIndex(SEntity *i)
 void ScNodeDisplay::setTopRootIndex(const QModelIndex& i)
   {
   SProperty *p = (SProperty*)i.internalPointer();
+  setTopRootIndex(p);
+  }
+
+void ScNodeDisplay::setTopRootIndex(SProperty *p)
+  {
   _topRootIndex = p->entity();
   emit topRootIndexChanged();
+
+  if(!_rootIndex->isDescendedFrom(_topRootIndex))
+    {
+    setRootIndex(_topRootIndex.entity());
+    }
   }
 
 QModelIndex ScNodeDisplay::topRootIndex() const

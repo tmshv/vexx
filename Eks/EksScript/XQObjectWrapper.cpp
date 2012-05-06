@@ -643,7 +643,7 @@ struct Utils
     int id = XScriptConvert::from<int>(fromHandle(info.Data()));
     QMetaProperty prop(ths->metaObject()->property(id));
 
-#ifdef X_DEBUG
+#ifdef X_TYPE_DEBUG
     xAssert(prop.isValid());
     const char *name = prop.name();
     (void)name;
@@ -676,7 +676,7 @@ struct Utils
   static v8::Handle<v8::Value> methodCall(QObject *ths, int id, const v8::Arguments& args)
     {
     QMetaMethod method = ths->metaObject()->method(id);
-#ifdef X_DEBUG
+#ifdef X_TYPE_DEBUG
     const char *name = method.signature();
     (void)name;
 #endif
@@ -931,6 +931,10 @@ struct Utils
     v8::Handle<v8::Object> calleeThis = getV8Internal(xArgs.callee());
     QObject *object = (QObject *)calleeThis->Get(0).As<v8::External>()->Value();
     int id = calleeThis->Get(1)->Int32Value();
+#ifdef X_TYPE_DEBUG
+    const char* name = object->metaObject()->method(id).signature();
+    (void)name;
+#endif
 
     union
       {

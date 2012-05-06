@@ -61,7 +61,8 @@ OTHER_FILES += \
     startupTang.js \
     Components/SteelPlate.json.js \
     Components/SteelPlate.json \
-    ViewportContextMenu.js
+    ViewportContextMenu.js \
+    NodeEditor.js
 
 
 

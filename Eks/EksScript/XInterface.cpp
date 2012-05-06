@@ -115,7 +115,7 @@ QVariant XInterfaceBase::toVariant(const XScriptValue &inp, int typeHint)
     {
     const void *val = _fromScript(inp);
 
-    if(typeHint == _typeId)
+    if(typeHint == _typeId || typeHint == 0)
       {
       return QVariant(_typeId, &val);
       }

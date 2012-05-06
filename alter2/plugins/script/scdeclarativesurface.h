@@ -24,6 +24,7 @@ public slots:
 
 signals:
   void emitRequest(const QString &, const QVariantList &);
+  void sendRequest(const QString &, const QVariantList &);
   void focusLost();
 
 protected:

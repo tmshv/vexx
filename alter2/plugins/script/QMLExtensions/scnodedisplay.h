@@ -48,6 +48,7 @@ public:
   void setRootIndex(SEntity *);
   QModelIndex rootIndex() const;
   void setTopRootIndex(const QModelIndex& );
+  Q_INVOKABLE void setTopRootIndex(SProperty *);
   QModelIndex topRootIndex() const;
 
   QDeclarativeComponent *input() const;

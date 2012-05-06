@@ -361,7 +361,15 @@ QVariant XScriptValue::toVariant(int typeHint) const
     {
     return toBoolean();
     }
-  if(typeHint == QVariant::String || internal->_object->IsString())
+  else if(typeHint == QVariant::Int || internal->_object->IsInt32())
+    {
+    return toInteger();
+    }
+  else if(typeHint == QVariant::Double || internal->_object->IsNumber())
+    {
+    return toNumber();
+    }
+  else if(typeHint == QVariant::String || internal->_object->IsString())
     {
     return toString();
     }

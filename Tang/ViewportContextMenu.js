@@ -1,3 +1,5 @@
+script.include("ViewportContextMenu.js")
+
 function popupViewportContextMenu(pos, window)
   {
   isComponent = function(obj)

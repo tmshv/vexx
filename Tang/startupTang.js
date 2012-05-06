@@ -1,5 +1,6 @@
 script.includeFolder("Components")
 script.include("ViewportContextMenu.js")
+script.include("NodeEditor.js")
 
 db.types.Component.prototype.addInstance = function(shaderGroup)
   {
@@ -49,6 +50,8 @@ tang.mainScene.renderGroup.addPointer(shadingGroup);
 var shader = tang.mainArea.shaders.add(db.types.StandardSurface, "Shader");
 shadingGroup.shader.input = shader;
 
+
+setupNodeEditor(tang.mainArea);
 
 
 // create a new component document and pop it up.

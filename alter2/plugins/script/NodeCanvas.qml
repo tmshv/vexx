@@ -401,6 +401,24 @@ Rectangle
     currentInputDraggingItem = null;
     }
 
+  function setTopRootIndex(idx)
+    {
+    print("1", display)
+    print("2", display.setTopRootIndex);
+    print("IDX>> ", idx);
+    display.setTopRootIndex(idx);
+    }
+
+
+  Component.onCompleted: {
+    external.sendRequest.connect(
+      function(thing, args){
+            print(thing, args);
+        nodecanvas[thing].apply(this, args);
+      }
+    )
+  }
+
   MouseAndScrollArea {
     id: mouseArea
 

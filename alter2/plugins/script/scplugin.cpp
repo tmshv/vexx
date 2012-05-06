@@ -220,14 +220,26 @@ bool ScPlugin::loadPlugin(const QString &plugin)
 void ScPlugin::includePath(const QString &filename)
   {
   ScProfileFunction
-  bool result = executeFile(filename);
-  if(result)
+
+  QFileInfo fInfo(filename);
+  QString basePath = fInfo.canonicalFilePath();
+
+  if(!_includedFiles.contains(basePath))
     {
-    qDebug() << " Include File" << filename << " ... Success";
+    _includedFiles << basePath;
+    bool result = executeFile(filename);
+    if(result)
+      {
+      qDebug() << " Include File" << basePath << " ... Success";
+      }
+    else
+      {
+      qWarning() << " Include File" << basePath << " ... Failure";
+      }
     }
   else
     {
-    qWarning() << " Include File" << filename << " ... Failure";
+    qDebug() << " Already Included File" << basePath << " ... Success";
     }
   }
 

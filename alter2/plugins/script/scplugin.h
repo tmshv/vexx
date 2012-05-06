@@ -6,6 +6,8 @@
 #include "styperegistry.h"
 
 #include "styperegistry.h"
+#include "QSet"
+
 class ScCoreObject;
 class XScriptEngine;
 class ScObject;
@@ -76,6 +78,8 @@ private:
   ScSurface *_surface;
 
   SDatabaseModel *_model;
+
+  QSet <QString> _includedFiles;
   };
 
 #endif // SCPLUGIN_H
