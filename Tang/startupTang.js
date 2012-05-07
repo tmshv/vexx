@@ -1,10 +1,9 @@
 script.includeFolder("Components")
 script.include("ViewportContextMenu.js")
-script.include("NodeEditor.js")
 
-db.types.Component.prototype.addInstance = function(shaderGroup)
+db.types.GCRenderArray.prototype.addInstance = function(renderable)
   {
-  shaderGroup.renderGroup.addPointer(this);
+  this.renderGroup.addPointer(renderable);
   }
 
 
@@ -14,44 +13,18 @@ ui.addDock("Viewport", viewportWidget);
 
 tang.mainViewport = viewportWidget;
 
-var createBasicScene = function(viewportWidget)
-  {
-  var dbViewport = viewportWidget.viewport();
+script.include("Scene.js");
+tang.mainScene = new Scene(viewportWidget);
 
-  var cam = dbViewport.addChild(db.types.GCPerspectiveCamera, "Camera");
-  cam.viewportX.input = dbViewport.x;
-  cam.viewportY.input = dbViewport.y;
-  cam.viewportWidth.input = dbViewport.width;
-  cam.viewportHeight.input = dbViewport.height;
+script.include("MainAreaDocument.js");
+tang.mainAreaDocument = new MainAreaDocument();
 
-  cam.setPosition(0.0, 0.0, 10.0);
-  cam.setFocalPoint(0.0, 0.0, 0.0);
+print(tang.mainAreaDocument.newFile);
 
-  var msc = dbViewport.addChild(db.types.GCManipulatableScene,"Scene");
+tang.mainAreaDocument.addRenderables(tang.mainScene);
 
-  msc.setCamera(cam);
-  viewportWidget.setScene(msc);
-
-  return msc;
-  }
-
-tang.mainScene = createBasicScene(viewportWidget);
-
-
-// create a new component document and pop it up.
-tang.mainAreaDocument = db.addDocument(db.types.AreaDocument);
-tang.mainAreaDocument.newFile();
-
-// get the area from the doc
-tang.mainArea = tang.mainAreaDocument.children[0];
-var shadingGroup = tang.mainArea.shaderGroups.add(db.types.GCShadingGroup, "Groups");
-tang.mainScene.renderGroup.addPointer(shadingGroup);
-
-var shader = tang.mainArea.shaders.add(db.types.StandardSurface, "Shader");
-shadingGroup.shader.input = shader;
-
-
-setupNodeEditor(tang.mainArea);
+script.include("NodeEditor.js");
+tang.nodeEditor = NodeEditor(tang.mainAreaDocument.area);
 
 
 // create a new component document and pop it up.

@@ -99,6 +99,21 @@ db.addType({
 
   */
 
+db.types.SProperty.prototype.undoBlock = function(fn)
+  {
+  this.beginBlock();
+  try
+    {
+    fn();
+    }
+  catch(e)
+    {
+    this.endBlock(false);
+    throw e;
+    }
+  this.endBlock(false);
+  }
+
 db.types.SProperty.prototype.cancelBlock = function(fn)
   {
   this.beginBlock();

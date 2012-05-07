@@ -410,7 +410,6 @@ Rectangle
   Component.onCompleted: {
     external.sendRequest.connect(
       function(thing, args){
-            print(thing, args);
         nodecanvas[thing].apply(this, args);
       }
     )

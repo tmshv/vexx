@@ -1,4 +1,3 @@
-
 function popupViewportContextMenu(pos, window)
   {
   isComponent = function(obj)
@@ -81,26 +80,26 @@ function popupViewportContextMenu(pos, window)
       },
     instanceComponent: function(data)
       {
-      if(tang.mainArea.shaderGroups.length)
+      if(tang.mainAreaDocument.area.shaderGroups.length)
         {
-        var shadingGroup = tang.mainArea.shaderGroups[0];
-        var comp = tang.mainArea.addChild(data, "NewComponent");
-        comp.addInstance(shadingGroup);
+        var shadingGroup = tang.mainAreaDocument.area.shaderGroups[0];
+        var comp = tang.mainAreaDocument.area.addChild(data, "NewComponent");
+        shadingGroup.addInstance(comp);
         }
       },
     newFile: function()
       {
-      tang.mainAreaDocument.newFile();
+      tang.mainAreaDocument.document.newFile();
       },
     saveFile: function()
       {
-                var filename = "";
-      tang.mainAreaDocument.saveFile(filename);
+                var filename = "../Tang/area.area";
+      tang.mainAreaDocument.document.saveFile(filename);
       },
     loadFile: function()
       {
-                var filename = "";
-      tang.mainAreaDocument.loadFile(filename);
+                var filename = "../Tang/area.area";
+      tang.mainAreaDocument.document.loadFile(filename);
       },
 
     create: function(data)
@@ -123,3 +122,5 @@ function popupViewportContextMenu(pos, window)
   contextMenu.surface.setPosition(mapped.x, mapped.y);
   contextMenu.surface.show();
   }
+
+var a = null;

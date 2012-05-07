@@ -62,7 +62,9 @@ OTHER_FILES += \
     Components/SteelPlate.json.js \
     Components/SteelPlate.json \
     ViewportContextMenu.js \
-    NodeEditor.js
+    NodeEditor.js \
+    MainAreaDocument.js \
+    Scene.js
 
 
 

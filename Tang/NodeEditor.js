@@ -1,23 +1,23 @@
 script.include("ViewportContextMenu.js")
 
-setupNodeEditor = function(topLevel)
+function NodeEditor(topLevel)
   {
-  var surfaceManager =
-    {
-    surface: script.addQMLSurface("NodeEditor", "Dock", "../alter2/plugins/script/NodeCanvas.qml", {}),
-    passIn: function(name, argsIn)
-      {
-      assert(this[name]);
-      this[name].apply(this, argsIn);
-      },
-    contextMenu: function(x, y, path)
-      {
-      popupViewportContextMenu(new Point(x, y), this.surface, path);
-      }
-    }
-  surfaceManager.surface.emitRequest.connect(surfaceManager, surfaceManager.passIn);
+  this.surface = script.addQMLSurface("NodeEditor", "Dock", "../alter2/plugins/script/NodeCanvas.qml", {});
 
-  surfaceManager.surface.sendRequest("setTopRootIndex", [ topLevel ]);
+  var passIn = function(name, argsIn)
+    {
+    assert(this[name]);
+    this[name].apply(this, argsIn);
+    };
+
+  this.contextMenu = function(x, y, path)
+    {
+    popupViewportContextMenu(new Point(x, y), this.surface, path);
+    }
+
+  this.surface.emitRequest.connect(this, passIn);
+
+  this.surface.sendRequest("setTopRootIndex", [ topLevel ]);
   }
 
 

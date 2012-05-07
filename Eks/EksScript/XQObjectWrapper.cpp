@@ -5,6 +5,9 @@
 #include "QVarLengthArray"
 #include "XFunctions.h"
 
+#ifdef X_DEBUG
+# define X_TYPE_DEBUG
+#endif
 
 class XQObjectConnectionList : public QObject
   {

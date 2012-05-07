@@ -65,7 +65,7 @@ void SHandler::endBlock(bool cancel)
 void SHandler::undoTo(xsize p)
   {
   xAssert(p <= (xsize)_done.size());
-  for(xsize i=((xsize)_done.size()-1); i>=p; --i)
+  for(xptrdiff i=(_done.size()-1); i>=(xptrdiff)p; --i)
     {
     SChange *c = _done[i];
 
