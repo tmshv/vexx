@@ -99,6 +99,11 @@ public:
       }
     return false;
     }
+
+  void clear()
+    {
+    SPropertyContainer::clear();
+    }
   };
 
 
@@ -158,6 +163,10 @@ template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInfor
 
 
     XInterfaceBase::Function fn;
+    fn = XScript::MethodToInCa<TypedPointerArray<TYPE>, void (), &T::clear>::Call;
+    api->addFunction("clear", fn);
+
+    fn;
     fn = XScript::MethodToInCa<TypedPointerArray<TYPE>, TYPE *(const PtrType *), &T::addPointer>::Call;
     api->addFunction("addPointer", fn);
 

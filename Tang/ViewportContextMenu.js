@@ -84,7 +84,7 @@ function popupViewportContextMenu(pos, window)
         {
         var shadingGroup = tang.mainAreaDocument.area.shaderGroups[0];
         var comp = tang.mainAreaDocument.area.addChild(data, "NewComponent");
-        shadingGroup.addInstance(comp);
+        comp.addInstanceTo(shadingGroup);
         }
       },
     newFile: function()
@@ -123,4 +123,3 @@ function popupViewportContextMenu(pos, window)
   contextMenu.surface.show();
   }
 
-var a = null;

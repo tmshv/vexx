@@ -1,6 +1,6 @@
 script.include("ViewportContextMenu.js")
 
-function NodeEditor(topLevel)
+function NodeEditor()
   {
   this.surface = script.addQMLSurface("NodeEditor", "Dock", "../alter2/plugins/script/NodeCanvas.qml", {});
 
@@ -10,14 +10,15 @@ function NodeEditor(topLevel)
     this[name].apply(this, argsIn);
     };
 
-  this.contextMenu = function(x, y, path)
-    {
-    popupViewportContextMenu(new Point(x, y), this.surface, path);
-    }
-
   this.surface.emitRequest.connect(this, passIn);
-
-  this.surface.sendRequest("setTopRootIndex", [ topLevel ]);
   }
 
+NodeEditor.prototype.contextMenu = function(x, y, path)
+  {
+  popupViewportContextMenu(new Point(x, y), this.surface, path);
+  }
 
+NodeEditor.prototype.setViewed = function(topLevel)
+  {
+  this.surface.sendRequest("setTopRootIndex", [ topLevel.renderable ]);
+  }

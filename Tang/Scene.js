@@ -17,9 +17,11 @@ function Scene(viewportWidget)
 
   this.scene.setCamera(cam);
   viewportWidget.setScene(this.scene);
+  }
 
-  this.addInstance = function(renderable)
-     {
-     this.scene.renderGroup.addPointer(renderable);
-     }
+
+Scene.prototype.setViewed = function(renderable)
+  {
+  tang.mainScene.scene.renderGroup.clear();
+  renderable.addInstanceTo(tang.mainScene.scene);
   }

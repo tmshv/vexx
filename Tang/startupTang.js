@@ -1,11 +1,10 @@
 script.includeFolder("Components")
 script.include("ViewportContextMenu.js")
 
-db.types.GCRenderArray.prototype.addInstance = function(renderable)
+db.types.GCRenderable.prototype.addInstanceTo = function(renderArray)
   {
-  this.renderGroup.addPointer(renderable);
+  renderArray.renderGroup.addPointer(this);
   }
-
 
 var viewportWidget = tang.createViewport();
 viewportWidget.setContextMenuHandler(viewportWidget, function(pos) { popupViewportContextMenu(pos, this) });
@@ -19,12 +18,10 @@ tang.mainScene = new Scene(viewportWidget);
 script.include("MainAreaDocument.js");
 tang.mainAreaDocument = new MainAreaDocument();
 
-print(tang.mainAreaDocument.newFile);
-
-tang.mainAreaDocument.addRenderables(tang.mainScene);
-
 script.include("NodeEditor.js");
-tang.nodeEditor = NodeEditor(tang.mainAreaDocument.area);
+tang.nodeEditor = new NodeEditor();
+tang.mainAreaDocument.addViewer(tang.nodeEditor);
+tang.mainAreaDocument.addViewer(tang.mainScene);
 
 
 // create a new component document and pop it up.

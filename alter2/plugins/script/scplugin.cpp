@@ -390,7 +390,15 @@ bool ScPlugin::execute(const QString &filename, const QString &code)
     }
   else
     {
-    qDebug() << "Script Returned: " << ret.toString();
+    XScriptFunction fn(ret);
+    if(!fn.isValid())
+      {
+      qDebug() << "Script Returned: " << ret.toString();
+      }
+    else
+      {
+      qDebug() << "Script Returned: [function Function]";
+      }
     }
   return true;
   }
