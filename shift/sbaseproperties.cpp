@@ -2,6 +2,52 @@
 #include "styperegistry.h"
 #include "sdatabase.h"
 
+QTextStream &operator<<(QTextStream &s, xuint8 v)
+  {
+  return s << (xuint32)v;
+  }
+
+QTextStream &operator>>(QTextStream &s, xuint8 &v)
+  {
+  xuint32 t;
+  s >> t;
+  v = (xuint8)t;
+  return s;
+  }
+
+QTextStream &operator>>(QTextStream &s, SStringVector &v)
+  {
+  v.clear();
+  QString temp;
+  bool found = true;
+  while(found)
+    {
+    found = false;
+
+    QChar brak;
+    s >> brak;
+    if(brak != "\"")
+      {
+      break;
+      }
+
+    }
+  return s;
+  }
+
+QTextStream &operator<<(QTextStream &s, const SStringVector &v)
+  {
+  for(int i=0, s=v.size(); i<s; ++i)
+    {
+    s << "\"" << v[i] << "\"";
+    if(i<(s-1))
+      {
+      s << ", ";
+      }
+    }
+  return s;
+  }
+
 IMPLEMENT_POD_PROPERTY(BoolProperty);
 IMPLEMENT_POD_PROPERTY(IntProperty);
 IMPLEMENT_POD_PROPERTY(LongIntProperty);
@@ -16,6 +62,8 @@ IMPLEMENT_POD_PROPERTY(QuaternionProperty);
 IMPLEMENT_POD_PROPERTY(StringPropertyBase);
 IMPLEMENT_POD_PROPERTY(ColourProperty);
 IMPLEMENT_POD_PROPERTY(ByteArrayProperty);
+
+IMPLEMENT_POD_PROPERTY(StringArrayProperty);
 
 S_IMPLEMENT_PROPERTY(StringProperty)
 
@@ -628,6 +676,11 @@ void StringPropertyBase::assignProperty(const SProperty *f, SProperty *t)
   }
 
 void ByteArrayProperty::assignProperty(const SProperty *, SProperty *)
+  {
+  xAssertFail();
+  }
+
+void StringArrayProperty::assignProperty(const SProperty *, SProperty *)
   {
   xAssertFail();
   }

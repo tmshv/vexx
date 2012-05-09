@@ -17,6 +17,12 @@ public:
   Q_INVOKABLE QString getOpenFilename(const QString& fileType);
   Q_INVOKABLE QString getSaveFilename(const QString& fileType);
 
+  enum
+    {
+    MaxRecentFiles = 10
+    };
+  Q_INVOKABLE QStringList getRecentFileList() const;
+
   Q_INVOKABLE void addDock(QString name, QWidget *w);
   void addSurface(UISurface *surface);
   void removeSurface(QString name);
@@ -35,6 +41,7 @@ private:
 
   void setLastUsedDirectoryFromFile(const QString &fName);
   QString lastUsedDirectory() const;
+  void addRecentFile(const QString &file);
 
   UIPluginPrivate *_priv;
   friend class UIPluginPrivate;

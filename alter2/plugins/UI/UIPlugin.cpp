@@ -198,15 +198,49 @@ void UIPlugin::removeSurface(UISurface *s)
 QString UIPlugin::getOpenFilename(const QString& fileType)
   {
   QString str = QFileDialog::getOpenFileName(_priv, QObject::tr("Open File"), lastUsedDirectory(), fileType);
-  setLastUsedDirectoryFromFile(str);
+  if(str != "")
+    {
+    setLastUsedDirectoryFromFile(str);
+    addRecentFile(str);
+    }
   return str;
   }
 
 QString UIPlugin::getSaveFilename(const QString& fileType)
   {
   QString str = QFileDialog::getSaveFileName(_priv, QObject::tr("Save File"), lastUsedDirectory(), fileType);
-  setLastUsedDirectoryFromFile(str);
+  if(str != "")
+    {
+    setLastUsedDirectoryFromFile(str);
+    addRecentFile(str);
+    }
   return str;
+  }
+
+QStringList UIPlugin::getRecentFileList() const
+  {
+  APlugin<SPlugin> plugin(const_cast<UIPlugin*>(this), "db");
+  if(plugin.isValid())
+    {
+    return plugin->setting<QStringList>("document", "recentFiles");
+    }
+  return QString();
+  }
+
+void UIPlugin::addRecentFile(const QString &file)
+  {
+  APlugin<SPlugin> plugin(this, "db");
+  if(plugin.isValid())
+    {
+    QStringList recentFiles = getRecentFileList();
+    recentFiles.prepend(file);
+    if(recentFiles.size() > MaxRecentFiles)
+      {
+      recentFiles.resize(MaxRecentFiles);
+      }
+
+    plugin->setSetting<QStringList>("document", "recentFiles", recentFiles);
+    }
   }
 
 QString UIPlugin::lastUsedDirectory() const

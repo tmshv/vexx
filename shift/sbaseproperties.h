@@ -14,21 +14,15 @@
 #include "sinterfaces.h"
 #include "QByteArray"
 
-namespace
-{
-QTextStream &operator<<(QTextStream &s, xuint8 v)
-  {
-  return s << (xuint32)v;
-  }
+typedef QVector<QString> SStringVector;
+Q_DECLARE_METATYPE(SStringVector)
 
-QTextStream &operator>>(QTextStream &s, xuint8 &v)
-  {
-  xuint32 t;
-  s >> t;
-  v = (xuint8)t;
-  return s;
-  }
-}
+SHIFT_EXPORT QTextStream &operator<<(QTextStream &s, xuint8 v);
+SHIFT_EXPORT QTextStream &operator>>(QTextStream &s, xuint8 &v);
+
+SHIFT_EXPORT QTextStream &operator>>(QTextStream &s, SStringVector &);
+SHIFT_EXPORT QTextStream &operator<<(QTextStream &s, const SStringVector &v);
+
 
 template <typename T>
 class SPODInterface
@@ -339,6 +333,8 @@ DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringPropertyBase, QString, "", 111);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ColourProperty, XColour, XColour(0.0f, 0.0f, 0.0f, 1.0f), 112);
 DEFINE_POD_PROPERTY(SHIFT_EXPORT, ByteArrayProperty, QByteArray, QByteArray(), 113);
 
+DEFINE_POD_PROPERTY(SHIFT_EXPORT, StringArrayProperty, SStringVector, SStringVector(), 114);
+
 class SHIFT_EXPORT StringProperty : public StringPropertyBase
   {
 public:
@@ -385,6 +381,15 @@ S_PROPERTY_INTERFACE(FilenameProperty)
 template <> class SPODInterface <bool> { public: typedef BoolProperty Type; \
   static void assign(BoolProperty* s, const bool &val) { s->assign(val); } \
   static const xuint8 &value(const BoolProperty* s) { return s->value(); } };
+
+template <> class SPODInterface <QStringList>
+  {
+public:
+  typedef StringArrayProperty Type;
+
+  static void assign(StringArrayProperty* s, const QStringList &val) { s->assign(val.toVector()); }
+  static QStringList value(const StringArrayProperty* s) { return QStringList::fromVector(s->value()); }
+  };
 
 
 
