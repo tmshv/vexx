@@ -51,10 +51,11 @@ function MainAreaDocument()
     var oldFn = document.loadFile;
     return function()
       {
+      var mainArguments = arguments;
       document.undoBlock(
         function()
           {
-          oldFn.apply(document, arguments);
+          oldFn.apply(document, mainArguments);
 
           updateInternal(objToAddTo);
         });

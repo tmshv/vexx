@@ -104,18 +104,39 @@ function popupViewportContextMenu(pos, window)
         filename = ui.getSaveFilename("Area File (*.jsarea)");
         }
 
-      tang.mainAreaDocument.document.saveFile(filename);
+      if(filename !== "")
+        {
+        tang.mainAreaDocument.document.saveFile(filename);
+        }
+      else
+        {
+        print("Save Cancelled");
+        }
       },
     saveFileAs: function()
       {
       var filename = ui.getSaveFilename("Area File (*.jsarea)");
-      tang.mainAreaDocument.document.saveFile(filename);
+      if(filename !== "")
+        {
+        tang.mainAreaDocument.document.saveFile(filename);
+        }
+      else
+        {
+        print("Save Cancelled");
+        }
       },
     loadFile: function()
       {
       var filename = ui.getOpenFilename("Area File (*.jsarea)");
-                print("Load file", filename);
-      tang.mainAreaDocument.document.loadFile(filename);
+      if(filename !== "")
+        {
+        print("Load file", filename);
+        tang.mainAreaDocument.document.loadFile(filename);
+        }
+      else
+        {
+        print("Load Cancelled");
+        }
       },
 
     create: function(data)
