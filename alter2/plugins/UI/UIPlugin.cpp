@@ -19,6 +19,8 @@
 #include "UIGraphDebugSurface.h"
 #include "UIProfilerSurface.h"
 #include "UIEventLoggerSurface.h"
+#include "QFileDialog"
+#include "splugin.h"
 
 ALTER_PLUGIN(UIPlugin);
 
@@ -191,4 +193,39 @@ void UIPlugin::removeSurface(UISurface *s)
   {
   _priv->_surfaces.removeAll(s);
   s->privateData()->setPlugin(0);
+  }
+
+QString UIPlugin::getOpenFilename(const QString& fileType)
+  {
+  QString str = QFileDialog::getOpenFileName(_priv, QObject::tr("Open File"), lastUsedDirectory(), fileType);
+  setLastUsedDirectoryFromFile(str);
+  return str;
+  }
+
+QString UIPlugin::getSaveFilename(const QString& fileType)
+  {
+  QString str = QFileDialog::getSaveFileName(_priv, QObject::tr("Save File"), lastUsedDirectory(), fileType);
+  setLastUsedDirectoryFromFile(str);
+  return str;
+  }
+
+QString UIPlugin::lastUsedDirectory() const
+  {
+  APlugin<SPlugin> plugin(const_cast<UIPlugin*>(this), "db");
+  if(plugin.isValid())
+    {
+    return plugin->setting<QString>("document", "lastUsedDirectory");
+    }
+  return QString();
+  }
+
+void UIPlugin::setLastUsedDirectoryFromFile(const QString &fName)
+  {
+  APlugin<SPlugin> plugin(this, "db");
+  if(plugin.isValid())
+    {
+    QFileInfo file(fName);
+    QDir dir = file.absoluteDir();
+    plugin->setSetting<QString>("document", "lastUsedDirectory", dir.absolutePath());
+    }
   }

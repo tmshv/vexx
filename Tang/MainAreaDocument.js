@@ -7,6 +7,18 @@ function MainAreaDocument()
   newObj.viewers = [];
   newObj.renderable = null;
 
+  var updateInternal = function(objToAddTo)
+  {
+  // get the area from the doc
+  objToAddTo.area = objToAddTo.document.children[0];
+  objToAddTo.renderable = objToAddTo.area;
+
+  for(var i=0; i<objToAddTo.viewers.length; ++i)
+    {
+    objToAddTo.viewers[i].setViewed(objToAddTo);
+    }
+  }
+
   mainAreaDocumentNewFileBuilder = function(objToAddTo)
     {
     var document = objToAddTo.document;
@@ -16,25 +28,41 @@ function MainAreaDocument()
       document.undoBlock(
         function()
           {
-          oldFn.apply(document);
+          oldFn.apply(document, arguments);
 
           // get the area from the doc
-          objToAddTo.area = document.children[0];
-          objToAddTo.renderable = objToAddTo.area;
-          var shadingGroup = objToAddTo.area.shaderGroups.add(db.types.GCShadingGroup, "Groups");
+          var area = document.children[0];
 
-          var shader = objToAddTo.area.shaders.add(db.types.StandardSurface, "Shader");
+          var shadingGroup = area.shaderGroups.add(db.types.GCShadingGroup, "Groups");
+          var shader = area.shaders.add(db.types.StandardSurface, "Shader");
           shadingGroup.shader.input = shader;
 
-          for(var i=0; i<objToAddTo.viewers.length; ++i)
-            {
-            objToAddTo.viewers[i].setViewed(objToAddTo);
-            }
+          updateInternal(objToAddTo);
         });
       }
     }
 
   newObj.document.newFile = mainAreaDocumentNewFileBuilder(newObj);
+
+
+  mainAreaDocumentLoadFileBuilder = function(objToAddTo)
+    {
+    var document = objToAddTo.document;
+    var oldFn = document.loadFile;
+    return function()
+      {
+      document.undoBlock(
+        function()
+          {
+          oldFn.apply(document, arguments);
+
+          updateInternal(objToAddTo);
+        });
+      }
+    }
+
+  newObj.document.loadFile = mainAreaDocumentLoadFileBuilder(newObj);
+
   newObj.document.newFile();
   }
 

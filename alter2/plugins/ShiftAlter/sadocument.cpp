@@ -78,7 +78,7 @@ void SDocument::loadFile(const QString &f)
   QFile file(f);
   if(!file.open(QIODevice::ReadOnly))
     {
-    qWarning() << "Failed to open file for reading '" << filename() << "'";
+    qWarning() << "Failed to open file for reading '" << f << "'";
     return;
     }
 

@@ -14,6 +14,9 @@ class UI_EXPORT UIPlugin : public AAbstractPlugin
 public:
   UIPlugin();
 
+  Q_INVOKABLE QString getOpenFilename(const QString& fileType);
+  Q_INVOKABLE QString getSaveFilename(const QString& fileType);
+
   Q_INVOKABLE void addDock(QString name, QWidget *w);
   void addSurface(UISurface *surface);
   void removeSurface(QString name);
@@ -29,6 +32,9 @@ signals:
 private:
   virtual void load();
   virtual void unload();
+
+  void setLastUsedDirectoryFromFile(const QString &fName);
+  QString lastUsedDirectory() const;
 
   UIPluginPrivate *_priv;
   friend class UIPluginPrivate;

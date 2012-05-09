@@ -1,83 +1,88 @@
 function popupViewportContextMenu(pos, window)
   {
-  isComponent = function(obj)
-    {
-    if(!obj.prototype)
+  function buildTypeData()
+  {
+    isComponent = function(obj)
       {
+      if(!obj.prototype)
+        {
+        return false;
+        }
+      var proto = obj.prototype.__proto__;
+
+      while(proto)
+        {
+        if(proto.typeName === db.types.Component.typeName)
+          {
+          return true;
+          }
+
+        if(!proto.prototype)
+          {
+          break;
+          }
+
+        proto = proto.prototype.__proto__;
+        }
       return false;
       }
-    var proto = obj.prototype.__proto__;
 
-    while(proto)
+    var typesData = [
       {
-      if(proto.typeName === db.types.Component.typeName)
-        {
-        return true;
-        }
-
-      if(!proto.prototype)
-        {
-        break;
-        }
-
-      proto = proto.prototype.__proto__;
-      }
-    return false;
-    }
-
-  var typesData = [
-    {
-      name: "Cube",
-      description: "",
-      request: "instanceComponent",
-      requestData: [ "MCCuboid" ]
-    }
-  ];
-
-  for(name in db.types)
-    {
-    var type = db.types[name];
-    if(isComponent(type))
-      {
-      typesData.push({
-        name: type.typeName,
+        name: "Cube",
         description: "",
         request: "instanceComponent",
-        requestData: [ type.typeName ]
-        });
+        requestData: [ "MCCuboid" ]
+      }
+    ];
+
+    for(name in db.types)
+    {
+      var type = db.types[name];
+      if(isComponent(type))
+      {
+        typesData.push({
+          name: type.typeName,
+          description: "",
+          request: "instanceComponent",
+          requestData: [ type.typeName ]
+          });
       }
     }
+
+    return typesData;
+  }
 
   var menuContents =
     [
       {
       name: "Create",
       description: "Create an object",
-      children: typesData
+      children: buildTypeData()
       },
       {
       name: "New File",
       request: "newFile"
       },
       {
+      name: "Load File",
+      request: "loadFile"
+      },
+      {
       name: "Save File",
       request: "saveFile"
       },
       {
-      name: "Load File",
-      request: "loadFile"
+      name: "Save File As",
+      request: "saveFileAs"
       }
     ];
 
+  var surface = script.addQMLWindow("../alter2/plugins/script/NodeCanvasContextMenu.qml",
+                                    { transparent: true, tool: true, focusPolicy: "strong", menuContents: menuContents });
+
   var contextMenu =
     {
-    surface: script.addQMLWindow("../alter2/plugins/script/NodeCanvasContextMenu.qml",
-                                 { transparent: true, tool: true, focusPolicy: "strong", menuContents: menuContents }),
-    passIn: function(name, argsIn)
-      {
-      assert(this[name]);
-      this[name].apply(this, argsIn);
-      },
     instanceComponent: function(data)
       {
       if(tang.mainAreaDocument.area.shaderGroups.length)
@@ -93,12 +98,23 @@ function popupViewportContextMenu(pos, window)
       },
     saveFile: function()
       {
-                var filename = "../Tang/area.area";
+      var filename = tang.mainAreaDocument.document.filename.value;
+      if(filename === "")
+        {
+        filename = ui.getSaveFilename("Area File (*.jsarea)");
+        }
+
+      tang.mainAreaDocument.document.saveFile(filename);
+      },
+    saveFileAs: function()
+      {
+      var filename = ui.getSaveFilename("Area File (*.jsarea)");
       tang.mainAreaDocument.document.saveFile(filename);
       },
     loadFile: function()
       {
-                var filename = "../Tang/area.area";
+      var filename = ui.getOpenFilename("Area File (*.jsarea)");
+                print("Load file", filename);
       tang.mainAreaDocument.document.loadFile(filename);
       },
 
@@ -117,9 +133,28 @@ function popupViewportContextMenu(pos, window)
       parent.addChild(data, data);
       }
     }
-  contextMenu.surface.emitRequest.connect(contextMenu, contextMenu.passIn);
+
+  var toFire = "";
+  var toFireArgs = { };
+
+  var passIn = function(name, argsIn)
+    {
+    toFire = name;
+    toFireArgs = argsIn;
+    }
+
+  var passInTrigger = function()
+    {
+    if(contextMenu[toFire])
+      {
+      contextMenu[toFire].apply(contextMenu, toFireArgs);
+      }
+    }
+  surface.emitRequest.connect(passIn);
+  surface.destroyed.connect(passInTrigger);
+
   var mapped = window.mapToGlobal(pos);
-  contextMenu.surface.setPosition(mapped.x, mapped.y);
-  contextMenu.surface.show();
+  surface.setPosition(mapped.x, mapped.y);
+  surface.show();
   }
 
