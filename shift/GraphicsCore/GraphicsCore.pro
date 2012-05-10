@@ -33,7 +33,9 @@ HEADERS += GCGlobal.h \
     3D/Manipulators/GCTranslateManipulator.h \
     3D/Shaders/GCStandardSurface.h \
     3D/GCShaderDataBindings.h \
-    3D/GCTexture.h
+    3D/GCTexture.h \
+    GCComposeTransform.h \
+    GCComposeVector3.h
 
 INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript $$ROOT/Eks/Eks3D/include $$ROOT/Shift
 
@@ -62,7 +64,9 @@ SOURCES += \
     3D/Manipulators/GCTranslateManipulator.cpp \
     3D/Shaders/GCStandardSurface.cpp \
     3D/GCShaderDataBindings.cpp \
-    3D/GCTexture.cpp
+    3D/GCTexture.cpp \
+    GCComposeTransform.cpp \
+    GCComposeVector3.cpp
 
 
 

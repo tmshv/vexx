@@ -4,6 +4,7 @@
 #include "sdatabase.h"
 #include "XLine.h"
 #include "XFrustum.h"
+#include "XRenderer.h"
 
 S_IMPLEMENT_PROPERTY(GCTransform)
 
@@ -18,6 +19,13 @@ void GCTransform::createTypeInformation(SPropertyInformation *info, const SPrope
 
 GCTransform::GCTransform()
   {
+  }
+
+void GCTransform::render(XRenderer *r) const
+  {
+  r->pushTransform(transform());
+  GCRenderArray::render(r);
+  r->popTransform();
   }
 
 void GCTransform::addManipulators(SPropertyArray *a, const GCTransform *tr)

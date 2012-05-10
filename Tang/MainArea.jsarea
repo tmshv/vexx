@@ -20,7 +20,83 @@
                   "name":"__position",
                   "dynamic":"1",
                   "mode":"internal",
-                  "__V":"-101 108 0"
+                  "__V":"-555 38 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCComposeVector3",
+              "name":"GCComposeVector3",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"FloatProperty",
+                  "name":"xIn",
+                  "__V":"1.2"
+                },
+                {
+                  "__T":"FloatProperty",
+                  "name":"yIn",
+                  "__V":"1.2"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-298 89 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCComposeTransform",
+              "name":"GCComposeTransform",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"translationIn",
+                  "input":"..\/..\/GCComposeVector3\/vectorOut",
+                  "__V":"1.2 1.2 0"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-118 106 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCTransform",
+              "name":"NewComponent1",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"GCRenderablePointerArray",
+                  "name":"renderGroup",
+                  "__H":[
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"1",
+                      "dynamic":"1",
+                      "input":"..\/..\/..\/NewComponent"
+                    }
+                  ]
+                },
+                {
+                  "__T":"TransformProperty",
+                  "name":"transform",
+                  "input":"..\/..\/GCComposeTransform\/transformOut",
+                  "__V":"1001.2 0101.2 0010 0 0 0 1"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"60 22 0"
                 }
               ]
             }
@@ -53,8 +129,13 @@
                     {
                       "__T":"GCRenderablePointer",
                       "name":"1",
+                      "dynamic":"1"
+                    },
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"2",
                       "dynamic":"1",
-                      "input":"..\/..\/..\/..\/children\/NewComponent"
+                      "input":"..\/..\/..\/..\/children\/NewComponent1"
                     }
                   ]
                 },

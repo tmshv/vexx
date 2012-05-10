@@ -1,5 +1,6 @@
 function popupViewportContextMenu(pos, window)
   {
+
   function buildTypeData()
   {
     isComponent = function(obj)
@@ -29,14 +30,27 @@ function popupViewportContextMenu(pos, window)
 
     var typesData = [
       {
+        name: "Utilities",
+        children: [
+          {
+            name: "Compose Vector3",
+            request: "create",
+            requestData: [ "GCComposeVector3" ]
+          },
+          {
+            name: "Compose Transform",
+            request: "create",
+            requestData: [ "GCComposeTransform" ]
+          }
+        ]
+      },
+      {
         name: "Cube",
-        description: "",
         request: "instanceComponent",
         requestData: [ "MCCuboid" ]
       },
       {
         name: "Transform",
-        description: "",
         request: "instanceComponent",
         requestData: [ "GCTransform" ]
       }
@@ -49,7 +63,6 @@ function popupViewportContextMenu(pos, window)
       {
         typesData.push({
           name: type.typeName,
-          description: "",
           request: "instanceComponent",
           requestData: [ type.typeName ]
           });
@@ -121,6 +134,10 @@ function popupViewportContextMenu(pos, window)
         comp.addInstanceTo(shadingGroup);
         }
       },
+    create: function(data)
+      {
+      tang.mainAreaDocument.area.addChild(data, data);
+      },
     newFile: function()
       {
       tang.mainAreaDocument.document.newFile();
@@ -176,21 +193,6 @@ function popupViewportContextMenu(pos, window)
         {
         print("Cant Load Empty file");
         }
-      },
-
-    create: function(data)
-      {
-      var parent = db;
-      for(var i = 1; i < path.length; ++i)
-        {
-        parent = parent.children[path[i]];
-        if(!parent)
-          {
-          throw "Couldn't find parent " + path[i] + "to create child under";
-          }
-        }
-
-      parent.addChild(data, data);
       }
     }
 

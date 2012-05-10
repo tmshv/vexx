@@ -25,6 +25,9 @@
 #include "3D/Manipulators/GCDistanceManipulator.h"
 #include "3D/Manipulators/GCTranslateManipulator.h"
 
+#include "GCComposeVector3.h"
+#include "GCComposeTransform.h"
+
 void initiateGraphicsCore()
   {
   STypeRegistry::addType(GCQImage::staticTypeInformation());
@@ -52,6 +55,9 @@ void initiateGraphicsCore()
   STypeRegistry::addType(GCCamera::staticTypeInformation());
   STypeRegistry::addType(GCPerspectiveCamera::staticTypeInformation());
   STypeRegistry::addType(GCCameraPointer::staticTypeInformation());
+
+  STypeRegistry::addType(GCComposeVector3::staticTypeInformation());
+  STypeRegistry::addType(GCComposeTransform::staticTypeInformation());
 
 
   STypeRegistry::addType(GCRenderTarget::staticTypeInformation());

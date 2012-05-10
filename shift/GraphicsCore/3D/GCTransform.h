@@ -17,6 +17,8 @@ public:
 
   TransformProperty transform;
 
+  virtual void render(XRenderer *) const;
+
   virtual void addManipulators(SPropertyArray *, const GCTransform *tr=0);
 
   virtual void intersect(const XLine& line, Selector *);
