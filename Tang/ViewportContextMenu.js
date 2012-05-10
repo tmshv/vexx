@@ -41,6 +41,16 @@ function popupViewportContextMenu(pos, window)
             name: "Compose Transform",
             request: "create",
             requestData: [ "GCComposeTransform" ]
+          },
+          {
+            name: "Multiply",
+            request: "create",
+            requestData: [ "MCSimpleMultiply" ]
+          },
+          {
+            name: "Add",
+            request: "create",
+            requestData: [ "MCSimpleAdd" ]
           }
         ]
       },

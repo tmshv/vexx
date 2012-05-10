@@ -13,7 +13,10 @@ HEADERS += \
     mathscore.h \
     mcmathsoperation.h \
     mcimage.h \
-    mcsource.h
+    mcsource.h \
+    mcsimpleadd.h \
+    mcsimplemultiply.h \
+    mcsimple.h
 
 INCLUDEPATH += $$ROOT/shift/MathsCore $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript $$ROOT/Shift
 
@@ -23,7 +26,10 @@ SOURCES += \
     mathscore.cpp \
     mcmathsoperation.cpp \
     mcimage.cpp \
-    mcsource.cpp
+    mcsource.cpp \
+    mcsimpleadd.cpp \
+    mcsimplemultiply.cpp \
+    mcsimple.cpp
 
 
 

@@ -16,11 +16,16 @@
               "dynamic":"1",
               "__H":[
                 {
+                  "__T":"FloatProperty",
+                  "name":"Width",
+                  "__V":"0.2"
+                },
+                {
                   "__T":"Vector3DProperty",
                   "name":"__position",
                   "dynamic":"1",
                   "mode":"internal",
-                  "__V":"-555 38 0"
+                  "__V":"-22 -58 0"
                 }
               ]
             },
@@ -31,20 +36,16 @@
               "__H":[
                 {
                   "__T":"FloatProperty",
-                  "name":"xIn",
-                  "__V":"1.2"
-                },
-                {
-                  "__T":"FloatProperty",
-                  "name":"yIn",
-                  "__V":"1.2"
+                  "name":"zIn",
+                  "input":"..\/..\/MCSimpleMultiply1\/output",
+                  "__V":"0.05"
                 },
                 {
                   "__T":"Vector3DProperty",
                   "name":"__position",
                   "dynamic":"1",
                   "mode":"internal",
-                  "__V":"-298 89 0"
+                  "__V":"-272 40 0"
                 }
               ]
             },
@@ -57,14 +58,14 @@
                   "__T":"Vector3DProperty",
                   "name":"translationIn",
                   "input":"..\/..\/GCComposeVector3\/vectorOut",
-                  "__V":"1.2 1.2 0"
+                  "__V":"0 0 0.05"
                 },
                 {
                   "__T":"Vector3DProperty",
                   "name":"__position",
                   "dynamic":"1",
                   "mode":"internal",
-                  "__V":"-118 106 0"
+                  "__V":"31 90 0"
                 }
               ]
             },
@@ -89,14 +90,201 @@
                   "__T":"TransformProperty",
                   "name":"transform",
                   "input":"..\/..\/GCComposeTransform\/transformOut",
-                  "__V":"1001.2 0101.2 0010 0 0 0 1"
+                  "__V":"1000 0100 0010.05 0 0 0 1"
                 },
                 {
                   "__T":"Vector3DProperty",
                   "name":"__position",
                   "dynamic":"1",
                   "mode":"internal",
-                  "__V":"60 22 0"
+                  "__V":"220 27 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCTransform",
+              "name":"NewComponent2",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"GCRenderablePointerArray",
+                  "name":"renderGroup",
+                  "__H":[
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"1",
+                      "dynamic":"1",
+                      "input":"..\/..\/..\/NewComponent"
+                    }
+                  ]
+                },
+                {
+                  "__T":"TransformProperty",
+                  "name":"transform",
+                  "input":"..\/..\/GCComposeTransform1\/transformOut",
+                  "__V":"1000 0100 001-0.05 0 0 0 1"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"231 121 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCComposeTransform",
+              "name":"GCComposeTransform1",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"translationIn",
+                  "input":"..\/..\/GCComposeVector31\/vectorOut",
+                  "__V":"0 0 -0.05"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"70 178 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCComposeVector3",
+              "name":"GCComposeVector31",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"FloatProperty",
+                  "name":"zIn",
+                  "input":"..\/..\/MCSimpleMultiply\/output",
+                  "__V":"-0.05"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-91 151 0"
+                }
+              ]
+            },
+            {
+              "__T":"MCSimpleMultiply",
+              "name":"MCSimpleMultiply",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"FloatProperty",
+                  "name":"inputA",
+                  "input":"..\/..\/MCSimpleMultiply1\/output",
+                  "__V":"0.05"
+                },
+                {
+                  "__T":"FloatProperty",
+                  "name":"inputB",
+                  "__V":"-1"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-217 253 0"
+                }
+              ]
+            },
+            {
+              "__T":"SteelPlate",
+              "name":"NewComponent3",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"FloatProperty",
+                  "name":"Width",
+                  "__V":"0.1"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-639 157 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCTransform",
+              "name":"NewComponent4",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"GCRenderablePointerArray",
+                  "name":"renderGroup",
+                  "__H":[
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"1",
+                      "dynamic":"1",
+                      "input":"..\/..\/..\/NewComponent3"
+                    }
+                  ]
+                },
+                {
+                  "__T":"TransformProperty",
+                  "name":"transform",
+                  "input":"..\/..\/GCComposeTransform2\/transformOut",
+                  "__V":"1000 0100 0010 0 0 0 1"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"228 208 0"
+                }
+              ]
+            },
+            {
+              "__T":"MCSimpleMultiply",
+              "name":"MCSimpleMultiply1",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"FloatProperty",
+                  "name":"inputA",
+                  "input":"..\/..\/NewComponent3\/Width",
+                  "__V":"0.1"
+                },
+                {
+                  "__T":"FloatProperty",
+                  "name":"inputB",
+                  "__V":"0.5"
+                },
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"-421 193 0"
+                }
+              ]
+            },
+            {
+              "__T":"GCComposeTransform",
+              "name":"GCComposeTransform2",
+              "dynamic":"1",
+              "__H":[
+                {
+                  "__T":"Vector3DProperty",
+                  "name":"__position",
+                  "dynamic":"1",
+                  "mode":"internal",
+                  "__V":"42 262 0"
                 }
               ]
             }
@@ -136,6 +324,28 @@
                       "name":"2",
                       "dynamic":"1",
                       "input":"..\/..\/..\/..\/children\/NewComponent1"
+                    },
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"3",
+                      "dynamic":"1",
+                      "input":"..\/..\/..\/..\/children\/NewComponent2"
+                    },
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"4",
+                      "dynamic":"1"
+                    },
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"5",
+                      "dynamic":"1"
+                    },
+                    {
+                      "__T":"GCRenderablePointer",
+                      "name":"6",
+                      "dynamic":"1",
+                      "input":"..\/..\/..\/..\/children\/NewComponent4"
                     }
                   ]
                 },
@@ -160,7 +370,7 @@
           "name":"__inputsPosition",
           "dynamic":"1",
           "mode":"internal",
-          "__V":"-346 -38 0"
+          "__V":"174 -48 0"
         }
       ]
     }
