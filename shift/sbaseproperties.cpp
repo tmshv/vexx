@@ -15,36 +15,87 @@ QTextStream &operator>>(QTextStream &s, xuint8 &v)
   return s;
   }
 
-QTextStream &operator>>(QTextStream &s, SStringVector &v)
+namespace Utils
+{
+void readEscapedQuotedString(QTextStream &s, QString &str)
   {
-  v.clear();
-  QString temp;
-  bool found = true;
-  while(found)
-    {
-    found = false;
+  str.clear();
 
-    QChar brak;
-    s >> brak;
-    if(brak != "\"")
+  while(!s.atEnd())
+    {
+    QChar tempChar;
+    s >> tempChar;
+    if(tempChar == '\\')
+      {
+      s >> tempChar;
+      }
+    else if(tempChar == '"')
       {
       break;
       }
 
+    str.append(tempChar);
     }
+  }
+
+void writeEscapedQuotedString(QTextStream &s, QString str)
+  {
+  str.replace('\\', "\\\\");
+  str.replace('"', "\"");
+  s << "\"" << str << "\"";
+  }
+}
+
+QTextStream &operator>>(QTextStream &s, SStringVector &v)
+  {
+  v.clear();
+  QString temp;
+
+  s.skipWhiteSpace();
+
+  QChar tempCheck;
+  s >> tempCheck;
+  if(tempCheck == '[')
+    {
+    tempCheck = ',';
+    while(tempCheck != ']')
+      {
+      if(tempCheck != ',')
+        {
+        xAssertFail();
+        break;
+        }
+
+      s.skipWhiteSpace();
+      s >> tempCheck;
+      if(tempCheck == ']' || tempCheck != '"')
+        {
+        break;
+        }
+
+      Utils::readEscapedQuotedString(s, temp);
+      v << temp;
+      s.skipWhiteSpace();
+
+      s >> tempCheck;
+      }
+    }
+
   return s;
   }
 
 QTextStream &operator<<(QTextStream &s, const SStringVector &v)
   {
-  for(int i=0, s=v.size(); i<s; ++i)
+  s << "[ ";
+  for(int i=0, count=v.size(); i<count; ++i)
     {
-    s << "\"" << v[i] << "\"";
-    if(i<(s-1))
+    Utils::writeEscapedQuotedString(s, v[i]);
+    if(i<(count-1))
       {
       s << ", ";
       }
     }
+  s << " ]";
   return s;
   }
 

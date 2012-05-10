@@ -2,6 +2,7 @@
 #include "XScriptValueV8Internals.h"
 #include "XScriptObject.h"
 #include "XUnorderedMap"
+#include "QStringList"
 #include "XConvertFromScript.h"
 #include "XAssert"
 
@@ -172,13 +173,24 @@ XScriptValue::XScriptValue(const QVariant& val)
       break;
     case QVariant::List:
       {
-      QVariantList list = val.toList();
-      v8::Local<v8::Array> array = v8::Array::New(list.length());
-      for(int i = 0, s = list.size(); i < s; ++i)
+        QVariantList list = val.toList();
+        v8::Local<v8::Array> array = v8::Array::New(list.length());
+        for(int i = 0, s = list.size(); i < s; ++i)
         {
-        array->Set((uint32_t)i, getV8Internal(XScriptValue(list[i])));
+          array->Set((uint32_t)i, getV8Internal(XScriptValue(list[i])));
         }
-      *this = fromHandle(array);
+        *this = fromHandle(array);
+      }
+      break;
+    case QVariant::StringList:
+      {
+        QStringList list = val.toStringList();
+        v8::Local<v8::Array> array = v8::Array::New(list.length());
+        for(int i = 0, s = list.size(); i < s; ++i)
+        {
+          array->Set((uint32_t)i, getV8Internal(XScriptValue(list[i])));
+        }
+        *this = fromHandle(array);
       }
       break;
     case QVariant::Map:

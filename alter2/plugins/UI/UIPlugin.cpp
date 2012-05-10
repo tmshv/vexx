@@ -217,14 +217,19 @@ QString UIPlugin::getSaveFilename(const QString& fileType)
   return str;
   }
 
-QStringList UIPlugin::getRecentFileList() const
+QStringList UIPlugin::recentFileList() const
+  {
+  return recentFileVector().toList();
+  }
+
+QVector<QString> UIPlugin::recentFileVector() const
   {
   APlugin<SPlugin> plugin(const_cast<UIPlugin*>(this), "db");
   if(plugin.isValid())
     {
-    return plugin->setting<QStringList>("document", "recentFiles");
+    return plugin->setting<SStringVector>("document", "recentFiles");
     }
-  return QString();
+  return SStringVector();
   }
 
 void UIPlugin::addRecentFile(const QString &file)
@@ -232,14 +237,35 @@ void UIPlugin::addRecentFile(const QString &file)
   APlugin<SPlugin> plugin(this, "db");
   if(plugin.isValid())
     {
-    QStringList recentFiles = getRecentFileList();
-    recentFiles.prepend(file);
+    SStringVector recentFiles = recentFileVector();
+    for(int i = 0, s = recentFiles.size(); i < s; ++i)
+      {
+      if(!QFile::exists(recentFiles[i]))
+        {
+        recentFiles.remove(i, 1);
+        --s;
+        --i;
+        }
+      }
+
+    QFileInfo fileName(file);
+    QString path = fileName.canonicalFilePath();
+    if(path.isEmpty())
+      {
+        path = file;
+      }
+
+    if(qFind(recentFiles, path) == recentFiles.constEnd())
+      {
+      recentFiles.prepend(path);
+      }
+
     if(recentFiles.size() > MaxRecentFiles)
       {
       recentFiles.resize(MaxRecentFiles);
       }
 
-    plugin->setSetting<QStringList>("document", "recentFiles", recentFiles);
+    plugin->setSetting<SStringVector>("document", "recentFiles", recentFiles);
     }
   }
 

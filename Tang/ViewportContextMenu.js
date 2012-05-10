@@ -53,6 +53,25 @@ function popupViewportContextMenu(pos, window)
     return typesData;
   }
 
+  function buildRecentFiles()
+    {
+    var fileData = [
+    ];
+
+    var fileList = ui.recentFileList();
+    for(var i=0; i<fileList.length; ++i)
+    {
+      var file = fileList[i];
+      fileData.push({
+        name: file,
+        request: "loadRecentFile",
+        requestData: [ file ]
+        });
+    }
+
+    return fileData;
+  }
+
   var menuContents =
     [
       {
@@ -67,6 +86,10 @@ function popupViewportContextMenu(pos, window)
       {
       name: "Load File",
       request: "loadFile"
+      },
+      {
+      name: "Load Recent File",
+      children: buildRecentFiles()
       },
       {
       name: "Save File",
@@ -130,12 +153,22 @@ function popupViewportContextMenu(pos, window)
       var filename = ui.getOpenFilename("Area File (*.jsarea)");
       if(filename !== "")
         {
-        print("Load file", filename);
         tang.mainAreaDocument.document.loadFile(filename);
         }
       else
         {
         print("Load Cancelled");
+        }
+      },
+    loadRecentFile: function(filename)
+      {
+      if(filename !== "")
+        {
+        tang.mainAreaDocument.document.loadFile(filename);
+        }
+      else
+        {
+        print("Cant Load Empty file");
         }
       },
 

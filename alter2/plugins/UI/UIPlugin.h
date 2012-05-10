@@ -3,6 +3,7 @@
 
 #include "UIGlobal.h"
 #include "aabstractplugin.h"
+#include "QStringList"
 
 class UISurface;
 class UIPluginPrivate;
@@ -21,7 +22,7 @@ public:
     {
     MaxRecentFiles = 10
     };
-  Q_INVOKABLE QStringList getRecentFileList() const;
+  Q_INVOKABLE QStringList recentFileList() const;
 
   Q_INVOKABLE void addDock(QString name, QWidget *w);
   void addSurface(UISurface *surface);
@@ -38,6 +39,8 @@ signals:
 private:
   virtual void load();
   virtual void unload();
+
+  QVector<QString> recentFileVector() const;
 
   void setLastUsedDirectoryFromFile(const QString &fName);
   QString lastUsedDirectory() const;

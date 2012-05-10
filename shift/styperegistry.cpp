@@ -47,6 +47,8 @@ void STypeRegistry::initiate()
   addType(ColourProperty::staticTypeInformation());
   addType(ByteArrayProperty::staticTypeInformation());
 
+  addType(StringArrayProperty::staticTypeInformation());
+
   addType(Pointer::staticTypeInformation());
   addType(PointerArray::staticTypeInformation());
 
