@@ -139,6 +139,8 @@ void ScNodeDisplay::onConnectionChange(const SChange *change, bool backwards)
         if(conn->drivenProperty() == c->driven() &&
             conn->driverProperty() == c->driver())
           {
+          conn->driver()->removeDriver(conn);
+          conn->driven()->removeDriven(conn);
           conn->deleteLater();
           _connectors.remove(i);
           break;
