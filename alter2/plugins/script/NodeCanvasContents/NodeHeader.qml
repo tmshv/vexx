@@ -63,10 +63,11 @@ Rectangle {
     color: header.color
 
     PropertyInterfaceMouseArea {
+      id: inputArea
       anchors.fill: parent
       enabled: parent.visible
       onStartDrag: {
-        createConnection(nodeInputBlob, "input", x, y);
+        createConnection(inputArea, "input", x, y);
       }
     }
   }
@@ -80,10 +81,11 @@ Rectangle {
     visible: nodeInputBlob.visible
 
     PropertyInterfaceMouseArea {
+      id: outputArea
       anchors.fill: parent
       enabled: parent.visible
       onStartDrag: {
-        createConnection(nodeOutputBlob, "output", x, y);
+        createConnection(outputArea, "output", x, y);
       }
     }
   }

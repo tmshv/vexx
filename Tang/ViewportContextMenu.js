@@ -33,6 +33,12 @@ function popupViewportContextMenu(pos, window)
         description: "",
         request: "instanceComponent",
         requestData: [ "MCCuboid" ]
+      },
+      {
+        name: "Transform",
+        description: "",
+        request: "instanceComponent",
+        requestData: [ "GCTransform" ]
       }
     ];
 
