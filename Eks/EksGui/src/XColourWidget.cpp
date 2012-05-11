@@ -10,8 +10,8 @@
 
 #include "QDebug"
 
-XColourWidget::XColourWidget( const XColour &col, bool hA, QWidget *parent ) : QWidget(parent),
-        _slider( new XVector3DWidget( XVector3D( 0, 0, 0 ), QStringList() << "R" << "G" << "B", this )),
+XColourWidget::XColourWidget(  QWidget *parent, const XColour &col, bool hA ) : QWidget(parent),
+        _slider( new XVector3DWidget( this, XVector3D( 0, 0, 0 ), QStringList() << "R" << "G" << "B" )),
         _picker( new QtColorTriangle( this ) ),
         _outerLayout( new QVBoxLayout( this ) ),
         _sliderLayout( new QVBoxLayout( ) ),
@@ -45,7 +45,7 @@ XColourWidget::XColourWidget( const XColour &col, bool hA, QWidget *parent ) : Q
         _alphaLayout = new QHBoxLayout( this );
         _alphaLayout->setContentsMargins( 0, 0, 0, 0 );
 
-        _alpha = new XFloatWidget( col.w(), this );
+        _alpha = new XFloatWidget( this, col.w() );
 
         _alphaLayout->addWidget( new QLabel( "Alpha", this ) );
         _alphaLayout->addWidget( _alpha );

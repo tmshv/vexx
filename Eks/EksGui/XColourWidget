@@ -17,7 +17,7 @@ class EKSGUI_EXPORT XColourWidget : public QWidget
     {
 Q_OBJECT
 public:
-    XColourWidget( const XColour &, bool hasAlpha=true, QWidget *parent = 0 );
+    XColourWidget( QWidget *parent = 0, const XColour &col = XColour(), bool hasAlpha=true );
 
     double alpha();
     XColour colour();

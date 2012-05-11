@@ -12,6 +12,9 @@ class GCComposeTransform : public SEntity
 public:
   GCComposeTransform();
 
+  Vector3DProperty rotationAxisIn;
+  FloatProperty rotationAngleIn;
+
   Vector3DProperty translationIn;
 
   TransformProperty transformOut;

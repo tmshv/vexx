@@ -13,7 +13,7 @@ class EKSGUI_EXPORT XFloatWidget : public QWidget
     Q_OBJECT
 
 public:
-    XFloatWidget( qreal val=0.0, QWidget *parent = 0 );
+    XFloatWidget( QWidget *parent = 0, qreal val = 0.0f );
     XFloatWidget( qreal val, qreal min, qreal max, QWidget *parent = 0 );
 
     void setMaximum( double );

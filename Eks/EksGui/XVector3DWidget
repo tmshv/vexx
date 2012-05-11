@@ -12,7 +12,7 @@ class EKSGUI_EXPORT XVector3DWidget : public QWidget
     {
 Q_OBJECT
 public:
-    XVector3DWidget( XVector3D val=XVector3D(), QStringList labels=QStringList(), QWidget *parent = 0);
+    XVector3DWidget( QWidget *parent = 0, XVector3D val=XVector3D(), QStringList labels=QStringList());
     XVector3DWidget( XVector3D val, XVector3D min, XVector3D max, QStringList labels=QStringList(), QWidget *parent = 0);
 
     void setMaximum( XVector3D );

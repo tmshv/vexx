@@ -7,7 +7,7 @@
 
 #include "QKeyEvent"
 
-XVector3DWidget::XVector3DWidget( XVector3D val, QStringList labels, QWidget *parent ) : QWidget( parent ),
+XVector3DWidget::XVector3DWidget( QWidget *parent, XVector3D val, QStringList labels) : QWidget( parent ),
         _x( new XFloatWidget( val.x(), -HUGE_VAL, HUGE_VAL, this ) ),
         _y( new XFloatWidget( val.y(), -HUGE_VAL, HUGE_VAL, this ) ),
         _z( new XFloatWidget( val.z(), -HUGE_VAL, HUGE_VAL, this ) ),

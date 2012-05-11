@@ -22,13 +22,13 @@
 
 namespace SPropertyDefaultUI
 {
-template <typename T> class SUIBase : private SDirtyObserver
+template <typename WIDG, typename T> class SUIBase : public WIDG, private SDirtyObserver
   {
 XProperties:
   XProperty(bool, isAlreadySetting, setAlreadySetting);
 
 public:
-  SUIBase(SProperty *p) : _isAlreadySetting(false), _value(p->castTo<T>()), _dirty(false)
+  SUIBase(QWidget *parent, SProperty *p) : WIDG(parent), _isAlreadySetting(false), _value(p->castTo<T>()), _dirty(false)
     {
     xAssert(_value);
     _entity = _value->entity();
@@ -57,7 +57,7 @@ private:
   virtual void actOnChanges()
     {
     SProfileFunction
-    if(_dirty && !_isAlreadySetting)
+    if(_dirty && !_isAlreadySetting && isVisible())
       {
       _isAlreadySetting = true;
       syncGUI();
@@ -65,16 +65,22 @@ private:
       _dirty = true;
       }
     }
+
+  void showEvent(QShowEvent *) X_OVERRIDE
+    {
+    actOnChanges();
+    }
+
   T *_value;
   SEntityWeakPointer _entity;
   bool _dirty;
   };
 
-class SHIFT_EXPORT Bool : public QCheckBox, private SUIBase<BoolProperty>
+class SHIFT_EXPORT Bool : public SUIBase<QCheckBox, BoolProperty>
   {
   Q_OBJECT
 public:
-  Bool( SProperty *prop, bool readOnly, QWidget *parent ) : QCheckBox(parent), SUIBase<BoolProperty>(prop)
+  Bool( SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QCheckBox, BoolProperty>(parent, prop)
     {
     connect( this, SIGNAL(toggled(bool)), this, SLOT(guiChanged(bool)));
     syncGUI();
@@ -85,11 +91,11 @@ public:
   void syncGUI() { setChecked( propertyValue()->value() ); }
   };
 
-class SHIFT_EXPORT Int32 : public QSpinBox, private SUIBase<IntProperty>
+class SHIFT_EXPORT Int32 : public SUIBase<QSpinBox, IntProperty>
  {
  Q_OBJECT
 public:
- Int32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<IntProperty>(prop)
+ Int32( SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QSpinBox, IntProperty>(parent, prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -104,11 +110,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class SHIFT_EXPORT UInt32 : public QSpinBox, private SUIBase<UnsignedIntProperty>
+class SHIFT_EXPORT UInt32 : public SUIBase<QSpinBox, UnsignedIntProperty>
  {
  Q_OBJECT
 public:
- UInt32( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<UnsignedIntProperty>(prop)
+ UInt32( SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QSpinBox, UnsignedIntProperty>(parent, prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -123,11 +129,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class SHIFT_EXPORT Int64 : public QSpinBox, private SUIBase<LongIntProperty>
+class SHIFT_EXPORT Int64 : public SUIBase<QSpinBox, LongIntProperty>
  {
  Q_OBJECT
 public:
- Int64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongIntProperty>(prop)
+ Int64( SProperty *prop, bool readOnly, QWidget *parent ) : SUIBase<QSpinBox, LongIntProperty>(parent, prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -142,11 +148,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class SHIFT_EXPORT UInt64 : public QSpinBox, private SUIBase<LongUnsignedIntProperty>
+class SHIFT_EXPORT UInt64 : public SUIBase<QSpinBox, LongUnsignedIntProperty>
  {
  Q_OBJECT
 public:
- UInt64( SProperty *prop, bool readOnly, QWidget *parent ) : QSpinBox(parent), SUIBase<LongUnsignedIntProperty>(prop)
+ UInt64(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QSpinBox, LongUnsignedIntProperty>(parent, prop)
    {
    connect( this, SIGNAL(valueChanged(int)), this, SLOT(guiChanged(int)));
    setAlreadySetting(true);
@@ -161,11 +167,11 @@ public:
  void syncGUI() { setValue(propertyValue()->value()); }
  };
 
-class SHIFT_EXPORT Float : public XFloatWidget, private SUIBase<FloatProperty>
+class SHIFT_EXPORT Float : public SUIBase<XFloatWidget, FloatProperty>
   {
   Q_OBJECT
 public:
-  Float( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<FloatProperty>(prop)
+  Float(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<XFloatWidget, FloatProperty>(parent, prop)
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
@@ -179,11 +185,11 @@ public:
   void syncGUI() { setValue(propertyValue()->value()); }
   };
 
-class SHIFT_EXPORT Double : public XFloatWidget, private SUIBase<DoubleProperty>
+class SHIFT_EXPORT Double : public SUIBase<XFloatWidget, DoubleProperty>
   {
   Q_OBJECT
 public:
-  Double( SProperty *prop, bool readOnly, QWidget *parent ) : XFloatWidget(0.0f, parent), SUIBase<DoubleProperty>(prop)
+  Double(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<XFloatWidget, DoubleProperty>(parent, prop)
     {
     connect( this, SIGNAL(valueChanged(double)), this, SLOT(guiChanged(double)));
     setReadOnly(readOnly);
@@ -197,11 +203,11 @@ public:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class SHIFT_EXPORT String : public QLineEdit, private SUIBase<StringProperty>
+class SHIFT_EXPORT String : public SUIBase<QLineEdit, StringProperty>
   {
   Q_OBJECT
 public:
-  String( SProperty *prop, bool readOnly, QWidget *parent ) : QLineEdit(parent), SUIBase<StringProperty>(prop)
+  String(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QLineEdit, StringProperty>(parent, prop)
     {
     connect( this, SIGNAL(editingFinished()), this, SLOT(guiChanged()) );
     syncGUI();
@@ -212,11 +218,11 @@ public:
   void syncGUI() { setText(propertyValue()->value()); }
   };
 
-class SHIFT_EXPORT LongString : public QTextEdit, private SUIBase<StringProperty>
+class SHIFT_EXPORT LongString : public SUIBase<QTextEdit, StringProperty>
   {
   Q_OBJECT
 public:
-  LongString( SProperty *prop, bool readOnly, QWidget *parent ) : QTextEdit(parent), SUIBase<StringProperty>(prop)
+  LongString(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<QTextEdit, StringProperty>(parent, prop)
     {
     connect( this, SIGNAL(textChanged()), this, SLOT(guiChanged()) );
     syncGUI();
@@ -234,11 +240,11 @@ public:
     }
   };
 
-class SHIFT_EXPORT Vector2D : public XVector2DWidget, private SUIBase<Vector2DProperty>
+class SHIFT_EXPORT Vector2D : public SUIBase<XVector2DWidget, Vector2DProperty>
   {
   Q_OBJECT
 public:
-  Vector2D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector2DWidget( XVector2D(), QStringList(), parent ), SUIBase<Vector2DProperty>(prop)
+  Vector2D(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<XVector2DWidget, Vector2DProperty>(parent, prop)
     {
     connect( this, SIGNAL(valueChanged(XVector2D)), this, SLOT(guiChanged(XVector2D)));
     setReadOnly(readOnly);
@@ -252,11 +258,11 @@ private:
   };
 
 
-class SHIFT_EXPORT Vector3D : public XVector3DWidget, private SUIBase<Vector3DProperty>
+class SHIFT_EXPORT Vector3D : public SUIBase<XVector3DWidget, Vector3DProperty>
   {
   Q_OBJECT
 public:
-  Vector3D( SProperty *prop, bool readOnly, QWidget *parent ) : XVector3DWidget( XVector3D(), QStringList(), parent), SUIBase<Vector3DProperty>(prop)
+  Vector3D(SProperty *prop, bool readOnly, QWidget *parent) : SUIBase<XVector3DWidget, Vector3DProperty>(parent, prop)
     {
     connect( this, SIGNAL(valueChanged(XVector3D)), this, SLOT(guiChanged(XVector3D)));
     setReadOnly(readOnly);
@@ -270,11 +276,11 @@ private:
   void syncGUI() { setValue( propertyValue()->value() ); }
   };
 
-class SHIFT_EXPORT Colour : public XColourWidget, private SUIBase<ColourProperty>
+class SHIFT_EXPORT Colour : public SUIBase<XColourWidget, ColourProperty>
   {
   Q_OBJECT
 public:
-  Colour( SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent ) : XColourWidget( XColour(), false, parent ), SUIBase<ColourProperty>(prop)
+  Colour(SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent) : SUIBase<XColourWidget, ColourProperty>(parent, prop)
     {
     connect( this, SIGNAL(colourChanged(XColour)), this, SLOT(guiChanged(XColour)));
     // setReadOnly(readOnly); <- implement this...
@@ -288,11 +294,11 @@ private:
   };
 
 
-class Filename : public QWidget, private SUIBase<FilenameProperty>
+class Filename : public SUIBase<QWidget, FilenameProperty>
   {
   Q_OBJECT
 public:
-  Filename(SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent) : QWidget(parent), SUIBase<FilenameProperty>(prop),
+  Filename(SProperty *prop, bool X_UNUSED(readOnly), QWidget *parent) : SUIBase<QWidget, FilenameProperty>(parent, prop),
       _layout( new QHBoxLayout( this ) ), _label( new QLineEdit( this ) ),
       _button( new QToolButton( this ) )
     {

@@ -23,7 +23,7 @@ SEntityUI::SEntityUI(xuint32 options)
     setUIType(StringProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::String>() );
 
     setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector2D>() );
-    setUIType(Vector2DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector3D>() );
+    setUIType(Vector3DProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Vector3D>() );
     setUIType(ColourProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Colour>() );
 
     setUIType(FilenameProperty::staticTypeInformation(), addWidgetCreator<SPropertyDefaultUI::Filename>() );

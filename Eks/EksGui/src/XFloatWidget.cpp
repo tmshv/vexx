@@ -6,7 +6,7 @@
 
 #include "QDebug"
 
-XFloatWidget::XFloatWidget( qreal val, QWidget *parent ) : QWidget( parent ),
+XFloatWidget::XFloatWidget( QWidget *parent, qreal val ) : QWidget( parent ),
         _layout( new QHBoxLayout( this ) ),
         _spinner( new QDoubleSpinBox( this ) ),
         _slider( new QSlider( Qt::Horizontal, this ) ),
