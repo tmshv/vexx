@@ -309,8 +309,8 @@ public:
     xsize nonPointerId = (xsize)constBase->nonPointerTypeId();
     XInterface &bob = instance(name, qMetaTypeId<T*>(), XQMetaTypeIdOrInvalid<T>::id(), id, nonPointerId, constParent);
 
-    typedef T* (*TCastFn)(PARENT *ptr);
-    TCastFn typedFn = XScriptConvert::castFromBase<T, PARENT>;
+    typedef T* (*TCastFn)(BASE *ptr);
+    TCastFn typedFn = XScriptConvert::castFromBase<T, BASE>;
 
     UpCastFn fn = (UpCastFn)typedFn;
 

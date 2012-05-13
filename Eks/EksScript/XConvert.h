@@ -45,9 +45,6 @@ template <typename NT> struct NativeToJS
   {
   template <typename X>
   XScriptValue operator()( X const & ) const;
-
-private:
-  typedef xCompileTimeAssertDef<false> NativeToJSMustBeSpecialized;
   };
 
 }

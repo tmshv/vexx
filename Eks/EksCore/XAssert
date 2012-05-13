@@ -60,6 +60,7 @@ public:
 # define xAssertMessage(condition, message, ...) if(!(condition) && XAssert::currentFireFunction()) { X_CONSTRUCT_ASSERT(condition, message, __VA_ARGS__); if( XAssert::currentFireFunction()(ass) && XAssert::currentBreakFunction() ) { XAssert::currentBreakFunction()(); } }
 # define xVerify xAssert
 
+#ifndef X_CPPOX_SUPPORT
 template <bool Condition>
 struct xCompileTimeAssertDef
 {
@@ -68,6 +69,9 @@ struct xCompileTimeAssertDef
 /** Unimplemented - causes a compile-time error if used. */
 template <> struct xCompileTimeAssertDef<false>;
 #define xCompileTimeAssert(x) typedef xCompileTimeAssertDef<x> CTA_##__LINE__
+#else
+#define xCompileTimeAssert(x) static_assert(x, "Static Assert: " #x)
+#endif
 
 #else
 # define xAssertMessage(condition, message, ...)

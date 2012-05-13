@@ -19,8 +19,6 @@
 
 #include "3D/GCTexture.h"
 
-#include "3D/Shaders/GCStandardSurface.h"
-
 #include "3D/Manipulators/GCManipulator.h"
 #include "3D/Manipulators/GCDistanceManipulator.h"
 #include "3D/Manipulators/GCTranslateManipulator.h"
@@ -80,8 +78,6 @@ void initiateGraphicsCore()
 
   STypeRegistry::addType(GCScene::staticTypeInformation());
   STypeRegistry::addType(GCManipulatableScene::staticTypeInformation());
-
-  STypeRegistry::addType(GCStandardSurface::staticTypeInformation());
 
   STypeRegistry::addType(GCVisualManipulator::staticTypeInformation());
   STypeRegistry::addType(GCVisualCompoundManipulator::staticTypeInformation());
