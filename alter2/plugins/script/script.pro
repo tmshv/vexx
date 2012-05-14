@@ -35,7 +35,8 @@ SOURCES += scplugin.cpp \
     QMLExtensions/scconnectoritem.cpp \
     QMLExtensions/scmousearea.cpp \
     scdeclarativesurface.cpp \
-    scdbutils.cpp
+    scdbutils.cpp \
+    scdbobserver.cpp
 
 HEADERS += scplugin.h \
     scglobal.h \
@@ -51,7 +52,8 @@ HEADERS += scplugin.h \
     QMLExtensions/scconnectoritem.h \
     QMLExtensions/scmousearea.h \
     scdeclarativesurface.h \
-    scdbutils.h
+    scdbutils.h \
+    scdbobserver.h
 
 RESOURCES += \
     ScResources.qrc

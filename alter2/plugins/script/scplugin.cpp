@@ -28,6 +28,7 @@
 #include "QGLWidget"
 #include "scdeclarativesurface.h"
 #include "scdbutils.h"
+#include "scdbobserver.h"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -136,6 +137,8 @@ void ScPlugin::load()
   _engine = new XScriptEngine(true);
 
   _engine->set("print", printFn);
+
+  _engine->addInterface(ScDbTreeObserver::createInterface());
 
   registerScriptGlobal(this);
 
