@@ -52,7 +52,7 @@ void GCViewableTransform::createTypeInformation(SPropertyInformation *info, cons
     viewInfo->setCompute(computeView);
 
     TransformProperty::InstanceInformation* transformInfo = info->child(&GCViewableTransform::transform);
-    transformInfo->setAffects(viewInfo);
+    transformInfo->addAffects(viewInfo);
     }
 
   if(data.registerInterfaces)

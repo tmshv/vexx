@@ -375,14 +375,40 @@ void SPropertyInstanceInformation::setCompute(ComputeFunction fn)
     }
   }
 
+void SPropertyInstanceInformation::addAffects(const SPropertyInstanceInformation *info)
+  {
+  xsize *oldAffects = _affects;
+  xsize affectsSize = 0;
+  if(oldAffects)
+    {
+    xAssert(info);
+
+    xsize *current = _affects;
+    while(*current)
+      {
+      current++;
+      affectsSize++;
+      }
+    }
+
+  _affects = new xsize[affectsSize+2]; // one for the new one, one for the end 0
+
+  if(oldAffects)
+    {
+    memcpy(_affects, oldAffects, sizeof(xsize)*affectsSize);
+    delete oldAffects;
+    }
+
+  _affects[affectsSize] = info->location();
+  _affects[affectsSize+1] = 0;
+  }
+
 void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation *info)
   {
   xAssert(!_affects);
   xAssert(info);
 
-  _affects = new xsize[2];
-  _affects[0] = info->location();
-  _affects[1] = 0;
+  addAffects(info);
   }
 
 void SPropertyInstanceInformation::setAffects(const SPropertyInstanceInformation **info, xsize size)

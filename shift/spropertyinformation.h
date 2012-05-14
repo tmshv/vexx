@@ -122,6 +122,7 @@ public:
     }
 
   void setCompute(ComputeFunction fn);
+  void addAffects(const SPropertyInstanceInformation *info);
   void setAffects(const SPropertyInstanceInformation *info);
   void setAffects(const SPropertyInstanceInformation **info, xsize size);
   void setAffects(xsize *affects);

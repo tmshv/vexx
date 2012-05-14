@@ -6,14 +6,34 @@
 #include "XFrustum.h"
 #include "XRenderer.h"
 
+void unionTransformedBounds(const SPropertyInstanceInformation*, GCTransform* tr)
+  {
+  GCBoundingBox::ComputeLock l(&tr->bounds);
+  XCuboid *data = l.data();
+  *data = XCuboid();
+
+  for(GCRenderablePointer* r = tr->renderGroup.firstChild<GCRenderablePointer>(); r; r = r->nextSibling<GCRenderablePointer>())
+    {
+    const GCRenderable* ptd = r->pointed();
+
+    data->unite(ptd->bounds());
+    }
+
+  *data = tr->transform() * *data;
+  }
+
 S_IMPLEMENT_PROPERTY(GCTransform)
 
 void GCTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
+    GCBoundingBox::InstanceInformation* boundsInfo = info->child(&GCTransform::bounds);
+    boundsInfo->setCompute(unionTransformedBounds);
+
     TransformProperty::InstanceInformation* trInfo = info->add(&GCTransform::transform, "transform");
     trInfo->setDefault(XTransform::Identity());
+    trInfo->setAffects(boundsInfo);
     }
   }
 
