@@ -23,6 +23,7 @@ class ScPropertyItem : public QDeclarativeItem
   Q_PROPERTY(QPointF driverNormal READ driverNormal WRITE setDriverNormal)
   Q_PROPERTY(QPointF drivenNormal READ drivenNormal WRITE setDrivenNormal)
   Q_PROPERTY(bool deletable READ deletable CONSTANT)
+  Q_PROPERTY(SProperty * property READ property CONSTANT)
 
   XProperty(SProperty *, property, setProperty);
   XProperty(QPointF, driverPoint, setDriverPoint);

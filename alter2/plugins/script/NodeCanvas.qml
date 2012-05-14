@@ -60,6 +60,18 @@ Rectangle
       }
     }
 
+  function selectionChanged()
+    {
+    var sel = [];
+
+    for(var i = 0; i < nodecanvas.selection.length; ++i)
+      {
+      sel.push(nodecanvas.selection[i].property);
+      }
+
+    external.emitRequest("selectionChanged", [ sel ]);
+    }
+
   function clearSelection()
     {
     for(var i = 0; i < nodecanvas.selection.length; ++i)
@@ -67,6 +79,7 @@ Rectangle
       nodecanvas.selection[i].selected = false;
       }
     nodecanvas.selection = [ ];
+    selectionChanged();
     }
 
   function select(item, clear)
@@ -80,6 +93,7 @@ Rectangle
     sel.push(item);
     nodecanvas.selection = sel;
 
+    selectionChanged();
     item.selected = true;
     }
 
@@ -404,6 +418,7 @@ Rectangle
   function setTopRootIndex(idx)
     {
     display.setTopRootIndex(idx);
+    nodecanvas.selection = [ ];
     }
 
 

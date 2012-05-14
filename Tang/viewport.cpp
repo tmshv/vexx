@@ -12,7 +12,6 @@
 #include "3D/GCCamera.h"
 #include "3D/GCViewport.h"
 #include "3D/GCScene.h"
-#include "3D/Shaders/GCStandardSurface.h"
 #include "3D/GCShadingGroup.h"
 #include "3D/GCScreenRenderTarget.h"
 #include "3D/GCTexture.h"
