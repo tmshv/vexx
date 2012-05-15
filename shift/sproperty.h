@@ -40,7 +40,9 @@ class SDatabase;
   S_REGISTER_TYPE_FUNCTION()
 
 #define S_IMPLEMENT_PROPERTY(myName) \
-  const SPropertyInformation *myName::staticTypeInformation() { return SPropertyInformation::findStaticTypeInformation<myName>(#myName); }
+  static const SPropertyInformation *_##myName##StaticTypeInformation = \
+    SPropertyInformation::createTypeInformation<myName>(#myName, myName::ParentType::staticTypeInformation()); \
+  const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation; }
 
 #define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
   TEMPL S_IMPLEMENT_PROPERTY(myName)

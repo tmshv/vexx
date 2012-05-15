@@ -20,6 +20,21 @@ private:
   XPersistentScriptValue _act;
   };
 
-X_SCRIPTABLE_TYPE(ScDbTreeObserver);
+X_SCRIPTABLE_TYPE_BASE_INHERITED(ScDbTreeObserver, STreeObserver)
+namespace XScriptConvert
+{
+namespace internal
+{
+template <> struct NativeToJS<ScDbTreeObserver> : public XScript::NativeToJSConvertableTypeInherited<ScDbTreeObserver, STreeObserver> {};
+}
+}
+
+namespace XScript
+{
+typedef XSignature< ScDbTreeObserver (
+    XScript::CtorForwarder<ScDbTreeObserver *(const XScriptObject &, const XScriptFunction &, const XScriptFunction &)>
+  )> ScDbTreeObserverCtors;
+template <> class ClassCreator_Factory<ScDbTreeObserver> : public ClassCreatorCopyableFactory<ScDbTreeObserver, ScDbTreeObserverCtors> {};
+}
 
 #endif // SCDBOBSERVER_H

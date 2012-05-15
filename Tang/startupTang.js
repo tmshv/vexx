@@ -36,5 +36,18 @@ component.addInstance(shadingGroup);*/
 //componentDocument.editor = componentDocument.createEditor();
 //componentDocument.editor.show();
 
+var obj = { };
+
+function treeChange()
+{
+  print("treeChange", obj === this)
+}
+function finalise()
+{
+  print("finalise", obj === this)
+}
+
+obs = new STreeObserver(obj, treeChange, finalise);
+tang.mainAreaDocument.area.addTreeObserver(obs);
 
 ui.show();

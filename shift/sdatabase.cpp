@@ -7,6 +7,7 @@
 #include "styperegistry.h"
 #include "Serialisation/sjsonio.h"
 #include "xqtwrappers.h"
+#include "spropertyinformationhelpers.h"
 
 #ifdef X_DEBUG
 # include "XMemoryTracker"
@@ -121,7 +122,21 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   xAssert(type);
 
   SProperty *prop = (SProperty*)_memory->alloc(type->dynamicSize());
-  type->createProperty()(prop, type, (SPropertyInstanceInformation**)&prop->_instanceInfo);
+
+  // new the prop type
+  type->createProperty()(prop);
+
+  // new the instance information
+  xuint8 *alignedPtr = (xuint8*)(prop) + type->size();
+  alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
+  xAssertIsAligned(alignedPtr);
+
+  SPropertyInstanceInformation *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
+  type->createInstanceInformation()(instanceInfo);
+
+  instanceInfo->setDynamic(true);
+  prop->_instanceInfo = instanceInfo;
+
 
   if(init)
     {
@@ -174,7 +189,7 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
 
     if(child->extra())
       {
-      childInformation->createProperty()(thisProp, child->childInformation(), 0);
+      childInformation->createProperty()(thisProp);
       }
 
     xAssert(thisProp->_parent == 0);

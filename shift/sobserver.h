@@ -10,10 +10,12 @@ class SChange;
 class SObserver
   {
 public:
+  SObserver() { }
   virtual ~SObserver();
   virtual void actOnChanges() { };
 
 private:
+  X_DISABLE_COPY(SObserver);
   QVector <SEntity*> _entities;
   friend class SEntity;
   };

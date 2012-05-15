@@ -14,36 +14,6 @@ class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
 
-namespace ShiftTypePacker
-{
-inline QVariant pack(void)
-  {
-  return QVariant();
-  }
-inline QVariant pack(bool b)
-  {
-  return QVariant(b);
-  }
-inline QVariant pack(int i)
-  {
-  return QVariant(i);
-  }
-inline void unpack(const QVariant &i, bool *success, QString& out)
-  {
-  *success = true;
-  out =i.toString();
-  }
-inline void unpack(const QVariant &i, bool *success, int &in)
-  {
-  in = i.toInt(success);
-  }
-}
-
-namespace std
-{
-  template <typename T> class initializer_list;
-}
-
 class SPropertyInstanceInformationInitialiser
   {
 public:
@@ -52,8 +22,6 @@ public:
 
 class XInterfaceBase;
 template <typename T> class XInterface;
-template <typename T, typename PARENT> XInterfaceBase* initiateApiInterfaceWithParent(const SPropertyInformation *);
-template <typename T> XInterfaceBase* initiateApiInterface(const SPropertyInformation *);
 
 // Child information
 class SHIFT_EXPORT SPropertyInstanceInformation
@@ -173,19 +141,23 @@ public:
 class SHIFT_EXPORT SPropertyInformation
   {
 public:
-  typedef void (*CreatePropertyFunction)(void *data, const SPropertyInformation *type, SPropertyInstanceInformation **info);
+  typedef void (*CreatePropertyFunction)(void *data);
   typedef void (*PostCreateFunction)(void *data);
   typedef void (*PostSetFunction)(SPropertyContainer *cont, SProperty *data);
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
   typedef bool (*SaveQueryFunction)( const SProperty * );
+  typedef void (*CreateInformationFunction)(SPropertyInformation *, const SPropertyInformationCreateData &);
+  typedef void (*CreateInstanceInformationFunction)(SPropertyInstanceInformation *data);
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
 XProperties:
+  XProperty(CreateInformationFunction, createTypeInformation, setCreateTypeInformation);
+  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
   XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
@@ -306,13 +278,17 @@ public:
   template <typename T> void addAddonInterface() const;
   template <typename T> void addStaticInterface(T *) const;
 
-  template <typename T> static const SPropertyInformation *findStaticTypeInformation(const char *);
+  template <typename T> static const SPropertyInformation *createTypeInformation(const char *,
+                                                                                 const SPropertyInformation *parent);
+  static const SPropertyInformation *createTypeInformationInternal(const char *name,
+                                                                   const SPropertyInformation *parent,
+                                                                   void (SPropertyInformation *, const char *));
 
   template <typename T> XInterface<T> *apiInterface();
   template <typename T> const XInterface<T> *apiInterface() const;
 
   static SPropertyInformation *derive(const SPropertyInformation *obj);
-  template <typename T> static void initiate(SPropertyInformation *info, const QString &typeName);
+  template <typename T> static void initiate(SPropertyInformation *info, const char *typeName);
   static void initiate(SPropertyInformation *info, const SPropertyInformation *from);
 
   X_ALIGNED_OPERATOR_NEW
@@ -320,14 +296,8 @@ public:
 private:
   X_DISABLE_COPY(SPropertyInformation);
 
-  template <typename T> static SPropertyInstanceInformation *createInstanceInformationHelper(const QString &name, xsize index, xsize ptr);
-
   void reference() const;
   void dereference() const;
-
-  typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(const QString &name, xsize index, xsize location);
-  void (*_derive)(SPropertyInformation *, const SPropertyInformationCreateData &);
-  CreateInstanceInformationFunction _createInstanceInformation;
 
   mutable InterfaceHash _interfaceFactories;
 
@@ -338,124 +308,6 @@ private:
 
 Q_DECLARE_METATYPE(const SPropertyInformation*);
 
-#include "sproperty.h"
-
-namespace
-{
-template<typename T, bool Abstract = T::IsAbstract> struct CreatePropertyHelper;
-
-template<typename T> struct CreatePropertyHelper<T, true>
-  {
-  static void run(void *,
-                  const SPropertyInformation *,
-                  SPropertyInstanceInformation **)
-    {
-    xAssertFail();
-    }
-  };
-
-template<typename T> struct CreatePropertyHelper<T, false>
-  {
-  static void run(void *ptr,
-                  const SPropertyInformation *type,
-                  SPropertyInstanceInformation **instanceInfo)
-    {
-    T *prop = new(ptr) T();
-
-    if(instanceInfo)
-      {
-      xuint8 *alignedPtr = (xuint8*)(prop) + type->size();
-      alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
-      xAssertIsAligned(alignedPtr);
-      *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
-      new(*instanceInfo) T::InstanceInformation();
-      (*instanceInfo)->setDynamic(true);
-      }
-    }
-  };
-}
-
-template <typename T>
-  static SPropertyInstanceInformation *SPropertyInformation::createInstanceInformationHelper(
-    const QString &name,
-    xsize index,
-    xsize location)
-  {
-  typename T::InstanceInformation* def = (T::InstanceInformation*)SPropertyInstanceInformation::allocate(sizeof(T::InstanceInformation));
-
-  new(def) T::InstanceInformation;
-
-  def->initiate(T::staticTypeInformation(), name, index, location);
-
-  return def;
-  }
-
-namespace
-{
-template <typename PropType> struct SPropertyInformationCreateHelper
-  {
-public:
-  static void create(SPropertyInformation *info, const QString &typeName)
-    {
-    SPropertyInformation::initiate<PropType>(info, typeName);
-
-    SPropertyInformationCreateData data;
-    data.registerAttributes = true;
-    data.registerInterfaces = false;
-    SPropertyInformationCreateHelper<PropType::ParentType>::recursiveCreateTypeInformation(info, data);
-
-    info->setParentTypeInformation(PropType::ParentType::staticTypeInformation());
-
-    info->setApiInterface(initiateApiInterfaceWithParent<PropType, PropType::ParentType>(info));
-    }
-
-  static void recursiveCreateTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
-    {
-    SPropertyInformationCreateHelper<PropType::ParentType>::recursiveCreateTypeInformation(info, data);
-    PropType::createTypeInformation(info, data);
-    }
-  };
-
-template <> struct SPropertyInformationCreateHelper<SProperty>
-  {
-public:
-  static void create(SPropertyInformation *info, const QString &typeName)
-    {
-    info->setParentTypeInformation(0);
-    SPropertyInformation::initiate<SProperty>(info, typeName);
-
-    info->setApiInterface(initiateApiInterface<SProperty>(info));
-    }
-
-  static void recursiveCreateTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
-    {
-    SProperty::createTypeInformation(info, data);
-    }
-  };
-}
-
-template <typename PropType> void SPropertyInformation::initiate(SPropertyInformation *info, const QString &typeName)
-  {
-  // update copy constructor too
-  info->setCreateProperty(CreatePropertyHelper<PropType>::run);
-  info->setSave(PropType::saveProperty);
-  info->setLoad(PropType::loadProperty);
-  info->setShouldSave(PropType::shouldSaveProperty);
-  info->setShouldSaveValue(PropType::shouldSavePropertyValue);
-  info->setAssign(PropType::assignProperty);
-  info->setPostCreate(0);
-  info->setPostChildSet(PropType::postChildSet);
-  info->setVersion(PropType::Version);
-  info->setSize(sizeof(PropType));
-  info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
-
-  info->_createInstanceInformation = createInstanceInformationHelper<PropType>;
-  info->_derive = SPropertyInformationCreateHelper<PropType>::recursiveCreateTypeInformation;
-  info->_instances = 0;
-  info->_extendedParent = 0;
-
-  info->_typeName = typeName;
-  }
 
 template <typename T, typename U>
 typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QString &name)
@@ -554,46 +406,5 @@ template <typename T> void SPropertyInformation::addStaticInterface(T *factory) 
   {
   addInterfaceFactory(factory);
   }
-
-template <typename T> static const SPropertyInformation *SPropertyInformation::findStaticTypeInformation(const char *name)
-  {
-  SProfileFunction
-
-  static const SPropertyInformation *info = 0;
-  if(!info)
-    {
-    info = STypeRegistry::findType(name);
-
-    if(!info)
-      {
-      SProfileScopedBlock("Initiate information")
-
-      SPropertyInformation *createdInfo = SPropertyInformation::allocate();
-      SPropertyInformationCreateHelper<T>::create(createdInfo, name);
-
-      SPropertyInformationCreateData data;
-      data.registerAttributes = true;
-      data.registerInterfaces = true;
-
-      T::createTypeInformation(createdInfo, data);
-
-      // seal API
-      createdInfo->apiInterface()->seal();
-
-      xAssert(createdInfo);
-      info = createdInfo;
-      }
-    }
-  else
-    {
-    static bool found = STypeRegistry::findType(name);
-    xAssertMessage(found, "Types should be registered before they are used.", name);
-    }
-
-  xAssert(info);
-  return info;
-  }
-
-#include "spropertyinformationapiutilities.h"
 
 #endif // SPROPERTYINFORMATION_H

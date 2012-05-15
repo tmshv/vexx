@@ -1,6 +1,7 @@
 #include "spropertycontainer.h"
 #include "styperegistry.h"
 #include "sdatabase.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(SPropertyContainer)
 

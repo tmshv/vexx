@@ -5,6 +5,7 @@
 #include "sbasepointerproperties.h"
 #include "sdatabase.h"
 #include "XAllocatorBase"
+#include "sobserver.h"
 #include "XBucketAllocator"
 
 struct TypeData
@@ -68,6 +69,9 @@ void STypeRegistry::initiate()
 
   SEntity::staticTypeInformation()->addStaticInterface(new SBasicPositionInterface);
   SProperty::staticTypeInformation()->addStaticInterface(new SBasicColourInterface);
+
+  XInterface<STreeObserver> *treeObs = XInterface<STreeObserver>::create("_STreeObserver");
+  treeObs->seal();
   }
 
 void STypeRegistry::terminate()

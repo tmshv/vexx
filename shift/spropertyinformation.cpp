@@ -1,4 +1,5 @@
 #include "spropertyinformation.h"
+#include "spropertyinformationhelpers.h"
 #include "spropertycontainer.h"
 #include "sdatabase.h"
 #include "styperegistry.h"
@@ -81,7 +82,7 @@ void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyI
   info->setInstanceInformationSize(from->instanceInformationSize());
 
   info->_createInstanceInformation = from->_createInstanceInformation;
-  info->_derive = from->_derive;
+  info->_createTypeInformation = from->_createTypeInformation;
   info->_instances = 0;
   info->_extendedParent = 0;
 
@@ -90,7 +91,7 @@ void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyI
 
 SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *from)
   {
-  xAssert(from->_derive);
+  xAssert(from->_createTypeInformation);
   SPropertyInformation *copy = SPropertyInformation::allocate();
 
   SPropertyInformation::initiate(copy, from);
@@ -99,7 +100,7 @@ SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *f
   data.registerAttributes = true;
   data.registerInterfaces = false;
 
-  from->_derive(copy, data);
+  from->_createTypeInformation(copy, data);
   copy->setParentTypeInformation(from);
 
   copy->_apiInterface = from->_apiInterface;
@@ -134,7 +135,12 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra)
   {
   xAssert(newChildType);
-  SPropertyInstanceInformation *def = newChildType->_createInstanceInformation(name, _children.size(), location);
+
+  SPropertyInstanceInformation* def = SPropertyInstanceInformation::allocate(newChildType->instanceInformationSize());
+
+  newChildType->_createInstanceInformation(def);
+
+  def->initiate(newChildType, name, _children.size(), location);
 
   def->setHoldingTypeInformation(this);
   def->setExtra(extra);
@@ -153,6 +159,40 @@ SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyIns
   inst->setChildInformation(info);
 
   return info;
+}
+
+const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const char *name,
+                                                                                const SPropertyInformation *parent
+                                                                                void (init)(SPropertyInformation *, const char *))
+  {
+  SProfileScopedBlock("Initiate information")
+
+  SPropertyInformation *createdInfo = SPropertyInformation::allocate();
+
+  init(createdInfo, name);
+
+  SPropertyInformationCreateData data;
+
+  data.registerAttributes = true;
+  data.registerInterfaces = false;
+  const SPropertyInformation *ancestor = parentType;
+  while(ancestor)
+    {
+    ancestor->createTypeInformation()(createdInfo, data);
+    ancestor = ancestor->parentTypeInformation();
+    }
+
+  createdInfo->setParentTypeInformation(parentType);
+
+  data.registerAttributes = true;
+  data.registerInterfaces = true;
+  createdInfo->createTypeInformation()(createdInfo, data);
+
+  // seal API
+  createdInfo->apiInterface()->seal();
+
+  xAssert(createdInfo);
+  info = createdInfo;
   }
 
 
@@ -633,11 +673,11 @@ JSToNative<SPropertyInformation>::ResultType JSToNative<SPropertyInformation>::o
   if(h.isObject())
     {
     XScriptObject obj(h);
-    return STypeRegistry::findType(obj.get("typeName").toString());
+    return (SPropertyInformation*)STypeRegistry::findType(obj.get("typeName").toString());
     }
   else
     {
-    return STypeRegistry::findType(h.toString());
+    return (SPropertyInformation*)STypeRegistry::findType(h.toString());
     }
   }
 

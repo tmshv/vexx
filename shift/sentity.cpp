@@ -3,6 +3,7 @@
 #include "styperegistry.h"
 #include "sdatabase.h"
 #include "sinterfaces.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(SEntity)
 

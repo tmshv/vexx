@@ -8,9 +8,16 @@
 #include "sprocessmanager.h"
 #include "XProfiler"
 #include "styperegistry.h"
+#include "spropertyinformationhelpers.h"
 #include "XConvertScriptSTL.h"
 
-S_IMPLEMENT_PROPERTY(SProperty)
+static const SPropertyInformation *_sPropertyTypeInformation =
+  SPropertyInformation::createTypeInformation<SProperty>("SProperty",0);
+
+const SPropertyInformation *SProperty::staticTypeInformation()
+  {
+  return _sPropertyTypeInformation;
+  }
 
 void SProperty::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

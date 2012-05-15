@@ -73,7 +73,7 @@ HEADERS += \
     Serialisation/sjsonio.h \
     shandler.h \
     sinterfaces.h \
-    spropertyinformationapiutilities.h
+    spropertyinformationhelpers.h
 
 
 
