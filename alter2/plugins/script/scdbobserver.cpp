@@ -30,5 +30,6 @@ XInterfaceBase* ScDbTreeObserver::createInterface()
   {
   XInterface<ScDbTreeObserver> *ifc = XInterface<ScDbTreeObserver>::create("STreeObserver");
 
+  ifc->seal();
   return ifc;
   }

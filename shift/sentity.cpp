@@ -18,6 +18,14 @@ void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyI
     {
     XInterface<SEntity> *api = info->apiInterface<SEntity>();
     api->addMethod<SProperty* (const SPropertyInformation *, const QString &), &SEntity::addChild>("addChild");
+
+    api->addMethod<void (STreeObserver* obs), &SEntity::addTreeObserver>("addTreeObserver");
+    api->addMethod<void (SDirtyObserver* obs), &SEntity::addDirtyObserver>("addDirtyObserver");
+    api->addMethod<void (SConnectionObserver* obs), &SEntity::addConnectionObserver>("addConnectionObserver");
+
+    api->addMethod<void (STreeObserver* obs), &SEntity::removeTreeObserver>("removeTreeObserver");
+    api->addMethod<void (SDirtyObserver* obs), &SEntity::removeDirtyObserver>("removeDirtyObserver");
+    api->addMethod<void (SConnectionObserver* obs), &SEntity::removeConnectionObserver>("removeConnectionObserver");
     }
   }
 
@@ -27,6 +35,18 @@ SEntity::SEntity()
 
 SEntity::~SEntity()
   {
+  for(int o = 0; o < _observers.size(); ++o)
+    {
+    QVector<SEntity*>& obs = _observers[o].getObserver()->_entities;
+    for(int i = 0; i < obs.size(); ++i)
+      {
+      if(obs[i] == this)
+        {
+        obs.remove(i--);
+        }
+      }
+    }
+  _observers.clear();
   }
 
 void SEntity::reparent(SEntity *ent)
@@ -119,11 +139,29 @@ SProperty *SEntity::loadProperty(SPropertyContainer *p, SLoader &l)
   return SPropertyContainer::loadProperty(p, l);
   }
 
+SObserver *SEntity::ObserverStruct::getObserver()
+  {
+  if(mode == ObserverStruct::Tree)
+    {
+    return (STreeObserver*)this;
+    }
+  else if(mode == ObserverStruct::Dirty)
+    {
+    return (SDirtyObserver*)this;
+    }
+  else if(mode == ObserverStruct::Connection)
+    {
+    return (SConnectionObserver*)this;
+    }
+  return 0;
+  }
+
 void SEntity::addDirtyObserver(SDirtyObserver *in)
   {
   ObserverStruct s;
   s.mode = ObserverStruct::Dirty;
   s.observer = in;
+  in->_entities << this;
   _observers << s;
   }
 
@@ -132,6 +170,7 @@ void SEntity::addTreeObserver(STreeObserver *in)
   ObserverStruct s;
   s.mode = ObserverStruct::Tree;
   s.observer = in;
+  in->_entities << this;
   _observers << s;
   }
 
@@ -140,6 +179,7 @@ void SEntity::addConnectionObserver(SConnectionObserver *in)
   ObserverStruct s;
   s.mode = ObserverStruct::Connection;
   s.observer = in;
+  in->_entities << this;
   _observers << s;
   }
 
@@ -150,8 +190,7 @@ void SEntity::removeDirtyObserver(SDirtyObserver *in)
     if(_observers[x].observer == in)
       {
       xAssert(_observers[x].mode == ObserverStruct::Dirty);
-      _observers.removeAt(x);
-      --x;
+      _observers.removeAt(x--);
       }
     }
   }
@@ -163,8 +202,7 @@ void SEntity::removeTreeObserver(STreeObserver *in)
     if(_observers[x].observer == in)
       {
       xAssert(_observers[x].mode == ObserverStruct::Tree);
-      _observers.removeAt(x);
-      --x;
+      _observers.removeAt(x--);
       }
     }
   }
@@ -176,6 +214,17 @@ void SEntity::removeConnectionObserver(SConnectionObserver *in)
     if(_observers[x].observer == in)
       {
       xAssert(_observers[x].mode == ObserverStruct::Connection);
+      _observers.removeAt(x--);
+      }
+    }
+  }
+
+void SEntity::removeObserver(SObserver *in)
+  {
+  for(int x=0; x<_observers.size(); ++x)
+    {
+    if(_observers[x].getObserver() == in)
+      {
       _observers.removeAt(x);
       --x;
       }

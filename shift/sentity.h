@@ -74,6 +74,7 @@ public:
   void removeDirtyObserver(SDirtyObserver *);
   void removeTreeObserver(STreeObserver *);
   void removeConnectionObserver(SConnectionObserver *);
+  void removeObserver(SObserver *);
 
   void informDirtyObservers(SProperty *prop);
   void informTreeObservers(const SChange *event, bool backwards);
@@ -96,6 +97,8 @@ private:
       };
     xuint8 mode;
     void *observer;
+
+    SObserver *getObserver();
     };
   XList<ObserverStruct> _observers;
   };

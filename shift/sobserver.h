@@ -10,8 +10,12 @@ class SChange;
 class SObserver
   {
 public:
-  virtual ~SObserver() { }
+  virtual ~SObserver();
   virtual void actOnChanges() { };
+
+private:
+  QVector <SEntity*> _entities;
+  friend class SEntity;
   };
 
 class SHIFT_EXPORT STreeObserver : public virtual SObserver
@@ -21,12 +25,16 @@ public:
   virtual void onTreeChange(const SChange *, bool backwards) = 0;
   };
 
+X_SCRIPTABLE_TYPE(STreeObserver);
+
 class SHIFT_EXPORT SDirtyObserver : public virtual SObserver
   {
 public:
   virtual ~SDirtyObserver() { }
   virtual void onPropertyDirtied(const SProperty*) = 0;
   };
+
+X_SCRIPTABLE_TYPE(SDirtyObserver);
 
 class SHIFT_EXPORT SConnectionObserver : public virtual SObserver
   {
@@ -35,5 +43,6 @@ public:
   virtual void onConnectionChange(const SChange *, bool backwards) = 0;
   };
 
+X_SCRIPTABLE_TYPE(SConnectionObserver);
 
 #endif // SOBSERVER_H
