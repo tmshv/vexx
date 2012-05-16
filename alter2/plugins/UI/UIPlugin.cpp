@@ -1,8 +1,4 @@
 #include "UIPlugin.h"
-#include "UIVerticalLayout.h"
-#include "UIHorizontalLayout.h"
-#include "UIStackedLayout.h"
-#include "UIWorkspace.h"
 #include "UISurface.h"
 #include "acore.h"
 #include "QMainWindow"
@@ -98,12 +94,6 @@ void UIPlugin::load()
   if(shift.isValid())
     {
     SDatabase &db = shift->db();
-
-    STypeRegistry::addType(UIWorkspace::staticTypeInformation());
-    STypeRegistry::addType(UILayout::staticTypeInformation());
-    STypeRegistry::addType(UIStackedLayout::staticTypeInformation());
-    STypeRegistry::addType(UIVerticalLayout::staticTypeInformation());
-    STypeRegistry::addType(UIHorizontalLayout::staticTypeInformation());
 
     if(core()->isDebugUIEnabled())
       {

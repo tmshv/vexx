@@ -13,7 +13,7 @@
 # include "XMemoryTracker"
 #endif
 
-S_IMPLEMENT_SHIFT_PROPERTY(SDatabase)
+S_IMPLEMENT_PROPERTY(SDatabase, Shift)
 
 void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -156,10 +156,12 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
 
 void SDatabase::deleteProperty(SProperty *prop)
   {
+  const SPropertyInformation *info = prop->typeInformation();
+
   xAssert(!prop->_flags.hasFlag(PreGetting));
   uninitiateProperty(prop);
 
-  prop->~SProperty();
+  info->destroyProperty()(prop);
   }
 
 void SDatabase::deleteDynamicProperty(SProperty *prop)
@@ -219,7 +221,8 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
 
     if(child->extra())
       {
-      thisProp->~SProperty();
+      const SPropertyInformation *info = thisProp->typeInformation();
+      info->destroyProperty()(thisProp);
       }
     }
   }

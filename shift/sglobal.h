@@ -43,4 +43,10 @@ S_DEFINE_INTERFACE_TYPE(PropertyPositionInterface, 3)
 S_DEFINE_INTERFACE_TYPE(PropertyColourInterface, 4)
 S_DEFINE_INTERFACE_TYPE(PropertyConnectionInterface, 5)
 
+class SPropertyGroup;
+namespace Shift
+{
+SPropertyGroup &propertyGroup();
+}
+
 #endif // SHIFT_GLOBAL_H

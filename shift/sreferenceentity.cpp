@@ -2,7 +2,7 @@
 #include "styperegistry.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_SHIFT_PROPERTY(SReferenceEntity)
+S_IMPLEMENT_PROPERTY(SReferenceEntity, Shift)
 
 void SReferenceEntity::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {

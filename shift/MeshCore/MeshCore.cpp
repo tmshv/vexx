@@ -1,20 +1,17 @@
 #include "MeshCore.h"
 #include "styperegistry.h"
+#include "spropertygroup.h"
 
-#include "MCGeometry.h"
-#include "MCCuboid.h"
-#include "MCDensityShape.h"
-#include "MCSphere.h"
-#include "MCPolyhedron.h"
-
-void initiateMeshCore()
+namespace MeshCore
+{
+void initiate()
   {
-  STypeRegistry::addType(MCPolyhedronProperty::staticTypeInformation());
-  STypeRegistry::addType(MCGeometry::staticTypeInformation());
-
-  STypeRegistry::addType(MCShape::staticTypeInformation());
-  STypeRegistry::addType(MCDensityShape::staticTypeInformation());
-
-  STypeRegistry::addType(MCCuboid::staticTypeInformation());
-  STypeRegistry::addType(MCSphere::staticTypeInformation());
+  STypeRegistry::addPropertyGroup(propertyGroup());
   }
+
+SPropertyGroup &propertyGroup()
+  {
+  static SPropertyGroup grp;
+  return grp;
+  }
+}

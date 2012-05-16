@@ -11,7 +11,7 @@ void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocumen
   doc->revision = doc->revision() + 1;
   }
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument)
+S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument, ShiftAlter)
 
 void SDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

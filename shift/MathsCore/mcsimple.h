@@ -1,6 +1,7 @@
 #ifndef MCSIMPLE_H
 #define MCSIMPLE_H
 
+#include "mcglobal.h"
 #include "sentity.h"
 #include "sbaseproperties.h"
 

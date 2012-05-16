@@ -8,6 +8,8 @@
 #include "styperegistry.h"
 #include "QSet"
 
+#include "XScriptObject.h"
+
 class ScCoreObject;
 class XScriptEngine;
 class ScObject;

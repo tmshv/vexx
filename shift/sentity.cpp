@@ -5,7 +5,7 @@
 #include "sinterfaces.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_SHIFT_PROPERTY(SEntity)
+S_IMPLEMENT_PROPERTY(SEntity, Shift)
 
 void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

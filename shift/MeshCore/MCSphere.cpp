@@ -3,7 +3,7 @@
 #include "3D/GCTransform.h"
 #include "3D/Manipulators/GCDistanceManipulator.h"
 
-S_IMPLEMENT_PROPERTY(MCSphere)
+S_IMPLEMENT_PROPERTY(MCSphere, MeshCore)
 
 void MCSphere::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

@@ -100,30 +100,32 @@ QTextStream &operator<<(QTextStream &s, const SStringVector &v)
   return s;
   }
 
-IMPLEMENT_POD_PROPERTY(BoolProperty);
-IMPLEMENT_POD_PROPERTY(IntProperty);
-IMPLEMENT_POD_PROPERTY(LongIntProperty);
-IMPLEMENT_POD_PROPERTY(UnsignedIntProperty);
-IMPLEMENT_POD_PROPERTY(LongUnsignedIntProperty);
-IMPLEMENT_POD_PROPERTY(FloatProperty);
-IMPLEMENT_POD_PROPERTY(DoubleProperty);
-IMPLEMENT_POD_PROPERTY(Vector2DProperty);
-IMPLEMENT_POD_PROPERTY(Vector3DProperty);
-IMPLEMENT_POD_PROPERTY(Vector4DProperty);
-IMPLEMENT_POD_PROPERTY(QuaternionProperty);
-IMPLEMENT_POD_PROPERTY(StringPropertyBase);
-IMPLEMENT_POD_PROPERTY(ColourProperty);
-IMPLEMENT_POD_PROPERTY(ByteArrayProperty);
+#define IMPLEMENT_POD_SHIFT_PROPERTY(name) IMPLEMENT_POD_PROPERTY(name, Shift)
 
-IMPLEMENT_POD_PROPERTY(StringArrayProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(BoolProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(IntProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(LongIntProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(UnsignedIntProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(LongUnsignedIntProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(FloatProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(DoubleProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(Vector2DProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(Vector3DProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(Vector4DProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(QuaternionProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(StringPropertyBase);
+IMPLEMENT_POD_SHIFT_PROPERTY(ColourProperty);
+IMPLEMENT_POD_SHIFT_PROPERTY(ByteArrayProperty);
 
-S_IMPLEMENT_SHIFT_PROPERTY(StringProperty)
+IMPLEMENT_POD_SHIFT_PROPERTY(StringArrayProperty);
+
+S_IMPLEMENT_PROPERTY(StringProperty, Shift)
 
 void StringProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 
-S_IMPLEMENT_SHIFT_PROPERTY(FilenameProperty)
+S_IMPLEMENT_PROPERTY(FilenameProperty, Shift)
 
 void FilenameProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {

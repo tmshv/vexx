@@ -3,11 +3,11 @@
 #include "XRenderer.h"
 #include "sprocessmanager.h"
 
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderComponentPointer)
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderPointer)
-S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderComponentPointer, GraphicsCore)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderPointer, GraphicsCore)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray, GraphicsCore)
 
-S_IMPLEMENT_PROPERTY(GCShaderComponent)
+S_IMPLEMENT_PROPERTY(GCShaderComponent, GraphicsCore)
 
 void GCShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -17,19 +17,19 @@ GCShaderComponent::GCShaderComponent()
   {
   }
 
-S_IMPLEMENT_PROPERTY(GCFragmentShaderComponent)
+S_IMPLEMENT_PROPERTY(GCFragmentShaderComponent, GraphicsCore)
 
 void GCFragmentShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 
-S_IMPLEMENT_PROPERTY(GCVertexShaderComponent)
+S_IMPLEMENT_PROPERTY(GCVertexShaderComponent, GraphicsCore)
 
 void GCVertexShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 
-S_IMPLEMENT_PROPERTY(GCShader)
+S_IMPLEMENT_PROPERTY(GCShader, GraphicsCore)
 
 void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, GCShader *shader)
   {

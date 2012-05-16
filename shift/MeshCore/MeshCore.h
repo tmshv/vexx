@@ -10,6 +10,12 @@
 # define MESHCORE_EXPORT X_DECL_IMPORT
 #endif
 
-void MESHCORE_EXPORT initiateMeshCore();
+
+class SPropertyGroup;
+namespace MeshCore
+{
+void MESHCORE_EXPORT initiate();
+SPropertyGroup &propertyGroup();
+}
 
 #endif // GRAPHICSCORE_H

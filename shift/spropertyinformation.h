@@ -142,24 +142,26 @@ public:
 class SHIFT_EXPORT SPropertyInformation
   {
 public:
-  typedef void (*CreatePropertyFunction)(void *data);
-  typedef void (*PostCreateFunction)(void *data);
+  typedef void (*AllocatePropertyFunction)(SProperty *data);
+  typedef void (*PostCreateFunction)(SProperty *data);
   typedef void (*PostSetFunction)(SPropertyContainer *cont, SProperty *data);
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
   typedef bool (*SaveQueryFunction)( const SProperty * );
-  typedef void (*CreateInformationFunction)(SPropertyInformation *, const SPropertyInformationCreateData &);
-  typedef void (*CreateInstanceInformationFunction)(SPropertyInstanceInformation *data);
+  typedef void (*AllocateInformationFunction)(SPropertyInformation *, const SPropertyInformationCreateData &);
+  typedef void (*AllocateInstanceInformationFunction)(SPropertyInstanceInformation *data);
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
 XProperties:
-  XProperty(CreateInformationFunction, createTypeInformation, setCreateTypeInformation);
-  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
-  XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
+  XProperty(AllocateInformationFunction, createTypeInformation, setCreateTypeInformation);
+  XProperty(AllocateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
+  XProperty(AllocateInstanceInformationFunction, destroyInstanceInformation, setDestroyInstanceInformation);
+  XProperty(AllocatePropertyFunction, createProperty, setCreateProperty);
+  XProperty(AllocatePropertyFunction, destroyProperty, setDestroyProperty);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
   XProperty(SaveQueryFunction, shouldSave, setShouldSave);

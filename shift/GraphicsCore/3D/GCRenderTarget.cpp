@@ -2,7 +2,7 @@
 #include "styperegistry.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(GCRenderTarget)
+S_IMPLEMENT_PROPERTY(GCRenderTarget, GraphicsCore)
 
 void computeAspectRatio(const SPropertyInstanceInformation *, GCRenderTarget *vp)
   {

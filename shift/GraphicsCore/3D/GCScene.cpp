@@ -9,7 +9,7 @@
 #include "QVarLengthArray"
 #include "XCuboid.h"
 
-S_IMPLEMENT_PROPERTY(GCScene)
+S_IMPLEMENT_PROPERTY(GCScene, GraphicsCore)
 
 void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -54,7 +54,7 @@ void GCScene::setCamera(GCViewableTransform *e)
   activeCamera.setInput(e);
   }
 
-S_IMPLEMENT_PROPERTY(GCManipulatableScene)
+S_IMPLEMENT_PROPERTY(GCManipulatableScene, GraphicsCore)
 
 void computeManips(const SPropertyInstanceInformation *, GCManipulatableScene *s)
   {

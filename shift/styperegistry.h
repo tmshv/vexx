@@ -31,7 +31,6 @@ public:
 
   static const SPropertyInformation *findType(const QString &);
 
-
 private:
   STypeRegistry();
   X_DISABLE_COPY(STypeRegistry);
@@ -40,6 +39,9 @@ private:
   static void internalAddType(const SPropertyInformation *);
 
   static void initiateInternalTypes();
+
+  friend class SPropertyGroup;
+  static void onTypeAdded(SPropertyGroup *, const SPropertyInformation *);
   };
 
 #endif // STYPEREGISTRY_H

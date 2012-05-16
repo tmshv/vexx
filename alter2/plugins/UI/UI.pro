@@ -11,11 +11,6 @@ include("../../../Eks/EksCore/GeneralOptions.pri")
 
 SOURCES += UIPlugin.cpp \
     UISurface.cpp \
-    UIWorkspace.cpp \
-    UIVerticalLayout.cpp \
-    UIHorizontalLayout.cpp \
-    UIStackedLayout.cpp \
-    UILayout.cpp \
     UIDatabaseDebugSurface.cpp \
     UIGraphDebugSurface.cpp \
     UISurfacePrivate.cpp \
@@ -25,11 +20,6 @@ SOURCES += UIPlugin.cpp \
 HEADERS += UIPlugin.h \
     UIGlobal.h \
     UISurface.h \
-    UIWorkspace.h \
-    UIVerticalLayout.h \
-    UIHorizontalLayout.h \
-    UIStackedLayout.h \
-    UILayout.h \
     UIDatabaseDebugSurface.h \
     UIGraphDebugSurface.h \
     UISurfacePrivate.h \

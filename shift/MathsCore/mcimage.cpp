@@ -58,7 +58,7 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* , MCImage *
   l.data()->shuffle(image->_preOperation, shuffleMask);
   }
 
-S_IMPLEMENT_PROPERTY(MCImage)
+S_IMPLEMENT_PROPERTY(MCImage, MathsCore)
 
 void MCImage::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

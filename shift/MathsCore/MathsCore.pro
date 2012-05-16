@@ -10,7 +10,6 @@ include("../../Eks/EksCore/GeneralOptions.pri")
 
 HEADERS += \
     mcglobal.h \
-    mathscore.h \
     mcmathsoperation.h \
     mcimage.h \
     mcsource.h \

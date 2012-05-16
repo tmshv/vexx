@@ -6,21 +6,15 @@
 #include "XInterface.h"
 #include "sproperty.h"
 
-#define S_IMPLEMENT_PROPERTY(myName, propertyGroup) \
+#define S_IMPLEMENT_PROPERTY(myName, grp) \
   static const SPropertyInformation *_##myName##StaticTypeInformation = myName :: bootstrapStaticTypeInformation();\
   const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation; } \
   const SPropertyInformation *myName::bootstrapStaticTypeInformation() \
   { return SPropertyInformation::bootstrapTypeInformation<myName>(&_##myName##StaticTypeInformation, \
-      #myName, myName::ParentType::bootstrapStaticTypeInformation(), propertyGroup); }
+  #myName, myName::ParentType::bootstrapStaticTypeInformation(), grp::propertyGroup()); }
 
-#define S_IMPLEMENT_SHIFT_PROPERTY(name) S_IMPLEMENT_PROPERTY(name, shiftPropertyGroup())
-
-#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
-  TEMPL S_IMPLEMENT_PROPERTY(myName)
-
-
-#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  S_IMPLEMENT_PROPERTY(myName)
+#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName, grp) \
+  S_IMPLEMENT_PROPERTY(myName, grp)
 
 namespace
 {
@@ -48,38 +42,52 @@ public:
     }
   };
 
-template<typename T, bool Abstract = T::IsAbstract> struct CreatePropertyHelper;
+template<typename T, bool Abstract = T::IsAbstract> struct PropertyHelper;
 
-template<typename T> struct CreatePropertyHelper<T, true>
+template<typename T> struct PropertyHelper<T, true>
   {
-  static void run(void *)
+  static void create(SProperty *)
+    {
+    xAssertFail();
+    }
+  static void destroy(SProperty *)
     {
     xAssertFail();
     }
   };
 
-template<typename T> struct CreatePropertyHelper<T, false>
+template<typename T> struct PropertyHelper<T, false>
   {
-  static void run(void *ptr)
+  static void create(SProperty *ptr)
     {
     new(ptr) T();
     }
-  };
-
-template <typename T> struct CreateInstanceInformationHelper
-  {
-  static void run(SPropertyInstanceInformation *allocation)
+  static void destroy(SProperty *ptr)
     {
-    new(allocation) T::InstanceInformation;
+    ((T*)ptr)->~T();
     }
   };
 
+template <typename T> struct InstanceInformationHelper
+  {
+  static void create(SPropertyInstanceInformation *allocation)
+    {
+    new(allocation) T::InstanceInformation;
+    }
+  static void destroy(SPropertyInstanceInformation *allocation)
+    {
+    ((T*)allocation)->~T();
+    }
+  };
 }
 
 template <typename PropType> void SPropertyInformation::initiate(SPropertyInformation *info, const char *typeName)
   {
   // update copy constructor too
-  info->setCreateProperty(CreatePropertyHelper<PropType>::run);
+  info->setCreateProperty(PropertyHelper<PropType>::create);
+  info->setDestroyProperty(PropertyHelper<PropType>::destroy);
+  info->setCreateInstanceInformation(InstanceInformationHelper<PropType>::create);
+  info->setDestroyInstanceInformation(InstanceInformationHelper<PropType>::destroy);
   info->setSave(PropType::saveProperty);
   info->setLoad(PropType::loadProperty);
   info->setShouldSave(PropType::shouldSaveProperty);
@@ -91,7 +99,6 @@ template <typename PropType> void SPropertyInformation::initiate(SPropertyInform
   info->setSize(sizeof(PropType));
   info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
-  info->_createInstanceInformation = CreateInstanceInformationHelper<PropType>::run;
   info->_createTypeInformation = PropType::createTypeInformation;
   info->_instances = 0;
   info->_extendedParent = 0;

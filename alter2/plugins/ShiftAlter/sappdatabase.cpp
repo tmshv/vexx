@@ -3,7 +3,7 @@
 #include "styperegistry.h"
 #include "sadocument.h"
 
-S_IMPLEMENT_PROPERTY(SAppDatabase)
+S_IMPLEMENT_PROPERTY(SAppDatabase, ShiftAlter)
 
 void SAppDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

@@ -5,7 +5,7 @@
 #include "UIPlugin.h"
 #include "Viewport.h"
 #include "webview.h"
-#include "GraphicsCore.h"
+#include "GCGlobal.h"
 #include "MeshCore.h"
 #include "component.h"
 #include "componentdocument.h"
@@ -44,14 +44,12 @@ int main( int argc, char **argv )
     return EXIT_FAILURE;
     }
 
-  initiateMeshCore();
+  MeshCore::initiate();
 
   script->registerScriptGlobal("tang", new TangManager(&app));
 
-  STypeRegistry::addType(Component::staticTypeInformation());
-  STypeRegistry::addType(ComponentDocument::staticTypeInformation());
-  STypeRegistry::addType(Area::staticTypeInformation());
-  STypeRegistry::addType(AreaDocument::staticTypeInformation());
+  STypeRegistry::addPropertyGroup(Tang::propertyGroup());
+
   Component::staticTypeInformation()->addStaticInterface(new ComponentEditorInterface);
 
   script->include("startupTang.js");

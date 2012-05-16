@@ -149,6 +149,8 @@ void ScPlugin::load()
 
   registerScriptGlobal("db", XScriptConvert::to(&db->db()));
 
+  STypeRegistry::addPropertyGroup(dynamicScriptPropertyGroup());
+
   STypeRegistry::addTypeObserver(this);
   XScriptObject dbObject = _engine->get("db");
   XScriptObject types = XScriptObject::newObject();

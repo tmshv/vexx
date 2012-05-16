@@ -10,7 +10,7 @@
 #include "QPushButton"
 #include "saparteditorinterface.h"
 
-S_IMPLEMENT_PROPERTY(SPartDocument)
+S_IMPLEMENT_PROPERTY(SPartDocument, ShiftAlter)
 
 void SPartDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

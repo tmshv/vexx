@@ -12,12 +12,14 @@ void readValue(SLoader &, XShader &)
   xAssertFail();
   }
 
-IMPLEMENT_POD_PROPERTY(TransformProperty);
-IMPLEMENT_POD_PROPERTY(ComplexTransformProperty);
-IMPLEMENT_POD_PROPERTY(GCRuntimeShader)
-IMPLEMENT_POD_PROPERTY(GCQImage)
-IMPLEMENT_POD_PROPERTY(GCRuntimeGeometry)
-IMPLEMENT_POD_PROPERTY(GCBoundingBox)
+#define IMPLEMENT_POD_GC_PROPERTY(name) IMPLEMENT_POD_PROPERTY(name, GraphicsCore)
+
+IMPLEMENT_POD_GC_PROPERTY(TransformProperty);
+IMPLEMENT_POD_GC_PROPERTY(ComplexTransformProperty);
+IMPLEMENT_POD_GC_PROPERTY(GCRuntimeShader)
+IMPLEMENT_POD_GC_PROPERTY(GCQImage)
+IMPLEMENT_POD_GC_PROPERTY(GCRuntimeGeometry)
+IMPLEMENT_POD_GC_PROPERTY(GCBoundingBox)
 
 void GCBoundingBox::assignProperty(const SProperty *f, SProperty *t)
   {

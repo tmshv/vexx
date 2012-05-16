@@ -1,7 +1,7 @@
 #include "GCViewport.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(GCViewport)
+S_IMPLEMENT_PROPERTY(GCViewport, GraphicsCore)
 
 void GCViewport::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

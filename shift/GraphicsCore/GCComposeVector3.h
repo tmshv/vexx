@@ -1,10 +1,11 @@
 #ifndef GCCOMPOSEVECTOR3_H
 #define GCCOMPOSEVECTOR3_H
 
+#include "GCGlobal.h"
 #include "sentity.h"
 #include "sbaseproperties.h"
 
-class GCComposeVector3 : public SEntity
+class GRAPHICSCORE_EXPORT GCComposeVector3 : public SEntity
   {
   S_ENTITY(GCComposeVector3, SEntity, 0)
 

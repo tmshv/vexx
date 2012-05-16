@@ -3,7 +3,7 @@
 #include "styperegistry.h"
 #include "sprocessmanager.h"
 
-S_IMPLEMENT_PROPERTY(GCGeometry)
+S_IMPLEMENT_PROPERTY(GCGeometry, GraphicsCore)
 
 void GCGeometry::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -17,4 +17,4 @@ GCGeometry::GCGeometry()
   {
   }
 
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCGeometryPointer)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCGeometryPointer, GraphicsCore)

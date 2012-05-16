@@ -19,4 +19,10 @@ public:
   Q_INVOKABLE QWidget *createViewport();
   };
 
+class SPropertyGroup;
+namespace Tang
+{
+SPropertyGroup &propertyGroup();
+}
+
 #endif // TANGMANAGER_H

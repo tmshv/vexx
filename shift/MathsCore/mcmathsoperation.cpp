@@ -2,7 +2,7 @@
 #include "spropertyinformationhelpers.h"
 #include "QImage"
 
-S_IMPLEMENT_PROPERTY(MCMathsOperation)
+S_IMPLEMENT_PROPERTY(MCMathsOperation, MathsCore)
 
 void MCMathsOperation::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

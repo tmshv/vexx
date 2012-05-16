@@ -11,6 +11,12 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
+SPropertyGroup &dynamicScriptPropertyGroup()
+  {
+  static SPropertyGroup grp;
+  return grp;
+  }
+
 void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node)
   {
   ScProfileFunction
@@ -256,7 +262,7 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
     return error;
     }
 
-  STypeRegistry::addType(newType);
+  dynamicScriptPropertyGroup().registerPropertyInformation(newType);
 
   return XScriptValue();
   }

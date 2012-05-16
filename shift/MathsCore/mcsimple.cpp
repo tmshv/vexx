@@ -1,7 +1,7 @@
 #include "mcsimple.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(MCSimple)
+S_IMPLEMENT_PROPERTY(MCSimple, MathsCore)
 
 void MCSimple::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

@@ -77,7 +77,7 @@ private:
   XShader _shader;
   };
 
-S_IMPLEMENT_PROPERTY(GCDistanceManipulator)
+S_IMPLEMENT_PROPERTY(GCDistanceManipulator, GraphicsCore)
 
 void computeAbsDisp(const SPropertyInstanceInformation *, GCDistanceManipulator *d)
   {

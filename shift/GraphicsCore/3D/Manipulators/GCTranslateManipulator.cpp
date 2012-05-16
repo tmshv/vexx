@@ -160,7 +160,7 @@ private:
   XShader _shader;
   };
 
-S_IMPLEMENT_PROPERTY(GCSingularTranslateManipulator)
+S_IMPLEMENT_PROPERTY(GCSingularTranslateManipulator, GraphicsCore)
 
 void GCSingularTranslateManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -189,7 +189,7 @@ void GCSingularTranslateManipulator::onDrag(const MouseMoveEvent &e)
   }
 
 
-S_IMPLEMENT_PROPERTY(GCTranslateManipulator)
+S_IMPLEMENT_PROPERTY(GCTranslateManipulator, GraphicsCore)
 
 void postCreateTranslateManip(GCTranslateManipulator *m)
   {

@@ -8,7 +8,7 @@ void computeAddOutput(const SPropertyInstanceInformation *, MCSimpleMultiply *ad
   *l.data() = add->inputA() * add->inputB();
   }
 
-S_IMPLEMENT_PROPERTY(MCSimpleMultiply)
+S_IMPLEMENT_PROPERTY(MCSimpleMultiply, MathsCore)
 
 void MCSimpleMultiply::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

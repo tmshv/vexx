@@ -12,4 +12,11 @@
 
 S_DEFINE_INTERFACE_TYPE(SPartEditorInterface, 300)
 S_DEFINE_INTERFACE_TYPE(SExportableInterface, 301)
+
+class SPropertyGroup;
+namespace ShiftAlter
+{
+SPropertyGroup &propertyGroup();
+}
+
 #endif // SAGLOBAL_H

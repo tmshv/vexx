@@ -11,7 +11,6 @@ QT += opengl
 include("../../Eks/EksCore/GeneralOptions.pri")
 
 HEADERS += GCGlobal.h \
-    GraphicsCore.h \
     GCShiftRenderModel.h \
     GCAbstractNodeDelegate.h \
     GCNodeController.h \
@@ -41,7 +40,6 @@ INCLUDEPATH += $$ROOT/shift/GraphicsCore $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript
 LIBS += -lshift -lEksCore -lEks3D -lEksScript
 
 SOURCES += \
-    GraphicsCore.cpp \
     GCShiftRenderModel.cpp \
     GCAbstractNodeDelegate.cpp \
     GCNodeController.cpp \
@@ -64,7 +62,8 @@ SOURCES += \
     3D/GCShaderDataBindings.cpp \
     3D/GCTexture.cpp \
     GCComposeTransform.cpp \
-    GCComposeVector3.cpp
+    GCComposeVector3.cpp \
+    GCGlobal.cpp
 
 
 

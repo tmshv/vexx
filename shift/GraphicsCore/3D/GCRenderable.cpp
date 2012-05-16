@@ -1,10 +1,10 @@
 #include "GCRenderable.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCRenderablePointer)
-S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCRenderablePointerArray)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCRenderablePointer, GraphicsCore)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCRenderablePointerArray, GraphicsCore)
 
-S_IMPLEMENT_PROPERTY(GCRenderable)
+S_IMPLEMENT_PROPERTY(GCRenderable, GraphicsCore)
 
 void GCRenderable::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -27,7 +27,7 @@ void GCRenderable::intersect(const XFrustum &, Selector *)
   }
 
 
-S_IMPLEMENT_PROPERTY(GCRenderArray)
+S_IMPLEMENT_PROPERTY(GCRenderArray, GraphicsCore)
 
 void unionBounds(const SPropertyInstanceInformation*, GCRenderArray* array)
   {

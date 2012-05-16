@@ -13,10 +13,20 @@
 #include "saparteditor.h"
 #include "sashaderparteditorinterface.h"
 #include "acore.h"
-#include "mathscore.h"
+#include "mcglobal.h"
 #include "meshcore.h"
-#include "GraphicsCore.h"
+#include "gcglobal.h"
 #include "XArrayMath"
+#include "spropertygroup.h"
+
+namespace ShiftAlter
+{
+SPropertyGroup &propertyGroup()
+  {
+  static SPropertyGroup grp;
+  return grp;
+  }
+}
 
 ALTER_PLUGIN(SPlugin);
 
@@ -39,16 +49,15 @@ const SAppDatabase &SPlugin::db() const
 void SPlugin::load()
   {
   STypeRegistry::initiate();
-  STypeRegistry::addType(SAppDatabase::staticTypeInformation());
-  STypeRegistry::addType(SDocument::staticTypeInformation());
-  STypeRegistry::addType(SPartDocument::staticTypeInformation());
+
+  STypeRegistry::addPropertyGroup(ShiftAlter::propertyGroup());
 
   _mathsEngine = new XReferenceMathsEngine;
   XMathsEngine::setEngine(_mathsEngine);
 
-  initiateMathsCore();
-  initiateGraphicsCore();
-  initiateMeshCore();
+  MathsCore::initiate();
+  GraphicsCore::initiate();
+  MeshCore::initiate();
 
   XProfiler::setStringForContext(GCProfileScope, "GraphicsCore");
   XProfiler::setStringForContext(496, "EksDataModel"); // X3DDataModelProfileScope

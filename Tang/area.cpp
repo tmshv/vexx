@@ -1,7 +1,8 @@
 #include "area.h"
 #include "spropertyinformationhelpers.h"
+#include "tangmanager.h"
 
-S_IMPLEMENT_PROPERTY(Area)
+S_IMPLEMENT_PROPERTY(Area, Tang)
 
 void Area::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

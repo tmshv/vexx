@@ -17,3 +17,12 @@ QWidget *TangManager::createViewport()
 
   return new Viewport(*db);
   }
+
+namespace Tang
+{
+SPropertyGroup &propertyGroup()
+  {
+  static SPropertyGroup grp;
+  return grp;
+  }
+}

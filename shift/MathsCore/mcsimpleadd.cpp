@@ -8,7 +8,7 @@ void computeAddOutput(const SPropertyInstanceInformation *, MCSimpleAdd *add)
   *l.data() = add->inputA() + add->inputB();
   }
 
-S_IMPLEMENT_PROPERTY(MCSimpleAdd)
+S_IMPLEMENT_PROPERTY(MCSimpleAdd, MathsCore)
 
 void MCSimpleAdd::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

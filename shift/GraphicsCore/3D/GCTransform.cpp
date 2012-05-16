@@ -23,7 +23,7 @@ void unionTransformedBounds(const SPropertyInstanceInformation*, GCTransform* tr
   *data = tr->transform() * *data;
   }
 
-S_IMPLEMENT_PROPERTY(GCTransform)
+S_IMPLEMENT_PROPERTY(GCTransform, GraphicsCore)
 
 void GCTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

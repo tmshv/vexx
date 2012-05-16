@@ -6,10 +6,10 @@
 #include "3D/Manipulators/GCButtonManipulator.h"
 #include "sprocessmanager.h"
 
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCShadingGroupPointer)
-S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShadingGroupPointerArray)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShadingGroupPointer, GraphicsCore)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShadingGroupPointerArray, GraphicsCore)
 
-S_IMPLEMENT_PROPERTY(GCShadingGroup)
+S_IMPLEMENT_PROPERTY(GCShadingGroup, GraphicsCore)
 
 void GCShadingGroup::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

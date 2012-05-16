@@ -73,7 +73,7 @@ public:
     };
 
   SPropertyContainer();
-  virtual ~SPropertyContainer();
+  ~SPropertyContainer();
 
   template <typename T> T *firstChild() const
     {

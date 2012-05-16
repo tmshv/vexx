@@ -5,10 +5,10 @@
 #include "Eigen/Geometry"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCViewableTransformPointer)
-S_IMPLEMENT_TYPED_POINTER_TYPE(GCCameraPointer)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCViewableTransformPointer, GraphicsCore)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCCameraPointer, GraphicsCore)
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform, GraphicsCore)
 
 void computeView(const SPropertyInstanceInformation *, GCViewableTransform *tr)
   {
@@ -238,7 +238,7 @@ void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, floa
     }
   }
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCCamera)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCCamera, GraphicsCore)
 
 void GCCamera::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -248,7 +248,7 @@ GCCamera::GCCamera()
   {
   }
 
-S_IMPLEMENT_PROPERTY(GCPerspectiveCamera)
+S_IMPLEMENT_PROPERTY(GCPerspectiveCamera, GraphicsCore)
 
 void computePerspective(const SPropertyInstanceInformation *, GCPerspectiveCamera *c)
   {

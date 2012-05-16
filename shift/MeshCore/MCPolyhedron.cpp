@@ -1,7 +1,7 @@
 #include "MCPolyhedron.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(MCPolyhedronProperty)
+S_IMPLEMENT_PROPERTY(MCPolyhedronProperty, MeshCore)
 
 void MCPolyhedronProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {

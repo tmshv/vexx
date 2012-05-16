@@ -6,7 +6,7 @@
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_polyhedron_triangle_primitive.h>
 
-S_IMPLEMENT_PROPERTY(MCShape)
+S_IMPLEMENT_PROPERTY(MCShape, MeshCore)
 
 void unionBounds(const SPropertyInstanceInformation*, MCShape* shape)
   {

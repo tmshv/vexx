@@ -22,6 +22,4 @@ private:
   friend class STypeRegistry;
   };
 
-SPropertyGroup &shiftPropertyGroup();
-
 #endif // SPROPERTYGROUP_H

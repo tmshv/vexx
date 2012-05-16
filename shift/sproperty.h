@@ -69,7 +69,7 @@ public:
 
 public:
   SProperty();
-  virtual ~SProperty();
+  ~SProperty();
 
   void assign(const SProperty *propToAssign);
 

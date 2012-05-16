@@ -5,7 +5,7 @@
 
 #include "MCPolyhedron.h"
 
-S_IMPLEMENT_PROPERTY(MCCuboid)
+S_IMPLEMENT_PROPERTY(MCCuboid, MeshCore)
 
 void MCCuboid::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

@@ -14,7 +14,7 @@ void computeTransform(const SPropertyInstanceInformation *, GCComposeTransform *
   *l.data() = tr;
   }
 
-S_IMPLEMENT_PROPERTY(GCComposeTransform)
+S_IMPLEMENT_PROPERTY(GCComposeTransform, GraphicsCore)
 
 void GCComposeTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

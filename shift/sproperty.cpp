@@ -20,7 +20,7 @@ const SPropertyInformation *SProperty::staticTypeInformation()
 
 const SPropertyInformation *SProperty::bootstrapStaticTypeInformation()
   {
-  return SPropertyInformation::bootstrapTypeInformation<SProperty>(&_sPropertyTypeInformation, "SProperty", 0, shiftPropertyGroup());
+  return SPropertyInformation::bootstrapTypeInformation<SProperty>(&_sPropertyTypeInformation, "SProperty", 0, Shift::propertyGroup());
   }
 
 void SProperty::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)

@@ -313,8 +313,8 @@ template <> class SPODInterface <type> { public: typedef name Type; \
   static const type& value(const name* s) { return s->value(); } }; \
 S_PROPERTY_INTERFACE(name)
 
-#define IMPLEMENT_POD_PROPERTY(name) \
-  S_IMPLEMENT_SHIFT_PROPERTY(name) \
+#define IMPLEMENT_POD_PROPERTY(name, grp) \
+  S_IMPLEMENT_PROPERTY(name, grp) \
   void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
     if(data.registerInterfaces) { \
     info->addStaticInterface(new PODPropertyVariantInterface<name, name::PODType>()); } } \

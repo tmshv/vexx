@@ -67,7 +67,7 @@ private:
   XShader _shader;
   };
 
-S_IMPLEMENT_PROPERTY(GCButtonManipulator)
+S_IMPLEMENT_PROPERTY(GCButtonManipulator, GraphicsCore)
 
 void GCButtonManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

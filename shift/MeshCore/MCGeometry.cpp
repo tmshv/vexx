@@ -3,7 +3,7 @@
 #include "sprocessmanager.h"
 #include "QVarLengthArray"
 
-S_IMPLEMENT_PROPERTY(MCGeometry)
+S_IMPLEMENT_PROPERTY(MCGeometry, MeshCore)
 
 void computeRuntimeGeometry(const SPropertyInstanceInformation *, MCGeometry *rtGeo)
   {

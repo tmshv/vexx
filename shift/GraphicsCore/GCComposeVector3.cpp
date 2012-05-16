@@ -7,7 +7,7 @@ void computeVector(const SPropertyInstanceInformation *, GCComposeVector3 *vec)
   *l.data() = XVector3D(vec->xIn(), vec->yIn(), vec->zIn());
   }
 
-S_IMPLEMENT_PROPERTY(GCComposeVector3)
+S_IMPLEMENT_PROPERTY(GCComposeVector3, GraphicsCore)
 
 void GCComposeVector3::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

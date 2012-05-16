@@ -4,7 +4,7 @@
 #include "XPlane.h"
 #include "XLine.h"
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualManipulator)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualManipulator, GraphicsCore)
 
 void GCVisualManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -55,7 +55,7 @@ bool GCVisualManipulator::hitTest(
   return false;
   }
 
-S_IMPLEMENT_PROPERTY(GCVisualCompoundManipulator)
+S_IMPLEMENT_PROPERTY(GCVisualCompoundManipulator, GraphicsCore)
 
 void GCVisualCompoundManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -120,7 +120,7 @@ void GCVisualCompoundManipulator::onMouseRelease(const MouseEvent &)
   }
 
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualDragManipulator)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualDragManipulator, GraphicsCore)
 
 void GCVisualDragManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -148,7 +148,7 @@ void GCVisualDragManipulator::onMouseRelease(const MouseEvent &)
   }
 
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualClickManipulator)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCVisualClickManipulator, GraphicsCore)
 
 void GCVisualClickManipulator::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
@@ -176,7 +176,7 @@ void GCVisualClickManipulator::onMouseRelease(const MouseEvent &)
   }
 
 
-S_IMPLEMENT_ABSTRACT_PROPERTY(GCLinearDragManipulator)
+S_IMPLEMENT_ABSTRACT_PROPERTY(GCLinearDragManipulator, GraphicsCore)
 
 void GCLinearDragManipulator::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

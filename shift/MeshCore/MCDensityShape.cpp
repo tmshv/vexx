@@ -8,7 +8,7 @@
 #include <CGAL/make_surface_mesh.h>
 #include <CGAL/Implicit_surface_3.h>
 
-S_IMPLEMENT_PROPERTY(MCDensityShape)
+S_IMPLEMENT_PROPERTY(MCDensityShape, MeshCore)
 
 void MCDensityShape::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

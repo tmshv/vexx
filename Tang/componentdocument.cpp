@@ -1,7 +1,8 @@
 #include "componentdocument.h"
 #include "spropertyinformationhelpers.h"
+#include "tangmanager.h"
 
-S_IMPLEMENT_PROPERTY(ComponentDocument)
+S_IMPLEMENT_PROPERTY(ComponentDocument, Tang)
 
 void ComponentDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
