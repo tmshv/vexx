@@ -7,11 +7,15 @@
 #include "XAllocatorBase"
 #include "sobserver.h"
 #include "XBucketAllocator"
+#include "spropertygroup.h"
+#include "spropertyinformation.h"
 
 struct TypeData
   {
-  XSet <const SPropertyInformation *> types;
-  XList <STypeRegistry::Observer *> observers;
+  QVector <const SPropertyGroup *> groups;
+  QVector <const SPropertyInformation *> types;
+  QList <STypeRegistry::Observer *> observers;
+
   XAllocatorBase *allocator;
   };
 
@@ -21,55 +25,16 @@ STypeRegistry::STypeRegistry()
   {
   }
 
-void STypeRegistry::initiate()
+void STypeRegistry::initiateInternalTypes()
   {
   XScriptEngine::initiate();
 
   _internalTypes.allocator = new XBucketAllocator();
+  }
 
-  addType(SProperty::staticTypeInformation());
-  addType(SPropertyContainer::staticTypeInformation());
-  addType(SPropertyArray::staticTypeInformation());
-
-  addType(BoolProperty::staticTypeInformation());
-  addType(IntProperty::staticTypeInformation());
-  addType(LongIntProperty::staticTypeInformation());
-  addType(UnsignedIntProperty::staticTypeInformation());
-  addType(LongUnsignedIntProperty::staticTypeInformation());
-  addType(FloatProperty::staticTypeInformation());
-  addType(DoubleProperty::staticTypeInformation());
-  addType(Vector2DProperty::staticTypeInformation());
-  addType(Vector3DProperty::staticTypeInformation());
-  addType(Vector4DProperty::staticTypeInformation());
-  addType(QuaternionProperty::staticTypeInformation());
-  addType(StringPropertyBase::staticTypeInformation());
-  addType(FilenameProperty::staticTypeInformation());
-  addType(StringProperty::staticTypeInformation());
-  addType(ColourProperty::staticTypeInformation());
-  addType(ByteArrayProperty::staticTypeInformation());
-
-  addType(StringArrayProperty::staticTypeInformation());
-
-  addType(Pointer::staticTypeInformation());
-  addType(PointerArray::staticTypeInformation());
-
-  addType(SFloatArrayProperty::staticTypeInformation());
-  addType(SUIntArrayProperty::staticTypeInformation());
-
-  addType(SFloatArrayProperty::staticTypeInformation());
-  addType(SUIntArrayProperty::staticTypeInformation());
-  addType(SVector2ArrayProperty::staticTypeInformation());
-  addType(SVector3ArrayProperty::staticTypeInformation());
-  addType(SVector4ArrayProperty::staticTypeInformation());
-
-  addType(SEntity::staticTypeInformation());
-  addType(SDatabase::staticTypeInformation());
-  addType(SReferenceEntity::staticTypeInformation());
-
-
-  SEntity::staticTypeInformation()->addStaticInterface(new SBasicPositionInterface);
-  SProperty::staticTypeInformation()->addStaticInterface(new SBasicColourInterface);
-
+void STypeRegistry::initiate()
+  {
+  addPropertyGroup(shiftPropertyGroup());
   XInterface<STreeObserver> *treeObs = XInterface<STreeObserver>::create("_STreeObserver");
   treeObs->seal();
   }
@@ -85,11 +50,32 @@ void STypeRegistry::terminate()
 
 XAllocatorBase *STypeRegistry::allocator()
   {
+  if(!_internalTypes.allocator)
+    {
+    initiateInternalTypes();
+    }
+
   xAssert(_internalTypes.allocator);
   return _internalTypes.allocator;
   }
 
-const XSet <const SPropertyInformation *> &STypeRegistry::types()
+void STypeRegistry::addPropertyGroup(SPropertyGroup &g)
+  {
+  _internalTypes.groups << &g;
+  foreach(const SPropertyInformation *info, g.containedTypes())
+    {
+    addType(info);
+    }
+
+  g._added = true;
+  }
+
+const QVector <const SPropertyGroup *> &STypeRegistry::groups()
+  {
+  return _internalTypes.groups;
+  }
+
+const QVector <const SPropertyInformation *> &STypeRegistry::types()
   {
   return _internalTypes.types;
   }
@@ -116,9 +102,10 @@ void STypeRegistry::removeTypeObserver(Observer *o)
 void STypeRegistry::internalAddType(const SPropertyInformation *t)
   {
   xAssert(t);
+  xAssert(!findType(t->typeName()));
   if(!_internalTypes.types.contains(t))
     {
-    _internalTypes.types.insert(t);
+    _internalTypes.types << t;
     }
   }
 

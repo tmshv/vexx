@@ -22,8 +22,8 @@ public:
 
 S_PROPERTY_INTERFACE(GCGeometry)
 
-S_TYPED_POINTER_TYPE(GCGeometryPointer, GCGeometry)
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCGeometryPointer, GCGeometry)
 
-S_TYPED_POINTER_ARRAY_TYPE(GCGeometryPointerArray, GCGeometryPointer)
+S_TYPED_POINTER_ARRAY_TYPE(GRAPHICSCORE_EXPORT, GCGeometryPointerArray, GCGeometryPointer)
 
 #endif // GCGEOMETRY_H

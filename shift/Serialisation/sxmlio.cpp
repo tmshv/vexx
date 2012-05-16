@@ -1,6 +1,7 @@
 #include "sxmlio.h"
 #include "sentity.h"
 #include "styperegistry.h"
+#include "spropertyinformation.h"
 
 SXMLSaver::SXMLSaver() : _writer(), _root(0)
   {

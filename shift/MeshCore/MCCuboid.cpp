@@ -1,4 +1,5 @@
 #include "MCCuboid.h"
+#include "spropertyinformationhelpers.h"
 #include "3D/Manipulators/GCDistanceManipulator.h"
 #include "3D/GCTransform.h"
 

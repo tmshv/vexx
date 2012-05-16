@@ -1,4 +1,5 @@
 #include "MCSphere.h"
+#include "spropertyinformationhelpers.h"
 #include "3D/GCTransform.h"
 #include "3D/Manipulators/GCDistanceManipulator.h"
 

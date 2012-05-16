@@ -2,8 +2,25 @@
 #define SPROPERTYINFORMATIONAPIUTILITIES_H
 
 #include "spropertyinformation.h"
+#include "spropertygroup.h"
 #include "XInterface.h"
 #include "sproperty.h"
+
+#define S_IMPLEMENT_PROPERTY(myName, propertyGroup) \
+  static const SPropertyInformation *_##myName##StaticTypeInformation = myName :: bootstrapStaticTypeInformation();\
+  const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation; } \
+  const SPropertyInformation *myName::bootstrapStaticTypeInformation() \
+  { return SPropertyInformation::bootstrapTypeInformation<myName>(&_##myName##StaticTypeInformation, \
+      #myName, myName::ParentType::bootstrapStaticTypeInformation(), propertyGroup); }
+
+#define S_IMPLEMENT_SHIFT_PROPERTY(name) S_IMPLEMENT_PROPERTY(name, shiftPropertyGroup())
+
+#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
+  TEMPL S_IMPLEMENT_PROPERTY(myName)
+
+
+#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
+  S_IMPLEMENT_PROPERTY(myName)
 
 namespace
 {
@@ -82,6 +99,22 @@ template <typename PropType> void SPropertyInformation::initiate(SPropertyInform
   info->_typeName = typeName;
 
   ApiHelper<PropType>::create(info);
+  }
+
+template <typename T>
+const SPropertyInformation *SPropertyInformation::bootstrapTypeInformation(const SPropertyInformation **info,
+                                                                           const char *name,
+                                                                           const SPropertyInformation *parent,
+                                                                           SPropertyGroup& group)
+  {
+  if(*info)
+    {
+    return *info;
+    }
+
+  *info = SPropertyInformation::createTypeInformation<T>(name, parent);
+  group.registerPropertyInformation(*info);
+  return *info;
   }
 
 template <typename T> XInterface<T> *SPropertyInformation::apiInterface()

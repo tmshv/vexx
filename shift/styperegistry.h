@@ -3,7 +3,9 @@
 
 #include "sglobal.h"
 #include "XSet"
-#include "spropertyinformation.h"
+
+class SPropertyGroup;
+class SPropertyInformation;
 
 class SHIFT_EXPORT STypeRegistry
   {
@@ -23,16 +25,21 @@ public:
 
   static XAllocatorBase *allocator();
 
-  static const XSet <const SPropertyInformation *> &types();
-  static void addType(const SPropertyInformation *);
+  static const QVector <const SPropertyGroup *> &groups();
+  static const QVector <const SPropertyInformation *> &types();
+  static void addPropertyGroup(SPropertyGroup &);
 
   static const SPropertyInformation *findType(const QString &);
 
-  static void internalAddType(const SPropertyInformation *);
 
 private:
   STypeRegistry();
-  X_DISABLE_COPY(STypeRegistry)
+  X_DISABLE_COPY(STypeRegistry);
+
+  static void addType(const SPropertyInformation *);
+  static void internalAddType(const SPropertyInformation *);
+
+  static void initiateInternalTypes();
   };
 
 #endif // STYPEREGISTRY_H

@@ -1,6 +1,11 @@
 #include "GCShader.h"
+#include "spropertyinformationhelpers.h"
 #include "XRenderer.h"
 #include "sprocessmanager.h"
+
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderComponentPointer)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShaderPointer)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray)
 
 S_IMPLEMENT_PROPERTY(GCShaderComponent)
 

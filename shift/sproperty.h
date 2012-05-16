@@ -13,6 +13,13 @@ class SPropertyContainer;
 class SPropertyMetaData;
 class SHandler;
 class SDatabase;
+class SPropertyInstanceInformation;
+class SPropertyInformation;
+class SPropertyInformationCreateData;
+class SSaver;
+class SLoader;
+class SInterfaceBase;
+
 
 #define S_USER_DATA_TYPE(typeId) public: \
   enum { UserDataType = SUserDataTypes::typeId }; \
@@ -21,7 +28,8 @@ class SDatabase;
 
 #define S_REGISTER_TYPE_FUNCTION() \
   public: static void createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data); \
-  static const SPropertyInformation *staticTypeInformation();
+  static const SPropertyInformation *staticTypeInformation(); \
+  static const SPropertyInformation *bootstrapStaticTypeInformation();
 
 #define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
@@ -39,21 +47,6 @@ class SDatabase;
   typedef void ParentType; \
   S_REGISTER_TYPE_FUNCTION()
 
-#define S_IMPLEMENT_PROPERTY(myName) \
-  static const SPropertyInformation *_##myName##StaticTypeInformation = \
-    SPropertyInformation::createTypeInformation<myName>(#myName, myName::ParentType::staticTypeInformation()); \
-  const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation; }
-
-#define S_IMPLEMENT_TEMPLATED_PROPERTY(TEMPL, myName) \
-  TEMPL S_IMPLEMENT_PROPERTY(myName)
-
-
-#define S_IMPLEMENT_ABSTRACT_PROPERTY(myName) \
-  S_IMPLEMENT_PROPERTY(myName)
-
-#define S_IMPLEMENT_INLINE_PROPERTY(myName) \
-  inline S_IMPLEMENT_PROPERTY(myName)
-
 #define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
@@ -67,13 +60,6 @@ class SDatabase;
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
   S_REGISTER_TYPE_FUNCTION()
-
-class SPropertyInstanceInformation;
-class SPropertyInformation;
-class SPropertyInformationCreateData;
-class SSaver;
-class SLoader;
-class SInterfaceBase;
 
 class SHIFT_EXPORT SProperty
   {

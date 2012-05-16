@@ -23,8 +23,8 @@ public:
 
 S_PROPERTY_INTERFACE(GCShadingGroup)
 
-S_TYPED_POINTER_TYPE(GCShadingGroupPointer, GCShadingGroup);
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCShadingGroupPointer, GCShadingGroup);
 
-S_TYPED_POINTER_ARRAY_TYPE(GCShadingGroupPointerArray, GCShadingGroupPointer);
+S_TYPED_POINTER_ARRAY_TYPE(GRAPHICSCORE_EXPORT, GCShadingGroupPointerArray, GCShadingGroupPointer);
 
 #endif // GCSHADINGGROUP_H

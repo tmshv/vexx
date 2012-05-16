@@ -1,4 +1,5 @@
 #include "sappdatabase.h"
+#include "spropertyinformationhelpers.h"
 #include "styperegistry.h"
 #include "sadocument.h"
 

@@ -1,4 +1,5 @@
 #include "GCComposeTransform.h"
+#include "spropertyinformationhelpers.h"
 #include "XMacroHelpers"
 
 void computeTransform(const SPropertyInstanceInformation *, GCComposeTransform *vec)

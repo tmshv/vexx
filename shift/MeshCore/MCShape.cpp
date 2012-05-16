@@ -1,4 +1,5 @@
 #include "MCShape.h"
+#include "spropertyinformationhelpers.h"
 #include "XRenderer.h"
 #include "XLine.h"
 #include <CGAL/AABB_tree.h>

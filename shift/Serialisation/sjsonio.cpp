@@ -1,5 +1,6 @@
 #include "sjsonio.h"
 #include "sentity.h"
+#include "spropertyinformation.h"
 #include "styperegistry.h"
 #include "shandler.h"
 #include "QDebug"

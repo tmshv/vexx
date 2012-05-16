@@ -1,4 +1,5 @@
 #include "GCScene.h"
+#include "spropertyinformationhelpers.h"
 #include "XShader.h"
 #include "XRenderer.h"
 #include "XMatrix4x4"

@@ -13,6 +13,7 @@ class SLoader;
 class SSaver;
 class SPropertyContainer;
 class SPropertyInformation;
+class SPropertyGroup;
 
 class SPropertyInstanceInformationInitialiser
   {
@@ -284,6 +285,12 @@ public:
                                                                    const SPropertyInformation *parent,
                                                                    void (SPropertyInformation *, const char *));
 
+  template <typename T>
+    static const SPropertyInformation *bootstrapTypeInformation(const SPropertyInformation **info,
+                                                         const char *name,
+                                                         const SPropertyInformation *parent,
+                                                         SPropertyGroup& group);
+
   template <typename T> XInterface<T> *apiInterface();
   template <typename T> const XInterface<T> *apiInterface() const;
 
@@ -328,7 +335,7 @@ typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QSt
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
   {
-  const SPropertyInformation *newChildType = T::staticTypeInformation();
+  const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
 
   SPropertyInstanceInformation *inst = add(newChildType, name);
 
@@ -337,7 +344,7 @@ template <typename T> typename T::InstanceInformation *SPropertyInformation::add
 
 template <typename T> typename T::InstanceInformation *SPropertyInformation::add(xsize location, const QString &name)
   {
-  const SPropertyInformation *newChildType = T::staticTypeInformation();
+  const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
 
   SPropertyInstanceInformation *inst = add(newChildType, location, name, false);
 

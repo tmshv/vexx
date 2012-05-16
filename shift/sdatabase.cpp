@@ -13,7 +13,7 @@
 # include "XMemoryTracker"
 #endif
 
-S_IMPLEMENT_PROPERTY(SDatabase)
+S_IMPLEMENT_SHIFT_PROPERTY(SDatabase)
 
 void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

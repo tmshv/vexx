@@ -39,9 +39,9 @@ class GRAPHICSCORE_EXPORT GCVertexShaderComponent : public GCShaderComponent
 
 S_PROPERTY_INTERFACE(GCVertexShaderComponent)
 
-S_TYPED_POINTER_TYPE(GCShaderComponentPointer, GCShaderComponent);
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCShaderComponentPointer, GCShaderComponent);
 
-S_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray, GCShaderComponentPointer);
+S_TYPED_POINTER_ARRAY_TYPE(GRAPHICSCORE_EXPORT, GCShaderComponentPointerArray, GCShaderComponentPointer);
 
 class GRAPHICSCORE_EXPORT GCShader : public SEntity
   {
@@ -64,6 +64,6 @@ private:
 
 S_PROPERTY_INTERFACE(GCShader)
 
-S_TYPED_POINTER_TYPE(GCShaderPointer, GCShader);
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCShaderPointer, GCShader);
 
 #endif // GCSHADER_H

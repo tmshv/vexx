@@ -1,4 +1,5 @@
 #include "MCGeometry.h"
+#include "spropertyinformationhelpers.h"
 #include "sprocessmanager.h"
 #include "QVarLengthArray"
 

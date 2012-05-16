@@ -1,7 +1,7 @@
 #include "sbasepointerproperties.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(Pointer)
+S_IMPLEMENT_SHIFT_PROPERTY(Pointer)
 
 void Pointer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -51,3 +51,5 @@ void Pointer::assignPointerInformation(SPropertyInformation *newInfo, const SPro
   {
   newInfo->setData(g_pointerTypeKey, QVariant::fromValue(pointedToInfo));
   }
+
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(PointerArray, shiftPropertyGroup())

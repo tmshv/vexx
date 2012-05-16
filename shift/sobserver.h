@@ -7,7 +7,7 @@
 
 class SChange;
 
-class SObserver
+class SHIFT_EXPORT SObserver
   {
 public:
   SObserver() { }

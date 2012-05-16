@@ -22,6 +22,6 @@ public:
 
 S_PROPERTY_INTERFACE(GCTexture)
 
-S_TYPED_POINTER_TYPE(GCTexturePointer, GCTexture);
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCTexturePointer, GCTexture);
 
 #endif // GCTEXTURE_H

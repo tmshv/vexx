@@ -1,4 +1,5 @@
 #include "mcsimplemultiply.h"
+#include "spropertyinformationhelpers.h"
 
 void computeAddOutput(const SPropertyInstanceInformation *, MCSimpleMultiply *add)
   {

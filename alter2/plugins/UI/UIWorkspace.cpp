@@ -1,4 +1,5 @@
 #include "UIWorkspace.h"
+#include "spropertyinformationhelpers.h"
 #include "styperegistry.h"
 
 S_IMPLEMENT_PROPERTY(UIWorkspace)

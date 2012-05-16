@@ -11,12 +11,16 @@
 #include "spropertyinformationhelpers.h"
 #include "XConvertScriptSTL.h"
 
-static const SPropertyInformation *_sPropertyTypeInformation =
-  SPropertyInformation::createTypeInformation<SProperty>("SProperty",0);
+static const SPropertyInformation *_sPropertyTypeInformation = SProperty::bootstrapStaticTypeInformation();
 
 const SPropertyInformation *SProperty::staticTypeInformation()
   {
   return _sPropertyTypeInformation;
+  }
+
+const SPropertyInformation *SProperty::bootstrapStaticTypeInformation()
+  {
+  return SPropertyInformation::bootstrapTypeInformation<SProperty>(&_sPropertyTypeInformation, "SProperty", 0, shiftPropertyGroup());
   }
 
 void SProperty::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
@@ -44,6 +48,8 @@ void SProperty::createTypeInformation(SPropertyInformation *info, const SPropert
 
     api->addMethod<void(), &SProperty::beginBlock>("beginBlock");
     api->addMethod<void(bool), &SProperty::endBlock>("endBlock");
+
+    info->addStaticInterface(new SBasicColourInterface);
     }
   }
 

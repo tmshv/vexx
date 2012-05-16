@@ -1,4 +1,5 @@
 #include "areadocument.h"
+#include "spropertyinformationhelpers.h"
 #include "area.h"
 
 S_IMPLEMENT_PROPERTY(AreaDocument)

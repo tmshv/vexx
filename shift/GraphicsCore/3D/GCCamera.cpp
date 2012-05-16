@@ -3,6 +3,10 @@
 #include "XRenderer.h"
 #include "XCamera.h"
 #include "Eigen/Geometry"
+#include "spropertyinformationhelpers.h"
+
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCViewableTransformPointer)
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCCameraPointer)
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCViewableTransform)
 

@@ -117,13 +117,13 @@ IMPLEMENT_POD_PROPERTY(ByteArrayProperty);
 
 IMPLEMENT_POD_PROPERTY(StringArrayProperty);
 
-S_IMPLEMENT_PROPERTY(StringProperty)
+S_IMPLEMENT_SHIFT_PROPERTY(StringProperty)
 
 void StringProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {
   }
 
-S_IMPLEMENT_PROPERTY(FilenameProperty)
+S_IMPLEMENT_SHIFT_PROPERTY(FilenameProperty)
 
 void FilenameProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
   {

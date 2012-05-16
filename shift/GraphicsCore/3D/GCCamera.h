@@ -53,7 +53,7 @@ public:
   void rotateAboutPoint(const XVector3D &point, float x, float y);
   };
 
-S_TYPED_POINTER_TYPE(GCViewableTransformPointer, GCViewableTransform)
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCViewableTransformPointer, GCViewableTransform)
 S_PROPERTY_ABSTRACT_INTERFACE(GCViewableTransform)
 
 class GRAPHICSCORE_EXPORT GCCamera : public GCViewableTransform
@@ -83,6 +83,6 @@ public:
 
 S_PROPERTY_INTERFACE(GCPerspectiveCamera)
 
-S_TYPED_POINTER_TYPE(GCCameraPointer, GCCamera)
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCCameraPointer, GCCamera)
 
 #endif // GCCAMERA_H

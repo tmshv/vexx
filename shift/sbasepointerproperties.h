@@ -10,7 +10,7 @@ class SHIFT_EXPORT Pointer : public SProperty
   S_PROPERTY(Pointer, SProperty, 0);
 
 public:
-  typedef SProperty Type;
+  typedef SProperty PtrType;
 
   template <typename T>
   const T *pointed() const
@@ -38,7 +38,7 @@ public:
 template <typename T> class TypedPointer : public Pointer
   {
 public:
-  typedef T Type;
+  typedef T PtrType;
 
   // pre gets here to make sure we clear any dirty flags that have flowed in through
   // dependencies
@@ -55,7 +55,7 @@ public:
 template <typename PTR> class TypedPointerArray : public STypedPropertyArray<PTR>
   {
 public:
-  PTR* addPointer(const typename PTR::Type *prop)
+  PTR* addPointer(const typename PTR::PtrType *prop)
     {
     SHandler* db = SProperty::handler();
     xAssert(db);
@@ -68,7 +68,7 @@ public:
     return p;
     }
 
-  void removePointer(const typename PTR::Type *ptr)
+  void removePointer(const typename PTR::PtrType *ptr)
     {
     SProperty *c = SPropertyContainer::firstChild();
     while(c)
@@ -86,7 +86,7 @@ public:
       }
     }
 
-  bool hasPointer(const typename PTR::Type *ptr)
+  bool hasPointer(const typename PTR::PtrType *ptr)
     {
     SProperty *child = SPropertyContainer::firstChild();
     while(child)
@@ -119,20 +119,22 @@ private:
 
 S_PROPERTY_INTERFACE(Pointer)
 
-#define S_TYPED_POINTER_TYPE(name, type) \
-  class name : public TypedPointer<type> { \
+#define S_TYPED_POINTER_TYPE(exportType, name, type) \
+  class exportType name : public TypedPointer<type> { \
     S_PROPERTY(name, Pointer, 0); }; \
-    S_IMPLEMENT_INLINE_PROPERTY(name) \
-  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
-  if(data.registerInterfaces) { \
-    assignPointerInformation(info, type::staticTypeInformation()); } } \
   S_PROPERTY_INTERFACE(name)
+
+#define S_IMPLEMENT_TYPED_POINTER_TYPE(name, group) \
+  S_IMPLEMENT_PROPERTY(name, group) \
+  void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
+  if(data.registerInterfaces) { \
+  assignPointerInformation(info, name::PtrType::staticTypeInformation()); } } \
 
 template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {
-    typedef TYPE::Type PtrType;
+    typedef TYPE::PtrType PtrType;
 
     class PointerArrayConnectionInterface : public SPropertyConnectionInterface
       {
@@ -178,14 +180,16 @@ template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInfor
     }
   }
 
-#define S_TYPED_POINTER_ARRAY_TYPE(name, type) \
-  class name : public TypedPointerArray<type> { \
+#define S_TYPED_POINTER_ARRAY_TYPE(exportType, name, type) \
+  class exportType name : public TypedPointerArray<type> { \
   S_PROPERTY_CONTAINER(PointerArray, SPropertyContainer, 0); }; \
-  S_IMPLEMENT_INLINE_PROPERTY(name) \
-  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { createTypedPointerArray<name, type>(info, data); } \
   S_PROPERTY_INTERFACE(name) \
   S_PROPERTY_INTERFACE(TypedPointerArray<type>)
 
-S_TYPED_POINTER_ARRAY_TYPE(PointerArray, Pointer)
+#define S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(name, group) \
+  S_IMPLEMENT_PROPERTY(name, group) \
+  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { createTypedPointerArray<name, name::ElementType>(info, data); } \
+
+S_TYPED_POINTER_ARRAY_TYPE(SHIFT_EXPORT, PointerArray, Pointer)
 
 #endif // SBASEPOINTERPROPERTIES_H

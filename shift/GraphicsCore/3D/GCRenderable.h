@@ -32,8 +32,8 @@ public:
   };
 
 S_PROPERTY_INTERFACE(GCRenderable)
-S_TYPED_POINTER_TYPE(GCRenderablePointer, GCRenderable)
-S_TYPED_POINTER_ARRAY_TYPE(GCRenderablePointerArray, GCRenderablePointer)
+S_TYPED_POINTER_TYPE(GRAPHICSCORE_EXPORT, GCRenderablePointer, GCRenderable)
+S_TYPED_POINTER_ARRAY_TYPE(GRAPHICSCORE_EXPORT, GCRenderablePointerArray, GCRenderablePointer)
 
 class GRAPHICSCORE_EXPORT GCRenderArray : public GCRenderable
   {

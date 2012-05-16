@@ -1,4 +1,5 @@
 #include "mcsimpleadd.h"
+#include "spropertyinformationhelpers.h"
 
 void computeAddOutput(const SPropertyInstanceInformation *, MCSimpleAdd *add)
   {

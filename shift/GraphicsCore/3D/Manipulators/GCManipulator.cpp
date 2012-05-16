@@ -1,4 +1,5 @@
 #include "GCManipulator.h"
+#include "spropertyinformationhelpers.h"
 #include "3D/GCCamera.h"
 #include "XPlane.h"
 #include "XLine.h"

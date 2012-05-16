@@ -1,4 +1,5 @@
 #include "mcsource.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(MCSource)
 

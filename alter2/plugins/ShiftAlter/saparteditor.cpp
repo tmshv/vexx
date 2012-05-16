@@ -1,4 +1,5 @@
 #include "saparteditor.h"
+#include "spropertyinformationhelpers.h"
 #include "styperegistry.h"
 #include "sentity.h"
 #include "QFormLayout"

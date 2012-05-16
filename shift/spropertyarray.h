@@ -39,7 +39,9 @@ template <typename T> class STypedPropertyArray : public SPropertyContainer
   //S_PROPERTY_CONTAINER(STypedPropertyArray, SPropertyContainer, 0);
 
 public:
-  T *add()
+  typedef T ElementType;
+
+  ElementType *add()
     {
     return addProperty(T::staticTypeInformation())->castTo<T>();
     }
@@ -58,7 +60,7 @@ public:
       {
       for(xsize x=0; x<s; ++x)
         {
-        addProperty(false, internalCreateHelper(T::Type, handler()));
+        addProperty(T::staticTypeInformation());
         }
       }
     else if(dif < 0)
@@ -71,14 +73,14 @@ public:
       }
     }
 
-  T *operator[](xsize i) { return at(i); }
-  T *at(xsize i)
+  ElementType *operator[](xsize i) { return at(i); }
+  ElementType *at(xsize i)
     {
-    SProperty *c = firstChild();
+    ElementType *c = firstChild<ElementType>();
     while(c && i)
       {
       --i;
-      c = c->nextSibling();
+      c = c->nextSibling<ElementType>();
       }
 
     return c;

@@ -1,9 +1,13 @@
 #include "GCShadingGroup.h"
+#include "spropertyinformationhelpers.h"
 #include "XGeometry.h"
 #include "XModeller.h"
 #include "XRenderer.h"
 #include "3D/Manipulators/GCButtonManipulator.h"
 #include "sprocessmanager.h"
+
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCShadingGroupPointer)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShadingGroupPointerArray)
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup)
 

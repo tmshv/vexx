@@ -1,4 +1,5 @@
 #include "componentdocument.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(ComponentDocument)
 

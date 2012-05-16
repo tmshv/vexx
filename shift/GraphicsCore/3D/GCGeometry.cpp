@@ -1,4 +1,5 @@
 #include "GCGeometry.h"
+#include "spropertyinformationhelpers.h"
 #include "styperegistry.h"
 #include "sprocessmanager.h"
 
@@ -8,10 +9,12 @@ void GCGeometry::createTypeInformation(SPropertyInformation *info, const SProper
   {
   if(data.registerAttributes)
     {
-  	info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
+    info->add(&GCGeometry::runtimeGeometry, "runtimeGeometry");
     }
   }
 
 GCGeometry::GCGeometry()
   {
   }
+
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCGeometryPointer)

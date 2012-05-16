@@ -3,7 +3,7 @@
 #include "sdatabase.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(SPropertyContainer)
+S_IMPLEMENT_SHIFT_PROPERTY(SPropertyContainer)
 
 void SPropertyContainer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

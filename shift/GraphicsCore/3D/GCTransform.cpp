@@ -5,6 +5,7 @@
 #include "XLine.h"
 #include "XFrustum.h"
 #include "XRenderer.h"
+#include "spropertyinformationhelpers.h"
 
 void unionTransformedBounds(const SPropertyInstanceInformation*, GCTransform* tr)
   {

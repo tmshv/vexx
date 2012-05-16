@@ -1,4 +1,5 @@
 #include "scdbutils.h"
+#include "spropertyinformationhelpers.h"
 #include "scglobal.h"
 #include "XScriptFunction.h"
 #include "XScriptValue.h"

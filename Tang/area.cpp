@@ -1,4 +1,5 @@
 #include "area.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(Area)
 

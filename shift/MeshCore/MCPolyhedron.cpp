@@ -1,4 +1,5 @@
 #include "MCPolyhedron.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(MCPolyhedronProperty)
 

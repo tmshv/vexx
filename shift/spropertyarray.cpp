@@ -2,7 +2,7 @@
 #include "styperegistry.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(SPropertyArray)
+S_IMPLEMENT_SHIFT_PROPERTY(SPropertyArray)
 
 void SPropertyArray::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {

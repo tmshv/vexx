@@ -159,15 +159,16 @@ SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyIns
   inst->setChildInformation(info);
 
   return info;
-}
+  }
 
 const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const char *name,
-                                                                                const SPropertyInformation *parent
+                                                                                const SPropertyInformation *parentType,
                                                                                 void (init)(SPropertyInformation *, const char *))
   {
   SProfileScopedBlock("Initiate information")
 
   SPropertyInformation *createdInfo = SPropertyInformation::allocate();
+  xAssert(createdInfo);
 
   init(createdInfo, name);
 
@@ -191,8 +192,7 @@ const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(
   // seal API
   createdInfo->apiInterface()->seal();
 
-  xAssert(createdInfo);
-  info = createdInfo;
+  return createdInfo;
   }
 
 

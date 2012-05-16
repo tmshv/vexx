@@ -1,4 +1,8 @@
 #include "GCRenderable.h"
+#include "spropertyinformationhelpers.h"
+
+S_IMPLEMENT_TYPED_POINTER_TYPE(GCRenderablePointer)
+S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCRenderablePointerArray)
 
 S_IMPLEMENT_PROPERTY(GCRenderable)
 

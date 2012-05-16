@@ -42,7 +42,8 @@ SOURCES += \
     Serialisation/sjsonio.cpp \
     sloader.cpp \
     shandler.cpp \
-    sinterfaces.cpp
+    sinterfaces.cpp \
+    spropertygroup.cpp
 
 HEADERS += \
     sglobal.h \
@@ -73,7 +74,8 @@ HEADERS += \
     Serialisation/sjsonio.h \
     shandler.h \
     sinterfaces.h \
-    spropertyinformationhelpers.h
+    spropertyinformationhelpers.h \
+    spropertygroup.h
 
 
 

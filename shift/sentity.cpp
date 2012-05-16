@@ -5,7 +5,7 @@
 #include "sinterfaces.h"
 #include "spropertyinformationhelpers.h"
 
-S_IMPLEMENT_PROPERTY(SEntity)
+S_IMPLEMENT_SHIFT_PROPERTY(SEntity)
 
 void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
   {
@@ -27,6 +27,8 @@ void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyI
     api->addMethod<void (STreeObserver* obs), &SEntity::removeTreeObserver>("removeTreeObserver");
     api->addMethod<void (SDirtyObserver* obs), &SEntity::removeDirtyObserver>("removeDirtyObserver");
     api->addMethod<void (SConnectionObserver* obs), &SEntity::removeConnectionObserver>("removeConnectionObserver");
+
+    info->addStaticInterface(new SBasicPositionInterface);
     }
   }
 

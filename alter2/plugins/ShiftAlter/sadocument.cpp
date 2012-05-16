@@ -1,4 +1,5 @@
 #include "sadocument.h"
+#include "spropertyinformationhelpers.h"
 #include "QFileDialog"
 #include "Serialisation/sjsonio.h"
 #include "QMenu"

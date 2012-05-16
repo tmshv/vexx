@@ -1,4 +1,5 @@
 #include "GCButtonManipulator.h"
+#include "spropertyinformationhelpers.h"
 #include "3D/GCCamera.h"
 #include "XModeller.h"
 #include "XRenderer.h"

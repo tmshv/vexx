@@ -1,5 +1,6 @@
 #include "GCBaseProperties.h"
 #include "sdatabase.h"
+#include "spropertyinformationhelpers.h"
 
 void writeValue(SSaver &, const XShader &)
   {

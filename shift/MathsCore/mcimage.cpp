@@ -1,4 +1,5 @@
 #include "mcimage.h"
+#include "spropertyinformationhelpers.h"
 #include "QImage"
 
 void MCImage::computeImageOutput(const SPropertyInstanceInformation* , MCImage *image)

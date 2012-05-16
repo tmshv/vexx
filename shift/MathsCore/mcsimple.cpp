@@ -1,4 +1,5 @@
 #include "mcsimple.h"
+#include "spropertyinformationhelpers.h"
 
 S_IMPLEMENT_PROPERTY(MCSimple)
 
