@@ -522,7 +522,7 @@ bool SProperty::shouldSaveProperty(const SProperty *p)
     }
 
   const SPropertyInformation *info = p->typeInformation();
-  if(info->shouldSaveValue()(p))
+  if(info->functions().shouldSaveValue(p))
     {
     return true;
     }
@@ -567,7 +567,7 @@ void SProperty::assign(const SProperty *propToAssign)
   const SPropertyInformation *info = typeInformation();
   xAssert(info);
 
-  info->assign()(propToAssign, this);
+  info->functions().assign(propToAssign, this);
   }
 
 SEntity *SProperty::entity() const
@@ -1021,7 +1021,7 @@ void SProperty::postSet()
   SPropertyContainer *c = parent();
   xAssert(c); // setting the db object? that is odd. Or a property in undo somewhere?
   const SPropertyInformation *info = c->typeInformation();
-  info->postChildSet()(c, this);
+  info->functions().postChildSet(c, this);
 
   _flags.clearFlag(Dirty);
   }
@@ -1035,7 +1035,7 @@ void SProperty::setDirty()
     SPropertyContainer *c = parent();
     xAssert(c);
     const SPropertyInformation *info = c->typeInformation();
-    info->postChildSet()(c, this);
+    info->functions().postChildSet(c, this);
 
     if(entity())
       {

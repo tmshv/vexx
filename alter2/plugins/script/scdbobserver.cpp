@@ -28,7 +28,8 @@ void ScDbTreeObserver::actOnChanges()
 
 XInterfaceBase* ScDbTreeObserver::createInterface()
   {
-  XInterface<ScDbTreeObserver> *ifc = XInterface<ScDbTreeObserver>::create("STreeObserver");
+  auto parent = XInterface<STreeObserver>::lookup();
+  XInterface<ScDbTreeObserver> *ifc = XInterface<ScDbTreeObserver>::createWithParent("STreeObserver", parent, parent);
 
   ifc->seal();
   return ifc;

@@ -129,9 +129,8 @@ public:
   bool registerInterfaces;
   };
 
-class SHIFT_EXPORT SPropertyInformation
+struct SPropertyInformationFunctions
   {
-public:
   typedef SProperty *(*CreatePropertyFunction)(void *data);
   typedef void (*CreatePropertyInPlaceFunction)(SProperty *data);
   typedef void (*DestroyPropertyFunction)(SProperty *data);
@@ -145,24 +144,36 @@ public:
   typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(void *data);
   typedef void (*DestroyInstanceInformationFunction)(SPropertyInstanceInformation *data);
 
+  CreateTypeInformationFunction createTypeInformation;
+  CreateInstanceInformationFunction createInstanceInformation;
+  DestroyInstanceInformationFunction destroyInstanceInformation;
+  CreatePropertyFunction createProperty;
+  CreatePropertyInPlaceFunction createPropertyInPlace;
+  DestroyPropertyFunction destroyProperty;
+  SaveFunction save;
+  LoadFunction load;
+  SaveQueryFunction shouldSave;
+  SaveQueryFunction shouldSaveValue;
+  AssignFunction assign;
+#ifdef S_PROPERTY_POST_CREATE
+  PostCreateFunction postCreate;
+#endif
+  PostSetFunction postChildSet;
+  };
+
+class SHIFT_EXPORT SPropertyInformation
+  {
+public:
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
+  typedef SPropertyInformationFunctions Functions;
+
 XProperties:
-  XProperty(CreateTypeInformationFunction, createTypeInformation, setCreateTypeInformation);
-  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
-  XProperty(DestroyInstanceInformationFunction, destroyInstanceInformation, setDestroyInstanceInformation);
-  XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
-  XProperty(CreatePropertyInPlaceFunction, createPropertyInPlace, setCreatePropertyInPlace);
-  XProperty(DestroyPropertyFunction, destroyProperty, setDestroyProperty);
-  XProperty(SaveFunction, save, setSave);
-  XProperty(LoadFunction, load, setLoad);
-  XProperty(SaveQueryFunction, shouldSave, setShouldSave);
-  XProperty(SaveQueryFunction, shouldSaveValue, setShouldSaveValue);
-  XProperty(AssignFunction, assign, setAssign);
-  XProperty(PostCreateFunction, postCreate, setPostCreate);
-  XProperty(PostSetFunction, postChildSet, setPostChildSet);
+  XByRefProperty(SPropertyInformationFunctions, functions, setFunctions);
+
+  XProperty(xsize, propertyDataOffset, setPropertyDataOffset);
 
   XProperty(xuint32, version, setVersion);
 

@@ -325,7 +325,7 @@ public:
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance("", 0, 0, 0, 0, 0);
+    const XInterface &bob = instance(QString(), 0, 0, 0, 0, 0);
     xAssert(bob.isSealed());
     return &bob;
     }
@@ -710,12 +710,6 @@ public:
   X_SCRIPTABLE_MATCHERS(type) } \
   Q_DECLARE_METATYPE(type *);
 
-#define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
-  namespace XScriptConvert { namespace internal { \
-  template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
-  X_SCRIPTABLE_MATCHERS(type) } \
-  Q_DECLARE_METATYPE(type *);
-
 #define X_SCRIPTABLE_TYPE_COPYABLE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSCopyableType<type> {}; } } \
@@ -736,6 +730,12 @@ public:
   namespace XScript { \
   template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type> {}; }
 
+
+#define X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base)  \
+  namespace XScriptConvert { namespace internal { \
+  template <> struct JSToNative<type> : XScriptConvert::internal::JSToNativeObjectInherited<type, base> {}; } \
+  X_SCRIPTABLE_MATCHERS(type) } \
+  Q_DECLARE_METATYPE(type *);
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
   namespace XScriptConvert { namespace internal { \

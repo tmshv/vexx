@@ -69,20 +69,14 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
 void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyInformation *from)
   {
   // update template constructor too
-  info->setCreateProperty(from->createProperty());
-  info->setSave(from->save());
-  info->setLoad(from->load());
-  info->setShouldSave(from->shouldSave());
-  info->setShouldSaveValue(from->shouldSaveValue());
-  info->setAssign(from->assign());
-  info->setPostCreate(from->postCreate());
-  info->setPostChildSet(from->postChildSet());
+  info->setFunctions(from->functions());
+
   info->setVersion(from->version());
+
   info->setSize(from->size());
+  info->setPropertyDataOffset(from->propertyDataOffset());
   info->setInstanceInformationSize(from->instanceInformationSize());
 
-  info->_createInstanceInformation = from->_createInstanceInformation;
-  info->_createTypeInformation = from->_createTypeInformation;
   info->_instances = 0;
   info->_extendedParent = 0;
 
@@ -91,7 +85,7 @@ void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyI
 
 SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *from)
   {
-  xAssert(from->_createTypeInformation);
+  xAssert(from->functions().createTypeInformation);
   SPropertyInformation *copy = SPropertyInformation::allocate();
 
   SPropertyInformation::initiate(copy, from);
@@ -100,7 +94,7 @@ SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *f
   data.registerAttributes = true;
   data.registerInterfaces = false;
 
-  from->_createTypeInformation(copy, data);
+  from->functions().createTypeInformation(copy, data);
   copy->setParentTypeInformation(from);
 
   copy->_apiInterface = from->_apiInterface;
@@ -116,18 +110,29 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
   SPropertyInformation *allocatable = findAllocatableBase(backwardsOffset);
   xAssert(allocatable);
 
-  xsize finalLocation = X_ROUND_TO_ALIGNMENT(xsize, allocatable->size());
-  xsize finalSize = finalLocation + newChildType->size();
+  // size of the old type
+  xsize oldAlignedSize = X_ROUND_TO_ALIGNMENT(xsize, allocatable->size());
+
+  // the actual object will start at this offset before the type
+  xptrdiff firstFreeByte = oldAlignedSize - allocatable->propertyDataOffset();
+  xAssert(firstFreeByte > 0);
+
+  // location of the SProperty Data
+  xsize propertyDataLocation = firstFreeByte + newChildType->propertyDataOffset();
+
+  xsize finalSize = propertyDataLocation + newChildType->size();
 
   allocatable->setSize(finalSize);
 
-  xAssert(finalLocation > backwardsOffset);
-  xsize location = finalLocation - backwardsOffset;
+  xAssert(propertyDataLocation > backwardsOffset);
+  xsize location = propertyDataLocation - backwardsOffset;
 
   SPropertyInstanceInformation *def = add(newChildType, location, name, true);
 
+#ifdef X_DEBUG
   const SProperty *prop = def->locateProperty((const SPropertyContainer*)0);
-  xAssert((backwardsOffset + (xsize)prop) == finalLocation);
+  xAssert((backwardsOffset + (xsize)prop) == propertyDataLocation);
+#endif
 
   return def;
   }
@@ -138,7 +143,7 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 
   SPropertyInstanceInformation* def = SPropertyInstanceInformation::allocate(newChildType->instanceInformationSize());
 
-  newChildType->_createInstanceInformation(def);
+  newChildType->functions().createInstanceInformation(def);
 
   def->initiate(newChildType, name, _children.size(), location);
 
@@ -209,7 +214,7 @@ SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const 
         const SPropertyInformation *parent = from->parentTypeInformation();
         callCreateTypeInformationBottomUp(i, d, parent);
 
-        from->createTypeInformation()(i, d);
+        from->functions().createTypeInformation(i, d);
         }
       }
     };
@@ -222,7 +227,7 @@ SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const 
 
   data.registerAttributes = true;
   data.registerInterfaces = true;
-  createdInfo->createTypeInformation()(createdInfo, data);
+  createdInfo->functions().createTypeInformation(createdInfo, data);
 
   // seal API
   createdInfo->apiInterface()->seal();

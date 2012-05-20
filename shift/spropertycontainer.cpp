@@ -316,7 +316,7 @@ bool SPropertyContainer::shouldSavePropertyValue(const SProperty *p)
   for(SProperty *p=ptr->firstChild(); p; p=p->nextSibling())
     {
     const SPropertyInformation *info = p->typeInformation();
-    if(info->shouldSave()(p))
+    if(info->functions().shouldSave(p))
       {
       return true;
       }

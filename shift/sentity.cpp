@@ -171,6 +171,7 @@ void SEntity::addDirtyObserver(SDirtyObserver *in)
 
 void SEntity::addTreeObserver(STreeObserver *in)
   {
+  xAssert(in);
   ObserverStruct s;
   s.mode = ObserverStruct::Tree;
   s.observer = in;

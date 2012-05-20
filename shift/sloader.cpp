@@ -21,14 +21,14 @@ void SLoader::read(SPropertyContainer *read)
   const SPropertyInformation *info = type();
   xAssert(info);
 
-  xAssert(info->load());
+  xAssert(info->functions().load);
 
   bool shouldLoad = true;
   shouldLoad = childHasValue();
 
   if(shouldLoad)
     {
-    info->load()(read, *this);
+    info->functions().load(read, *this);
     }
   else
     {
@@ -46,7 +46,7 @@ void SSaver::saveChildren(const SPropertyContainer *c)
     {
     const SPropertyInformation *info = child->typeInformation();
 
-    if(info->shouldSave()(child))
+    if(info->functions().shouldSave(child))
       {
       shouldSaveAnyChildren = true;
       break;
@@ -60,7 +60,7 @@ void SSaver::saveChildren(const SPropertyContainer *c)
       {
       const SPropertyInformation *info = child->typeInformation();
 
-      if(info->shouldSave()(child))
+      if(info->functions().shouldSave(child))
         {
         beginNextChild();
         //if(info->shouldSaveValue())
@@ -78,7 +78,7 @@ void SSaver::write(const SProperty *prop)
   {
   const SPropertyInformation *info = prop->typeInformation();
   xAssert(info);
-  xAssert(info->save());
+  xAssert(info->functions().save);
 
-  info->save()(prop, *this);
+  info->functions().save(prop, *this);
   }

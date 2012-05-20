@@ -125,7 +125,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   void *propMem = _memory->alloc(type->dynamicSize());
 
   // new the prop type
-  SProperty *prop = type->createProperty()(propMem);
+  SProperty *prop = type->functions().createProperty(propMem);
 
   // new the instance information
   xuint8 *alignedPtr = (xuint8*)(prop) + type->size();
@@ -133,7 +133,7 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   xAssertIsAligned(alignedPtr);
 
   SPropertyInstanceInformation *instanceInfoMem = (SPropertyInstanceInformation *)(alignedPtr);
-  SPropertyInstanceInformation *instanceInfo = type->createInstanceInformation()(instanceInfoMem);
+  SPropertyInstanceInformation *instanceInfo = type->functions().createInstanceInformation(instanceInfoMem);
 
   instanceInfo->setDynamic(true);
   prop->_instanceInfo = instanceInfo;
@@ -162,7 +162,7 @@ void SDatabase::deleteProperty(SProperty *prop)
   xAssert(!prop->_flags.hasFlag(PreGetting));
   uninitiateProperty(prop);
 
-  info->destroyProperty()(prop);
+  info->functions().destroyProperty(prop);
   }
 
 void SDatabase::deleteDynamicProperty(SProperty *prop)
@@ -190,10 +190,9 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
 
-    xAssertIsAligned(thisProp);
     if(child->extra())
       {
-      childInformation->createPropertyInPlace()(thisProp);
+      childInformation->functions().createPropertyInPlace(thisProp);
       }
 
     xAssert(thisProp->_parent == 0);
@@ -224,7 +223,7 @@ void SDatabase::uninitiatePropertyFromMetaData(SPropertyContainer *container, co
     if(child->extra())
       {
       const SPropertyInformation *info = thisProp->typeInformation();
-      info->destroyProperty()(thisProp);
+      info->functions().destroyProperty(thisProp);
       }
     }
   }
@@ -279,16 +278,18 @@ void SDatabase::postInitiateProperty(SProperty *prop)
   }
   inst->initiateProperty(prop);
 
+#ifdef S_PROPERTY_POST_CREATE
   const SPropertyInformation *info = prop->typeInformation();
   while(info)
     {
-    SPropertyInformation::PostCreateFunction postCreate = info->postCreate();
+    SPropertyInformation::PostCreateFunction postCreate = info->functions().postCreate;
     if(postCreate)
       {
       postCreate(prop);
       }
     info = info->parentTypeInformation();
     }
+#endif
 
   xAssert(prop->handler());
   }

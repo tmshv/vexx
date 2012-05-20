@@ -282,26 +282,40 @@ public:
 private:
   static void initiate(SPropertyInformation *info, const char *typeName)
     {
+    SPropertyInformationFunctions fns;
+
     // update copy constructor too
-    info->setCreateProperty(PropertyHelper<PropType>::create);
-    info->setCreatePropertyInPlace(PropertyHelper<PropType>::createInPlace);
-    info->setDestroyProperty(PropertyHelper<PropType>::destroy);
-    info->setCreateInstanceInformation(InstanceInformationHelper<PropType>::create);
-    info->setDestroyInstanceInformation(InstanceInformationHelper<PropType>::destroy);
-    info->setSave(PropType::saveProperty);
-    info->setLoad(PropType::loadProperty);
-    info->setShouldSave(PropType::shouldSaveProperty);
-    info->setShouldSaveValue(PropType::shouldSavePropertyValue);
-    info->setAssign(PropType::assignProperty);
-    info->setPostCreate(0);
-    info->setPostChildSet(PropType::postChildSet);
+    fns.createProperty = PropertyHelper<PropType>::create;
+    fns.createPropertyInPlace = PropertyHelper<PropType>::createInPlace;
+    fns.destroyProperty = PropertyHelper<PropType>::destroy;
+    fns.createInstanceInformation = InstanceInformationHelper<PropType>::create;
+    fns.destroyInstanceInformation = InstanceInformationHelper<PropType>::destroy;
+
+    fns.save = PropType::saveProperty;
+    fns.load = PropType::loadProperty;
+    fns.shouldSave = PropType::shouldSaveProperty;
+    fns.shouldSaveValue = PropType::shouldSavePropertyValue;
+    fns.assign = PropType::assignProperty;
+    fns.postChildSet = PropType::postChildSet;
+
+#ifdef S_PROPERTY_POST_CREATE
+    fns.postCreate = 0;
+#endif
+
+    fns.createTypeInformation = (Functions::CreateTypeInformationFunction)PropType::createTypeInformation;
+
+    info->setFunctions(fns);
+
     info->setVersion(PropType::Version);
     info->setSize(sizeof(PropType));
     info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
 
-    CreateTypeInformationFunction fn = (CreateTypeInformationFunction)PropType::createTypeInformation;
+    PropType *offset = (PropType*)1;
+    SProperty *propertyData = offset;
+    xsize propertyDataOffset = (xsize)propertyData - 1;
 
-    info->setCreateTypeInformation(fn);
+    info->setPropertyDataOffset(propertyDataOffset);
+
     info->setExtendedParent(0);
 
     info->setTypeName(typeName);

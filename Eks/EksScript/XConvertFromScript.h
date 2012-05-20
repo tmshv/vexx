@@ -228,6 +228,15 @@ public:
         tid = (obj.internalFieldCount() != InternalFieldCount)
           ? 0
           : obj.internalField(TypeIdFieldIndex);
+
+#define TYPE_DEBUG
+#ifdef TYPE_DEBUG
+        const char *ptr = QMetaType::typeName((int)tid);
+        const char *ptr2 = QMetaType::typeName((int)TypeID);
+        (void)ptr;
+        (void)ptr2;
+#endif
+
         ext = ((xsize)tid == TypeID)
           ? obj.internalField(ObjectFieldIndex)
           : 0;
