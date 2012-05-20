@@ -325,9 +325,9 @@ public:
 
   static const XInterface *lookup()
     {
-    const XInterface &bob = instance(QString(), 0, 0, 0, 0, 0);
-    xAssert(bob.isSealed());
-    return &bob;
+    static const XInterface *bob = static_cast<XInterface<T>*>(findInterface(qMetaTypeId<T*>()));
+    xAssert(bob->isSealed());
+    return bob;
     }
 
   XInterface(xsize typeId,
