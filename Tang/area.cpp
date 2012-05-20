@@ -4,7 +4,7 @@
 
 S_IMPLEMENT_PROPERTY(Area, Tang)
 
-void Area::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void Area::createTypeInformation(SPropertyInformationTyped<Area> *info, const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {

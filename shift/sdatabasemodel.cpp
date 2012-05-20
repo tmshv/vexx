@@ -98,7 +98,7 @@ SDatabaseModel::~SDatabaseModel()
 
 QModelIndex SDatabaseModel::index(const SProperty *p) const
   {
-  return createIndex(p->index(), 0, (void*)p);
+  return createIndex(p->index(), 0, (SProperty *)p);
   }
 
 bool SDatabaseModel::isEqual(const QModelIndex &a, const QModelIndex &b) const
@@ -118,7 +118,7 @@ bool SDatabaseModel::isEqual(const QModelIndex &a, const QModelIndex &b) const
 
 QModelIndex SDatabaseModel::root() const
   {
-  return createIndex(0, 0, (void*)_root.entity());
+  return createIndex(0, 0, (SProperty*)_root.entity());
   }
 
 bool SDatabaseModel::isValid(const QModelIndex &a) const
@@ -265,11 +265,11 @@ QModelIndex SDatabaseModel::parent( const QModelIndex &child ) const
       {
       if(_options.hasFlag(EntitiesOnly))
         {
-        return createIndex(parent->entity()->index(), 0, parent->entity());
+        return createIndex(parent->entity()->index(), 0, (SProperty*)parent->entity());
         }
       else
         {
-        return createIndex(parent->index(), 0, parent);
+        return createIndex(parent->index(), 0, (SProperty*)parent);
         }
       }
     }
@@ -563,13 +563,13 @@ void SDatabaseModel::onTreeChange(const SChange *c, bool back)
 
     if(tC->after(back) == 0)
       {
-      changePersistentIndex(createIndex(tC->index(), 0, (void*)tC->property()), QModelIndex());
+      changePersistentIndex(createIndex(tC->index(), 0, tC->property()), QModelIndex());
 
       const SPropertyContainer *parent = tC->before(back);
       xAssert(parent);
 
       xsize i = tC->index();
-      emit beginRemoveRows(createIndex(parent->index(), 0, (void *)parent), i, i);
+      emit beginRemoveRows(createIndex(parent->index(), 0, (SProperty*)parent), i, i);
       _currentTreeChange = 0;
       emit endRemoveRows();
       }
@@ -579,7 +579,7 @@ void SDatabaseModel::onTreeChange(const SChange *c, bool back)
       xAssert(parent);
 
       xsize i = xMin(parent->size()-1, tC->index());
-      emit beginInsertRows(createIndex(parent->index(), 0, (void *)parent), i, i);
+      emit beginInsertRows(createIndex(parent->index(), 0, (SProperty*)parent), i, i);
       _currentTreeChange = 0;
       emit endInsertRows();
       }
@@ -591,7 +591,7 @@ void SDatabaseModel::onTreeChange(const SChange *c, bool back)
   if(nameChange)
     {
     const SProperty *prop = nameChange->property();
-    QModelIndex ind = createIndex(prop->index(), 0, (void *)prop);
+    QModelIndex ind = createIndex(prop->index(), 0, (SProperty*)prop);
     emit dataChanged(ind, ind);
     }
   }

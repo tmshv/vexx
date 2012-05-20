@@ -5,7 +5,8 @@
 
 S_IMPLEMENT_PROPERTY(AreaDocument, Tang)
 
-void AreaDocument::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void AreaDocument::createTypeInformation(SPropertyInformationTyped<AreaDocument> *,
+                                         const SPropertyInformationCreateData &)
   {
   }
 

@@ -13,30 +13,31 @@ void SDocument::incrementRevision(const SPropertyInstanceInformation *, SDocumen
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(SDocument, ShiftAlter)
 
-void SDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SDocument::createTypeInformation(SPropertyInformationTyped<SDocument> *info,
+                                      const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    SPropertyArray::InstanceInformation *transientInst = info->add(&SDocument::transientData, "transientData");
+    auto transientInst = info->add(&SDocument::transientData, "transientData");
     transientInst->setMode(SPropertyInstanceInformation::Internal);
 
-    StringProperty::InstanceInformation *filenameInst = info->add(&SDocument::filename, "filename");
+    auto filenameInst = info->add(&SDocument::filename, "filename");
     filenameInst->setMode(SPropertyInstanceInformation::Internal);
 
-    UnsignedIntProperty::InstanceInformation *rev = info->add(&SDocument::revision, "revision");
-    rev->setCompute(incrementRevision);
+    auto rev = info->add(&SDocument::revision, "revision");
+    rev->setCompute<incrementRevision>();
     rev->setMode(SPropertyInstanceInformation::Internal);
 
-    PointerArray::InstanceInformation *fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
+    auto fCS = info->add(&SDocument::fileChangedStub, "fileChangedStub");
     fCS->setAffects(rev);
     fCS->setMode(SPropertyInstanceInformation::Internal);
     }
 
   if(data.registerInterfaces)
     {
-    info->addInheritedInterface<SDocument, SHandler>();
+    info->addInheritedInterface<SHandler>();
 
-    XInterface<SDocument> *api = info->apiInterface<SDocument>();
+    auto api = info->apiInterface();
 
     api->addMethod<void(), &SDocument::newFile>("newFile");
     api->addMethod<void(const QString &), &SDocument::loadFile>("loadFile");

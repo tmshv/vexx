@@ -133,6 +133,8 @@ public:
 
   static void postChildSet(SPropertyContainer *, SProperty *);
 
+  X_ALIGNED_OPERATOR_NEW
+
 protected:
   // contained implies the property is aggregated by the inheriting class and should not be deleted.
   // you cannot add another contained property once dynamic properties have been added, this bool

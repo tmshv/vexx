@@ -1,4 +1,4 @@
-#include "MathsCore.h"
+#include "MCGlobal.h"
 #include "styperegistry.h"
 #include "spropertygroup.h"
 

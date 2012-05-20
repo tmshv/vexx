@@ -3,7 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(MCSimple, MathsCore)
 
-void MCSimple::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCSimple::createTypeInformation(SPropertyInformationTyped<MCSimple> *info,
+                                     const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {

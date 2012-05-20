@@ -7,29 +7,30 @@
 
 S_IMPLEMENT_PROPERTY(MCCuboid, MeshCore)
 
-void MCCuboid::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCCuboid::createTypeInformation(SPropertyInformationTyped<MCCuboid> *info,
+                                     const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    MCGeometry::InstanceInformation *inst = info->child(&MCShape::geometry);
-    inst->setCompute(computeGeometry);
+    auto inst = info->child(&MCShape::geometry);
+    inst->setCompute<computeGeometry>();
 
-    FloatProperty::InstanceInformation *wInfo = info->add(&MCCuboid::width, "width");
+    auto wInfo = info->add(&MCCuboid::width, "width");
     wInfo->setAffects(inst);
     wInfo->setDefault(1.0f);
 
-    FloatProperty::InstanceInformation *hInfo = info->add(&MCCuboid::height, "height");
+    auto hInfo = info->add(&MCCuboid::height, "height");
     hInfo->setAffects(inst);
     hInfo->setDefault(1.0f);
 
-    FloatProperty::InstanceInformation *dInfo = info->add(&MCCuboid::depth, "depth");
+    auto dInfo = info->add(&MCCuboid::depth, "depth");
     dInfo->setAffects(inst);
     dInfo->setDefault(1.0f);
     }
 
   if(data.registerInterfaces)
     {
-    info->addInheritedInterface<MCCuboid, GCManipulatable>();
+    info->addInheritedInterface<GCManipulatable>();
     }
   }
 

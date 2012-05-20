@@ -13,15 +13,12 @@ class SInterfaceBaseFactory
   {
   S_INTERFACE_FACTORY_TYPE(SInterfaceBase);
 XProperties:
-  XROProperty(xsize, referenceCount);
+  XProperty(xsize, referenceCount, setReferenceCount);
   XROProperty(bool, deleteOnNoReferences);
 
 public:
   SInterfaceBaseFactory(bool del) : _referenceCount(0), _deleteOnNoReferences(del) { }
   virtual SInterfaceBase *classInterface(SProperty *) { return 0; }
-
-private:
-  friend class SPropertyInformation;
   };
 
 #define S_INTERFACE_TYPE(typeId) public: \
@@ -29,10 +26,16 @@ private:
   virtual xuint32 interfaceTypeId() const { return InterfaceTypeId; } \
   private:
 
-class SInterfaceBase : public SProperty::UserData
+class SInterfaceBase
+#ifdef S_PROPERTY_USER_DATA
+    : public SProperty::UserData
+#endif
   {
   S_INTERFACE_TYPE(Invalid)
-  bool onPropertyDelete(SProperty *) { return true; }
+
+#ifdef S_PROPERTY_USER_DATA
+  bool onPropertyDelete(SProperty *) X_OVERRIDE { return true; }
+#endif
   };
 
 

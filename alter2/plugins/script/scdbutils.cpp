@@ -243,7 +243,7 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
 
   SPropertyInformation *newType = SPropertyInformation::derive(parent);
   newType->setVersion(version);
-  newType->typeName() = name;
+  newType->setTypeName(name);
   newType->setParentTypeInformation(parent);
 
   XInterfaceBase* pAPI = parent->apiInterface();
@@ -262,7 +262,7 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
     return error;
     }
 
-  dynamicScriptPropertyGroup().registerPropertyInformation(newType);
+  STypeRegistry::addType(newType);
 
   return XScriptValue();
   }

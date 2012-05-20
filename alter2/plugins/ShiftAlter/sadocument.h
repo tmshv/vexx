@@ -40,7 +40,7 @@ public:
     if(!ifc)
       {
       SExportableInterface *mIfc = new SExportableInterface();
-      i->addStaticInterface(mIfc);
+      const_cast<SPropertyInformation*>(i)->addStaticInterface(mIfc);
 
       ifc = mIfc;
       }

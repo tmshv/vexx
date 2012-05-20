@@ -543,33 +543,37 @@ private:
 
     XPersistentScriptValue persistent(jobj);
     XScriptObject self(persistent.asValue());
-    T * nobj = NULL;
+    Factory::ReturnType nobj = NULL;
     try
-    {
-    WeakWrap::PreWrap( self, argv  );
-    nobj = Factory::Create( self, argv );
-    if( ! nobj )
       {
-      return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
+      WeakWrap::PreWrap( self, argv  );
+      nobj = Factory::Create( self, argv );
+      if( ! nobj )
+        {
+        return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
+        }
+
+      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
+      WeakWrap::Wrap( self, native );
+      persistent.makeWeak( nobj, weak_dtor );
+      findInterface<T>(native)->wrapInstance(self, nobj);
       }
-    WeakWrap::Wrap( self, nobj );
-    persistent.makeWeak( nobj, weak_dtor );
-    findInterface<T>(nobj)->wrapInstance(self, nobj);
-    }
     catch(std::exception const &ex)
-    {
-      WeakWrap::Unwrap( self, nobj );
-      if( nobj ) Factory::Delete( nobj );
+      {
+      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
+      WeakWrap::Unwrap( self, native );
+      if( nobj ) Factory::Delete( native );
       persistent.dispose();
       return Toss(ex.what());
       }
     catch(...)
-    {
-    WeakWrap::Unwrap( self, nobj );
-    if( nobj ) Factory::Delete( nobj );
-    persistent.dispose();
-    return Toss("Native constructor threw an unknown exception!");
-    }
+      {
+      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
+      WeakWrap::Unwrap( self, native );
+      if( nobj ) Factory::Delete( native );
+      persistent.dispose();
+      return Toss("Native constructor threw an unknown exception!");
+      }
     return self;
     }
   };
@@ -660,12 +664,12 @@ public:
   }
 };
 
-template <typename T> class ClassCreatorConvertableFactory
+template <typename T, typename BASE> class ClassCreatorConvertableFactory
 {
 public:
-  typedef T* ReturnType;
+  typedef BASE* ReturnType;
 
-  static T *Create(XScriptObject &, XScriptArguments const &args)
+  static BASE *Create(XScriptObject &, XScriptArguments const &args)
   {
     xAssert(args.length() == 1);
     XScriptValue val = args.at(0);
@@ -677,7 +681,7 @@ public:
     }
     XScriptEngine::adjustAmountOfExternalAllocatedMemory((int)sizeof(*b));
     return b;*/
-    return (T*)val.toExternal();
+    return (BASE*)val.toExternal();
   }
 
   static void Delete(T *obj)
@@ -724,27 +728,27 @@ public:
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type> {}; }
 
 #define X_SCRIPTABLE_ABSTRACT_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
   namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type> {}; }
 
 
 #define X_SCRIPTABLE_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableTypeInherited<type, base> {}; } } \
   namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, base> {}; }
 
 
 #define X_SCRIPTABLE_ABSTRACT_TYPE_INHERITS(type, base, ...) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, base) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableTypeInherited<type, base> {}; } } \
   namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, base> {}; }
 
 
 #define X_SCRIPTABLE_TYPE_NOT_COPYABLE(type) X_SCRIPTABLE_TYPE_BASE(type)

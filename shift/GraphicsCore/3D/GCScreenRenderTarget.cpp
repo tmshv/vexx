@@ -4,7 +4,8 @@
 
 S_IMPLEMENT_PROPERTY(GCScreenRenderTarget, GraphicsCore)
 
-void GCScreenRenderTarget::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void GCScreenRenderTarget::createTypeInformation(SPropertyInformationTyped<GCScreenRenderTarget> *,
+                                                 const SPropertyInformationCreateData &)
   {
   }
 

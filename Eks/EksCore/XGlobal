@@ -36,7 +36,7 @@
 #define X_ROUND_TO_ALIGNMENT(type, exp) X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, X_ALIGN_BYTE_COUNT)
 #define X_ROUND_TO_SPECIFIC_ALIGNMENT(type, exp, align) ((type)((xuint8*)exp + ((ptrdiff_t)align - (((ptrdiff_t)exp)&((ptrdiff_t)align-1)))))
 #define xAssertIsAligned(ptr) xAssertIsSpecificAligned(ptr, X_ALIGN_BYTE_COUNT)
-#define xAssertIsSpecificAligned(ptr, alignment) xAssert((alignment > 0) || (((xsize)(ptr)&(alignment-1)) == 0))
+#define xAssertIsSpecificAligned(ptr, alignment) xAssert((alignment > 1) && (((xsize)(ptr)&(alignment-1)) == 0), (xsize)ptr, alignment, ((xsize)(ptr)&(alignment-1)))
 
 #ifndef QT_NO_DEBUG
 # define X_DEBUG

@@ -4,7 +4,8 @@
 
 S_IMPLEMENT_PROPERTY(SReferenceEntity, Shift)
 
-void SReferenceEntity::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void SReferenceEntity::createTypeInformation(SPropertyInformationTyped<SReferenceEntity> *,
+                                             const SPropertyInformationCreateData &)
   {
   }
 

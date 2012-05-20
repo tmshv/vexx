@@ -27,7 +27,9 @@ public:
 
   static const QVector <const SPropertyGroup *> &groups();
   static const QVector <const SPropertyInformation *> &types();
+
   static void addPropertyGroup(SPropertyGroup &);
+  static void addType(const SPropertyInformation *);
 
   static const SPropertyInformation *findType(const QString &);
 
@@ -35,13 +37,9 @@ private:
   STypeRegistry();
   X_DISABLE_COPY(STypeRegistry);
 
-  static void addType(const SPropertyInformation *);
   static void internalAddType(const SPropertyInformation *);
 
-  static void initiateInternalTypes();
-
   friend class SPropertyGroup;
-  static void onTypeAdded(SPropertyGroup *, const SPropertyInformation *);
   };
 
 #endif // STYPEREGISTRY_H

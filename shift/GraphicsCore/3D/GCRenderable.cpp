@@ -6,7 +6,8 @@ S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCRenderablePointerArray, GraphicsCore)
 
 S_IMPLEMENT_PROPERTY(GCRenderable, GraphicsCore)
 
-void GCRenderable::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCRenderable::createTypeInformation(SPropertyInformationTyped<GCRenderable> *info,
+                                         const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
@@ -43,14 +44,15 @@ void unionBounds(const SPropertyInstanceInformation*, GCRenderArray* array)
     }
   }
 
-void GCRenderArray::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCRenderArray::createTypeInformation(SPropertyInformationTyped<GCRenderArray> *info,
+                                          const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCRenderablePointerArray::InstanceInformation* rGInst = info->add(&GCRenderArray::renderGroup, "renderGroup");
+    auto rGInst = info->add(&GCRenderArray::renderGroup, "renderGroup");
 
-    GCBoundingBox::InstanceInformation* bInst = info->child(&GCRenderArray::bounds);
-    bInst->setCompute(unionBounds);
+    auto bInst = info->child(&GCRenderArray::bounds);
+    bInst->setCompute<unionBounds>();
 
     rGInst->setAffects(bInst);
     }

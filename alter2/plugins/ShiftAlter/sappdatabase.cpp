@@ -5,19 +5,20 @@
 
 S_IMPLEMENT_PROPERTY(SAppDatabase, ShiftAlter)
 
-void SAppDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SAppDatabase::createTypeInformation(SPropertyInformationTyped<SAppDatabase> *info,
+                                         const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    SPropertyArray::InstanceInformation *childInst = info->child(&SAppDatabase::children);
-    SPropertyInformation* childrenExt = info->extendContainedProperty(childInst);
+    auto childInst = info->child(&SAppDatabase::children);
+    auto childrenExt = info->extendContainedProperty(childInst);
 
     childrenExt->add(&SAppDatabase::settings, "settings");
     }
 
   if(data.registerInterfaces)
     {
-    XInterface<SAppDatabase> *api = info->apiInterface<SAppDatabase>();
+    auto api = info->apiInterface();
 
     api->addMethod<SDocument *(const SPropertyInformation *), &SAppDatabase::addDocument>("addDocument");
     }

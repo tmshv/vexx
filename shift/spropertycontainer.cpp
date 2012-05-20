@@ -5,12 +5,12 @@
 
 S_IMPLEMENT_PROPERTY(SPropertyContainer, Shift)
 
-void SPropertyContainer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SPropertyContainer::createTypeInformation(SPropertyInformationTyped<SPropertyContainer> *info,
+                                               const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {
-    XInterface<SPropertyContainer> *api = info->apiInterface<SPropertyContainer>();
-
+    auto *api = info->apiInterface();
 
     XInterfaceBase::IndexedGetter indexedGetter = XScript::XMethodToIndexedGetter<SPropertyContainer, SProperty *(xsize i), &SPropertyContainer::at>::Get;
     api->XInterfaceBase::setIndexAccessor(indexedGetter);

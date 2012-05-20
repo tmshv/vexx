@@ -126,11 +126,13 @@ S_PROPERTY_INTERFACE(Pointer)
 
 #define S_IMPLEMENT_TYPED_POINTER_TYPE(name, group) \
   S_IMPLEMENT_PROPERTY(name, group) \
-  void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
+  void name::createTypeInformation(SPropertyInformationTyped<name> *info, \
+    const SPropertyInformationCreateData &data) { \
   if(data.registerInterfaces) { \
   assignPointerInformation(info, name::PtrType::staticTypeInformation()); } } \
 
-template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInformation *info,
+                                                                  const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {
@@ -161,7 +163,7 @@ template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInfor
 
     info->addStaticInterface(new PointerArrayConnectionInterface);
 
-    XInterface<T>* api = info->apiInterface<T>();
+    auto api = info->apiInterface();
 
 
     XInterfaceBase::Function fn;
@@ -182,13 +184,13 @@ template <typename T, typename TYPE> void createTypedPointerArray(SPropertyInfor
 
 #define S_TYPED_POINTER_ARRAY_TYPE(exportType, name, type) \
   class exportType name : public TypedPointerArray<type> { \
-  S_PROPERTY_CONTAINER(PointerArray, SPropertyContainer, 0); }; \
+  S_PROPERTY_CONTAINER(name, SPropertyContainer, 0); }; \
   S_PROPERTY_INTERFACE(name) \
   S_PROPERTY_INTERFACE(TypedPointerArray<type>)
 
 #define S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(name, group) \
   S_IMPLEMENT_PROPERTY(name, group) \
-  inline void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { createTypedPointerArray<name, name::ElementType>(info, data); } \
+  void name::createTypeInformation(SPropertyInformationTyped<name> *info, const SPropertyInformationCreateData &data) { createTypedPointerArray<name, name::ElementType>(info, data); } \
 
 S_TYPED_POINTER_ARRAY_TYPE(SHIFT_EXPORT, PointerArray, Pointer)
 

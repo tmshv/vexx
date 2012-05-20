@@ -12,7 +12,8 @@
 
 S_IMPLEMENT_PROPERTY(SPartDocument, ShiftAlter)
 
-void SPartDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SPartDocument::createTypeInformation(SPropertyInformationTyped<SPartDocument> *info,
+                                          const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {

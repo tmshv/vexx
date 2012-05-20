@@ -16,16 +16,17 @@ void computeTransform(const SPropertyInstanceInformation *, GCComposeTransform *
 
 S_IMPLEMENT_PROPERTY(GCComposeTransform, GraphicsCore)
 
-void GCComposeTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCComposeTransform::createTypeInformation(SPropertyInformationTyped<GCComposeTransform> *info,
+                                               const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    TransformProperty::InstanceInformation *transformInst = info->add(&GCComposeTransform::transformOut, "transformOut");
-    transformInst->setCompute(computeTransform);
+    auto transformInst = info->add(&GCComposeTransform::transformOut, "transformOut");
+    transformInst->setCompute<computeTransform>();
 
-    Vector3DProperty::InstanceInformation *axInst = info->add(&GCComposeTransform::rotationAxisIn, "rotationAxisIn");
-    FloatProperty::InstanceInformation *angInst = info->add(&GCComposeTransform::rotationAngleIn, "rotationAngleIn");
-    Vector3DProperty::InstanceInformation *trInst = info->add(&GCComposeTransform::translationIn, "translationIn");
+    auto axInst = info->add(&GCComposeTransform::rotationAxisIn, "rotationAxisIn");
+    auto angInst = info->add(&GCComposeTransform::rotationAngleIn, "rotationAngleIn");
+    auto trInst = info->add(&GCComposeTransform::translationIn, "translationIn");
 
     axInst->setAffects(transformInst);
     angInst->setAffects(transformInst);

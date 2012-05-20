@@ -10,12 +10,13 @@ void computeAddOutput(const SPropertyInstanceInformation *, MCSimpleMultiply *ad
 
 S_IMPLEMENT_PROPERTY(MCSimpleMultiply, MathsCore)
 
-void MCSimpleMultiply::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCSimpleMultiply::createTypeInformation(SPropertyInformationTyped<MCSimpleMultiply> *info,
+                                             const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    FloatProperty::InstanceInformation *outInst = info->child(&MCSimpleMultiply::output);
-    outInst->setCompute(computeAddOutput);
+    auto outInst = info->child(&MCSimpleMultiply::output);
+    outInst->setCompute<computeAddOutput>();
     }
   }
 

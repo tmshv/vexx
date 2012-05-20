@@ -44,13 +44,9 @@ int main( int argc, char **argv )
     return EXIT_FAILURE;
     }
 
-  MeshCore::initiate();
-
   script->registerScriptGlobal("tang", new TangManager(&app));
 
   STypeRegistry::addPropertyGroup(Tang::propertyGroup());
-
-  Component::staticTypeInformation()->addStaticInterface(new ComponentEditorInterface);
 
   script->include("startupTang.js");
 

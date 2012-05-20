@@ -121,13 +121,15 @@ IMPLEMENT_POD_SHIFT_PROPERTY(StringArrayProperty);
 
 S_IMPLEMENT_PROPERTY(StringProperty, Shift)
 
-void StringProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void StringProperty::createTypeInformation(SPropertyInformationTyped<StringProperty> *,
+                                           const SPropertyInformationCreateData &)
   {
   }
 
 S_IMPLEMENT_PROPERTY(FilenameProperty, Shift)
 
-void FilenameProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void FilenameProperty::createTypeInformation(SPropertyInformationTyped<FilenameProperty> *,
+                                             const SPropertyInformationCreateData &)
   {
   }
 

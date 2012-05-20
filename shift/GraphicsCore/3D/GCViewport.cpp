@@ -3,13 +3,15 @@
 
 S_IMPLEMENT_PROPERTY(GCViewport, GraphicsCore)
 
-void GCViewport::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCViewport::createTypeInformation(SPropertyInformationTyped<GCViewport> *info,
+                                       const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    UnsignedIntProperty::InstanceInformation *xInst = info->add(&GCViewport::x, "x");
+    auto xInst = info->add(&GCViewport::x, "x");
     xInst->setMode(SPropertyInstanceInformation::Output);
-    UnsignedIntProperty::InstanceInformation *yInst = info->add(&GCViewport::y, "y");
+
+    auto yInst = info->add(&GCViewport::y, "y");
     yInst->setMode(SPropertyInstanceInformation::Output);
     }
   }

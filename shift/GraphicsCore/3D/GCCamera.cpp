@@ -32,19 +32,21 @@ void computeInverseProjection(const SPropertyInstanceInformation *, GCViewableTr
   tr->inverseProjection = inv;
   }
 
-void GCViewableTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCViewableTransform::createTypeInformation(SPropertyInformationTyped<GCViewableTransform> *info,
+                                                const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    Vector3DProperty::InstanceInformation* upInfo = info->add(&GCViewableTransform::upVector, "upVector");
+    auto upInfo = info->add(&GCViewableTransform::upVector, "upVector");
     upInfo->setDefault(XVector3D(0.0f, 1.0f, 0.0f));
 
-    FloatProperty::InstanceInformation* focalInfo = info->add(&GCViewableTransform::focalDistance, "focalDistance");
+    auto focalInfo = info->add(&GCViewableTransform::focalDistance, "focalDistance");
     focalInfo->setDefault(1.0f);
 
-    ComplexTransformProperty::InstanceInformation *invProjInfo = info->add(&GCViewableTransform::inverseProjection, "inverseProjection");
-    invProjInfo->setCompute(computeInverseProjection);
-    ComplexTransformProperty::InstanceInformation *projInfo = info->add(&GCViewableTransform::projection, "projection");
+    auto invProjInfo = info->add(&GCViewableTransform::inverseProjection, "inverseProjection");
+    invProjInfo->setCompute<computeInverseProjection>();
+
+    auto projInfo = info->add(&GCViewableTransform::projection, "projection");
     projInfo->setAffects(invProjInfo);
 
     info->add(&GCViewableTransform::viewportX, "viewportX");
@@ -52,16 +54,16 @@ void GCViewableTransform::createTypeInformation(SPropertyInformation *info, cons
     info->add(&GCViewableTransform::viewportWidth, "viewportWidth");
     info->add(&GCViewableTransform::viewportHeight, "viewportHeight");
 
-    TransformProperty::InstanceInformation* viewInfo = info->add(&GCViewableTransform::viewTransform, "viewTransform");
-    viewInfo->setCompute(computeView);
+    auto viewInfo = info->add(&GCViewableTransform::viewTransform, "viewTransform");
+    viewInfo->setCompute<computeView>();
 
-    TransformProperty::InstanceInformation* transformInfo = info->child(&GCViewableTransform::transform);
+    auto transformInfo = info->child(&GCViewableTransform::transform);
     transformInfo->addAffects(viewInfo);
     }
 
   if(data.registerInterfaces)
     {
-    XInterface<GCViewableTransform> *ifc = info->apiInterface<GCViewableTransform>();
+    auto ifc = info->apiInterface();
 
     XInterfaceBase::Function fn;
     fn = XScript::MethodToInCa<GCViewableTransform, void(float, float, float), &GCViewableTransform::setFocalPoint>::Call;
@@ -240,7 +242,8 @@ void GCViewableTransform::rotateAboutPoint(const XVector3D &point, float x, floa
 
 S_IMPLEMENT_ABSTRACT_PROPERTY(GCCamera, GraphicsCore)
 
-void GCCamera::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void GCCamera::createTypeInformation(SPropertyInformationTyped<GCCamera> *,
+                                     const SPropertyInformationCreateData &)
   {
   }
 
@@ -255,27 +258,29 @@ void computePerspective(const SPropertyInstanceInformation *, GCPerspectiveCamer
   c->projection = XTransformUtilities::perspective(c->fieldOfView(), (float)c->viewportWidth() / (float)c->viewportHeight(), c->nearClip(), c->farClip());
   }
 
-void GCPerspectiveCamera::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCPerspectiveCamera::createTypeInformation(SPropertyInformationTyped<GCPerspectiveCamera> *info,
+                                                const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    ComplexTransformProperty::InstanceInformation *proj = info->child(&GCCamera::projection);
-    proj->setCompute(computePerspective);
+    auto proj = info->child(&GCCamera::projection);
+    proj->setCompute<computePerspective>();
 
-    UnsignedIntProperty::InstanceInformation *width = info->child(&GCCamera::viewportWidth);
+    auto width = info->child(&GCCamera::viewportWidth);
     width->setAffects(proj);
-    UnsignedIntProperty::InstanceInformation *height = info->child(&GCCamera::viewportHeight);
+
+    auto height = info->child(&GCCamera::viewportHeight);
     height->setAffects(proj);
 
-    FloatProperty::InstanceInformation *fov = info->add(&GCPerspectiveCamera::fieldOfView, "fieldOfView");
+    auto fov = info->add(&GCPerspectiveCamera::fieldOfView, "fieldOfView");
     fov->setDefault(45.0f);
     fov->setAffects(proj);
 
-    FloatProperty::InstanceInformation *nC = info->add(&GCPerspectiveCamera::nearClip, "nearClip");
+    auto nC = info->add(&GCPerspectiveCamera::nearClip, "nearClip");
     nC->setDefault(0.1f);
     nC->setAffects(proj);
 
-    FloatProperty::InstanceInformation *fC = info->add(&GCPerspectiveCamera::farClip, "farClip");
+    auto fC = info->add(&GCPerspectiveCamera::farClip, "farClip");
     fC->setDefault(100.0f);
     fC->setAffects(proj);
     }

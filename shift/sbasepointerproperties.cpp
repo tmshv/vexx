@@ -3,7 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(Pointer, Shift)
 
-void Pointer::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void Pointer::createTypeInformation(SPropertyInformationTyped<Pointer> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {

@@ -4,11 +4,12 @@
 
 S_IMPLEMENT_PROPERTY(ComponentDocument, Tang)
 
-void ComponentDocument::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void ComponentDocument::createTypeInformation(SPropertyInformationTyped<ComponentDocument> *info,
+                                              const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    StringProperty::InstanceInformation* type = info->child(&ComponentDocument::type);
+    auto type = info->child(&ComponentDocument::type);
     type->setDefault("Component");
     }
   }

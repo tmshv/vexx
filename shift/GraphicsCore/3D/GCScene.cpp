@@ -11,7 +11,8 @@
 
 S_IMPLEMENT_PROPERTY(GCScene, GraphicsCore)
 
-void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCScene::createTypeInformation(SPropertyInformationTyped<GCScene> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
@@ -22,7 +23,7 @@ void GCScene::createTypeInformation(SPropertyInformation *info, const SPropertyI
 
   if(data.registerInterfaces)
     {
-    XInterface<GCScene>* ifc = info->apiInterface<GCScene>();
+    auto ifc = info->apiInterface();
     ifc->addMethod<void(GCViewableTransform*), &GCScene::setCamera>("setCamera");
     }
   }
@@ -61,14 +62,15 @@ void computeManips(const SPropertyInstanceInformation *, GCManipulatableScene *s
   s->refreshManipulators();
   }
 
-void GCManipulatableScene::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCManipulatableScene::createTypeInformation(SPropertyInformationTyped<GCManipulatableScene> *info,
+                                                 const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    SPropertyArray::InstanceInformation *manInfo = info->add(&GCManipulatableScene::manipulators, "manipulators");
-    manInfo->setCompute(computeManips);
+    auto manInfo = info->add(&GCManipulatableScene::manipulators, "manipulators");
+    manInfo->setCompute<computeManips>();
 
-    PointerArray::InstanceInformation *selInfo = info->add(&GCManipulatableScene::selection, "selection");
+    auto selInfo = info->add(&GCManipulatableScene::selection, "selection");
     selInfo->setAffects(manInfo);
     }
   }

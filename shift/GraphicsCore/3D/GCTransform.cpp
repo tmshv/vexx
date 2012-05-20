@@ -25,14 +25,15 @@ void unionTransformedBounds(const SPropertyInstanceInformation*, GCTransform* tr
 
 S_IMPLEMENT_PROPERTY(GCTransform, GraphicsCore)
 
-void GCTransform::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCTransform::createTypeInformation(SPropertyInformationTyped<GCTransform> *info,
+                                        const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCBoundingBox::InstanceInformation* boundsInfo = info->child(&GCTransform::bounds);
-    boundsInfo->setCompute(unionTransformedBounds);
+    auto boundsInfo = info->child(&GCTransform::bounds);
+    boundsInfo->setCompute<unionTransformedBounds>();
 
-    TransformProperty::InstanceInformation* trInfo = info->add(&GCTransform::transform, "transform");
+    auto trInfo = info->add(&GCTransform::transform, "transform");
     trInfo->setDefault(XTransform::Identity());
     trInfo->setAffects(boundsInfo);
     }

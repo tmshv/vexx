@@ -9,7 +9,8 @@ S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShaderComponentPointerArray, GraphicsCore
 
 S_IMPLEMENT_PROPERTY(GCShaderComponent, GraphicsCore)
 
-void GCShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void GCShaderComponent::createTypeInformation(SPropertyInformationTyped<GCShaderComponent> *,
+                                              const SPropertyInformationCreateData &)
   {
   }
 
@@ -19,13 +20,15 @@ GCShaderComponent::GCShaderComponent()
 
 S_IMPLEMENT_PROPERTY(GCFragmentShaderComponent, GraphicsCore)
 
-void GCFragmentShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void GCFragmentShaderComponent::createTypeInformation(SPropertyInformationTyped<GCFragmentShaderComponent> *,
+                                                      const SPropertyInformationCreateData &)
   {
   }
 
 S_IMPLEMENT_PROPERTY(GCVertexShaderComponent, GraphicsCore)
 
-void GCVertexShaderComponent::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void GCVertexShaderComponent::createTypeInformation(SPropertyInformationTyped<GCVertexShaderComponent> *,
+                                                    const SPropertyInformationCreateData &)
   {
   }
 
@@ -81,15 +84,16 @@ void GCShader::computeShaderRuntime(const SPropertyInstanceInformation *, GCShad
   shader->_setVariables = false;
   }
 
-void GCShader::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCShader::createTypeInformation(SPropertyInformationTyped<GCShader> *info,
+                                     const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCRuntimeShader::InstanceInformation *rtInfo = info->add(&GCShader::runtimeShader, "runtimeShader");
-    rtInfo->setCompute(computeShaderRuntime);
+    auto rtInfo = info->add(&GCShader::runtimeShader, "runtimeShader");
+    rtInfo->setCompute<computeShaderRuntime>();
     rtInfo->setComputeLockedToMainThread(true);
 
-    GCShaderComponentPointerArray::InstanceInformation *comInfo = info->add(&GCShader::components, "components");
+    auto comInfo = info->add(&GCShader::components, "components");
     comInfo->setAffects(rtInfo);
     }
   }

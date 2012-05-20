@@ -3,6 +3,7 @@
 #include "GraphicsCore/GCGlobal.h"
 #include "GraphicsCore/3D/GCShader.h"
 #include "sprocessmanager.h"
+#include "spropertyinformationhelpers.h"
 #include "QThread"
 #include "QDesktopServices"
 #include "QFile"
@@ -73,8 +74,11 @@ void SPlugin::load()
 
   SProcessManager::initiate(threadCount);
 
-  SProperty::staticTypeInformation()->addStaticInterface(new SDefaultPartEditorInterface);
-  GCShader::staticTypeInformation()->addStaticInterface(new SShaderPartEditorInterface);
+  const_cast<SPropertyInformation*>(SProperty::staticTypeInformation())->
+      addStaticInterface(new SDefaultPartEditorInterface);
+
+  const_cast<SPropertyInformation*>(GCShader::staticTypeInformation())->
+      addStaticInterface(new SShaderPartEditorInterface);
 
   _db = new SAppDatabase();
   _db->setPlugin(this);

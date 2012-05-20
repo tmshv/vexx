@@ -9,16 +9,17 @@ void computeVector(const SPropertyInstanceInformation *, GCComposeVector3 *vec)
 
 S_IMPLEMENT_PROPERTY(GCComposeVector3, GraphicsCore)
 
-void GCComposeVector3::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCComposeVector3::createTypeInformation(SPropertyInformationTyped<GCComposeVector3> *info,
+                                             const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    Vector3DProperty::InstanceInformation *vectorInst = info->add(&GCComposeVector3::vectorOut, "vectorOut");
-    vectorInst->setCompute(computeVector);
+    auto vectorInst = info->add(&GCComposeVector3::vectorOut, "vectorOut");
+    vectorInst->setCompute<computeVector>();
 
-    FloatProperty::InstanceInformation *xInst = info->add(&GCComposeVector3::xIn, "xIn");
-    FloatProperty::InstanceInformation *yInst = info->add(&GCComposeVector3::yIn, "yIn");
-    FloatProperty::InstanceInformation *zInst = info->add(&GCComposeVector3::zIn, "zIn");
+    auto xInst = info->add(&GCComposeVector3::xIn, "xIn");
+    auto yInst = info->add(&GCComposeVector3::yIn, "yIn");
+    auto zInst = info->add(&GCComposeVector3::zIn, "zIn");
 
     xInst->setAffects(vectorInst);
     yInst->setAffects(vectorInst);

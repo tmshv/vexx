@@ -15,7 +15,8 @@
 
 S_IMPLEMENT_PROPERTY(SDatabase, Shift)
 
-void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SDatabase::createTypeInformation(SPropertyInformationTyped<SDatabase> *info,
+                                      const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
@@ -26,9 +27,9 @@ void SDatabase::createTypeInformation(SPropertyInformation *info, const SPropert
 
   if(data.registerInterfaces)
     {
-    info->addInheritedInterface<SDatabase, SHandler>();
+    info->addInheritedInterface<SHandler>();
 
-    XInterface<SDatabase> *api = info->apiInterface<SDatabase>();
+    auto *api = info->apiInterface();
 
     api->addMethod<QVector<SProperty *> (const QString &, QIODevice *, SPropertyContainer *), &SDatabase::load>("load");
     api->addMethod<void (const QString &, QIODevice *, SEntity *, bool, bool), &SDatabase::save>("save");
@@ -121,18 +122,18 @@ SProperty *SDatabase::createDynamicProperty(const SPropertyInformation *type, SP
   SProfileFunction
   xAssert(type);
 
-  SProperty *prop = (SProperty*)_memory->alloc(type->dynamicSize());
+  void *propMem = _memory->alloc(type->dynamicSize());
 
   // new the prop type
-  type->createProperty()(prop);
+  SProperty *prop = type->createProperty()(propMem);
 
   // new the instance information
   xuint8 *alignedPtr = (xuint8*)(prop) + type->size();
   alignedPtr = X_ROUND_TO_ALIGNMENT(xuint8 *, alignedPtr);
   xAssertIsAligned(alignedPtr);
 
-  SPropertyInstanceInformation *instanceInfo = (SPropertyInstanceInformation *)(alignedPtr);
-  type->createInstanceInformation()(instanceInfo);
+  SPropertyInstanceInformation *instanceInfoMem = (SPropertyInstanceInformation *)(alignedPtr);
+  SPropertyInstanceInformation *instanceInfo = type->createInstanceInformation()(instanceInfoMem);
 
   instanceInfo->setDynamic(true);
   prop->_instanceInfo = instanceInfo;
@@ -189,9 +190,10 @@ void SDatabase::initiatePropertyFromMetaData(SPropertyContainer *container, cons
     // extract the properties location from the meta data.
     SProperty *thisProp = child->locateProperty(container);
 
+    xAssertIsAligned(thisProp);
     if(child->extra())
       {
-      childInformation->createProperty()(thisProp);
+      childInformation->createPropertyInPlace()(thisProp);
       }
 
     xAssert(thisProp->_parent == 0);

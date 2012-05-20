@@ -80,16 +80,6 @@ public:
   bool isDefaultMode() const;
   const QString &modeString() const;
 
-  template <typename T> void setCompute(void (*fn)( const SPropertyInstanceInformation *, T * ))
-    {
-    SPropertyContainer *c = static_cast<T*>((SPropertyContainer*)0);
-    xAssert(c == 0);
-
-    ComputeFunction t = (ComputeFunction)fn;
-
-    setCompute(t);
-    }
-
   void setCompute(ComputeFunction fn);
   void addAffects(const SPropertyInstanceInformation *info);
   void setAffects(const SPropertyInstanceInformation *info);
@@ -142,26 +132,30 @@ public:
 class SHIFT_EXPORT SPropertyInformation
   {
 public:
-  typedef void (*AllocatePropertyFunction)(SProperty *data);
+  typedef SProperty *(*CreatePropertyFunction)(void *data);
+  typedef void (*CreatePropertyInPlaceFunction)(SProperty *data);
+  typedef void (*DestroyPropertyFunction)(SProperty *data);
   typedef void (*PostCreateFunction)(SProperty *data);
   typedef void (*PostSetFunction)(SPropertyContainer *cont, SProperty *data);
   typedef void (*SaveFunction)( const SProperty *, SSaver & );
   typedef SProperty *(*LoadFunction)( SPropertyContainer *, SLoader & );
   typedef void (*AssignFunction)( const SProperty *, SProperty * );
   typedef bool (*SaveQueryFunction)( const SProperty * );
-  typedef void (*AllocateInformationFunction)(SPropertyInformation *, const SPropertyInformationCreateData &);
-  typedef void (*AllocateInstanceInformationFunction)(SPropertyInstanceInformation *data);
+  typedef void (*CreateTypeInformationFunction)(SPropertyInformation *, const SPropertyInformationCreateData &);
+  typedef SPropertyInstanceInformation *(*CreateInstanceInformationFunction)(void *data);
+  typedef void (*DestroyInstanceInformationFunction)(SPropertyInstanceInformation *data);
 
   typedef xuint16 DataKey;
   typedef XHash<DataKey, QVariant> DataHash;
   typedef XHash<xuint32, SInterfaceBaseFactory *> InterfaceHash;
 
 XProperties:
-  XProperty(AllocateInformationFunction, createTypeInformation, setCreateTypeInformation);
-  XProperty(AllocateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
-  XProperty(AllocateInstanceInformationFunction, destroyInstanceInformation, setDestroyInstanceInformation);
-  XProperty(AllocatePropertyFunction, createProperty, setCreateProperty);
-  XProperty(AllocatePropertyFunction, destroyProperty, setDestroyProperty);
+  XProperty(CreateTypeInformationFunction, createTypeInformation, setCreateTypeInformation);
+  XProperty(CreateInstanceInformationFunction, createInstanceInformation, setCreateInstanceInformation);
+  XProperty(DestroyInstanceInformationFunction, destroyInstanceInformation, setDestroyInstanceInformation);
+  XProperty(CreatePropertyFunction, createProperty, setCreateProperty);
+  XProperty(CreatePropertyInPlaceFunction, createPropertyInPlace, setCreatePropertyInPlace);
+  XProperty(DestroyPropertyFunction, destroyProperty, setDestroyProperty);
   XProperty(SaveFunction, save, setSave);
   XProperty(LoadFunction, load, setLoad);
   XProperty(SaveQueryFunction, shouldSave, setShouldSave);
@@ -172,7 +166,7 @@ XProperties:
 
   XProperty(xuint32, version, setVersion);
 
-  XRefProperty(QString, typeName);
+  XByRefProperty(QString, typeName, setTypeName);
 
   XProperty(const SPropertyInformation *, parentTypeInformation, setParentTypeInformation);
 
@@ -182,7 +176,7 @@ XProperties:
 
   XRORefProperty(DataHash, data);
 
-  XROProperty(xsize, instances);
+  XProperty(xsize, instances, setInstances);
 
   XProperty(SPropertyInstanceInformation *, extendedParent, setExtendedParent);
 
@@ -205,38 +199,7 @@ public:
   // this classes children count
   xsize childCount() const { return children().size(); }
 
-  template <typename T, typename U>
-  typename U::InstanceInformation *child(U T::* location)
-    {
-    union Convertor
-    {
-      U T::* in;
-      SProperty SPropertyContainer::* out;
-    };
-    Convertor c;
-    c.in = location;
-
-    return static_cast<typename U::InstanceInformation*>(child(c.out));
-  }
-
-  template <typename T, typename U>
-  const typename U::InstanceInformation *child(U T::* location) const
-    {
-    union Convertor
-    {
-      U T::* in;
-      SProperty SPropertyContainer::* out;
-    };
-    Convertor c;
-    c.in = location;
-
-    return static_cast<const typename U::InstanceInformation*>(child(c.out));
-    }
-
   // access the properties from offset of member
-  SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location);
-  const SPropertyInstanceInformation *child(SProperty SPropertyContainer::* location) const;
-
   SPropertyInstanceInformation *child(xsize location);
   const SPropertyInstanceInformation *child(xsize location) const;
 
@@ -255,165 +218,51 @@ public:
   // size of the property type, and its instance information
   xsize dynamicSize() const { return size() + instanceInformationSize() + X_ALIGN_BYTE_COUNT; }
 
-  template <typename T, typename U> typename U::InstanceInformation *add(U T::* ptr, const QString &name);
-  template <typename T> typename T::InstanceInformation *add(const QString &name);
-  template <typename T> typename T::InstanceInformation *add(xsize location, const QString &name);
-  SPropertyInstanceInformation *add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra);
+  SPropertyInstanceInformation *add(const SPropertyInformation *newChildType,
+                                    xsize location,
+                                    const QString &name,
+                                    bool extra);
+
   SPropertyInstanceInformation *add(const SPropertyInformation *newChildType, const QString &name);
 
-  const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const
-    {
-    const SInterfaceBaseFactory *fac = 0;
-    const SPropertyInformation *info = this;
-    while(!fac && info)
-      {
-      fac = info->_interfaceFactories.value(type, 0);
-      info = info->parentTypeInformation();
-      }
-
-    return fac;
-    }
-
+  const SInterfaceBaseFactory *interfaceFactory(xuint32 type) const;
   SPropertyInformation *extendContainedProperty(SPropertyInstanceInformation *inst);
 
-  template <typename T> void addInterfaceFactory(T *factory) const;
-  template <typename PROPTYPE, typename T> void addInheritedInterface() const;
-  template <typename T> void addAddonInterface() const;
-  template <typename T> void addStaticInterface(T *) const;
+  template <typename T> void addInterfaceFactory(T *factory)
+    {
+    addInterfaceFactoryInternal(T::InterfaceType::InterfaceTypeId, factory);
+    }
+  template <typename T> void addStaticInterface(T *factory)
+    {
+    addInterfaceFactory(factory);
+    }
+  void addInterfaceFactoryInternal(xuint32 typeId, SInterfaceBaseFactory *);
 
-  template <typename T> static const SPropertyInformation *createTypeInformation(const char *,
+#ifdef S_PROPERTY_USER_DATA
+  template <typename T> void addAddonInterface() const;
+#endif
+
+  template <typename T> static SPropertyInformation *createTypeInformation(const char *,
                                                                                  const SPropertyInformation *parent);
-  static const SPropertyInformation *createTypeInformationInternal(const char *name,
+  static SPropertyInformation *createTypeInformationInternal(const char *name,
                                                                    const SPropertyInformation *parent,
                                                                    void (SPropertyInformation *, const char *));
 
-  template <typename T>
-    static const SPropertyInformation *bootstrapTypeInformation(const SPropertyInformation **info,
-                                                         const char *name,
-                                                         const SPropertyInformation *parent,
-                                                         SPropertyGroup& group);
-
-  template <typename T> XInterface<T> *apiInterface();
-  template <typename T> const XInterface<T> *apiInterface() const;
-
   static SPropertyInformation *derive(const SPropertyInformation *obj);
-  template <typename T> static void initiate(SPropertyInformation *info, const char *typeName);
   static void initiate(SPropertyInformation *info, const SPropertyInformation *from);
-
-  X_ALIGNED_OPERATOR_NEW
 
 private:
   X_DISABLE_COPY(SPropertyInformation);
 
-  void reference() const;
-  void dereference() const;
-
   mutable InterfaceHash _interfaceFactories;
 
+  void reference() const;
+  void dereference() const;
 
   friend class SProperty;
   friend class SDatabase;
 };
 
 Q_DECLARE_METATYPE(const SPropertyInformation*);
-
-
-template <typename T, typename U>
-typename U::InstanceInformation *SPropertyInformation::add(U T::* ptr, const QString &name)
-  {
-  T *u = 0;
-  SPropertyContainer *container = static_cast<SPropertyContainer *>(u);
-  U *offset = &(u->*ptr);
-  xptrdiff location = reinterpret_cast<xsize>(offset) - reinterpret_cast<xsize>(container);
-  xAssert(location > 0);
-
-  if(extendedParent())
-    {
-    location -= extendedParent()->location();
-    }
-
-  return add<U>(location, name);
-  }
-
-template <typename T> typename T::InstanceInformation *SPropertyInformation::add(const QString &name)
-  {
-  const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
-
-  SPropertyInstanceInformation *inst = add(newChildType, name);
-
-  return static_cast<typename T::InstanceInformation*>(inst);
-  }
-
-template <typename T> typename T::InstanceInformation *SPropertyInformation::add(xsize location, const QString &name)
-  {
-  const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
-
-  SPropertyInstanceInformation *inst = add(newChildType, location, name, false);
-
-  return static_cast<typename T::InstanceInformation*>(inst);
-  }
-
-template <typename T> void SPropertyInformation::addInterfaceFactory(T *factory) const
-  {
-  xAssert(factory);
-  xAssert(T::InterfaceType::InterfaceTypeId != SInterfaceTypes::Invalid);
-  _interfaceFactories.insert(T::InterfaceType::InterfaceTypeId, factory);
-  SInterfaceBaseFactory *facBase = factory;
-  ++facBase->_referenceCount;
-  xAssert(interfaceFactory(T::InterfaceType::InterfaceTypeId) == factory);
-  }
-
-template <typename PROPTYPE, typename T> void SPropertyInformation::addInheritedInterface() const
-  {
-  class InheritedInterface : public SInterfaceBaseFactory
-    {
-    S_INTERFACE_FACTORY_TYPE(T)
-  public:
-    InheritedInterface() : SInterfaceBaseFactory(true) { }
-    virtual SInterfaceBase *classInterface(SProperty *prop)
-      {
-      return prop->castTo<PROPTYPE>();
-      }
-    };
-
-  addInterfaceFactory(new InheritedInterface);
-  }
-
-template <typename T> void SPropertyInformation::addAddonInterface() const
-  {
-  class AddonInterface : public SInterfaceBaseFactory
-    {
-    S_INTERFACE_FACTORY_TYPE(T)
-    AddonInterface() : SInterfaceBaseFactory(true) { }
-    virtual SInterfaceBase *classInterface(SProperty *prop)
-      {
-      SProperty::UserData *userData = prop->firstUserData();
-      while(userData)
-        {
-        if(userData->userDataTypeId() == SUserDataTypes::InterfaceUserDataType)
-          {
-          SInterfaceBase *interfaceBase = static_cast<SInterfaceBase*>(userData);
-          if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceTypeId)
-            {
-            return interfaceBase;
-            }
-          }
-        userData = userData->next();
-        }
-
-      // none found, create one and add it.
-      T* newInterface = new T(prop);
-      prop->addUserData(newInterface);
-      return newInterface;
-      }
-    };
-
-  addInterfaceFactory(new AddonInterface);
-  }
-
-template <typename T> void SPropertyInformation::addStaticInterface(T *factory) const
-  {
-  addInterfaceFactory(factory);
-  }
 
 #endif // SPROPERTYINFORMATION_H

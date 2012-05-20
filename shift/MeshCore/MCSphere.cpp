@@ -5,20 +5,21 @@
 
 S_IMPLEMENT_PROPERTY(MCSphere, MeshCore)
 
-void MCSphere::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCSphere::createTypeInformation(SPropertyInformationTyped<MCSphere> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    MCGeometry::InstanceInformation* geomInst = info->child(&MCSphere::geometry);
+    auto geomInst = info->child(&MCSphere::geometry);
 
-    FloatProperty::InstanceInformation* radInst = info->add(&MCSphere::radius, "radius");
+    auto radInst = info->add(&MCSphere::radius, "radius");
     radInst->setAffects(geomInst);
     radInst->setDefault(1.0f);
     }
 
   if(data.registerInterfaces)
     {
-    info->addInheritedInterface<MCSphere, GCManipulatable>();
+    info->addInheritedInterface<GCManipulatable>();
     }
   }
 

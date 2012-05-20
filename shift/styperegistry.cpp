@@ -19,17 +19,14 @@ STypeRegistry::STypeRegistry()
   {
   }
 
-void STypeRegistry::initiateInternalTypes()
+void STypeRegistry::initiate()
   {
   XScriptEngine::initiate();
 
   _internalTypes = new TypeData();
 
   _internalTypes->allocator = new XBucketAllocator();
-  }
 
-void STypeRegistry::initiate()
-  {
   addPropertyGroup(Shift::propertyGroup());
 
   XInterface<STreeObserver> *treeObs = XInterface<STreeObserver>::create("_STreeObserver");
@@ -49,11 +46,6 @@ void STypeRegistry::terminate()
 
 XAllocatorBase *STypeRegistry::allocator()
   {
-  if(!_internalTypes)
-    {
-    initiateInternalTypes();
-    }
-
   xAssert(_internalTypes->allocator);
   return _internalTypes->allocator;
   }
@@ -61,20 +53,7 @@ XAllocatorBase *STypeRegistry::allocator()
 void STypeRegistry::addPropertyGroup(SPropertyGroup &g)
   {
   _internalTypes->groups << &g;
-  foreach(const SPropertyInformation *info, g.containedTypes())
-    {
-    addType(info);
-    }
-  g._added = true;
-  }
-
-void STypeRegistry::onTypeAdded(SPropertyGroup *, const SPropertyInformation *t)
-  {
-  foreach(Observer *o, _internalTypes->observers)
-    {
-    o->typeAdded(t);
-    }
-  addType(t);
+  g.bootstrap();
   }
 
 const QVector <const SPropertyGroup *> &STypeRegistry::groups()

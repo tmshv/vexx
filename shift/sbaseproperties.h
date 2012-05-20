@@ -315,7 +315,8 @@ S_PROPERTY_INTERFACE(name)
 
 #define IMPLEMENT_POD_PROPERTY(name, grp) \
   S_IMPLEMENT_PROPERTY(name, grp) \
-  void name::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data) { \
+  void name::createTypeInformation(SPropertyInformationTyped<name> *info, \
+      const SPropertyInformationCreateData &data) { \
     if(data.registerInterfaces) { \
     info->addStaticInterface(new PODPropertyVariantInterface<name, name::PODType>()); } } \
   name::name() { }
@@ -367,7 +368,7 @@ S_PROPERTY_INTERFACE(StringProperty)
 
 class SHIFT_EXPORT FilenameProperty : public StringProperty
   {
-  S_PROPERTY(StringProperty, StringPropertyBase, 0);
+  S_PROPERTY(FilenameProperty, StringProperty, 0);
 
 public:
   FilenameProperty()

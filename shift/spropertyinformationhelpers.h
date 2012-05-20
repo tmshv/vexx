@@ -7,11 +7,13 @@
 #include "sproperty.h"
 
 #define S_IMPLEMENT_PROPERTY(myName, grp) \
-  static const SPropertyInformation *_##myName##StaticTypeInformation = myName :: bootstrapStaticTypeInformation();\
-  const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation; } \
+  static SPropertyGroup::Information _##myName##StaticTypeInformation = \
+    grp :: propertyGroup().registerPropertyInformation( \
+    &_##myName##StaticTypeInformation, myName::bootstrapStaticTypeInformation); \
+  const SPropertyInformation *myName::staticTypeInformation() { return _##myName##StaticTypeInformation.information; } \
   const SPropertyInformation *myName::bootstrapStaticTypeInformation() \
-  { return SPropertyInformation::bootstrapTypeInformation<myName>(&_##myName##StaticTypeInformation, \
-  #myName, myName::ParentType::bootstrapStaticTypeInformation(), grp::propertyGroup()); }
+  { SPropertyInformationTyped<myName>::bootstrapTypeInformation(&_##myName##StaticTypeInformation.information, \
+  #myName, myName::ParentType::bootstrapStaticTypeInformation()); return staticTypeInformation(); }
 
 #define S_IMPLEMENT_ABSTRACT_PROPERTY(myName, grp) \
   S_IMPLEMENT_PROPERTY(myName, grp)
@@ -24,8 +26,9 @@ public:
   static void create(SPropertyInformation *info)
     {
     const XInterface<PropType::ParentType> *parentTempl =
-        PropType::ParentType::staticTypeInformation()->apiInterface<PropType::ParentType>();
-    const XInterface<SProperty> *baseTempl = SProperty::staticTypeInformation()->apiInterface<SProperty>();
+        static_cast<XInterface<PropType::ParentType>*>(PropType::ParentType::staticTypeInformation()->apiInterface());
+    const XInterface<SProperty> *baseTempl =
+        static_cast<XInterface<SProperty>*>(SProperty::staticTypeInformation()->apiInterface());
 
     XInterface<PropType> *templ = XInterface<PropType>::createWithParent(info->typeName(), parentTempl, baseTempl);
     info->setApiInterface(templ);
@@ -46,7 +49,12 @@ template<typename T, bool Abstract = T::IsAbstract> struct PropertyHelper;
 
 template<typename T> struct PropertyHelper<T, true>
   {
-  static void create(SProperty *)
+  static SProperty *create(void *)
+    {
+    xAssertFail();
+    return 0;
+    }
+  static void createInPlace(SProperty *)
     {
     xAssertFail();
     }
@@ -58,9 +66,14 @@ template<typename T> struct PropertyHelper<T, true>
 
 template<typename T> struct PropertyHelper<T, false>
   {
-  static void create(SProperty *ptr)
+  static SProperty *create(void *ptr)
     {
-    new(ptr) T();
+    return new(ptr) T();
+    }
+  static void createInPlace(SProperty *ptr)
+    {
+    T* t = static_cast<T*>(ptr);
+    new(t) T();
     }
   static void destroy(SProperty *ptr)
     {
@@ -70,69 +83,234 @@ template<typename T> struct PropertyHelper<T, false>
 
 template <typename T> struct InstanceInformationHelper
   {
-  static void create(SPropertyInstanceInformation *allocation)
+  static SPropertyInstanceInformation *create(void *allocation)
     {
-    new(allocation) T::InstanceInformation;
+    return new(allocation) T::InstanceInformation;
     }
   static void destroy(SPropertyInstanceInformation *allocation)
     {
     ((T*)allocation)->~T();
     }
   };
+
+template <typename T, void FUNC( const SPropertyInstanceInformation *, T * )> struct ComputeHelper
+  {
+  static void compute( const SPropertyInstanceInformation *c, SProperty *prop)
+    {
+    T* t = prop->castTo<T>();
+    FUNC(c, t);
+    }
+  };
 }
 
-template <typename PropType> void SPropertyInformation::initiate(SPropertyInformation *info, const char *typeName)
+template <typename PropType, typename InstanceType> class SPropertyInstanceInformationTyped : public InstanceType
   {
-  // update copy constructor too
-  info->setCreateProperty(PropertyHelper<PropType>::create);
-  info->setDestroyProperty(PropertyHelper<PropType>::destroy);
-  info->setCreateInstanceInformation(InstanceInformationHelper<PropType>::create);
-  info->setDestroyInstanceInformation(InstanceInformationHelper<PropType>::destroy);
-  info->setSave(PropType::saveProperty);
-  info->setLoad(PropType::loadProperty);
-  info->setShouldSave(PropType::shouldSaveProperty);
-  info->setShouldSaveValue(PropType::shouldSavePropertyValue);
-  info->setAssign(PropType::assignProperty);
-  info->setPostCreate(0);
-  info->setPostChildSet(PropType::postChildSet);
-  info->setVersion(PropType::Version);
-  info->setSize(sizeof(PropType));
-  info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+public:
+  using InstanceType::setCompute;
 
-  info->_createTypeInformation = PropType::createTypeInformation;
-  info->_instances = 0;
-  info->_extendedParent = 0;
-
-  info->_typeName = typeName;
-
-  ApiHelper<PropType>::create(info);
-  }
-
-template <typename T>
-const SPropertyInformation *SPropertyInformation::bootstrapTypeInformation(const SPropertyInformation **info,
-                                                                           const char *name,
-                                                                           const SPropertyInformation *parent,
-                                                                           SPropertyGroup& group)
-  {
-  if(*info)
+  template <void FUNC( const SPropertyInstanceInformation *, PropType * )>
+      void setCompute()
     {
-    return *info;
+    ComputeFunction t = (ComputeFunction)ComputeHelper<PropType, FUNC>::compute;
+
+    setCompute(t);
+    }
+  };
+
+template <typename PropType> class SPropertyInformationTyped : public SPropertyInformation
+  {
+public:
+  static void bootstrapTypeInformation(SPropertyInformation **info,
+                               const char *name,
+                               const SPropertyInformation *parent)
+    {
+    if(!*info)
+      {
+      *info = createTypeInformation(name, parent);
+      }
     }
 
-  *info = SPropertyInformation::createTypeInformation<T>(name, parent);
-  group.registerPropertyInformation(*info);
-  return *info;
+  using SPropertyInformation::child;
+
+  template <typename U>
+  SPropertyInstanceInformationTyped<PropType, typename U::InstanceInformation> *child(U PropType::* ptr)
+    {
+    xsize location = findLocation(ptr);
+
+    return static_cast<SPropertyInstanceInformationTyped<PropType,
+                                                         typename U::InstanceInformation>*>(child(location));
   }
 
-template <typename T> XInterface<T> *SPropertyInformation::apiInterface()
-  {
-  return static_cast<XInterface<T>*>(_apiInterface);
-  }
+  template <typename U>
+  const SPropertyInstanceInformationTyped<PropType, typename U::InstanceInformation> *child(U PropType::* ptr) const
+    {
+    xsize location = findLocation(ptr);
 
-template <typename T> const XInterface<T> *SPropertyInformation::apiInterface() const
-  {
-  return static_cast<const XInterface<T>*>(_apiInterface);
-  }
+    return static_cast<const SPropertyInstanceInformationTyped<PropType,
+                                                               typename U::InstanceInformation>*>(child(location));
+    }
+
+  XInterface<PropType> *apiInterface()
+    {
+    return static_cast<XInterface<PropType>*>(SPropertyInformation::apiInterface());
+    }
+
+  const XInterface<PropType> *apiInterface() const
+    {
+    return static_cast<const XInterface<PropType>*>(SPropertyInformation::apiInterface());
+    }
+
+  static SPropertyInformation *createTypeInformation(const char *name, const SPropertyInformation *parentType)
+    {
+    SProfileFunction
+
+    typedef void (*FnType)(SPropertyInformation *, const char *);
+    FnType fn = SPropertyInformationTyped<PropType>::initiate;
+
+    return createTypeInformationInternal(name, parentType, fn);
+    }
+
+  template <typename U> xsize findLocation(U PropType::* ptr)
+    {
+    PropType *u = reinterpret_cast<PropType*>(1); // avoid special casing for zero static cast
+    SPropertyContainer *container = static_cast<SPropertyContainer *>(u);
+    U *offset = &(u->*ptr);
+
+    SProperty *propOffset = offset;
+
+    // one added earlier is cancelled out because the 1 is counted in both offset and container
+    xptrdiff location = reinterpret_cast<xsize>(propOffset) - reinterpret_cast<xsize>(container);
+    xAssert(location > 0);
+
+    return (xsize)location;
+    }
+
+  template <typename U>
+      SPropertyInstanceInformationTyped<PropType, typename U::InstanceInformation> *add(U PropType::* ptr,
+                                                                                    const QString &name)
+    {
+    xptrdiff location = findLocation(ptr);
+
+    if(extendedParent())
+      {
+      location -= extendedParent()->location();
+      }
+
+    return add<U>(location, name);
+    }
+
+  template <typename T>
+      SPropertyInstanceInformationTyped<PropType, typename T::InstanceInformation> *add(const QString &name)
+    {
+    const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
+
+    SPropertyInstanceInformation *inst = add(newChildType, name);
+
+    return static_cast<SPropertyInstanceInformationTyped<PropType, typename T::InstanceInformation> *>(inst);
+    }
+
+  template <typename T>
+      SPropertyInstanceInformationTyped<PropType, typename T::InstanceInformation> *add(xsize location,
+                                                                                        const QString &name)
+    {
+    const SPropertyInformation *newChildType = T::bootstrapStaticTypeInformation();
+
+    SPropertyInstanceInformation *inst = SPropertyInformation::add(newChildType, location, name, false);
+
+    return static_cast<SPropertyInstanceInformationTyped<PropType, typename T::InstanceInformation> *>(inst);
+    }
+
+  template <typename T> void addInheritedInterface()
+    {
+    class InheritedInterface : public SInterfaceBaseFactory
+      {
+      S_INTERFACE_FACTORY_TYPE(T)
+    public:
+      InheritedInterface() : SInterfaceBaseFactory(true) { }
+      virtual SInterfaceBase *classInterface(SProperty *prop)
+        {
+        return prop->castTo<PropType>();
+        }
+      };
+
+    addInterfaceFactory(new InheritedInterface);
+    }
+
+  template <typename PropType, typename InstanceType>
+      SPropertyInformationTyped<PropType> *
+          extendContainedProperty(SPropertyInstanceInformationTyped<PropType, InstanceType> *inst)
+    {
+    SPropertyInformation *info = SPropertyInformation::extendContainedProperty(inst);
+
+    return static_cast<SPropertyInformationTyped<PropType>*>(info);
+    }
+
+#ifdef S_PROPERTY_USER_DATA
+  template <typename T> void addAddonInterface() const
+    {
+    class AddonInterface : public SInterfaceBaseFactory
+      {
+      S_INTERFACE_FACTORY_TYPE(T)
+      AddonInterface() : SInterfaceBaseFactory(true) { }
+      virtual SInterfaceBase *classInterface(SProperty *prop)
+        {
+        SProperty::UserData *userData = prop->firstUserData();
+        while(userData)
+          {
+          if(userData->userDataTypeId() == SUserDataTypes::InterfaceUserDataType)
+            {
+            SInterfaceBase *interfaceBase = static_cast<SInterfaceBase*>(userData);
+            if(interfaceBase->interfaceTypeId() == T::InterfaceType::InterfaceTypeId)
+              {
+              return interfaceBase;
+              }
+            }
+          userData = userData->next();
+          }
+
+        // none found, create one and add it.
+        T* newInterface = new T(prop);
+        prop->addUserData(newInterface);
+        return newInterface;
+        }
+      };
+
+    addInterfaceFactory(new AddonInterface);
+    }
+#endif
+
+private:
+  static void initiate(SPropertyInformation *info, const char *typeName)
+    {
+    // update copy constructor too
+    info->setCreateProperty(PropertyHelper<PropType>::create);
+    info->setCreatePropertyInPlace(PropertyHelper<PropType>::createInPlace);
+    info->setDestroyProperty(PropertyHelper<PropType>::destroy);
+    info->setCreateInstanceInformation(InstanceInformationHelper<PropType>::create);
+    info->setDestroyInstanceInformation(InstanceInformationHelper<PropType>::destroy);
+    info->setSave(PropType::saveProperty);
+    info->setLoad(PropType::loadProperty);
+    info->setShouldSave(PropType::shouldSaveProperty);
+    info->setShouldSaveValue(PropType::shouldSavePropertyValue);
+    info->setAssign(PropType::assignProperty);
+    info->setPostCreate(0);
+    info->setPostChildSet(PropType::postChildSet);
+    info->setVersion(PropType::Version);
+    info->setSize(sizeof(PropType));
+    info->setInstanceInformationSize(sizeof(typename PropType::InstanceInformation));
+
+    CreateTypeInformationFunction fn = (CreateTypeInformationFunction)PropType::createTypeInformation;
+
+    info->setCreateTypeInformation(fn);
+    info->setExtendedParent(0);
+
+    info->setTypeName(typeName);
+
+    info->setInstances(0);
+
+    ApiHelper<PropType>::create(info);
+    }
+  };
 
 namespace XScriptConvert
 {
@@ -152,17 +330,5 @@ template <> struct SHIFT_EXPORT NativeToJS<SPropertyInformation>
   };
 }
 }
-
-template <typename T>
-  static const SPropertyInformation *SPropertyInformation::createTypeInformation(const char *name,
-                                                            const SPropertyInformation *parentType)
-  {
-  SProfileFunction
-
-  typedef void (*FnType)(SPropertyInformation *, const char *);
-  FnType fn = SPropertyInformation::initiate<T>;
-
-  return createTypeInformationInternal(name, parentType, fn);
-  }
 
 #endif // SPROPERTYINFORMATIONAPIUTILITIES_H

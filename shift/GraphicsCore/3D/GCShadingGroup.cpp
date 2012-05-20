@@ -11,7 +11,8 @@ S_IMPLEMENT_TYPED_POINTER_ARRAY_TYPE(GCShadingGroupPointerArray, GraphicsCore)
 
 S_IMPLEMENT_PROPERTY(GCShadingGroup, GraphicsCore)
 
-void GCShadingGroup::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void GCShadingGroup::createTypeInformation(SPropertyInformationTyped<GCShadingGroup> *info,
+                                           const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
@@ -20,7 +21,7 @@ void GCShadingGroup::createTypeInformation(SPropertyInformation *info, const SPr
 
   if(data.registerInterfaces)
     {
-    info->addInheritedInterface<GCShadingGroup, GCManipulatable>();
+    info->addInheritedInterface<GCManipulatable>();
     }
   }
 

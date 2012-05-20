@@ -4,7 +4,7 @@
 
 S_IMPLEMENT_PROPERTY(Object, Tang)
 
-void Object::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void Object::createTypeInformation(SPropertyInformationTyped<Object> *, const SPropertyInformationCreateData &)
   {
   }
 

@@ -16,14 +16,15 @@ void unionBounds(const SPropertyInstanceInformation*, MCShape* shape)
   *data = shape->geometry.runtimeGeometry().computeBounds();
   }
 
-void MCShape::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCShape::createTypeInformation(SPropertyInformationTyped<MCShape> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCBoundingBox::InstanceInformation* bInst = info->child(&GCRenderArray::bounds);
-    bInst->setCompute(unionBounds);
+    auto bInst = info->child(&GCRenderArray::bounds);
+    bInst->setCompute<unionBounds>();
 
-    MCGeometry::InstanceInformation* geoInst = info->add(&MCShape::geometry, "geometry");
+    auto geoInst = info->add(&MCShape::geometry, "geometry");
     geoInst->setAffects(bInst);
     }
   }

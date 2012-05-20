@@ -7,17 +7,18 @@
 
 S_IMPLEMENT_PROPERTY(SEntity, Shift)
 
-void SEntity::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SEntity::createTypeInformation(SPropertyInformationTyped<SEntity> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    SPropertyArray::InstanceInformation *childInst = info->add(&SEntity::children, "children");
+    auto *childInst = info->add(&SEntity::children, "children");
     childInst->setMode(SPropertyInstanceInformation::Internal);
     }
 
   if(data.registerInterfaces)
     {
-    XInterface<SEntity> *api = info->apiInterface<SEntity>();
+    auto *api = info->apiInterface();
     api->addMethod<SProperty* (const SPropertyInformation *, const QString &), &SEntity::addChild>("addChild");
 
     api->addMethod<void (STreeObserver* obs), &SEntity::addTreeObserver>("addTreeObserver");

@@ -4,6 +4,7 @@
 #include "sbaseproperties.h"
 #include "3D/GCTexture.h"
 #include "3D/GCShaderDataBindings.h"
+#include "spropertyinformationhelpers.h"
 
 namespace GraphicsCore
 {
@@ -11,8 +12,11 @@ void initiate()
   {
   STypeRegistry::addPropertyGroup(propertyGroup());
 
-  ColourProperty::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::Vector4);
-  GCTexturePointer::staticTypeInformation()->addStaticInterface(new GCShaderDataBindings::TextureRef);
+  SPropertyInformation *colInfo = const_cast<SPropertyInformation *>(ColourProperty::staticTypeInformation());
+  colInfo->addStaticInterface(new GCShaderDataBindings::Vector4);
+
+  SPropertyInformation *texInfo = const_cast<SPropertyInformation *>(GCTexturePointer::staticTypeInformation());
+  texInfo->addStaticInterface(new GCShaderDataBindings::TextureRef);
   }
 
 SPropertyGroup &propertyGroup()

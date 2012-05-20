@@ -1,12 +1,28 @@
 #include "spropertygroup.h"
 #include "styperegistry.h"
 
-SPropertyGroup::SPropertyGroup() : _added(false)
+SPropertyGroup::SPropertyGroup() : _first(0)
   {
   }
 
-void SPropertyGroup::registerPropertyInformation(const SPropertyInformation *i)
+SPropertyGroup::Information SPropertyGroup::registerPropertyInformation(SPropertyGroup::Information *ths,
+                                                              BootstrapFunction bootstrapFunction)
   {
-  _containedTypes << i;
-  STypeRegistry::onTypeAdded(this, i);
+  Information *first = _first;
+  _first = ths;
+
+  Information ret = { 0, bootstrapFunction, first };
+  return ret;
+  }
+
+void SPropertyGroup::bootstrap()
+  {
+  for(Information *i = _first; i; i = i->next)
+    {
+    i->bootstrap();
+
+    xAssert(i->information);
+
+    STypeRegistry::addType(i->information);
+    }
   }

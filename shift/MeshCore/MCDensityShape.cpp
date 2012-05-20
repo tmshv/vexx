@@ -10,12 +10,13 @@
 
 S_IMPLEMENT_PROPERTY(MCDensityShape, MeshCore)
 
-void MCDensityShape::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCDensityShape::createTypeInformation(SPropertyInformationTyped<MCDensityShape> *info,
+                                           const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCGeometry::InstanceInformation *inst = info->add(&MCDensityShape::geometry, "geometry");
-    inst->setCompute(computeGeometry);
+    auto inst = info->add(&MCDensityShape::geometry, "geometry");
+    inst->setCompute<computeGeometry>();
     }
   }
 

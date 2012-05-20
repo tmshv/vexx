@@ -46,9 +46,9 @@ void SPropertyInformation::destroy(SPropertyInformation *d)
   {
   foreach(SInterfaceBaseFactory *f, d->_interfaceFactories)
     {
-    xAssert(f->_referenceCount > 0);
-    --f->_referenceCount;
-    if(f->_referenceCount == 0 && f->_deleteOnNoReferences)
+    xAssert(f->referenceCount() > 0);
+    f->setReferenceCount(f->referenceCount() - 1);
+    if(f->referenceCount() == 0 && f->deleteOnNoReferences())
       {
       delete f;
       }
@@ -150,6 +150,30 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
   return def;
   }
 
+void SPropertyInformation::addInterfaceFactoryInternal(xuint32 typeId, SInterfaceBaseFactory *factory)
+  {
+  xAssert(factory);
+  xAssert(typeId != SInterfaceTypes::Invalid);
+
+  _interfaceFactories.insert(typeId, factory);
+
+  factory->setReferenceCount(factory->referenceCount() + 1);
+  xAssert(interfaceFactory(typeId) == factory);
+  }
+
+const SInterfaceBaseFactory *SPropertyInformation::interfaceFactory(xuint32 type) const
+  {
+  const SInterfaceBaseFactory *fac = 0;
+  const SPropertyInformation *info = this;
+  while(!fac && info)
+    {
+    fac = info->_interfaceFactories.value(type, 0);
+    info = info->parentTypeInformation();
+    }
+
+  return fac;
+  }
+
 SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyInstanceInformation *inst)
   {
   const SPropertyInformation *oldInst = inst->childInformation();
@@ -161,7 +185,7 @@ SPropertyInformation *SPropertyInformation::extendContainedProperty(SPropertyIns
   return info;
   }
 
-const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const char *name,
+SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const char *name,
                                                                                 const SPropertyInformation *parentType,
                                                                                 void (init)(SPropertyInformation *, const char *))
   {
@@ -174,14 +198,25 @@ const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(
 
   SPropertyInformationCreateData data;
 
+  struct Utils
+    {
+    static void callCreateTypeInformationBottomUp(SPropertyInformation *i,
+                                           SPropertyInformationCreateData &d,
+                                           const SPropertyInformation *from)
+      {
+      if(from)
+        {
+        const SPropertyInformation *parent = from->parentTypeInformation();
+        callCreateTypeInformationBottomUp(i, d, parent);
+
+        from->createTypeInformation()(i, d);
+        }
+      }
+    };
+
   data.registerAttributes = true;
   data.registerInterfaces = false;
-  const SPropertyInformation *ancestor = parentType;
-  while(ancestor)
-    {
-    ancestor->createTypeInformation()(createdInfo, data);
-    ancestor = ancestor->parentTypeInformation();
-    }
+  Utils::callCreateTypeInformationBottomUp(createdInfo, data, parentType);
 
   createdInfo->setParentTypeInformation(parentType);
 
@@ -193,25 +228,6 @@ const SPropertyInformation *SPropertyInformation::createTypeInformationInternal(
   createdInfo->apiInterface()->seal();
 
   return createdInfo;
-  }
-
-
-SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr)
-  {
-  SPropertyContainer *u = 0;
-  SProperty *offset = &(u->*ptr);
-  xptrdiff location = reinterpret_cast<xsize>(offset);
-  xAssert(location > 0);
-  return child(location);
-  }
-
-const SPropertyInstanceInformation *SPropertyInformation::child(SProperty SPropertyContainer::* ptr) const
-  {
-  SPropertyContainer *u = 0;
-  SProperty *offset = &(u->*ptr);
-  xptrdiff location = reinterpret_cast<xsize>(offset);
-  xAssert(location > 0);
-  return child(location);
   }
 
 SPropertyInstanceInformation *SPropertyInformation::child(xsize location)

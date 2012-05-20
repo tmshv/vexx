@@ -15,23 +15,27 @@ class SHandler;
 class SDatabase;
 class SPropertyInstanceInformation;
 class SPropertyInformation;
+template <typename T> class SPropertyInformationTyped;
 class SPropertyInformationCreateData;
 class SSaver;
 class SLoader;
 class SInterfaceBase;
 
-
+#ifdef S_PROPERTY_USER_DATA
 #define S_USER_DATA_TYPE(typeId) public: \
   enum { UserDataType = SUserDataTypes::typeId }; \
   virtual xuint32 userDataTypeId() const { return UserDataType; } \
   private:
+#endif
 
-#define S_REGISTER_TYPE_FUNCTION() \
-  public: static void createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data); \
+#define S_REGISTER_TYPE_FUNCTION(name) \
+  public: static void createTypeInformation(SPropertyInformationTyped<name> *info, \
+    const SPropertyInformationCreateData &data); \
   static const SPropertyInformation *staticTypeInformation(); \
   static const SPropertyInformation *bootstrapStaticTypeInformation();
 
-#define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
+#define S_ADD_INSTANCE_INFORMATION(name) const InstanceInformation *instanceInformation() const \
+  { return static_cast<const InstanceInformation *>(baseInstanceInformation()); }
 
 
 #define S_ADD_STATIC_INFO(name, version) \
@@ -45,26 +49,27 @@ class SInterfaceBase;
   S_ADD_STATIC_INFO(myName, version); \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef void ParentType; \
-  S_REGISTER_TYPE_FUNCTION()
+  S_REGISTER_TYPE_FUNCTION(myName)
 
 #define S_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
-  S_REGISTER_TYPE_FUNCTION()
+  S_REGISTER_TYPE_FUNCTION(myName)
 
 #define S_ABSTRACT_PROPERTY(myName, superName, version) \
   public: \
   S_ADD_ABSTRACT_STATIC_INFO(myName, version) \
   S_ADD_INSTANCE_INFORMATION(myName) \
   typedef superName ParentType; \
-  S_REGISTER_TYPE_FUNCTION()
+  S_REGISTER_TYPE_FUNCTION(myName)
 
 class SHIFT_EXPORT SProperty
   {
 public:
   typedef SPropertyInstanceInformation InstanceInformation;
+
   S_PROPERTY_ROOT(SProperty, 0)
 
 public:
@@ -228,6 +233,7 @@ public:
     return static_cast<const T *>(interface(T::InterfaceTypeId));
     }
 
+#ifdef S_PROPERTY_USER_DATA
   class UserData
     {
     S_USER_DATA_TYPE(Invalid);
@@ -243,6 +249,7 @@ public:
   UserData *firstUserData() { return _userData; }
   void addUserData(UserData *userData);
   void removeUserData(UserData *userData);
+#endif
 
   class DataChange : public SChange
     {
@@ -353,6 +360,7 @@ private:
 
   void connectInternal(SProperty *) const;
   void disconnectInternal(SProperty *) const;
+
   SProperty *_nextSibling;
   SProperty *_input;
   SProperty *_output;
@@ -361,7 +369,6 @@ private:
   SPropertyContainer *_parent;
   const SPropertyInformation *_info;
   const InstanceInformation *_instanceInfo;
-  UserData *_userData;
   mutable SEntity *_entity;
 
   enum Flags
@@ -372,6 +379,10 @@ private:
     PreGetting = 8
     };
   XFlags<Flags, xuint8> _flags;
+
+#ifdef S_PROPERTY_USER_DATA
+  UserData *_userData;
+#endif
 
   friend class SEntity;
   friend class SDatabase;

@@ -11,23 +11,29 @@
 #include "spropertyinformationhelpers.h"
 #include "XConvertScriptSTL.h"
 
-static const SPropertyInformation *_sPropertyTypeInformation = SProperty::bootstrapStaticTypeInformation();
+static SPropertyGroup::Information _sPropertyTypeInformation =
+  Shift::propertyGroup().registerPropertyInformation(&_sPropertyTypeInformation,
+                                                     SProperty::bootstrapStaticTypeInformation);
 
 const SPropertyInformation *SProperty::staticTypeInformation()
   {
-  return _sPropertyTypeInformation;
+  return _sPropertyTypeInformation.information;
   }
 
 const SPropertyInformation *SProperty::bootstrapStaticTypeInformation()
   {
-  return SPropertyInformation::bootstrapTypeInformation<SProperty>(&_sPropertyTypeInformation, "SProperty", 0, Shift::propertyGroup());
+  SPropertyInformationTyped<SProperty>::bootstrapTypeInformation(
+        &_sPropertyTypeInformation.information, "SProperty", 0);
+
+  return staticTypeInformation();
   }
 
-void SProperty::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void SProperty::createTypeInformation(SPropertyInformationTyped<SProperty> *info,
+                                      const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {
-    XInterface<SProperty> *api = info->apiInterface<SProperty>();
+    auto *api = info->apiInterface();
     api->addProperty<const SPropertyInformation *, &SProperty::typeInformation>("typeInformation");
     api->addProperty<SProperty *, const SProperty *, &SProperty::input, &SProperty::setInput>("input");
     api->addProperty<SPropertyContainer *, SPropertyContainer *, &SProperty::parent, &SProperty::setParent>("parent");
@@ -141,8 +147,12 @@ bool SProperty::NameChange::inform(bool backwards)
   }
 
 SProperty::SProperty() : _nextSibling(0), _input(0), _output(0), _nextOutput(0),
-    _handler(0), _parent(0), _info(0), _instanceInfo(0), _userData(0), _entity(0),
+    _handler(0), _parent(0), _info(0), _instanceInfo(0), _entity(0),
     _flags(Dirty)
+
+#ifdef S_PROPERTY_USER_DATA
+    , _userData(0)
+#endif
   {
   }
 
@@ -159,6 +169,7 @@ SProperty& SProperty::operator =(const SProperty &)
 
 SProperty::~SProperty()
   {
+#ifdef S_PROPERTY_USER_DATA
   UserData *ud = _userData;
   while(ud)
     {
@@ -169,6 +180,7 @@ SProperty::~SProperty()
       }
     ud = next;
     }
+#endif
 
   if(isDynamic())
     {
@@ -1074,6 +1086,7 @@ void SProperty::update() const
   xAssert(!_flags.hasFlag(Dirty));
   }
 
+#ifdef S_PROPERTY_USER_DATA
 void SProperty::addUserData(UserData *userData)
   {
   xAssert(userData);
@@ -1111,6 +1124,7 @@ void SProperty::removeUserData(UserData *userData)
     }
   xAssert(!userData->_next);
   }
+#endif
 
 SInterfaceBase *SProperty::interface(xuint32 typeId)
   {

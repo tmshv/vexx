@@ -86,6 +86,8 @@ public:
   static void saveProperty(const SProperty *, SSaver &);
   static SProperty *loadProperty(SPropertyContainer *, SLoader &);
 
+  X_ALIGNED_OPERATOR_NEW
+
 private:
   struct ObserverStruct
     {

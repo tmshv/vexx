@@ -4,11 +4,12 @@
 
 S_IMPLEMENT_PROPERTY(MCMathsOperation, MathsCore)
 
-void MCMathsOperation::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCMathsOperation::createTypeInformation(SPropertyInformationTyped<MCMathsOperation> *info,
+                                             const SPropertyInformationCreateData &data)
   {
   if(data.registerInterfaces)
     {
-    XInterface<MCMathsOperation> *ifc = info->apiInterface<MCMathsOperation>();
+    auto ifc = info->apiInterface();
     ifc->addMethod<bool (QString), &MCMathsOperation::saveResultToFile>("saveResultToFile");
     }
   }

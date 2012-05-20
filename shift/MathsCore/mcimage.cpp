@@ -60,17 +60,18 @@ void MCImage::computeImageOutput(const SPropertyInstanceInformation* , MCImage *
 
 S_IMPLEMENT_PROPERTY(MCImage, MathsCore)
 
-void MCImage::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCImage::createTypeInformation(SPropertyInformationTyped<MCImage> *info,
+                                    const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    MCMathsOperation::InstanceInformation *outputInst = info->child(&MCImage::output);
-    outputInst->setCompute(computeImageOutput);
+    auto outputInst = info->child(&MCImage::output);
+    outputInst->setCompute<computeImageOutput>();
 
-    BoolProperty::InstanceInformation *preMultInst = info->add(&MCImage::premultiply, "premultiply");
+    auto preMultInst = info->add(&MCImage::premultiply, "premultiply");
     preMultInst->setAffects(outputInst);
 
-    StringProperty::InstanceInformation *filenameInst = info->add(&MCImage::filename, "filename");
+    auto filenameInst = info->add(&MCImage::filename, "filename");
     filenameInst->setAffects(outputInst);
     }
   }

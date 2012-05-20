@@ -57,14 +57,14 @@ template <> inline QWidget *castFromBase(QObject *ptr)
 
 namespace XScript
 {
-template <> class ClassCreator_Factory<QObject> : public ClassCreatorConvertableFactory<QObject> {};
+template <> class ClassCreator_Factory<QObject> : public ClassCreatorConvertableFactory<QObject, QObject> {};
 }
 
 #define X_SCRIPTABLE_QOBJECT_TYPE(type) X_SCRIPTABLE_TYPE_BASE_INHERITED(type, QObject) \
   namespace XScriptConvert { namespace internal { \
   template <> struct NativeToJS<type> : public NativeToJS<QObject> {}; } } \
   namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type> {}; }
+  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, QObject> {}; }
 
 X_SCRIPTABLE_QOBJECT_TYPE(QWidget)
 

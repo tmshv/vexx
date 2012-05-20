@@ -14,15 +14,16 @@ void computeRuntimeGeometry(const SPropertyInstanceInformation *, MCGeometry *rt
   rtGeo->runtimeGeometry = x;
   }
 
-void MCGeometry::createTypeInformation(SPropertyInformation *info, const SPropertyInformationCreateData &data)
+void MCGeometry::createTypeInformation(SPropertyInformationTyped<MCGeometry> *info,
+                                       const SPropertyInformationCreateData &data)
   {
   if(data.registerAttributes)
     {
-    GCRuntimeGeometry::InstanceInformation *rtGeo = info->child(&MCGeometry::runtimeGeometry);
-    rtGeo->setCompute(computeRuntimeGeometry);
+    auto rtGeo = info->child(&MCGeometry::runtimeGeometry);
+    rtGeo->setCompute<computeRuntimeGeometry>();
     rtGeo->setComputeLockedToMainThread(true);
 
-    MCPolyhedronProperty::InstanceInformation *attrs = info->add(&MCGeometry::polygons, "polygons");
+    auto attrs = info->add(&MCGeometry::polygons, "polygons");
     attrs->setAffects(rtGeo);
     }
   }

@@ -1,11 +1,17 @@
 #include "component.h"
 #include "spropertyinformationhelpers.h"
+#include "componentdocument.h"
 #include "tangmanager.h"
 
 S_IMPLEMENT_PROPERTY(Component, Tang);
 
-void Component::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void Component::createTypeInformation(SPropertyInformationTyped<Component> *info,
+                                      const SPropertyInformationCreateData &data)
   {
+  if(data.registerInterfaces)
+    {
+    info->addStaticInterface(new ComponentEditorInterface);
+    }
   }
 
 Component::Component()

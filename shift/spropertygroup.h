@@ -9,16 +9,23 @@ class SPropertyInformation;
 
 class SHIFT_EXPORT SPropertyGroup
   {
-XProperties:
-  XRORefProperty(QVector<const SPropertyInformation *>, containedTypes);
-
 public:
+  typedef const SPropertyInformation *(*BootstrapFunction)();
+  struct Information
+    {
+    SPropertyInformation *information;
+    BootstrapFunction bootstrap;
+    Information *next;
+    };
+
   SPropertyGroup();
 
-  void registerPropertyInformation(const SPropertyInformation *);
+  void bootstrap();
+  Information registerPropertyInformation(Information *info, BootstrapFunction fn);
 
 private:
-  bool _added;
+  Information *_first;
+
   friend class STypeRegistry;
   };
 

@@ -3,7 +3,8 @@
 
 S_IMPLEMENT_PROPERTY(MCPolyhedronProperty, MeshCore)
 
-void MCPolyhedronProperty::createTypeInformation(SPropertyInformation *, const SPropertyInformationCreateData &)
+void MCPolyhedronProperty::createTypeInformation(SPropertyInformationTyped<MCPolyhedronProperty> *,
+                                                 const SPropertyInformationCreateData &)
   {
   }
 
