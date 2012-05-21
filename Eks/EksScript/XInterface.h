@@ -372,7 +372,8 @@ private:
     return bob;
     }
 
-  static XScriptObject FindHolder( XScriptObject const & jo, T const * nh )
+  template <typename BASE>
+      static XScriptObject FindHolder( XScriptObject const & jo, BASE const * nh )
     {
     if( !nh || !jo.isValid() ) return XScriptObject();
     XScriptValue proto(jo);
@@ -411,8 +412,10 @@ private:
     {
     XScriptValue val = pv.asValue();
     XScriptObject jobj(val);
+    typedef typename Factory::ReturnType BT;
     typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NT;
     NT native = XScriptConvert::from<T>( val );
+    BT base = native;
     if( !native )
       {
       /* see: http://code.google.com/p/v8-juice/issues/detail?id=27
@@ -451,7 +454,7 @@ private:
              _exactly_ which JS object in the prototype chain nh is
              bound to.
           */
-      XScriptObject nholder = FindHolder( jobj, native );
+      XScriptObject nholder = FindHolder( jobj, base );
 #if 0 /* reminder: i've never actually seen this error happen, i'm just pedantic about checking... */
       assert( ! nholder.isValid() );
       WeakWrap::Unwrap( nholder /*jobj? subtle difference!*/, native );

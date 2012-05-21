@@ -147,15 +147,15 @@ SObserver *SEntity::ObserverStruct::getObserver()
   {
   if(mode == ObserverStruct::Tree)
     {
-    return (STreeObserver*)this;
+    return (STreeObserver*)observer;
     }
   else if(mode == ObserverStruct::Dirty)
     {
-    return (SDirtyObserver*)this;
+    return (SDirtyObserver*)observer;
     }
   else if(mode == ObserverStruct::Connection)
     {
-    return (SConnectionObserver*)this;
+    return (SConnectionObserver*)observer;
     }
   return 0;
   }
