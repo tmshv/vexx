@@ -4,6 +4,22 @@
 #include "sdatabase.h"
 #include "styperegistry.h"
 
+struct Utils
+  {
+  static void callCreateTypeInformationBottomUp(SPropertyInformation *i,
+                                         SPropertyInformationCreateData &d,
+                                         const SPropertyInformation *from)
+    {
+    if(from)
+      {
+      const SPropertyInformation *parent = from->parentTypeInformation();
+      callCreateTypeInformationBottomUp(i, d, parent);
+
+      from->functions().createTypeInformation(i, d);
+      }
+    }
+  };
+
 SPropertyInstanceInformation::SPropertyInstanceInformation()
   {
   _holdingTypeInformation = 0;
@@ -80,6 +96,8 @@ void SPropertyInformation::initiate(SPropertyInformation *info, const SPropertyI
   info->_instances = 0;
   info->_extendedParent = 0;
 
+  info->_parentTypeInformation = from->_parentTypeInformation;
+
   info->_typeName = from->typeName();
   }
 
@@ -90,12 +108,13 @@ SPropertyInformation *SPropertyInformation::derive(const SPropertyInformation *f
 
   SPropertyInformation::initiate(copy, from);
 
+  copy->_parentTypeInformation = from;
+
   SPropertyInformationCreateData data;
   data.registerAttributes = true;
   data.registerInterfaces = false;
 
-  from->functions().createTypeInformation(copy, data);
-  copy->setParentTypeInformation(from);
+  Utils::callCreateTypeInformationBottomUp(copy, data, from);
 
   copy->_apiInterface = from->_apiInterface;
   xAssert(copy->_apiInterface);
@@ -202,22 +221,6 @@ SPropertyInformation *SPropertyInformation::createTypeInformationInternal(const 
   init(createdInfo, name);
 
   SPropertyInformationCreateData data;
-
-  struct Utils
-    {
-    static void callCreateTypeInformationBottomUp(SPropertyInformation *i,
-                                           SPropertyInformationCreateData &d,
-                                           const SPropertyInformation *from)
-      {
-      if(from)
-        {
-        const SPropertyInformation *parent = from->parentTypeInformation();
-        callCreateTypeInformationBottomUp(i, d, parent);
-
-        from->functions().createTypeInformation(i, d);
-        }
-      }
-    };
 
   data.registerAttributes = true;
   data.registerInterfaces = false;

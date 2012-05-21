@@ -98,6 +98,7 @@ template <typename T, void FUNC( const SPropertyInstanceInformation *, T * )> st
   static void compute( const SPropertyInstanceInformation *c, SProperty *prop)
     {
     T* t = prop->castTo<T>();
+    xAssert(t);
     FUNC(c, t);
     }
   };
