@@ -16,14 +16,6 @@ void SPropertyArray::createTypeInformation(SPropertyInformationTyped<SPropertyAr
     }
   }
 
-SPropertyArray::SPropertyArray()
-  {
-  }
-
-SPropertyArray::~SPropertyArray()
-  {
-  }
-
 void SPropertyArray::remove(SProperty *prop)
   {
   SPropertyContainer::removeProperty(prop);

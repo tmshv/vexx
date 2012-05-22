@@ -16,12 +16,15 @@ function NodeEditor()
 NodeEditor.prototype.selectionChanged = function(selection)
   {
   var selectionArray = tang.mainScene.scene.selection;
-  selectionArray.clear();
+  selectionArray.undoBlock(
+    function() {
+      selectionArray.clear();
 
-  for(var i = 0; i < selection.length; ++i)
-    {
-    selectionArray.addPointer(selection[i]);
-    }
+      for(var i = 0; i < selection.length; ++i)
+        {
+        selectionArray.addPointer(selection[i]);
+        }
+    });
   }
 
 NodeEditor.prototype.contextMenu = function(x, y, path)

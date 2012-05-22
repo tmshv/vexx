@@ -8,7 +8,3 @@ void SReferenceEntity::createTypeInformation(SPropertyInformationTyped<SReferenc
                                              const SPropertyInformationCreateData &)
   {
   }
-
-SReferenceEntity::SReferenceEntity()
-  {
-  }

@@ -21,8 +21,7 @@ class SHIFT_EXPORT SEntity : public SPropertyContainer, public XWeakSharedData
   S_ENTITY(SEntity, SPropertyContainer, 0);
 
 public:
-  SEntity();
-  virtual ~SEntity();
+  ~SEntity();
 
   SPropertyArray children;
 
@@ -63,9 +62,6 @@ public:
   SEntity *parentEntity() const;
   SEntity *firstChildEntity() const;
   SEntity *nextSiblingEntity() const;
-
-  virtual bool acceptsChild(const SEntity *) const;
-  virtual bool acceptsParent(const SEntity *) const;
 
   void addDirtyObserver(SDirtyObserver *);
   void addTreeObserver(STreeObserver *);

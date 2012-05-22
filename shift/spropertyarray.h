@@ -9,9 +9,6 @@ class SHIFT_EXPORT SPropertyArray : public SPropertyContainer
   S_PROPERTY_CONTAINER(SPropertyArray, SPropertyContainer, 0);
 
 public:
-  SPropertyArray();
-  virtual ~SPropertyArray();
-
   template <typename T> T *add()
     {
     return addProperty(T::staticTypeInformation(), X_SIZE_SENTINEL)->castTo<T>();

@@ -48,6 +48,6 @@ function finalise()
 }
 
 obs = new STreeObserver(obj, treeChange, finalise);
-tang.mainAreaDocument.area.addTreeObserver(obs);
+tang.mainScene.scene.addTreeObserver(obs);
 
 ui.show();
