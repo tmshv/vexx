@@ -24,7 +24,6 @@ SOURCES += \
     sobserver.cpp \
     UI/sentityui.cpp \
     UI/spropertydefaultui.cpp \
-    sreferenceentity.cpp \
     spropertycontainer.cpp \
     spropertyarray.cpp \
     sbaseproperties.cpp \
@@ -54,7 +53,6 @@ HEADERS += \
     sobserver.h \
     UI/sentityui.h \
     UI/spropertydefaultui.h \
-    sreferenceentity.h \
     spropertycontainer.h \
     spropertyarray.h \
     sbaseproperties.h \
