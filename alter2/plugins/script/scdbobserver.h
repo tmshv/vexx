@@ -7,7 +7,10 @@
 class ScDbTreeObserver : public STreeObserver
   {
 public:
-  ScDbTreeObserver(const XScriptObject &thsObject, const XScriptFunction &function, const XScriptFunction &act);
+  ScDbTreeObserver(const XScriptObject &thsObject,
+                   const XScriptFunction &treeChange,
+                   const XScriptFunction &nameChange,
+                   const XScriptFunction &act);
 
   void onTreeChange(const SChange *, bool backwards) X_OVERRIDE;
   void actOnChanges() X_OVERRIDE;
@@ -16,7 +19,8 @@ public:
 
 private:
   XPersistentScriptValue _ths;
-  XPersistentScriptValue _fn;
+  XPersistentScriptValue _tree;
+  XPersistentScriptValue _name;
   XPersistentScriptValue _act;
   };
 
@@ -32,7 +36,7 @@ template <> struct NativeToJS<ScDbTreeObserver> : public XScript::NativeToJSConv
 namespace XScript
 {
 typedef XSignature< ScDbTreeObserver (
-    XScript::CtorForwarder<ScDbTreeObserver *(const XScriptObject &, const XScriptFunction &, const XScriptFunction &)>
+    XScript::CtorForwarder<ScDbTreeObserver *(const XScriptObject &, const XScriptFunction &, const XScriptFunction &, const XScriptFunction &)>
   )> ScDbTreeObserverCtors;
 template <> class ClassCreator_Factory<ScDbTreeObserver> : public ClassCreatorCopyableFactory<ScDbTreeObserver, ScDbTreeObserverCtors> {};
 }

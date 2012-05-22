@@ -1,20 +1,53 @@
 #include "scdbobserver.h"
 #include "scplugin.h"
+#include "spropertycontainer.h"
 
-ScDbTreeObserver::ScDbTreeObserver(const XScriptObject &thsObject, const XScriptFunction &fn, const XScriptFunction &act)
+ScDbTreeObserver::ScDbTreeObserver(const XScriptObject &thsObject,
+                                   const XScriptFunction &tree,
+                                   const XScriptFunction &name,
+                                   const XScriptFunction &act)
   {
   _ths = XScriptValue(thsObject);
-  _fn = XScriptValue(fn);
+  _tree = XScriptValue(tree);
+  _name = XScriptValue(name);
   _act = XScriptValue(act);
   }
 
-void ScDbTreeObserver::onTreeChange(const SChange *, bool backwards)
+void ScDbTreeObserver::onTreeChange(const SChange *c, bool backwards)
   {
-  XScriptFunction fn(_fn.asValue());
-  XScriptObject ths(_ths.asValue());
-  xAssert(fn.isValid());
+  const SPropertyContainer::TreeChange* tree = c->castTo<SPropertyContainer::TreeChange>();
+  if(tree)
+    {
+    XScriptFunction fn(_name.asValue());
+    XScriptObject ths(_ths.asValue());
+    xAssert(fn.isValid());
 
-  ScPlugin::call(fn, ths, 0, 0);
+    XScriptValue args[] = {
+      XScriptConvert::to(const_cast<SProperty*>(tree->property())),
+      XScriptConvert::to(const_cast<SPropertyContainer*>(tree->before(backwards))),
+      XScriptConvert::to(const_cast<SPropertyContainer*>(tree->after(backwards))),
+      backwards
+    };
+
+    ScPlugin::call(fn, ths, args, X_ARRAY_COUNT(args));
+    }
+
+  const SProperty::NameChange* name = c->castTo<SProperty::NameChange>();
+  if(name)
+    {
+    XScriptFunction fn(_tree.asValue());
+    XScriptObject ths(_ths.asValue());
+    xAssert(fn.isValid());
+
+    XScriptValue args[] = {
+      XScriptConvert::to(const_cast<SProperty*>(name->property())),
+      name->before(backwards),
+      name->after(backwards),
+      backwards
+    };
+
+    ScPlugin::call(fn, ths, args, X_ARRAY_COUNT(args));
+    }
   }
 
 void ScDbTreeObserver::actOnChanges()

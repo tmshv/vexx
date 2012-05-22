@@ -1155,7 +1155,7 @@ struct CtorForwarderProxy<Sig,4>
   typedef typename XSignature<Sig>::ReturnType ReturnType;
   static ReturnType Call( XScriptArguments const & argv )
     {
-    if( argv.Length() < Arity )
+    if( argv.length() < Arity )
       {
       throw std::range_error("CtorForwarder<T,4>::Ctor() expects at least 4 JS arguments!");
       }
@@ -1166,15 +1166,15 @@ struct CtorForwarderProxy<Sig,4>
       typedef typename sl::At< 2, XSignature<Sig> >::Type A2;
       typedef typename sl::At< 3, XSignature<Sig> >::Type A3;
 
-      typedef ArgCaster<A0> AC0;
-      typedef ArgCaster<A1> AC1;
-      typedef ArgCaster<A2> AC2;
-      typedef ArgCaster<A3> AC3;
+      typedef XScriptConvert::ArgCaster<A0> AC0;
+      typedef XScriptConvert::ArgCaster<A1> AC1;
+      typedef XScriptConvert::ArgCaster<A2> AC2;
+      typedef XScriptConvert::ArgCaster<A3> AC3;
 
-      AC0 ac0; A0 arg0(ac0.ToNative(argv[0]));
-      AC1 ac1; A1 arg1(ac1.ToNative(argv[1]));
-      AC2 ac2; A2 arg2(ac2.ToNative(argv[2]));
-      AC3 ac3; A3 arg3(ac3.ToNative(argv[3]));
+      AC0 ac0; A0 arg0(ac0.ToNative(argv.at(0)));
+      AC1 ac1; A1 arg1(ac1.ToNative(argv.at(1)));
+      AC2 ac2; A2 arg2(ac2.ToNative(argv.at(2)));
+      AC3 ac3; A3 arg3(ac3.ToNative(argv.at(3)));
 
       typedef typename XScriptTypeInfo<ReturnType>::Type Type;
       return new Type(  arg0, arg1, arg2, arg3 );

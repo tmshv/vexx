@@ -38,16 +38,20 @@ component.addInstance(shadingGroup);*/
 
 var obj = { };
 
-function treeChange()
+function treeChange(prop, before, after, backwards)
 {
-  print("treeChange", obj === this)
+  print("treeChange", prop, before, after, backwards)
+}
+function nameChange(prop, before, after)
+{
+  print("treeChange", prop, before, after, backwards)
 }
 function finalise()
 {
-  print("finalise", obj === this)
+  print("finalise")
 }
 
-obs = new STreeObserver(obj, treeChange, finalise);
+obs = new STreeObserver(obj, treeChange, nameChange, finalise);
 tang.mainScene.scene.addTreeObserver(obs);
 
 ui.show();
