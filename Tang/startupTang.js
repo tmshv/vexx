@@ -36,19 +36,30 @@ component.addInstance(shadingGroup);*/
 //componentDocument.editor = componentDocument.createEditor();
 //componentDocument.editor.show();
 
-var obj = { };
+var obj = { updateSelection: false };
 
 function treeChange(prop, before, after, backwards)
 {
-  print("treeChange ", prop, "=", before, "=", after, "=", backwards)
+  var selection = tang.mainScene.scene.selection;
+  if(before === selection || after === selection)
+  {
+    this.updateSelection = true;
+  }
 }
-function nameChange(prop, before, after, backwards)
-{
-  print("nameChange ", prop, "=", before, "=", after, "=", backwards)
-}
+
+function nameChange(prop, before, after, backwards) { }
 function finalise()
 {
-  print("finalise")
+  if(this.updateSelection)
+  {
+    this.updateSelection = false;
+
+    var selection = tang.mainScene.scene.selection;
+    for(var i = 0; i < selection.size; ++i)
+    {
+      print(selection[i].name);
+    }
+  }
 }
 
 obs = new STreeObserver(obj, treeChange, nameChange, finalise);
