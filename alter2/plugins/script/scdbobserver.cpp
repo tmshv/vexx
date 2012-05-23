@@ -18,7 +18,7 @@ void ScDbTreeObserver::onTreeChange(const SChange *c, bool backwards)
   const SPropertyContainer::TreeChange* tree = c->castTo<SPropertyContainer::TreeChange>();
   if(tree)
     {
-    XScriptFunction fn(_name.asValue());
+    XScriptFunction fn(_tree.asValue());
     XScriptObject ths(_ths.asValue());
     xAssert(fn.isValid());
 
@@ -35,7 +35,7 @@ void ScDbTreeObserver::onTreeChange(const SChange *c, bool backwards)
   const SProperty::NameChange* name = c->castTo<SProperty::NameChange>();
   if(name)
     {
-    XScriptFunction fn(_tree.asValue());
+    XScriptFunction fn(_name.asValue());
     XScriptObject ths(_ths.asValue());
     xAssert(fn.isValid());
 

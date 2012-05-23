@@ -630,6 +630,10 @@ template <typename T, typename BASE> struct NativeToJSConvertableTypeInherited
   {
   XScriptValue operator()(T *n) const
     {
+    if(!n)
+      {
+      return XScriptValue();
+      }
     BASE* base = n;
     const XInterfaceBase* interface = findInterface<T>(n);
     XScriptValue vals[1] = { base };

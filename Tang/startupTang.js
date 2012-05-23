@@ -40,11 +40,11 @@ var obj = { };
 
 function treeChange(prop, before, after, backwards)
 {
-  print("treeChange", prop, before, after, backwards)
+  print("treeChange ", prop, "=", before, "=", after, "=", backwards)
 }
-function nameChange(prop, before, after)
+function nameChange(prop, before, after, backwards)
 {
-  print("treeChange", prop, before, after, backwards)
+  print("nameChange ", prop, "=", before, "=", after, "=", backwards)
 }
 function finalise()
 {

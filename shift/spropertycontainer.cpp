@@ -141,6 +141,11 @@ SProperty *SPropertyContainer::internalFindChild(const QString &name)
   return 0;
   }
 
+const SProperty *SPropertyContainer::internalFindChild(const QString &name) const
+  {
+  return const_cast<SPropertyContainer*>(this)->internalFindChild(name);
+  }
+
 bool SPropertyContainer::contains(SProperty *child) const
   {
   preGet();
@@ -211,12 +216,36 @@ void SPropertyContainer::internalClear()
   _child = 0;
   }
 
+QString SPropertyContainer::makeUniqueName(const QString &name) const
+  {
+  QString newName;
+
+  xuint32 id = 1;
+  newName = name + QString::number(id);
+  while(internalFindChild(newName))
+    {
+    newName = name + QString::number(id);
+    ++id;
+    }
+  return newName;
+  }
+
 SProperty *SPropertyContainer::addProperty(const SPropertyInformation *info, xsize index, const QString& name, SPropertyInstanceInformationInitialiser *init)
   {
   xAssert(index >= _containedProperties);
 
+
   SProperty *newProp = database()->createDynamicProperty(info, this, init);
-  ((SPropertyInstanceInformation*)newProp->_instanceInfo)->_name = name;
+
+  bool nameUnique = !name.isEmpty() && internalFindChild(name) == false;
+  if(!nameUnique)
+    {
+    ((SPropertyInstanceInformation*)newProp->_instanceInfo)->_name = makeUniqueName(name);
+    }
+  else
+    {
+    ((SPropertyInstanceInformation*)newProp->_instanceInfo)->_name = name;
+    }
 
   handler()->doChange<TreeChange>((SPropertyContainer*)0, this, newProp, index);
   return newProp;
@@ -226,7 +255,19 @@ void SPropertyContainer::moveProperty(SPropertyContainer *c, SProperty *p)
   {
   xAssert(p->parent() == this);
 
-  handler()->doChange<TreeChange>(this, c, p, X_SIZE_SENTINEL);
+  const QString &name = p->name();
+  bool nameUnique = c->internalFindChild(name) == false;
+  if(!nameUnique)
+    {
+    SBlock b(database());
+
+    p->setName(c->makeUniqueName(name));
+    handler()->doChange<TreeChange>(this, c, p, X_SIZE_SENTINEL);
+    }
+  else
+    {
+    handler()->doChange<TreeChange>(this, c, p, X_SIZE_SENTINEL);
+    }
   }
 
 void SPropertyContainer::removeProperty(SProperty *oldProp)
@@ -337,23 +378,6 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
   xAssert(newProp->_parent == 0);
   xAssert(newProp->_nextSibling == 0);
 
-  const QString &name = newProp->name();
-  bool nameUnique = internalFindChild(name) == false;
-  QString newName;
-  if(!nameUnique || name.isEmpty())
-    {
-    xAssert(newProp->isDynamic());
-    handler()->beginBlock();
-
-    xuint32 id = 1;
-    newName = newProp->name() + QString::number(id);
-    while(internalFindChild(newName))
-      {
-      newName = newProp->name() + QString::number(id);
-      ++id;
-      }
-    }
-
   if(_child)
     {
     xsize propIndex = 0;
@@ -414,12 +438,6 @@ void SPropertyContainer::internalInsertProperty(bool contained, SProperty *newPr
     newProp->_flags.setFlag(ParentHasOutput);
     }
   xAssert(newProp->_parent);
-
-  if(!newName.isEmpty())
-    {
-    newProp->setName(newName);
-    handler()->endBlock();
-    }
   }
 
 void SPropertyContainer::internalRemoveProperty(SProperty *oldProp)

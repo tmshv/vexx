@@ -149,10 +149,12 @@ protected:
 
 private:
   SProperty *internalFindChild(const QString &name);
+  const SProperty *internalFindChild(const QString &name) const;
   friend void setDependantsDirty(SProperty* prop, bool force);
   SProperty *_child;
   xsize _containedProperties;
 
+  QString makeUniqueName(const QString &name) const;
   void internalInsertProperty(bool contained, SProperty *, xsize index);
   void internalRemoveProperty(SProperty *);
 

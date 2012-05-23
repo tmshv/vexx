@@ -15,7 +15,7 @@ void MCDensityShape::createTypeInformation(SPropertyInformationTyped<MCDensitySh
   {
   if(data.registerAttributes)
     {
-    auto inst = info->add(&MCDensityShape::geometry, "geometry");
+    auto inst = info->child(&MCDensityShape::geometry);
     inst->setCompute<computeGeometry>();
     }
   }

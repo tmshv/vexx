@@ -159,6 +159,7 @@ SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformati
 SPropertyInstanceInformation *SPropertyInformation::add(const SPropertyInformation *newChildType, xsize location, const QString &name, bool extra)
   {
   xAssert(newChildType);
+  xAssert(!childFromName(name));
 
   SPropertyInstanceInformation* def = SPropertyInstanceInformation::allocate(newChildType->instanceInformationSize());
 
