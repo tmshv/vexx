@@ -17,6 +17,41 @@ function Scene(viewportWidget)
 
   this.scene.setCamera(cam);
   viewportWidget.setScene(this.scene);
+
+  this.updateSelection = false;
+
+  function nameChange(prop, before, after, backwards) { }
+  function treeChange(prop, before, after, backwards)
+  {
+    var selection = this.scene.selection;
+    if((before && before.equals(selection)) || (after && after.equals(selection)))
+    {
+      this.updateSelection = true;
+    }
+  }
+
+  function finalise()
+  {
+    if(this.updateSelection)
+    {
+      this.updateSelection = false;
+
+      var selectedItems = [];
+
+      var selection = this.scene.selection;
+      for(var i = 0; i < selection.length; ++i)
+      {
+        var selected = selection[i].input;
+        if(selected)
+        {
+          selectedItems.push(selected);
+        }
+      }
+    }
+  }
+
+  this.selectionObsserver = new STreeObserver(this, treeChange, nameChange, finalise);
+  this.scene.addTreeObserver(this.selectionObsserver);
   }
 
 
