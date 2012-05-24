@@ -41,7 +41,7 @@ var obj = { updateSelection: false };
 function treeChange(prop, before, after, backwards)
 {
   var selection = tang.mainScene.scene.selection;
-  if(before === selection || after === selection)
+  if((before && before.equals(selection)) || (after && after.equals(selection)))
   {
     this.updateSelection = true;
   }
@@ -54,10 +54,16 @@ function finalise()
   {
     this.updateSelection = false;
 
+    var selectedItems = [];
+
     var selection = tang.mainScene.scene.selection;
-    for(var i = 0; i < selection.size; ++i)
+    for(var i = 0; i < selection.length; ++i)
     {
-      print(selection[i].name);
+      var selected = selection[i].input;
+      if(selected)
+      {
+        selectedItems.push(selected);
+      }
     }
   }
 }

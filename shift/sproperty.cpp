@@ -55,6 +55,8 @@ void SProperty::createTypeInformation(SPropertyInformationTyped<SProperty> *info
     api->addMethod<void(), &SProperty::beginBlock>("beginBlock");
     api->addMethod<void(bool), &SProperty::endBlock>("endBlock");
 
+    api->addConstMethod<bool(const SProperty *), &SProperty::equals>("equals");
+
     info->addStaticInterface(new SBasicColourInterface);
     }
   }
@@ -478,6 +480,11 @@ void SProperty::beginBlock()
 void SProperty::endBlock(bool cancel)
   {
   handler()->endBlock(cancel);
+  }
+
+bool SProperty::equals(const SProperty *in) const
+  {
+  return this == in;
   }
 
 bool SProperty::shouldSavePropertyValue(const SProperty *p)

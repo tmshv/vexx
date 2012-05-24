@@ -141,6 +141,8 @@ public:
   void beginBlock();
   void endBlock(bool cancel);
 
+  bool equals(const SProperty *) const;
+
   bool inheritsFromType(const SPropertyInformation *type) const;
   template <typename T> bool inheritsFromType() const { return inheritsFromType(T::staticTypeInformation()); }
 
