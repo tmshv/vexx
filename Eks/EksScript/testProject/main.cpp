@@ -71,7 +71,7 @@ int main(int a, char* b[])
     "}\n";
 
   const char* kScriptChars =
-  "#import"
+  "#import(\"NativeTest\")"
   "class FieldsTest {\n"
   "  static String testMain() {\n"
   "    NativeTest obj = new NativeTest(45.5);\n"
