@@ -43,4 +43,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DartUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
