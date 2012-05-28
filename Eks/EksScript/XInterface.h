@@ -99,11 +99,13 @@ public:
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
   typedef XScriptValue (*IndexedGetter)(xuint32, const XAccessorInfo& info);
+  typedef void *(*Constructor)( XScriptArguments const & argv );
+
+  void addConstructor(const char *name, Constructor);
   void addProperty(const char *name, Getter, Setter);
   void addFunction(const char *name, Function);
   void setIndexAccessor(IndexedGetter);
   void setNamedAccessor(NamedGetter);
-  void setCallableAsFunction(Function fn);
 
   void addClassTo(const QString &thisClassName, XScriptObject const &dest) const;
 
@@ -150,21 +152,32 @@ public:
     set(name, XScriptConvert::to(val));
     }
 
+  using XInterfaceBase::addConstructor;
   using XInterfaceBase::addProperty;
   using XInterfaceBase::addFunction;
-  using XInterfaceBase::setCallableAsFunction;
+
+  template <typename TYPE>
+    void addConstructor(const char *name="")
+  {
+    typedef T* (*TypedConstructor)( XScriptArguments const & argv );
+    TypedConstructor tCtor = XScript::CtorForwarder<TYPE>::Call;
+    Constructor ctor = (Constructor)tCtor;
+
+    addConstructor(name, ctor);
+
+  }
 
   template <typename GETTYPE,
-            typename SETTYPE,
-            typename XConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD,
-            typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
-  void addProperty(const char *name)
-    {
+    typename SETTYPE,
+    typename XConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD,
+    typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
+    void addProperty(const char *name)
+  {
     Getter getter = XScript::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
     Setter setter = XScript::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
 
     XInterfaceBase::addProperty(name, getter, setter);
-    }
+  }
 
   template <typename GETTYPE,
             typename XConstMethodSignature<T, GETTYPE ()>::FunctionType GETTERMETHOD>
@@ -225,15 +238,6 @@ public:
     NamedGetter fn = XScript::XMethodToNamedGetter<T, RETTYPE (const QString &name), METHOD>::Get;
 
     XInterfaceBase::setNamedAccessor(fn);
-    }
-
-  template <typename SIG,
-            typename XMethodSignature<T, SIG>::FunctionType METHOD>
-  void setCallableAsFunction()
-    {
-    Function fn = XScript::MethodToInCa<T, SIG, METHOD>::Call;
-
-    XInterfaceBase::setCallableAsFunction(fn);
     }
 
   /**

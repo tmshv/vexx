@@ -1,6 +1,7 @@
 #ifndef XQOBJECTWRAPPER_H
 #define XQOBJECTWRAPPER_H
 
+#include "XScriptGlobal.h"
 #include "XUnorderedMap"
 #include "XInterface.h"
 #include "XScriptObject.h"
