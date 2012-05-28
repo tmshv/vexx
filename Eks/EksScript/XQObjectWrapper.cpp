@@ -110,6 +110,7 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
     QMetaMethod snd = sender()->metaObject()->method(senderSignalIndex());
     QList<QByteArray> types = snd.parameterTypes();
 
+#ifndef X_DART
     v8::Locker l;
     v8::Handle<v8::Context> ctxt = getV8EngineInternal();
 
@@ -193,6 +194,7 @@ int XQObjectConnectionList::qt_metacall(QMetaObject::Call method, int index, voi
       {
       delete this;
       }
+#endif
     }
 
   return -1;
@@ -231,6 +233,7 @@ QString formatClassName(const QString &n)
 const char *qobjectName = "QObject";
 void XQObjectWrapper::initiate(XScriptEngine *c)
   {
+#ifndef X_DART
   qRegisterMetaType<XScriptObject>("XScriptObject");
   qRegisterMetaType<XScriptFunction>("XScriptFunction");
 
@@ -254,6 +257,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
   widget->seal();
 
   instance()->_objects.insert(&QWidget::staticMetaObject, widget);
+#endif
   }
 
 XQObjectWrapper *XQObjectWrapper::instance()

@@ -1,8 +1,8 @@
 #ifndef XSCRIPTEXCEPTION_H
 #define XSCRIPTEXCEPTION_H
 
-#include "QString"
 #include "XScriptGlobal.h"
+#include "QString"
 
 class XScriptValue;
 

@@ -46,9 +46,10 @@ HEADERS += XScriptGlobal.h \
     XScriptObject.h \
     XQObjectWrapper.h \
     XScriptEngine.h \
-    XQtWrappers.h
+    XQtWrappers.h \
+    XScriptValueDartInternals.h
 
-LIBS += -lQtV8 -lEksCore
+LIBS += -lQtV8 -lEksCore -L./dart/ -llibdart_builtin -llibdart_withcore -llibdart_lib_withcore -llibdouble_conversion -llibdart_vm -llibjscre
 INCLUDEPATH += $$ROOT/Eks/EksCore $$ROOT/Eks/EksScript/qtjsbackend/src/3rdparty/v8/include
 
 OTHER_FILES += \
