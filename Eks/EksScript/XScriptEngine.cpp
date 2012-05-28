@@ -27,9 +27,6 @@ bool isolateInterruptCallback()
 }
 
 std::map<std::pair<std::string, uint8_t>, Dart_NativeFunction> _symbols;
-Dart_Handle buildLibrarySource(const XInterface* ifc)
-  {
-  }
 
 Dart_NativeFunction Resolve(Dart_Handle name, int num_of_arguments)
 {
@@ -38,7 +35,7 @@ Dart_NativeFunction Resolve(Dart_Handle name, int num_of_arguments)
 
   auto toFind(std::pair<std::string, uint8_t>(cname, num_of_arguments));
 
-  xAssert(_symbols.find(toFind) != _lookup.end());
+  xAssert(_symbols.find(toFind) != _symbols.end());
   return _symbols[toFind];
 }
 
@@ -226,7 +223,7 @@ void XScriptEngine::set(const QString &name, Function fn)
 void XScriptEngine::addInterface(const XInterfaceBase *i)
   {
 #ifdef X_DART
-  _libs[i->typeName()] = buildLibrarySource(i, _symbols);
+  xAssertFail();
 #else
   xAssert(i->isSealed());
   i->addClassTo(i->typeName(), fromHandle(g_engine->context->Global()));

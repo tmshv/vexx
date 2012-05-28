@@ -109,8 +109,8 @@ template <> void setupBindings<QIODevice>(XInterface<QIODevice> *templ)
   {
   templ->addMethod<bool(QIODevice::OpenMode), &QIODevice::open>("open");
 
-  XInterfaceBase::Function fn = XScript::MethodToInCa<QIODevice, qint64(const QByteArray &), &QIODevice::write>::Call;
-  templ->addFunction("write", fn);
+  typedef XScript::MethodToInCa<QIODevice, qint64(const QByteArray &), &QIODevice::write> FunctionType;
+  templ->addFunction("write", FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
 
   templ->addMethod<void(), &QIODevice::close>("close");
   }

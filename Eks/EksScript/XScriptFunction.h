@@ -66,6 +66,44 @@ private:
   bool _isConstructCall;
   };
 
+class XScriptDartArguments
+  {
+public:
+  void setReturnValue(const XScriptValue& val);
+
+private:
+  XScriptDartArguments();
+
+  void *_args;
+  };
+
+class XScriptDartArgumentsNoThis
+  {
+public:
+  XScriptDartArgumentsNoThis(XScriptDartArguments args, xsize offset=0)
+    : _args(args), _offset(offset)
+    {
+    }
+
+private:
+  XScriptDartArguments _args;
+  xsize _offset;
+  };
+
+class XScriptDartArgumentsWithThis
+  {
+public:
+  XScriptDartArgumentsWithThis(XScriptDartArguments args);
+
+  XScriptDartArgumentsNoThis argsNoThis()
+    {
+    return XScriptDartArgumentsNoThis(args, 1);
+    }
+
+  XScriptDartArguments args;
+  };
+
+
 Q_DECLARE_METATYPE(XScriptFunction*);
 Q_DECLARE_METATYPE(XScriptFunction);
 

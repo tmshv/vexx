@@ -19,6 +19,84 @@ private:
   void *_impl;
   };
 
+template <typename T, typename ArgsType> T &getThis(ArgsType const &argv)
+  {
+  T * self = XScriptConvert::from<T>(argv.calleeThis());
+  if( ! self )
+    {
+    throw MissingThisExceptionT<T>();
+    }
+  }
+
+template <typename T> struct XFunctionHelperBase
+  {
+  typedef char AssertArity[ (1 == sl::Arity<typename T::SignatureType>::Value) ? 1 : -1];
+  };
+
+template <typename T> struct XFunctionForwarderHelperVoid : XFunctionHelperBase<T>
+  {
+  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    T::CallNative( func, argv );
+    return XScriptValue();
+    }
+  };
+
+template <typename T> struct XFunctionForwarderHelper : XFunctionHelperBase<T>
+  {
+  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    return CastToJS( T::CallNative( func, argv ) );
+    }
+  };
+
+template <typename T> struct XMethodForwarderHelperVoid : XFunctionHelperBase<T>
+  {
+  static XScriptValue Call( T & self, typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    try
+    {
+    T::CallNative( self, func, argv );
+    return XScriptValue();
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static typename T::ReturnType CallNative( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    return (T::ReturnType)T::CallNative(getThis<T>(argv), func, argv);
+    }
+  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    try
+    {
+    T::CallNative(func, argv);
+    return XScriptValue();
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  };
+
+template <typename T> struct XMethodForwarderHelper : XFunctionHelperBase<T>
+  {
+  static XScriptValue Call( T  & self, typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    try { return CastToJS( T::CallNative( self, func, argv ) ); }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static typename T::ReturnType CallNative( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    return (T::ReturnType)T::CallNative(getThis<T>(argv), func, argv);
+    }
+  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
+    {
+    try { return XScriptConvert::to( T::CallNative(func, argv) ); }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  };
+
+
+
+
 /**
     A concept class, primarily for documentation and tag-type purposes.
 */
@@ -386,6 +464,10 @@ struct FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
     {
     return CastToJS( CallNative( func, argv ) );
     }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
+    }
 
   ASSERT_UNLOCKV8_IS_FALSE;
   typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
@@ -411,6 +493,10 @@ struct FunctionForwarder<0,Sig, UnlockV8> : XFunctionSignature<Sig>
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( CallNative( func, argv ) );
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
   ASSERT_UNLOCK_SANITY_CHECK;
   typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
@@ -441,6 +527,10 @@ struct FunctionForwarderVoid<0,Sig, UnlockV8> : XFunctionSignature<Sig>
     CallNative( func, argv );
     return v8::Undefined();
     }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    CastToJS( CallNative(func, argv));
+    }
   ASSERT_UNLOCK_SANITY_CHECK;
   typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
   };
@@ -462,6 +552,10 @@ struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
     {
     CallNative( func, argv );
     return v8::Undefined();
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
   ASSERT_UNLOCKV8_IS_FALSE;
   typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
@@ -499,15 +593,21 @@ public:
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T * self = XScriptConvert::from<T>(argv.calleeThis());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
+    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
     }
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     try
     {
     return XScriptConvert::to( CallNative( func, argv ) );
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -528,15 +628,21 @@ struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     {
     return (self.*func)(argv);
     }
-  static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
+  static void Call( T & self, FunctionType func, XScriptDartArguments const & argv )
     {
     try
     {
-    return CastToJS( CallNative( self, func, argv ) );
+    argv.setReturnValue(CastToJS( CallNative( self, func, argv ) ));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+    {
+    T * self = CastFromJS<T>(argv.This());
+    if( ! self ) throw MissingThisExceptionT<T>();
+    return (ReturnType)CallNative(*self, func, argv);
+    }
+  static ReturnType CallNative( FunctionType func, XScriptDartArguments const & argv )
     {
     T * self = CastFromJS<T>(argv.This());
     if( ! self ) throw MissingThisExceptionT<T>();
@@ -547,6 +653,14 @@ struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     try
     {
     return CastToJS( CallNative(func, argv) );
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -588,9 +702,7 @@ public:
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T * self = XScriptConvert::from<T>(argv.calleeThis());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
+    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
     }
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
@@ -598,6 +710,14 @@ public:
     {
     CallNative(func, argv);
     return XScriptValue();
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -612,7 +732,11 @@ struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
   typedef typename XSignatureType::FunctionType FunctionType;
   typedef typename XScriptTypeInfo<T>::Type Type;
   typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( Type & self, FunctionType func, XScriptArguments const & argv )
+  static ReturnType CallNative( Type & self, FunctionType func, XScriptDartArgumentsNoThis const & argv )
+    {
+    return (ReturnType)(self.*func)(argv);
+    }
+  static ReturnType CallNative( Type & self, FunctionType func, XScriptDartArguments const & argv )
     {
     return (ReturnType)(self.*func)(argv);
     }
@@ -624,13 +748,24 @@ struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
     return XScriptValue();
     }
     HANDLE_PROPAGATE_EXCEPTION;
-
+    }
+  static XScriptValue CallDart( Type & self, FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    CallNative( self, func, argv );
+    return XScriptValue();
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
     }
   static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
     {
-    T * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
+    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
+    }
+  static ReturnType CallNative( FunctionType func, XScriptDartArguments const & aIn )
+    {
+    XScriptDartArgumentsWithThis args(aIn, true);
+    return (ReturnType)CallNative(getThis<T>(args), func, args.noThis());
     }
   static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
@@ -692,6 +827,14 @@ public:
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
@@ -726,6 +869,14 @@ struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
     try
     {
     return CastToJS( CallNative(func, argv) );
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -780,6 +931,10 @@ public:
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
+    }
   ASSERT_UNLOCK_SANITY_CHECK;
   };
 
@@ -817,6 +972,14 @@ struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), Unlock
     try
     {
     return CastToJS( CallNative( func, argv ) );
+    }
+    HANDLE_PROPAGATE_EXCEPTION;
+    }
+  static void Call( FunctionType func, XScriptDartArguments const & argv )
+    {
+    try
+    {
+    argv.setReturnValue(CastToJS( CallNative(func, argv)));
     }
     HANDLE_PROPAGATE_EXCEPTION;
     }
@@ -925,53 +1088,6 @@ public:
     }
   };
 
-/**
-    CallForwarder basically does the opposite of FunctionForwarder: it
-    converts native arguments to JS and calls a JS function.
-
-    The default implementation is useless - it must be specialized
-    for each arity.
-*/
-template <int Arity>
-struct CallForwarder
-  {
-  /**
-        Implementations must be templates taking Arity arguments in addition
-        to the first two. All argument types must legal for use with
-        CastToJS().
-
-        If either self or func.IsEmpty() then a JS exception must be thrown,
-        else implementations must return func->Call(self, N, ARGS), where
-        ARGS is an array of v8::Handle<v8::Value> and N is the number of
-        items in that array (and, not coincidentally, is the same value as
-        Arity). The ARGS array must be populated by calling CastToJS(ARG_N)
-        for each argument, where ARG_N is the Nth argument.
-    */
-  static XScriptValue Call( XScriptValue const & self, XScriptFunction const & func,
-                                     ... );
-  /**
-        Convenience form of Call() which must be equivalent to
-        Call(func,func,...).
-    */
-  static XScriptValue Call( XScriptFunction const & func, ... );
-  };
-
-//! Specialization for 0-arity calls.
-template <>
-struct CallForwarder<0>
-  {
-  static XScriptValue Call( XScriptObject const &self, XScriptFunction const &func )
-    {
-    return func.call(self, 0, 0);
-    }
-  static XScriptValue Call( XScriptFunction const &func )
-    {
-    XScriptObject obj(func);
-    return Call( obj, func );
-    }
-  };
-
-
 #if !defined(DOXYGEN)
 namespace Detail {
 
@@ -1055,6 +1171,10 @@ struct MethodToInCa : XMethodPtr<T,Sig, Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
+  static void CallDart( XScriptDartArguments const & argv )
+    {
+    return Proxy::Call( Func, argv );
+    }
   static XScriptValue Call( T & self, XScriptArguments const & argv )
     {
     return Proxy::Call( self, Func, argv );
@@ -1083,6 +1203,10 @@ struct MethodToInCaVoid : XMethodPtr<T,Sig,Func>, InCa
     return Proxy::Call( Func, argv );
     }
   static XScriptValue Call( XScriptArguments const & argv )
+    {
+    return Proxy::Call( Func, argv );
+    }
+  static XScriptValue CallDart( XScriptDartArguments const & argv )
     {
     return Proxy::Call( Func, argv );
     }
@@ -1585,7 +1709,7 @@ forwardConstMethod(Sig func, XScriptArguments const & argv )
    for a given InvocationCallback. Since we cannot typedef function
    templates this way, this class can fill that gap.
 */
-template <XInterfaceBase::Invocation ICB>
+template <XInterfaceBase::Function ICB>
 struct InCaToInCa : FunctionToInCa< XScriptValue (XScriptArguments const &), ICB>
   {
   };

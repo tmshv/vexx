@@ -305,7 +305,7 @@ void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
 #endif
   }
 
-void XInterfaceBase::addFunction(const char *name, Function fn)
+void XInterfaceBase::addFunction(const char *name, xsize argCount, Function fn, FunctionDart fnDart)
   {
 #ifdef X_DART
   xAssertFail();
