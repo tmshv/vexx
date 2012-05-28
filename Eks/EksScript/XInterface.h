@@ -94,7 +94,7 @@ public:
   void set(const char *name, XScriptValue val);
 
   typedef XScriptValue (*Function)( XScriptArguments const & argv );
-  typedef XScriptValue (*Invocation)(const XScriptArguments& args);
+  typedef void (*FunctionDart)( const XScriptDartArguments &argv );
   typedef XScriptValue (*Getter)(XScriptValue property,const XAccessorInfo& info);
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
@@ -103,7 +103,7 @@ public:
 
   void addConstructor(const char *name, Constructor);
   void addProperty(const char *name, Getter, Setter);
-  void addFunction(const char *name, Function);
+  void addFunction(const char *name, xsize argCount, Function, FunctionDart);
   void setIndexAccessor(IndexedGetter);
   void setNamedAccessor(NamedGetter);
 
@@ -160,10 +160,15 @@ public:
     void addConstructor(const char *name="")
   {
     typedef T* (*TypedConstructor)( XScriptArguments const & argv );
+
     TypedConstructor tCtor = XScript::CtorForwarder<TYPE>::Call;
     Constructor ctor = (Constructor)tCtor;
 
-    addConstructor(name, ctor);
+
+    TypedDartConstructor tDartCtor = XScript::CtorForwarder<TYPE>::CallDart;
+    DartConstructor ctorDart = (DartConstructor)tDartCtor;
+
+    addConstructor(name, XScript::CtorForwarder<TYPE>::Arity, ctor, ctorDart);
 
   }
 
@@ -201,9 +206,9 @@ public:
             typename XMethodSignature<T, SIG>::FunctionType METHOD>
   void addMethod(const char *name)
     {
-    Function fn = XScript::MethodToInCa<T, SIG, METHOD>::Call;
+    typedef XScript::MethodToInCa<T, SIG, METHOD> FunctionType;
 
-    XInterfaceBase::addFunction(name, fn);
+    XInterfaceBase::addFunction(name, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
     }
 
   template <typename SIG,
