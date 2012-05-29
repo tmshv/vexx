@@ -85,15 +85,21 @@ public:
     {
     }
 
+  XScriptValue at(xsize idx);
+  xsize length() const;
+  XScriptValue at(xsize i) const;
+
 private:
   XScriptDartArguments _args;
   xsize _offset;
   };
 
-class XScriptDartArgumentsWithThis
+class XScriptDartArgumentsWithThis : public XScriptDartArgumentsNoThis
   {
 public:
   XScriptDartArgumentsWithThis(XScriptDartArguments args);
+
+  XScriptObject calleeThis();
 
   XScriptDartArgumentsNoThis argsNoThis()
     {

@@ -1,11 +1,10 @@
 namespace Detail {
 template <typename Sig, bool UnlockV8>
 struct FunctionForwarder<1,Sig,UnlockV8>
-    : XFunctionSignature<Sig>,
-    XFunctionForwarderHelper<FunctionForwarder<1,Sig,UnlockV8>>
+    : XFunctionForwarderHelper<FunctionForwarder<1,Sig,UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> SignatureType;
-  static typename SignatureType::ReturnType CallNative( SignatureType::FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static typename ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -20,11 +19,10 @@ struct FunctionForwarder<1,Sig,UnlockV8>
 
 template <typename Sig, bool UnlockV8>
 struct FunctionForwarderVoid<1,Sig,UnlockV8>
-    : XFunctionSignature<Sig>,
-    XFunctionForwarderHelperVoid<FunctionForwarderVoid<1,Sig,UnlockV8>>
+    : XFunctionForwarderHelperVoid<FunctionForwarderVoid<1,Sig,UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> SignatureType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -38,12 +36,11 @@ struct FunctionForwarderVoid<1,Sig,UnlockV8>
   };
 
 template <typename T, typename Sig, bool UnlockV8>
-struct XMethodForwarder<T, 1,Sig, UnlockV8>
-    : XMethodSignature<T,Sig>,
-    XMethodForwarderHelper<XMethodForwarder<T, 1,Sig, UnlockV8>>
+struct XMethodForwarder<T, 1,Sig, UnlockV8> :
+    XMethodForwarderHelper<XMethodForwarder<T, 1,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-  typedef XMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T  & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -58,11 +55,10 @@ struct XMethodForwarder<T, 1,Sig, UnlockV8>
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarderVoid<T, 1,Sig, UnlockV8>
-    : XMethodSignature<T,Sig>,
-    XMethodForwarderHelperVoid<XMethodForwarder<T, 1,Sig, UnlockV8>>
+    : XMethodForwarderHelperVoid<XMethodForwarder<T, 1,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-  typedef XMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T  & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -77,11 +73,10 @@ struct XMethodForwarderVoid<T, 1,Sig, UnlockV8>
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XConstMethodForwarder<T, 1,Sig, UnlockV8>
-    : XConstMethodSignature<T,Sig>,
-    XMethodForwarderHelper<XConstMethodForwarder<T, 1,Sig, UnlockV8>>
+    : XMethodForwarderHelper<XConstMethodForwarder<T, 1,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
-  typedef XConstMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -96,11 +91,10 @@ struct XConstMethodForwarder<T, 1,Sig, UnlockV8>
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XConstMethodForwarderVoid<T, 1,Sig, UnlockV8>
-    : XConstMethodSignature<T,Sig>,
-    XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T, 1,Sig, UnlockV8>>
+    : XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T, 1,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
-  typedef XConstMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
 
@@ -141,11 +135,10 @@ struct CtorForwarderProxy<Sig,1>
 
 template <typename Sig, bool UnlockV8>
 struct FunctionForwarder<2,Sig,UnlockV8>
-    : XFunctionSignature<Sig>,
-    XFunctionForwarderHelper<FunctionForwarder<2,Sig,UnlockV8>>
+    : XFunctionForwarderHelper<FunctionForwarder<2,Sig,UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> SignatureType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -163,11 +156,10 @@ struct FunctionForwarder<2,Sig,UnlockV8>
 
 template <typename Sig, bool UnlockV8>
 struct FunctionForwarderVoid<2,Sig,UnlockV8>
-    : XFunctionSignature<Sig>,
-    XFunctionForwarderHelperVoid<FunctionForwarderVoid<2,Sig,UnlockV8>>
+    : XFunctionForwarderHelperVoid<FunctionForwarderVoid<2,Sig,UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> SignatureType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -185,11 +177,10 @@ struct FunctionForwarderVoid<2,Sig,UnlockV8>
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarder<T, 2,Sig, UnlockV8>
-    : XMethodSignature<T,Sig>,
-    XMethodForwarderHelper<XMethodForwarder<T, 2,Sig, UnlockV8>>
+    : XMethodForwarderHelper<XMethodForwarder<T, 2,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-  typedef XMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T  & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -207,11 +198,10 @@ struct XMethodForwarder<T, 2,Sig, UnlockV8>
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarderVoid<T, 2,Sig, UnlockV8>
-    : XMethodSignature<T,Sig>,
-    XMethodForwarderHelperVoid<XMethodForwarderVoid<T, 2,Sig, UnlockV8>>
+    : XMethodForwarderHelperVoid<XMethodForwarderVoid<T, 2,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-  typedef XMethodSignature<T,Sig> SignatureType;
-  static ReturnType CallNative( T  & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T  & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -228,13 +218,11 @@ struct XMethodForwarderVoid<T, 2,Sig, UnlockV8>
   };
 
 template <typename T, typename Sig, bool UnlockV8>
-struct XConstMethodForwarder<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
+struct XConstMethodForwarder<T, 2,Sig, UnlockV8>
+    : XMethodForwarderHelper<XConstMethodForwarder<T, 2,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
-  typedef XConstMethodSignature<T,Sig> SignatureType;
-  typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
-  typedef typename SignatureType::FunctionType FunctionType;
-  typedef typename SignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;
     typedef typename sl::At< 1, XSignature<Sig> >::Type A1;
@@ -248,20 +236,6 @@ struct XConstMethodForwarder<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
     Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)(  arg0, arg1 );
     }
-  static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try { return CastToJS( CallNative( self, func, argv ) ); }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try { return XScriptConvert::to( CallNative(func, argv) ); }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
   };
 
 template <typename T, typename Sig, bool UnlockV8>
@@ -269,8 +243,7 @@ struct XConstMethodForwarderVoid<T, 2,Sig, UnlockV8> : XConstMethodSignature<T,S
   {
   typedef XConstMethodSignature<T,Sig> SignatureType;
   typedef char AssertArity[ (2 == sl::Arity<SignatureType>::Value) ? 1 : -1];
-  typedef typename SignatureType::FunctionType FunctionType;
-  typedef typename SignatureType::ReturnType ReturnType;
+  FORWARDER_DEF
   static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
     {
     typedef typename sl::At< 0, XSignature<Sig> >::Type A0;

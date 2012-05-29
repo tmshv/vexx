@@ -94,7 +94,7 @@ public:
   void set(const char *name, XScriptValue val);
 
   typedef XScriptValue (*Function)( XScriptArguments const & argv );
-  typedef void (*FunctionDart)( const XScriptDartArguments &argv );
+  typedef void (*FunctionDart)( XScriptDartArguments argv );
   typedef XScriptValue (*Getter)(XScriptValue property,const XAccessorInfo& info);
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
@@ -215,9 +215,9 @@ public:
             typename XConstMethodSignature<T, SIG>::FunctionType METHOD>
   void addConstMethod(const char *name)
     {
-    Function fn = XScript::ConstMethodToInCa<T, SIG, METHOD>::Call;
+    typedef XScript::ConstMethodToInCa<T, SIG, METHOD> FunctionType;
 
-    XInterfaceBase::addFunction(name, fn);
+    XInterfaceBase::addFunction(name, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
     }
 
   template <typename SIG,
