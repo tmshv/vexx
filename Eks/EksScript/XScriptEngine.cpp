@@ -13,6 +13,8 @@
 #include "XQObjectWrapper.h"
 #include "XQtWrappers.h"
 
+#define WRAPPER_NAME "NativeWrapper"
+
 #ifdef X_DART
 bool isolateCreateCallback(const char* ,
   void* ,
@@ -26,18 +28,27 @@ bool isolateInterruptCallback()
   return true;
 }
 
-std::map<std::pair<std::string, uint8_t>, Dart_NativeFunction> _symbols;
+typedef QPair<QString, uint8_t> ArgPair;
+QMap<ArgPair, Dart_NativeFunction> _symbols;
 
 Dart_NativeFunction Resolve(Dart_Handle name, int num_of_arguments)
 {
   const char* cname;
   Dart_StringToCString(name, &cname);
 
-  auto toFind(std::pair<std::string, uint8_t>(cname, num_of_arguments));
+  auto toFind(ArgPair(cname, num_of_arguments));
 
   xAssert(_symbols.find(toFind) != _symbols.end());
   return _symbols[toFind];
 }
+
+QString addDartNativeLookup(const QString &typeName, const QString &functionName, xsize argCount, Dart_NativeFunction fn)
+  {
+  QString fullName = typeName + "__" + functionName;
+  _symbols[ArgPair(fullName, argCount)] = fn;
+
+  return fullName;
+  }
 
 Dart_Handle loadLibrary(Dart_Handle url, Dart_Handle libSrc, Dart_Handle importMap)
 {
@@ -48,13 +59,13 @@ Dart_Handle loadLibrary(Dart_Handle url, Dart_Handle libSrc, Dart_Handle importM
 
   const int kNumEventHandlerFields = 1;
   Dart_CreateNativeWrapperClass(lib,
-    Dart_NewString("NativeWrapper"),
+    Dart_NewString(WRAPPER_NAME),
     kNumEventHandlerFields);
 
   return lib;
 }
 
-std::map<std::string, Dart_Handle> _libs;
+QMap<QString, Dart_Handle> _libs;
 Dart_Handle tagHandler(Dart_LibraryTag tag, Dart_Handle library, Dart_Handle url, Dart_Handle import_map)
 {
   if (!Dart_IsLibrary(library)) {
@@ -71,12 +82,7 @@ Dart_Handle tagHandler(Dart_LibraryTag tag, Dart_Handle library, Dart_Handle url
   Dart_Handle importLibrary = Dart_LookupLibrary(url);
   if (Dart_IsError(importLibrary))
   {
-    const char* url_chars = NULL;
-    Dart_Handle result = Dart_StringToCString(url, &url_chars);
-    if (Dart_IsError(result)) {
-      return Dart_Error("accessing url characters failed");
-    }
-    std::string strUrl(url_chars);
+    QString strUrl = XScriptConvert::from<QString>(url);
     xAssert(_libs.find(strUrl) != _libs.end());
     Dart_Handle source = _libs[strUrl];
     importLibrary = loadLibrary(url, source, import_map);
@@ -223,7 +229,15 @@ void XScriptEngine::set(const QString &name, Function fn)
 void XScriptEngine::addInterface(const XInterfaceBase *i)
   {
 #ifdef X_DART
-  xAssertFail();
+  QString parentName = i->parent() ? i->parent()->typeName() : WRAPPER_NAME;
+  QString src = getDartSource(i, parentName);
+
+  if(i->parent())
+    {
+    src = "#import(\"" + parentName + "\");\n" + src;
+    }
+
+  _libs[i->typeName()] = getDartInternal(XScriptConvert::to(src));
 #else
   xAssert(i->isSealed());
   i->addClassTo(i->typeName(), fromHandle(g_engine->context->Global()));

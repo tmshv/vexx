@@ -31,9 +31,13 @@ public:
   bool isValid() const;
   bool isObject() const;
   bool isArray() const;
+  bool isBoolean() const;
+  bool isNumber() const;
+  bool isInteger() const;
+  bool isString() const;
 
   xsize length() const;
-  XScriptValue at(xsize id);
+  XScriptValue at(xsize id) const;
   void set(xsize id, const XScriptValue &);
 
   void *toExternal() const;
@@ -48,6 +52,7 @@ public:
 
 private:
   void *_object;
+  friend class XPersistentScriptValue;
   };
 
 class EKSSCRIPT_EXPORT XPersistentScriptValue

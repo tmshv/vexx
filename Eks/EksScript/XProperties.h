@@ -310,25 +310,38 @@ struct XMethodToGetter : XAccessorGetterType
 template <typename T, typename Sig, typename XConstMethodSignature<T,Sig>::FunctionType Getter>
 struct XConstMethodToGetter : XAccessorGetterType
   {
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+
   inline static XScriptValue Get( XScriptValue property, const XAccessorInfo & info )
     {
-    typedef typename XScriptTypeInfo<T>::Type Type;
-    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
     NativeHandle const self = XScriptConvert::from<T>( info.calleeThis() );
     return self
         ? XScriptConvert::to( (self->*Getter)() )
-        : Toss(QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)))
-          ;
+        : Toss(QString("Native member property getter '%1' could not access native This object!").arg(XScriptConvert::from<QString>(property)));
+    }
+  inline static void GetDart( XScriptDartArguments argv )
+    {
+    XScriptDartArgumentsWithThis args(argv);
+    xAssert(args.length() == 0);
+    NativeHandle const self = XScriptConvert::from<T>( args.calleeThis() );
+    if(!self)
+      {
+      Toss(QString("Native member property getter '%1' could not access native This object!"));
+      }
+
+    argv.setReturnValue(XScriptConvert::to( (self->*Getter)() ));
     }
   };
 
 template <typename T, typename InputArg, typename XMethodSignature<T,void (InputArg)>::FunctionType Setter>
 struct XMethodToSetter : XAccessorSetterType
   {
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+
   static void Set(XScriptValue property, XScriptValue value, const XAccessorInfo &info)
     {
-    typedef typename XScriptTypeInfo<T>::Type Type;
-    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
     NativeHandle self = XScriptConvert::from<NativeHandle>( info.calleeThis() );
     if( ! self )
       {
@@ -336,10 +349,8 @@ struct XMethodToSetter : XAccessorSetterType
       }
     else
       {
-
       typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
       XScriptConvert::ArgCaster<ArgT> ac;
-
       XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
 
       bool valid = true;
@@ -353,7 +364,34 @@ struct XMethodToSetter : XAccessorSetterType
         (self->*Setter)( in );
         }
       }
-    return;
+    }
+
+  static void SetDart(XScriptDartArguments argv)
+    {
+    XScriptDartArgumentsWithThis args(argv);
+    xAssert(args.length() == 1);
+    NativeHandle self = XScriptConvert::from<NativeHandle>( args.calleeThis() );
+    if(!self)
+      {
+      Toss( QString("Native member property setter '%1' could not access native This object!") );
+      }
+    else
+      {
+      typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
+      XScriptConvert::ArgCaster<ArgT> ac;
+      XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( args.at(1) );
+
+      bool valid = true;
+      InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
+      if(!valid)
+        {
+        Toss(QString("Native member property setter '%1' could convert input argument!") );
+        }
+      else
+        {
+        (self->*Setter)( in );
+        }
+      }
     }
   };
 

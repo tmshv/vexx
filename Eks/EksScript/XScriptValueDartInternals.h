@@ -34,4 +34,8 @@ inline Dart_Handle &getDartHandle(void *&ptr)
   return (Dart_Handle&)ptr;
   }
 
+QString addDartNativeLookup(const QString &typeName, const QString &functionName, xsize argCount, Dart_NativeFunction);
+
+QString getDartSource(const XInterfaceBase *, const QString &parentName);
+
 #endif // XSCRIPTVALUEDARTINTERNALS_H

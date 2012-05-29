@@ -49,6 +49,8 @@ XProperties:
   XROProperty(xsize, typeIdField);
   XROProperty(xsize, nativeField);
 
+  XRORefProperty(QString, functionSource);
+
   XProperty(ToScriptFn, toScript, setToScript);
   XProperty(FromScriptFn, fromScript, setFromScript);
 
@@ -98,10 +100,9 @@ public:
   typedef void (*Setter)(XScriptValue property, XScriptValue value, const XAccessorInfo& info);
   typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
   typedef XScriptValue (*IndexedGetter)(xuint32, const XAccessorInfo& info);
-  typedef void *(*Constructor)( XScriptArguments const & argv );
 
-  void addConstructor(const char *name, Constructor);
-  void addProperty(const char *name, Getter, Setter);
+  void addConstructor(const char *name, xsize argCount, Function, FunctionDart);
+  void addProperty(const char *name, Getter, FunctionDart, Setter, FunctionDart);
   void addFunction(const char *name, xsize argCount, Function, FunctionDart);
   void setIndexAccessor(IndexedGetter);
   void setNamedAccessor(NamedGetter);
@@ -162,17 +163,11 @@ public:
   template <typename TYPE>
     void addConstructor(const char *name="")
   {
-    typedef T* (*TypedConstructor)( XScriptArguments const & argv );
+    typedef XScript::CtorFunctionWrapper<T, TYPE> Wrapper;
 
-    TypedConstructor tCtor = XScript::CtorForwarder<TYPE>::Call;
-    Constructor ctor = (Constructor)tCtor;
+    FunctionDart ctorDart = Wrapper::CallDart;
 
-
-    TypedDartConstructor tDartCtor = XScript::CtorForwarder<TYPE>::CallDart;
-    DartConstructor ctorDart = (DartConstructor)tDartCtor;
-
-    addConstructor(name, XScript::CtorForwarder<TYPE>::Arity, ctor, ctorDart);
-
+    addConstructor(name, Wrapper::Arity, 0, ctorDart);
   }
 
   template <typename GETTYPE,
@@ -181,10 +176,10 @@ public:
     typename XMethodSignature<T, void (SETTYPE)>::FunctionType SETTERMETHOD>
     void addProperty(const char *name)
   {
-    Getter getter = XScript::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD>::Get;
-    Setter setter = XScript::XMethodToSetter<T, SETTYPE, SETTERMETHOD>::Set;
+    typedef XScript::XConstMethodToGetter<T, GETTYPE (), GETTERMETHOD> Getter;
+    typedef XScript::XMethodToSetter<T, SETTYPE, SETTERMETHOD> Setter;
 
-    XInterfaceBase::addProperty(name, getter, setter);
+    XInterfaceBase::addProperty(name, Getter::Get, Getter::GetDart, Setter::Set, Setter::SetDart);
   }
 
   template <typename GETTYPE,
