@@ -1,5 +1,6 @@
 #include "XScriptValue.h"
 #include "XScriptValueV8Internals.h"
+#include "XScriptValueDartInternals.h"
 #include "XScriptObject.h"
 #include "XUnorderedMap"
 #include "QStringList"
@@ -44,6 +45,17 @@ struct XScriptValueInternal
   mutable v8::Handle<v8::Value> _object;
   };
 xCompileTimeAssert(sizeof(XScriptValue) == sizeof(XScriptValueInternal));
+xCompileTimeAssert(sizeof(XScriptValue) == sizeof(Dart_Handle));
+
+Dart_Handle& getDartHandle(const XScriptValue &obj)
+  {
+  struct Internal
+    {
+    Dart_Handle ptr;
+    };
+
+  return ((Internal*)(&obj))->ptr;
+  }
 
 struct XPersistentScriptValueInternal
   {
@@ -86,50 +98,82 @@ xCompileTimeAssert(sizeof(XPersistentScriptValue) == sizeof(XPersistentScriptVal
 
 XScriptValue::XScriptValue()
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_Null();
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Null();
+#endif
   }
 
 XScriptValue::XScriptValue(bool x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewBoolean(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Boolean::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(xuint32 x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewInteger(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Integer::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(xint32 x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewInteger(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Integer::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(xuint64 x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewInteger(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Number::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(xint64 x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewInteger(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Number::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(double x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewDouble(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Number::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(float x)
   {
+#ifdef X_DART
+  getDartHandle(_object) = Dart_NewDouble(x);
+#else
   XScriptValueInternal *internal = XScriptValueInternal::init(this);
   internal->_object = v8::Number::New(x);
+#endif
   }
 
 XScriptValue::XScriptValue(const QString &str)
@@ -451,10 +495,32 @@ XScriptValue fromHandle(v8::Handle<v8::Value> v)
   return o;
   }
 
+XScriptValue fromHandle(Dart_Handle h)
+  {
+  XScriptValue v;
+  getDartHandle(v) = h;
+  return v;
+  }
+
 v8::Handle<v8::Value> getV8Internal(const XScriptValue &o)
   {
   const XScriptValueInternal *internal = XScriptValueInternal::val(&o);
   return internal->_object;
+  }
+
+Dart_Handle getDartInternal(const XScriptValue& v)
+  {
+  return getDartHandle(v);
+  }
+
+v8::Handle<v8::Value> *getV8Internal(const XScriptValue *o)
+  {
+  return (v8::Handle<v8::Value> *)o;
+  }
+
+Dart_Handle *geDartInternal(const XScriptValue *o)
+  {
+  return (Dart_Handle*)o;
   }
 
 XPersistentScriptValue::XPersistentScriptValue()

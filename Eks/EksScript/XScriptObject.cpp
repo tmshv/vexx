@@ -1,5 +1,6 @@
 #include "XScriptObject.h"
 #include "XScriptValueV8Internals.h"
+#include "XScriptValueDartInternals.h"
 
 struct XScriptObjectInternal
   {
@@ -39,6 +40,16 @@ struct XScriptObjectInternal
   mutable v8::Handle<v8::Object> _object;
   };
 xCompileTimeAssert(sizeof(XScriptObject) == sizeof(XScriptObjectInternal));
+
+Dart_Handle& getDartHandle(const XScriptObject &obj)
+  {
+  struct Internal
+    {
+    Dart_Handle ptr;
+    };
+
+  return ((Internal*)(&obj))->ptr;
+  }
 
 XScriptObject::XScriptObject()
   {
@@ -155,16 +166,23 @@ v8::Handle<v8::Object> getV8Internal(const XScriptObject &o)
   return internal->_object;
   }
 
-v8::Handle<v8::Value> *getV8Internal(const XScriptValue *o)
-  {
-  return (v8::Handle<v8::Value> *)o;
-  }
-
 XScriptObject fromObjectHandle(v8::Handle<v8::Object> v)
   {
   XScriptObject o;
   XScriptObjectInternal *internal = XScriptObjectInternal::val(&o);
   internal->_object = v;
   return o;
+  }
+
+XScriptObject fromObjectHandle(Dart_Handle v)
+  {
+  XScriptObject o;
+  getDartHandle(o) = v;
+  return o;
+  }
+
+Dart_Handle getDartInternal(const XScriptObject &o)
+  {
+  return getDartHandle(o);
   }
 
