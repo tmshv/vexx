@@ -98,7 +98,7 @@ protected:
 class EKSSCRIPT_EXPORT XScriptDartArgumentsWithThis : public XScriptDartArgumentsNoThis
   {
 public:
-  XScriptDartArgumentsWithThis(XScriptDartArguments args, xsize offset=0)
+  XScriptDartArgumentsWithThis(XScriptDartArguments args)
       : XScriptDartArgumentsNoThis(args, 1)
     {
     }

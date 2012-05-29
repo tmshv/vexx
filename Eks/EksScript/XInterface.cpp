@@ -39,7 +39,8 @@ _lookup[std::pair<std::string, uint8_t>("Fields_crapSalad", 2)] = crapSalad;
 
 _libs["NativeTest"] = Dart_NewString(lib);
 # endif
-#else
+#endif
+
 typedef v8::Persistent<v8::FunctionTemplate> FnTempl;
 typedef v8::Persistent<v8::ObjectTemplate> ObjTempl;
 
@@ -62,7 +63,6 @@ const ObjTempl *prototype(const void *& b)
   {
   return (const ObjTempl*)&b;
   }
-#endif
 
 
 XInterfaceBase::XInterfaceBase(xsize typeID,
@@ -211,17 +211,16 @@ void XInterfaceBase::seal()
   _isSealed = true;
   }
 
+#ifndef X_DART
 XScriptFunction XInterfaceBase::constructorFunction() const
   {
   // In my experience, if GetFunction() is called BEFORE setting up
   // the Prototype object, v8 gets very unhappy (class member lookups don't work?).
   _isSealed = true;
 
-#ifndef X_DART
   return fromFunction((*constructor(_constructor))->GetFunction());
-#endif
-  return fromFunction(Dart_Null());
   }
+#endif
 
 void XInterfaceBase::wrapInstance(XScriptObject scObj, void *object) const
   {
@@ -401,11 +400,8 @@ XInterfaceBase *findInterface(int id)
   return base;
   }
 
-
-#ifndef X_DART
 v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
   {
   void *proto = o->prototype();
   return *::prototype(proto);
   }
-#endif

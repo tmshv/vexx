@@ -90,7 +90,6 @@ public:
   void unwrapInstance(XScriptObject object) const;
 
   XScriptObject newInstance(int argc, XScriptValue argv[]) const;
-  XScriptFunction constructorFunction() const;
   void set(const char *name, XScriptValue val);
 
   typedef XScriptValue (*Function)( XScriptArguments const & argv );
@@ -120,6 +119,10 @@ protected:
   NativeCtor _nativeCtor;
   void *_constructor;
   void *_prototype;
+
+#ifdef X_DART
+  XScriptFunction constructorFunction() const;
+#endif
   };
 
 template <typename T> const XInterfaceBase* findInterface(const T*);

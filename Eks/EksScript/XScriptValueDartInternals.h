@@ -23,11 +23,15 @@ inline void printError(Dart_Handle han)
 
 XScriptValue fromHandle(Dart_Handle);
 XScriptObject fromObjectHandle(Dart_Handle);
-XScriptFunction fromFunction(Dart_Handle);
 
 #define CHECK_HANDLE(handle) if(Dart_IsError(handle)) { printError(handle); }
 
 Dart_Handle getDartInternal(const XScriptValue&);
 Dart_Handle getDartInternal(const XScriptObject &o);
+
+inline Dart_Handle &getDartHandle(void *&ptr)
+  {
+  return (Dart_Handle&)ptr;
+  }
 
 #endif // XSCRIPTVALUEDARTINTERNALS_H
