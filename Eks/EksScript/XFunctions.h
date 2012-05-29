@@ -19,82 +19,151 @@ private:
   void *_impl;
   };
 
-template <typename T, typename ArgsType> T &getThis(ArgsType const &argv)
+namespace Detail
+{
+/** Temporary internal macro. Undef'd at the end of this file. */
+#define HANDLE_PROPAGATE_EXCEPTION catch( MissingThisException const & ){ return TossMissingThis<T>(); } \
+  catch(...){ throw; } (void)0/* (void)0 is a hack to help emacs' indentation out!*/
+
+/**
+        A MissingThisException type holding generic
+        message text which references TypeName<T>::Value
+        as being the problematic class.
+    */
+template <typename T>
+struct MissingThisExceptionT : MissingThisException
   {
-  T * self = XScriptConvert::from<T>(argv.calleeThis());
-  if( ! self )
+  MissingThisExceptionT()
     {
-    throw MissingThisExceptionT<T>();
+    this->init<T>();
     }
-  }
-
-template <typename T> struct XFunctionHelperBase
-  {
-  typedef char AssertArity[ (1 == sl::Arity<typename T::SignatureType>::Value) ? 1 : -1];
   };
+}
 
-template <typename T> struct XFunctionForwarderHelperVoid : XFunctionHelperBase<T>
+#define FORWARDER_DEF \
+  typedef typename SignatureType::ReturnType ReturnType; \
+  typedef typename SignatureType::FunctionType FunctionType;
+
+#define FORWARDER_DEF_WITH_TYPE FORWARDER_DEF \
+  typedef typename XScriptTypeInfo<T>::Type Type;
+
+template <typename T, typename Sig> struct XFunctionForwarderHelperVoid : XFunctionSignature<Sig>
   {
+  typedef XFunctionSignature<Sig> SignatureType;
+  FORWARDER_DEF
+
   static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
     {
     T::CallNative( func, argv );
     return XScriptValue();
     }
+
+  static XScriptValue Call( typename T::FunctionType func, XScriptDartArguments const & argv )
+    {
+    XScriptDartArgumentsNoThis args(argv);
+    T::CallNative( func, args );
+    return XScriptValue();
+    }
   };
 
-template <typename T> struct XFunctionForwarderHelper : XFunctionHelperBase<T>
+template <typename T, typename Sig> struct XFunctionForwarderHelper : XFunctionSignature<Sig>
   {
+  typedef XFunctionSignature<Sig> SignatureType;
+  FORWARDER_DEF
+
   static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
     {
     return CastToJS( T::CallNative( func, argv ) );
     }
+
+  static XScriptValue Call( typename T::FunctionType func, XScriptDartArguments const & argv )
+    {
+    XScriptDartArgumentsNoThis args(argv);
+    return CastToJS( T::CallNative( func, args ) );
+    }
   };
 
-template <typename T> struct XMethodForwarderHelperVoid : XFunctionHelperBase<T>
+template <typename T, typename Sig> struct XMethodForwarderHelperVoid : Sig
   {
-  static XScriptValue Call( T & self, typename T::FunctionType func, XScriptArguments const & argv )
-    {
-    try
+  typedef Sig SignatureType;
+  typedef typename SignatureType::Context ThisType;
+  FORWARDER_DEF_WITH_TYPE
+
+  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptArguments const & argv )
     {
     T::CallNative( self, func, argv );
     return XScriptValue();
     }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static typename T::ReturnType CallNative( typename T::FunctionType func, XScriptArguments const & argv )
+
+  static void Call( ThisType & self, typename FunctionType func, XScriptDartArguments const & argv )
     {
-    return (T::ReturnType)T::CallNative(getThis<T>(argv), func, argv);
+    XScriptDartArgumentsNoThis args(argv);
+    T::CallNative( self, func, args );
     }
-  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
+
+  static XScriptValue Call( typename FunctionType func, XScriptArguments const & argv )
     {
-    try
-    {
-    T::CallNative(func, argv);
-    return XScriptValue();
+    ThisType *self = XScriptConvert::from<ThisType>(argv.calleeThis());
+    if(self)
+      {
+      T::CallNative(*self, func, argv);
+      return XScriptValue();
+      }
+    return TossMissingThis<T>();
     }
-    HANDLE_PROPAGATE_EXCEPTION;
+
+  static void Call( typename FunctionType func, XScriptDartArguments &argv )
+    {
+    XScriptDartArgumentsWithThis args(argv);
+    ThisType *self = XScriptConvert::from<ThisType>(args.calleeThis());
+    if(self)
+      {
+      T::CallNative(*self, func, args.argsNoThis());
+      }
+    argv.setReturnValue(TossMissingThis<T>());
     }
   };
 
-template <typename T> struct XMethodForwarderHelper : XFunctionHelperBase<T>
+template <typename T, typename Sig> struct XMethodForwarderHelper : Sig
   {
-  static XScriptValue Call( T  & self, typename T::FunctionType func, XScriptArguments const & argv )
+  typedef Sig SignatureType;
+  typedef typename SignatureType::Context ThisType;
+  FORWARDER_DEF_WITH_TYPE
+
+  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptArguments const & argv )
     {
-    try { return CastToJS( T::CallNative( self, func, argv ) ); }
+    try { return CastToJS( T :: CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
     }
-  static typename T::ReturnType CallNative( typename T::FunctionType func, XScriptArguments const & argv )
+
+  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptDartArguments const & argv )
     {
-    return (T::ReturnType)T::CallNative(getThis<T>(argv), func, argv);
-    }
-  static XScriptValue Call( typename T::FunctionType func, XScriptArguments const & argv )
-    {
-    try { return XScriptConvert::to( T::CallNative(func, argv) ); }
+    XScriptDartArgumentsNoThis args(argv);
+    try { return CastToJS( T :: CallNative( self, func, args ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
+    }
+
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
+    {
+    ThisType *self = XScriptConvert::from<ThisType>(argv.calleeThis());
+    if(self)
+      {
+      return XScriptConvert::to( T::CallNative(*self, func, argv) );
+      }
+    return TossMissingThis<T>();
+    }
+
+  static void Call( FunctionType func, XScriptDartArguments &argv )
+    {
+    XScriptDartArgumentsWithThis args(argv);
+    ThisType *self = XScriptConvert::from<ThisType>(args.calleeThis());
+    if(self)
+      {
+      argv.setReturnValue(XScriptConvert::to( T::CallNative(*self, func, args.argsNoThis()) ));
+      }
+    argv.setReturnValue(TossMissingThis<T>());
     }
   };
-
-
 
 
 /**
@@ -161,9 +230,8 @@ struct XFunctionPtr<RV (XScriptArguments const &),FuncPtr>
   : XFunctionSignature<RV (XScriptArguments const &)>
   {
   public:
-  typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XSignatureType::FunctionType FunctionType;
+  typedef XFunctionSignature<RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
   static FunctionType GetFunction()
     {
     return FuncPtr;
@@ -179,9 +247,8 @@ template <typename T,typename RV, RV (T::*FuncPtr)(XScriptArguments const &) >
 struct XMethodPtr<T, RV (T::*)(XScriptArguments const &),FuncPtr>
   : XMethodSignature<T, RV (T::*)(XScriptArguments const &)>
   {
-  typedef XMethodSignature<T, RV (T::*)(XScriptArguments const &)> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XSignatureType::FunctionType FunctionType;
+  typedef XMethodSignature<T, RV (T::*)(XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF_WITH_TYPE
   static FunctionType GetFunction()
     {
     return FuncPtr;
@@ -197,9 +264,8 @@ template <typename T,typename RV, RV (T::*FuncPtr)(XScriptArguments const &) con
 struct XConstMethodPtr<T, RV (T::*)(XScriptArguments const &) const,FuncPtr>
   : XConstMethodSignature<T, RV (T::*)(XScriptArguments const &) const>
   {
-  typedef XConstMethodSignature<T, RV (T::*)(XScriptArguments const &) const> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XSignatureType::FunctionType FunctionType;
+  typedef XConstMethodSignature<T, RV (T::*)(XScriptArguments const &) const> SignatureType;
+  FORWARDER_DEF_WITH_TYPE
   static FunctionType GetFunction()
     {
     return FuncPtr;
@@ -404,23 +470,6 @@ template <typename T> XScriptValue TossMissingThis()
 
 #if !defined(DOXYGEN)
 namespace Detail {
-/** Temporary internal macro. Undef'd at the end of this file. */
-#define HANDLE_PROPAGATE_EXCEPTION catch( MissingThisException const & ){ return TossMissingThis<T>(); } \
-  catch(...){ throw; } (void)0/* (void)0 is a hack to help emacs' indentation out!*/
-
-/**
-        A MissingThisException type holding generic
-        message text which references TypeName<T>::Value
-        as being the problematic class.
-    */
-template <typename T>
-struct MissingThisExceptionT : MissingThisException
-  {
-  MissingThisExceptionT()
-    {
-    this->init<T>();
-    }
-  };
 
 /**
     Temporary internal macro to trigger a static assertion if unlocking
@@ -440,7 +489,7 @@ struct MissingThisExceptionT : MissingThisException
     XSignature's types) cannot obey the (un)locking rules.
 */
 #define ASSERT_UNLOCK_SANITY_CHECK typedef char AssertCanEnableUnlock[ \
-  !UnlockV8 ? 1 : (XSignatureIsUnlockable< XSignatureType >::Value ?  1 : -1) \
+  !UnlockV8 ? 1 : (XSignatureIsUnlockable< SignatureType >::Value ?  1 : -1) \
   ]
 
 template <int Arity_, typename Sig,
@@ -449,28 +498,13 @@ struct FunctionForwarder;
 
 template <int Arity, typename RV, bool UnlockV8>
 struct FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
-  : XFunctionSignature<RV (XScriptArguments const &)>
+  : XFunctionForwarderHelper<FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>, RV (XScriptArguments const &)>
   {
-  public:
-  typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     return (RV) func(argv);
     }
-
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    return CastToJS( CallNative( func, argv ) );
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-
-  ASSERT_UNLOCKV8_IS_FALSE;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
   };
 
 //! Reminder to self: we really do need this specialization for some cases.
@@ -480,26 +514,15 @@ struct FunctionForwarder<Arity,RV (*)(XScriptArguments const &), UnlockV8>
   {};
 
 template <typename Sig, bool UnlockV8>
-struct FunctionForwarder<0,Sig, UnlockV8> : XFunctionSignature<Sig>
+struct FunctionForwarder<0,Sig, UnlockV8>
+    : XFunctionForwarderHelper<FunctionForwarder<0,Sig, UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return func();
     }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    return CastToJS( CallNative( func, argv ) );
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-  ASSERT_UNLOCK_SANITY_CHECK;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
   };
 
 template <int Arity_, typename Sig,
@@ -507,12 +530,11 @@ template <int Arity_, typename Sig,
 struct FunctionForwarderVoid;
 
 template <typename Sig, bool UnlockV8>
-struct FunctionForwarderVoid<0,Sig, UnlockV8> : XFunctionSignature<Sig>
+struct FunctionForwarderVoid<0,Sig, UnlockV8>
+    : XFunctionForwarderHelperVoid<FunctionForwarderVoid<0,Sig, UnlockV8>, Sig>
   {
-  typedef XFunctionSignature<Sig> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef Sig FunctionType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)func()
@@ -522,43 +544,18 @@ struct FunctionForwarderVoid<0,Sig, UnlockV8> : XFunctionSignature<Sig>
                    return of a void expression without the cast.
                 */;
     }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    CallNative( func, argv );
-    return v8::Undefined();
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    CastToJS( CallNative(func, argv));
-    }
-  ASSERT_UNLOCK_SANITY_CHECK;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == 0 ? 1 : -1];
   };
 
 template <int Arity, typename RV, bool UnlockV8>
 struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
-  : XFunctionSignature<RV (XScriptArguments const &)>
+  : XFunctionForwarderHelperVoid<FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>, RV (XScriptArguments const &)>
   {
-  public:
-  typedef XFunctionSignature<RV (XScriptArguments const &)> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)func(argv);
     }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    CallNative( func, argv );
-    return v8::Undefined();
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-  ASSERT_UNLOCKV8_IS_FALSE;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
   };
 
 /**
@@ -571,100 +568,26 @@ struct XMethodForwarder;
 
 
 template <typename T, typename Sig, bool UnlockV8>
-struct XMethodForwarder<T, 0, Sig, UnlockV8> : XMethodSignature<T,Sig>
+struct XMethodForwarder<T, 0, Sig, UnlockV8>
+    : XMethodForwarderHelper<XMethodForwarder<T, 0, Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-public:
-  typedef XMethodSignature<T,Sig> XSignatureType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XScriptTypeInfo<T>::Type Type;
-  static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, FunctionType func, ArgsType const & )
     {
     Unlocker<UnlockV8> unlocker;
     return (self.*func)();
     }
-  static XScriptValue Call( T & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative( self, func, argv ) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return XScriptConvert::to( CallNative( func, argv ) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-
-  ASSERT_UNLOCK_SANITY_CHECK;
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
-  : XMethodSignature<T, RV (XScriptArguments const &)>
+  : XMethodForwarderHelper<XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>, XMethodSignature<T, RV (XScriptArguments const &)>>
   {
-  public:
-  typedef XMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, FunctionType func, ArgsType const & argv )
     {
     return (self.*func)(argv);
     }
-  static void Call( T & self, FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative( self, func, argv ) ));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    T * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
-    }
-  static ReturnType CallNative( FunctionType func, XScriptDartArguments const & argv )
-    {
-    T * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative(func, argv) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  ASSERT_UNLOCKV8_IS_FALSE;
   };
 
 template <typename T, typename RV, bool UnlockV8, int _Arity>
@@ -679,104 +602,25 @@ struct XMethodForwarderVoid ;
 
 template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarderVoid<T,0,Sig, UnlockV8>
-    : XMethodSignature<T,Sig>
+    : XMethodForwarderHelperVoid<XMethodForwarderVoid<T,0,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
-public:
-  typedef XMethodSignature<T,Sig> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef T Type;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( Type & self, FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, FunctionType func, ArgsType const & )
     {
     Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)();
-    }
-  static XScriptValue Call( Type & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative( self, func, argv );
-    return v8::Undefined();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative(func, argv);
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
     }
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
-  : XMethodSignature<T,RV (XScriptArguments const &)>
+  : XMethodForwarderHelperVoid<XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>, XMethodSignature<T,RV (XScriptArguments const &)>>
   {
-  public:
-  typedef XMethodSignature<T,RV (XScriptArguments const &)> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XScriptTypeInfo<T>::Type Type;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( Type & self, FunctionType func, XScriptDartArgumentsNoThis const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, FunctionType func, ArgsType const & argv )
     {
     return (ReturnType)(self.*func)(argv);
     }
-  static ReturnType CallNative( Type & self, FunctionType func, XScriptDartArguments const & argv )
-    {
-    return (ReturnType)(self.*func)(argv);
-    }
-  static XScriptValue Call( Type & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative( self, func, argv );
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static XScriptValue CallDart( Type & self, FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    CallNative( self, func, argv );
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    return (ReturnType)CallNative(getThis<T>(argv), func, argv);
-    }
-  static ReturnType CallNative( FunctionType func, XScriptDartArguments const & aIn )
-    {
-    XScriptDartArgumentsWithThis args(aIn, true);
-    return (ReturnType)CallNative(getThis<T>(args), func, args.noThis());
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative(func, argv);
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  ASSERT_UNLOCKV8_IS_FALSE;
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
@@ -793,94 +637,26 @@ template <typename T, int Arity_, typename Sig,
 struct XConstMethodForwarder ;
 
 template <typename T, typename Sig, bool UnlockV8>
-struct XConstMethodForwarder<T,0,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
+struct XConstMethodForwarder<T,0,Sig, UnlockV8>
+    : XMethodForwarderHelper<XConstMethodForwarder<T,0,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
-public:
-  typedef XConstMethodSignature<T,Sig> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (self.*func)();
-    }
-
-  static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative( self, func, argv ) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    T const * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative(func, argv) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
     }
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
-  : XConstMethodSignature<T, RV (XScriptArguments const &)>
+  : XMethodForwarderHelper<XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>, XConstMethodSignature<T, RV (XScriptArguments const &)>>
   {
-  public:
-  typedef XConstMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T const & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & argv )
     {
     return (ReturnType)(self.*func)(argv);
     }
-  static XScriptValue Call( T const & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative( self, func, argv ) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    T const * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative(func, argv) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  ASSERT_UNLOCKV8_IS_FALSE;
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
@@ -894,96 +670,27 @@ template <typename T, int Arity_, typename Sig,
 struct XConstMethodForwarderVoid;
 
 template <typename T, typename Sig, bool UnlockV8>
-struct XConstMethodForwarderVoid<T,0,Sig, UnlockV8> : XConstMethodSignature<T,Sig>
+struct XConstMethodForwarderVoid<T,0,Sig, UnlockV8>
+    : XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T,0,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
-public:
-  typedef XConstMethodSignature<T,Sig> XSignatureType;
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XScriptTypeInfo<T>::Type Type;
-  static ReturnType CallNative( Type const & self, FunctionType func, XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType CallNative( Type const & self, FunctionType func, ArgsType const & )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)();
     }
-
-  static XScriptValue Call( Type const & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative( self, func, argv );
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    T const * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return (ReturnType)CallNative(*self, func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative(func, argv);
-    return XScriptValue();
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-  ASSERT_UNLOCK_SANITY_CHECK;
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>
-  : XConstMethodSignature<T, RV (XScriptArguments const &)>
+  : XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>, XConstMethodSignature<T, RV (XScriptArguments const &)>>
   {
-  public:
-  typedef XConstMethodSignature<T, RV (XScriptArguments const &)> XSignatureType;
-  typedef char AssertArity[ sl::Arity<XSignatureType>::Value == -1 ? 1 : -1];
-  typedef typename XSignatureType::FunctionType FunctionType;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  typedef typename XScriptTypeInfo<T>::Type Type;
-  static ReturnType CallNative( Type const & self, FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( Type const & self, FunctionType func, ArgsType const & argv )
     {
     V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
     return (ReturnType)(self.*func)();
     }
-  static XScriptValue Call( Type const & self, FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    CallNative( self, func, argv );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
-    {
-    T const * self = CastFromJS<T>(argv.This());
-    if( ! self ) throw MissingThisExceptionT<T>();
-    return CallNative(*self, func, argv);
-    }
-  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
-    {
-    try
-    {
-    return CastToJS( CallNative( func, argv ) );
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  static void Call( FunctionType func, XScriptDartArguments const & argv )
-    {
-    try
-    {
-    argv.setReturnValue(CastToJS( CallNative(func, argv)));
-    }
-    HANDLE_PROPAGATE_EXCEPTION;
-    }
-  ASSERT_UNLOCKV8_IS_FALSE;
   };
 
 template <typename T, int Arity, typename RV, bool UnlockV8>
@@ -1061,19 +768,20 @@ private:
   >::Type
   Proxy;
 public:
-  typedef typename Proxy::SignatureType XSignatureType;
+  typedef typename Proxy::SignatureType SignatureType;
   typedef typename Proxy::ReturnType ReturnType;
   typedef typename Proxy::FunctionType FunctionType;
   /**
        Passes the given arguments to func(), converting them to the appropriate
-       types. If argv.Length() is less than sl::Arity< XSignatureType >::Value then
+       types. If argv.Length() is less than sl::Arity< SignatureType >::Value then
        a JS exception is thrown, with one exception: if the function has "-1 arity"
        (i.e. it is InvocationCallback-like) then argv is passed on to it regardless
        of the value of argv.Length().
 
        The native return value of the call is returned to the caller.
     */
-  static ReturnType CallNative( FunctionType func, XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
     return Proxy::CallNative( func, argv );
     }
@@ -1100,10 +808,11 @@ template <typename Sig,
 struct FunctionToInCa : XFunctionPtr<Sig,Func>, InCa
   {
 
-  typedef XFunctionSignature<Sig> XSignatureType;
-  typedef FunctionForwarder< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( XScriptArguments const & argv )
+  typedef XFunctionSignature<Sig> SignatureType;
+  typedef FunctionForwarder< sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( ArgsType const & argv )
     {
     return (ReturnType)Proxy::CallNative( Func, argv );
     /**
@@ -1133,10 +842,11 @@ template <typename Sig,
           bool UnlockV8 = XSignatureIsUnlockable< XFunctionSignature<Sig> >::Value >
 struct FunctionToInCaVoid : XFunctionPtr<Sig,Func>, InCa
   {
-  typedef XFunctionSignature<Sig> XSignatureType;
-  typedef FunctionForwarderVoid< sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( XScriptArguments const & argv )
+  typedef XFunctionSignature<Sig> SignatureType;
+  typedef FunctionForwarderVoid< sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( ArgsType const & argv )
     {
     return (ReturnType)Proxy::CallNative( Func, argv );
     }
@@ -1155,11 +865,12 @@ template <typename T,
           >
 struct MethodToInCa : XMethodPtr<T,Sig, Func>, InCa
   {
-  typedef XMethodPtr<T, Sig, Func> XSignatureType;
-  enum { Arity = sl::Arity<XSignatureType>::Value };
+  typedef XMethodPtr<T, Sig, Func> SignatureType;
+  enum { Arity = sl::Arity<SignatureType>::Value };
   typedef XMethodForwarder< T, Arity, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T & self, XScriptArguments const & argv )
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, ArgsType const & argv )
     {
     return Proxy::CallNative( self, Func, argv );
     }
@@ -1171,9 +882,9 @@ struct MethodToInCa : XMethodPtr<T,Sig, Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static void CallDart( XScriptDartArguments const & argv )
+  static void CallDart( XScriptDartArguments argv )
     {
-    return Proxy::Call( Func, argv );
+    Proxy::Call( Func, argv );
     }
   static XScriptValue Call( T & self, XScriptArguments const & argv )
     {
@@ -1190,11 +901,12 @@ template <typename T,
           >
 struct MethodToInCaVoid : XMethodPtr<T,Sig,Func>, InCa
   {
-  typedef XMethodPtr<T, Sig, Func> XSignatureType;
-  enum { Arity = sl::Arity<XSignatureType>::Value };
+  typedef XMethodPtr<T, Sig, Func> SignatureType;
+  enum { Arity = sl::Arity<SignatureType>::Value };
   typedef XMethodForwarderVoid< T, Arity, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T & self, XScriptArguments const & argv )
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( T & self, ArgsType const & argv )
     {
     return Proxy::CallNative( self, Func, argv );
     }
@@ -1206,7 +918,7 @@ struct MethodToInCaVoid : XMethodPtr<T,Sig,Func>, InCa
     {
     return Proxy::Call( Func, argv );
     }
-  static XScriptValue CallDart( XScriptDartArguments const & argv )
+  static void CallDart( XScriptDartArguments argv )
     {
     return Proxy::Call( Func, argv );
     }
@@ -1225,10 +937,12 @@ template <typename T,
           >
 struct ConstMethodToInCa : XConstMethodPtr<T,Sig, Func>, InCa
   {
-  typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
-  typedef XConstMethodForwarder< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T const & self, XScriptArguments const & argv )
+  typedef XConstMethodPtr<T, Sig, Func> SignatureType;
+  enum { Arity = sl::Arity<SignatureType>::Value };
+  typedef XConstMethodForwarder< T, sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, ArgsType const & argv )
     {
     return Proxy::CallNative( self, Func, argv );
     }
@@ -1239,6 +953,10 @@ struct ConstMethodToInCa : XConstMethodPtr<T,Sig, Func>, InCa
   static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
+    }
+  static void CallDart( XScriptDartArguments argv )
+    {
+    Proxy::Call( Func, argv );
     }
   static XScriptValue Call( T const & self, XScriptArguments const & argv )
     {
@@ -1253,10 +971,11 @@ template <typename T,
           >
 struct ConstMethodToInCaVoid : XConstMethodPtr<T,Sig,Func>, InCa
   {
-  typedef XConstMethodPtr<T, Sig, Func> XSignatureType;
-  typedef XConstMethodForwarderVoid< T, sl::Arity<XSignatureType>::Value, Sig, UnlockV8 > Proxy;
-  typedef typename XSignatureType::ReturnType ReturnType;
-  static ReturnType CallNative( T const & self, XScriptArguments const & argv )
+  typedef XConstMethodPtr<T, Sig, Func> SignatureType;
+  typedef XConstMethodForwarderVoid< T, sl::Arity<SignatureType>::Value, Sig, UnlockV8 > Proxy;
+  typedef typename SignatureType::ReturnType ReturnType;
+  template <typename ArgsType>
+      static ReturnType CallNative( T const & self, ArgsType const & argv )
     {
     return Proxy::CallNative( self, Func, argv );
     }
@@ -1267,6 +986,10 @@ struct ConstMethodToInCaVoid : XConstMethodPtr<T,Sig,Func>, InCa
   static XScriptValue Call( XScriptArguments const & argv )
     {
     return Proxy::Call( Func, argv );
+    }
+  static void CallDart( XScriptDartArguments argv )
+    {
+    Proxy::Call( Func, argv );
     }
   static XScriptValue Call( T const & self, XScriptArguments const & argv )
     {
@@ -1515,13 +1238,13 @@ private:
   >::Type
   Proxy;
 public:
-  typedef typename Proxy::SignatureType XSignatureType;
+  typedef typename Proxy::SignatureType SignatureType;
   typedef typename Proxy::FunctionType FunctionType;
   typedef typename Proxy::ReturnType ReturnType;
   /**
        Passes the given arguments to (self.*func)(), converting them
        to the appropriate types. If argv.Length() is less than
-       sl::Arity<XSignatureType>::Value then a JS exception is
+       sl::Arity<SignatureType>::Value then a JS exception is
        thrown, with one exception: if the function has "-1 arity"
        (i.e. it is InvocationCallback-like) then argv is passed on
        to it regardless of the value of argv.Length().
@@ -1561,7 +1284,7 @@ private:
   >::Type
   Proxy;
 public:
-  typedef typename Proxy::SignatureType XSignatureType;
+  typedef typename Proxy::SignatureType SignatureType;
   typedef typename Proxy::FunctionType FunctionType;
 
   /**
@@ -2280,6 +2003,7 @@ struct NativeToJS< ToInCaVoid<T, Sig, Func> > : NativeToJS_InCa_Base {};
 #endif
 
 #include "XFunctionSpecialisations.h"
+#undef FORWARDER_DEF_WITH_TYPE
 
 } // namespace
 

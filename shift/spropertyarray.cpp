@@ -11,8 +11,8 @@ void SPropertyArray::createTypeInformation(SPropertyInformationTyped<SPropertyAr
     {
     auto* api = info->apiInterface();
 
-    XInterfaceBase::Function fn = XScript::MethodToInCa<SPropertyArray, SProperty *(const SPropertyInformation *, const QString &), &SPropertyArray::add>::Call;
-    api->addFunction("add", fn);
+    typedef XScript::MethodToInCa<SPropertyArray, SProperty *(const SPropertyInformation *, const QString &), &SPropertyArray::add> FunctionType;
+    api->addFunction("add", FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
     }
   }
 
