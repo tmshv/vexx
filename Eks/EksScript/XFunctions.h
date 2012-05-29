@@ -118,7 +118,7 @@ template <typename T, typename Sig> struct XMethodForwarderHelperVoid : Sig
     ThisType *self = XScriptConvert::from<ThisType>(args.calleeThis());
     if(self)
       {
-      T::CallNative(*self, func, args.argsNoThis());
+      T::CallNative(*self, func, args);
       }
     argv.setReturnValue(TossMissingThis<T>());
     }
@@ -159,7 +159,7 @@ template <typename T, typename Sig> struct XMethodForwarderHelper : Sig
     ThisType *self = XScriptConvert::from<ThisType>(args.calleeThis());
     if(self)
       {
-      argv.setReturnValue(XScriptConvert::to( T::CallNative(*self, func, args.argsNoThis()) ));
+      argv.setReturnValue(XScriptConvert::to( T::CallNative(*self, func, args) ));
       }
     argv.setReturnValue(TossMissingThis<T>());
     }
