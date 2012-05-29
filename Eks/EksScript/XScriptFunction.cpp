@@ -283,7 +283,7 @@ XScriptDartArguments::XScriptDartArguments()
 
 xsize XScriptDartArgumentsNoThis::length() const
   {
-  return Dart_GetNativeArgumentCount((Dart_NativeArguments)_args._args);
+  return Dart_GetNativeArgumentCount((Dart_NativeArguments)_args._args) - _offset;
   }
 
 XScriptValue XScriptDartArgumentsNoThis::at(xsize i) const

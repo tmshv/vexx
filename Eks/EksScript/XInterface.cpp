@@ -295,7 +295,32 @@ void XInterfaceBase::set(const char *name, XScriptValue val)
 #endif
   }
 
-void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
+void XInterfaceBase::addConstructor(const char *cname, size_t argCount, Function fn, FunctionDart ctor)
+  {
+#ifdef X_DART
+  QString args;
+  for(size_t i = 0; i < argCount; ++i)
+    {
+    args += "Dynamic _" + QString::number(i);
+    if(i < (argCount-1))
+      {
+      args += ",";
+      }
+    }
+
+  QString shortName = cname;
+  QString name = typeName() + "." + shortName;
+  QString resolvedName = addDartNativeLookup(_typeName, " _ctor_" + shortName, argCount, (Dart_NativeFunction)ctor);
+  _functionSource += name + "(" + args + ") {_ctor_" + cname + "} \n";
+  _functionSource += "void _ctor_" + shortName + "(" + args + ") native \"" + resolvedName + "\"\n";
+#else
+  (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
+
+  xAssert(fn);
+#endif
+  }
+
+void XInterfaceBase::addProperty(const char *name, Getter getter, FunctionDart fnGetter, Setter setter, FunctionDart fnSetter)
   {
 #ifdef X_DART
   xAssertFail();
@@ -304,10 +329,22 @@ void XInterfaceBase::addProperty(const char *name, Getter getter, Setter setter)
 #endif
   }
 
-void XInterfaceBase::addFunction(const char *name, xsize argCount, Function fn, FunctionDart fnDart)
+void XInterfaceBase::addFunction(const char *cname, xsize argCount, Function fn, FunctionDart fnDart)
   {
 #ifdef X_DART
-  xAssertFail();
+  QString args;
+  for(size_t i = 0; i < argCount; ++i)
+    {
+    args += "Dynamic";
+    if(i < (argCount-1))
+      {
+      args += ",";
+      }
+    }
+
+  QString name = cname;
+  QString resolvedName = addDartNativeLookup(_typeName, name, argCount, (Dart_NativeFunction)fnDart);
+  _functionSource += "Dynamic " + name + "(" + args + ") native \"" + resolvedName + "\"\n";
 #else
   v8::Handle<v8::FunctionTemplate> fnTmpl = ::v8::FunctionTemplate::New((v8::InvocationCallback)fn);
   (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
@@ -404,4 +441,14 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
   {
   void *proto = o->prototype();
   return *::prototype(proto);
+  }
+
+QString getDartSource(const XInterfaceBase *ifc, const QString &parentName)
+  {
+  QString source = "class " + ifc->typeName() +
+                   " extends " + parentName + "{" +
+                   ifc->functionSource() +
+                   "}";
+
+  return source;
   }
