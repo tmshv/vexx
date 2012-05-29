@@ -2,6 +2,7 @@
 #include "XScriptValue.h"
 #include "XScriptObject.h"
 #include "XScriptException.h"
+#include "XScriptValueDartInternals.h"
 #include "XScriptValueV8Internals.h"
 
 struct XScriptFunctionInternal
@@ -269,4 +270,28 @@ v8::Handle<v8::Function> getV8Internal(const XScriptFunction &o)
   {
   const XScriptFunctionInternal *internal = XScriptFunctionInternal::val(&o);
   return internal->_object;
+  }
+
+void XScriptDartArguments::setReturnValue(const XScriptValue& val)
+  {
+  Dart_SetReturnValue((Dart_NativeArguments)_args, getDartInternal(val));
+  }
+
+XScriptDartArguments::XScriptDartArguments()
+  {
+  }
+
+xsize XScriptDartArgumentsNoThis::length() const
+  {
+  return Dart_GetNativeArgumentCount((Dart_NativeArguments)_args._args);
+  }
+
+XScriptValue XScriptDartArgumentsNoThis::at(xsize i) const
+  {
+  return fromHandle(Dart_GetNativeArgument((Dart_NativeArguments)_args._args, i + _offset));
+  }
+
+XScriptObject XScriptDartArgumentsWithThis::calleeThis()
+  {
+  return fromHandle(Dart_GetNativeArgument((Dart_NativeArguments)_args._args, 0));
   }

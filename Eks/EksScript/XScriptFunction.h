@@ -66,7 +66,7 @@ private:
   bool _isConstructCall;
   };
 
-class XScriptDartArguments
+class EKSSCRIPT_EXPORT XScriptDartArguments
   {
 public:
   void setReturnValue(const XScriptValue& val);
@@ -74,10 +74,12 @@ public:
 private:
   XScriptDartArguments();
 
+  friend class XScriptDartArgumentsNoThis;
+  friend class XScriptDartArgumentsWithThis;
   void *_args;
   };
 
-class XScriptDartArgumentsNoThis
+class EKSSCRIPT_EXPORT XScriptDartArgumentsNoThis
   {
 public:
   XScriptDartArgumentsNoThis(XScriptDartArguments args, xsize offset=0)
@@ -85,28 +87,23 @@ public:
     {
     }
 
-  XScriptValue at(xsize idx);
+  XScriptValue at(xsize idx) const;
   xsize length() const;
-  XScriptValue at(xsize i) const;
 
-private:
+protected:
   XScriptDartArguments _args;
   xsize _offset;
   };
 
-class XScriptDartArgumentsWithThis : public XScriptDartArgumentsNoThis
+class EKSSCRIPT_EXPORT XScriptDartArgumentsWithThis : public XScriptDartArgumentsNoThis
   {
 public:
-  XScriptDartArgumentsWithThis(XScriptDartArguments args);
-
-  XScriptObject calleeThis();
-
-  XScriptDartArgumentsNoThis argsNoThis()
+  XScriptDartArgumentsWithThis(XScriptDartArguments args, xsize offset=0)
+      : XScriptDartArgumentsNoThis(args, 1)
     {
-    return XScriptDartArgumentsNoThis(args, 1);
     }
 
-  XScriptDartArguments args;
+  XScriptObject calleeThis();
   };
 
 
