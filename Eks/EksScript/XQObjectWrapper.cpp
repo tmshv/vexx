@@ -241,6 +241,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
 
   // build up custom QObject wrapper
   XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName);
+  interface->addNativeContructor();
   buildInterface(interface, &QObject::staticMetaObject);
   interface->seal();
   c->addInterface(interface);
@@ -249,6 +250,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
 
   // build up custom QWidget wrapper
   XInterface<QWidget>* widget = XInterface<QWidget>::createWithParent("QWidget", interface, interface);
+  widget->addNativeContructor();
 
   widget->addConstMethod<QPoint (QWidget*, const QPoint&), &QWidget::mapTo>("mapTo");
   widget->addConstMethod<QPoint (const QPoint&), &QWidget::mapToGlobal>("mapToGlobal");
