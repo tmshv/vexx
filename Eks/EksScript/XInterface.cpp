@@ -268,11 +268,18 @@ void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
 #endif
   }
 
-XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[]) const
+Dart_Handle getDartInternal(const XInterfaceBase *ifc)
+  {
+  Dart_Handle lib = Dart_LookupLibrary(getDartInternal(XScriptConvert::to(getDartUrl(ifc))));
+  return Dart_GetClass(lib, getDartInternal(XScriptConvert::to(ifc->typeName())));
+  }
+
+XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[], const QString& name) const
   {
 #ifdef X_DART
-  xAssertFail();
-  return fromObjectHandle(Dart_Null());
+  Dart_Handle cls = getDartInternal(this);
+  Dart_Handle obj = Dart_New(cls, getDartInternal(XScriptConvert::to(name)), argc, getDartInternal(argv));
+  return fromObjectHandle(obj);
 
 #else
   v8::Locker l;
