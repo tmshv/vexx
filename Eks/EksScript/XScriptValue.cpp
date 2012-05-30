@@ -698,7 +698,7 @@ v8::Handle<v8::Value> *getV8Internal(const XScriptValue *o)
   return (v8::Handle<v8::Value> *)o;
   }
 
-Dart_Handle *geDartInternal(const XScriptValue *o)
+Dart_Handle *getDartInternal(const XScriptValue *o)
   {
   return (Dart_Handle*)o;
   }

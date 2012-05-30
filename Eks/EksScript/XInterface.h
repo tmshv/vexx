@@ -91,7 +91,7 @@ public:
   void wrapInstance(XScriptObject obj, void *object) const;
   void unwrapInstance(XScriptObject object) const;
 
-  XScriptObject newInstance(int argc, XScriptValue argv[]) const;
+  XScriptObject newInstance(int argc, XScriptValue argv[], const QString& name="") const;
   void set(const char *name, XScriptValue val);
 
   typedef XScriptValue (*Function)( XScriptArguments const & argv );
@@ -170,23 +170,9 @@ public:
     addConstructor<T *(const T&)>();
     }
 
-  template <typename T, void Dtor(XPersistentScriptValue, void *)>
-      struct NativeWrap
-      : XScript::CtorFunctionWrapperBase<T, NativeWrap<T, Dtor>, Dtor>
-    {
-    enum { Arity = 1 };
-
-    template <typename ArgType>
-    static void *Wrap(ArgType argv)
-      {
-      xAssert(argv.length() == 1);
-      return argv.at(0).toExternal();
-      }
-    };
-
   void addNativeConvertConstructor()
     {
-    addConstructor("_internal", 1, 0, NativeWrap<T, XInterface<T>::weak_dtor>::CallDart);
+    addConstructor("_internal", 1, 0, XScript::CtorNativeWrap<T, XInterface<T>::weak_dtor>::CallDart);
     }
 
   template <typename TYPE>
@@ -708,9 +694,7 @@ template <typename T, typename BASE> struct NativeToJSConvertableTypeInherited
 
 #define X_SCRIPTABLE_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \
-  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } } \
-  namespace XScript { \
-  template <> class ClassCreator_Factory<type> : public ClassCreatorConvertableFactory<type, type> {}; }
+  template <> struct NativeToJS<type> : public XScript::NativeToJSConvertableType<type> {}; } }
 
 #define X_SCRIPTABLE_ABSTRACT_TYPE(type, ...) X_SCRIPTABLE_TYPE_BASE(type) \
   namespace XScriptConvert { namespace internal { \

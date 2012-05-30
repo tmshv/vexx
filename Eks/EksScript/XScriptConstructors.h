@@ -274,6 +274,19 @@ struct CtorFunctionWrapper : CtorFunctionWrapperBase<T, CtorFunctionWrapper<T, C
     }
   };
 
+
+template <typename T, void Dtor(XPersistentScriptValue, void *)>
+    struct CtorNativeWrap : XScript::CtorFunctionWrapperBase<T, CtorNativeWrap<T, Dtor>, Dtor>
+  {
+  enum { Arity = 1 };
+
+  template <typename ArgType> static void *Wrap(ArgType argv)
+    {
+    xAssert(argv.length() == 1);
+    return argv.at(0).toExternal();
+    }
+  };
+
 } // namespaces
 
 #endif // XSCRIPRCONSTRUCTORS_H

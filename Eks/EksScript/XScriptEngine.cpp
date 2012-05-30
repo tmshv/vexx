@@ -225,6 +225,10 @@ void XScriptEngine::set(const QString &name, Function fn)
   }
 #endif
 
+QString getDartUrl(const XInterfaceBase* i)
+  {
+  return i->typeName();
+  }
 
 void XScriptEngine::addInterface(const XInterfaceBase *i)
   {
@@ -237,7 +241,10 @@ void XScriptEngine::addInterface(const XInterfaceBase *i)
     src = "#import(\"" + parentName + "\");\n" + src;
     }
 
-  _libs[i->typeName()] = getDartInternal(XScriptConvert::to(src));
+  QString url = getDartUrl(i);
+  src = "#library(\"" + url + "\");\n" + src;
+
+  _libs[url] = getDartInternal(XScriptConvert::to(src));
 #else
   xAssert(i->isSealed());
   i->addClassTo(i->typeName(), fromHandle(g_engine->context->Global()));
@@ -246,7 +253,9 @@ void XScriptEngine::addInterface(const XInterfaceBase *i)
 
 void XScriptEngine::adjustAmountOfExternalAllocatedMemory(int in)
   {
-#ifndef X_DART
+#ifdef X_DART
+  (void)in;
+#else
   v8::V8::AdjustAmountOfExternalAllocatedMemory(in);
 #endif
   }

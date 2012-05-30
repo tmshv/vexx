@@ -26,8 +26,12 @@ XScriptObject fromObjectHandle(Dart_Handle);
 
 #define CHECK_HANDLE(handle) if(Dart_IsError(handle)) { printError(handle); }
 
+QString getDartUrl(const XInterfaceBase* ifc);
+
 Dart_Handle getDartInternal(const XScriptValue&);
+Dart_Handle *getDartInternal(const XScriptValue*);
 Dart_Handle getDartInternal(const XScriptObject &o);
+Dart_Handle getDartInternal(const XInterfaceBase* b);
 
 inline Dart_Handle &getDartHandle(void *&ptr)
   {
