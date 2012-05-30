@@ -31,7 +31,8 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,0>
   {
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( XScriptArguments const & )
+  template <typename ArgsType>
+      static ReturnType Call( ArgsType const & )
     {
     typedef typename XScriptTypeInfo<ReturnType>::Type RType;
     return new RType;
@@ -42,7 +43,8 @@ template <typename Sig>
 struct CtorForwarderProxy<Sig,-1>
   {
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType Call( ArgsType const & argv )
     {
     typedef typename XScriptTypeInfo<ReturnType>::Type T;
     return new T(argv);
@@ -101,12 +103,8 @@ struct CtorForwarder : XSignature<Sig>
 
             May propagate native exceptions.
         */
-  static ReturnType Call( XScriptArguments const & argv )
-    {
-    typedef Detail::CtorForwarderProxy<Sig> Proxy;
-    return Proxy::Call( argv );
-    }
-  static ReturnType Call( XScriptDartArguments const & argv )
+  template <typename ArgType>
+  static ReturnType Call( ArgType const & argv )
     {
     typedef Detail::CtorForwarderProxy<Sig> Proxy;
     return Proxy::Call( argv );
@@ -232,14 +230,12 @@ struct CtorArityDispatcher
     }
   };
 
-template <typename T, typename CtorType>
-struct CtorFunctionWrapper
+template <typename T, typename Wrapper, void Dtor(XPersistentScriptValue, void *)>
+struct CtorFunctionWrapperBase
   {
   typedef XScript::ClassCreator_InternalFields<T> InternalFields;
   typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
-  typedef XScript::CtorForwarder<CtorType> Forwarder;
-  enum { Arity = Forwarder::Arity };
 
   static void CallDart(XScriptDartArguments argv)
     {
@@ -253,15 +249,28 @@ struct CtorFunctionWrapper
     XPersistentScriptValue persistent(ths);
     XScriptObject self(persistent.asValue());
 
-    T* constructed = Forwarder::CallDart(args);
+    void *constructed = Wrapper::Wrap(args);
     if(!constructed)
       {
       Toss("Native constructor failed");
       }
 
     WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(constructed);
-    persistent.makeWeak( constructed, weak_dtor );
+    persistent.makeWeak( constructed, Dtor );
     findInterface<T>(native)->wrapInstance(self, constructed);
+    }
+  };
+
+template <typename T, typename CtorType, void Dtor(XPersistentScriptValue, void *)>
+struct CtorFunctionWrapper : CtorFunctionWrapperBase<T, CtorFunctionWrapper<T, CtorType, Dtor>, Dtor>
+  {
+  typedef XScript::CtorForwarder<CtorType> Forwarder;
+  enum { Arity = Forwarder::Arity };
+
+  template <typename ArgsType>
+  static T *Wrap(ArgsType argv)
+    {
+    return Forwarder::Call(argv);
     }
   };
 

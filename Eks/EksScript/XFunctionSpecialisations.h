@@ -112,7 +112,8 @@ struct CtorForwarderProxy<Sig,1>
   {
   enum { Arity = 1 };
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType Call( ArgsType const & argv )
     {
     if( argv.length() < Arity )
       {
@@ -291,7 +292,8 @@ struct CtorForwarderProxy<Sig,2>
   {
   enum { Arity = 2 };
   typedef typename XSignature<Sig>::ReturnType ReturnType;
-  static ReturnType Call( XScriptArguments const & argv )
+  template <typename ArgsType>
+      static ReturnType Call( ArgsType const & argv )
     {
     if( argv.length() < Arity )
       {

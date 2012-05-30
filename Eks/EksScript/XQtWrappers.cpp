@@ -48,6 +48,7 @@ template <typename T> struct Binder
     const XInterface<PARENT> *parent = XInterface<PARENT>::lookup();
     const XInterface<BASE> *base = XInterface<BASE>::lookup();
     XInterface<T> *templ = XInterface<T>::createWithParent(name, parent, base);
+
     setupBindings<T>(templ);
     templ->seal();
     engine->addInterface(templ);
@@ -61,30 +62,42 @@ template <typename T> void setupBindings(XInterface<T> *templ)
 
 template <> void setupBindings<QPointF>(XInterface<QPointF> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
+  templ->addConstructor<QPointF *(float, float)>();
   templ->addProperty<qreal, qreal, &QPointF::x, &QPointF::setX>("x");
   templ->addProperty<qreal, qreal, &QPointF::y, &QPointF::setY>("y");
   }
 
 template <> void setupBindings<QPoint>(XInterface<QPoint> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
+  templ->addConstructor<QPoint *(int, int)>();
   templ->addProperty<int, int, &QPoint::x, &QPoint::setX>("x");
   templ->addProperty<int, int, &QPoint::y, &QPoint::setY>("y");
   }
 
 template <> void setupBindings<QSizeF>(XInterface<QSizeF> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
   templ->addProperty<qreal, qreal, &QSizeF::width, &QSizeF::setWidth>("width");
   templ->addProperty<qreal, qreal, &QSizeF::height, &QSizeF::setHeight>("height");
   }
 
 template <> void setupBindings<QSize>(XInterface<QSize> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
   templ->addProperty<int, int, &QSize::width, &QSize::setWidth>("width");
   templ->addProperty<int, int, &QSize::height, &QSize::setHeight>("height");
   }
 
 template <> void setupBindings<QRectF>(XInterface<QRectF> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
   templ->addProperty<qreal, qreal, &QRectF::left, &QRectF::setLeft>("left");
   templ->addProperty<qreal, qreal, &QRectF::right, &QRectF::setRight>("right");
   templ->addProperty<qreal, qreal, &QRectF::top, &QRectF::setTop>("top");
@@ -94,6 +107,8 @@ template <> void setupBindings<QRectF>(XInterface<QRectF> *templ)
 
 template <> void setupBindings<QRect>(XInterface<QRect> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addCopyConstructor();
   templ->addProperty<int, int, &QRect::left, &QRect::setLeft>("left");
   templ->addProperty<int, int, &QRect::right, &QRect::setRight>("right");
   templ->addProperty<int, int, &QRect::top, &QRect::setTop>("top");
@@ -101,8 +116,11 @@ template <> void setupBindings<QRect>(XInterface<QRect> *templ)
   templ->addProperty<QPoint, const QPoint &, &QRect::topLeft, &QRect::setTopLeft>("topLeft");
   }
 
-template <> void setupBindings<QFile>(XInterface<QFile> *)
+template <> void setupBindings<QFile>(XInterface<QFile> *templ)
   {
+  templ->addDefaultConstructor();
+  templ->addNativeConvertConstructor();
+  templ->addConstructor<QFile *(const QString &)>("fromFilename");
   }
 
 template <> void setupBindings<QIODevice>(XInterface<QIODevice> *templ)
