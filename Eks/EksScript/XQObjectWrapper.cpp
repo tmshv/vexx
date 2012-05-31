@@ -272,7 +272,7 @@ XScriptObject XQObjectWrapper::wrap(QObject *obj)
   {
   const XInterfaceBase* interface = findInterface(obj->metaObject());
 
-  XScriptValue vals[1] = { obj };
+  XScriptValue vals[1] = { XScriptValue(obj) };
   XScriptObject self = interface->newInstance(1, vals);
   xAssert(self.isValid());
 

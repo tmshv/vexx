@@ -19,6 +19,8 @@ public:
   static void initiate();
   static void terminate();
 
+  XScriptValue run(const QString &src);
+
   typedef XScriptValue (*Function)( XScriptArguments const & argv );
 
 #ifndef X_DART

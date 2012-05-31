@@ -56,6 +56,15 @@ Dart_Handle& getDartHandle(const XScriptValue &obj)
 
   return ((Internal*)(&obj))->ptr;
   }
+Dart_Handle& getDartHandle(const XPersistentScriptValue &obj)
+  {
+  struct Internal
+    {
+    Dart_Handle ptr;
+    };
+
+  return ((Internal*)(&obj))->ptr;
+  }
 
 struct XPersistentScriptValueInternal
   {
@@ -231,7 +240,7 @@ XScriptValue::XScriptValue(const QVariant& val)
       *this = XScriptValue(val.toDouble());
       break;
     case QVariant::List:
-      {    
+      {
 #ifdef X_DART
     xAssertFail();
 #else
@@ -365,7 +374,7 @@ void XScriptValue::clear()
 bool XScriptValue::isValid() const
   {
 #ifdef X_DART
-  Dart_Handle h = getDartHandle(_object);
+  Dart_Handle h = getDartInternal(*this);
   return h != 0 && !Dart_IsNull(h);
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -389,7 +398,7 @@ bool XScriptValue::isObject() const
 bool XScriptValue::isBoolean() const
   {
 #ifdef X_DART
-  return Dart_IsBoolean(getDartHandle(_object));
+  return Dart_IsBoolean(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   return internal->_object->IsBoolean();
@@ -399,7 +408,7 @@ bool XScriptValue::isBoolean() const
 bool XScriptValue::isNumber() const
   {
 #ifdef X_DART
-  return Dart_IsNumber(getDartHandle(_object));
+  return Dart_IsNumber(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   return internal->_object->IsNumber();
@@ -409,7 +418,7 @@ bool XScriptValue::isNumber() const
 bool XScriptValue::isString() const
   {
 #ifdef X_DART
-  return Dart_IsString(getDartHandle(_object));
+  return Dart_IsString(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   return internal->_object->IsString();
@@ -419,7 +428,7 @@ bool XScriptValue::isString() const
 bool XScriptValue::isInteger() const
   {
 #ifdef X_DART
-  return Dart_IsInteger(getDartHandle(_object));
+  return Dart_IsInteger(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   return internal->_object->IsInteger();
@@ -429,7 +438,7 @@ bool XScriptValue::isInteger() const
 bool XScriptValue::isArray() const
   {
 #ifdef X_DART
-  return  Dart_IsList(getDartHandle(_object));
+  return  Dart_IsList(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   return internal->_object->IsArray();
@@ -440,7 +449,7 @@ xsize XScriptValue::length() const
   {
 #ifdef X_DART
   intptr_t len = 0;
-  Dart_ListLength(getDartHandle(_object), &len);
+  Dart_ListLength(getDartInternal(*this), &len);
   return len;
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -452,7 +461,7 @@ xsize XScriptValue::length() const
 XScriptValue XScriptValue::at(xsize id) const
   {
 #ifdef X_DART
-  return fromHandle(Dart_ListGetAt(getDartHandle(_object), id));
+  return fromHandle(Dart_ListGetAt(getDartInternal(*this), id));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
   v8::Handle<v8::Array> arr = internal->_object.As<v8::Array>();
@@ -485,7 +494,7 @@ double XScriptValue::toNumber() const
   {
 #ifdef X_DART
   double dbl = 0.0f;
-  Dart_DoubleValue(getDartHandle(_object), &dbl);
+  Dart_DoubleValue(getDartInternal(*this), &dbl);
   return dbl;
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -497,7 +506,7 @@ xint64 XScriptValue::toInteger() const
   {
 #ifdef X_DART
   xint64 igr = 0;
-  Dart_IntegerToInt64(getDartHandle(_object), &igr);
+  Dart_IntegerToInt64(getDartInternal(*this), &igr);
   return igr;
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -513,7 +522,7 @@ bool XScriptValue::toBoolean() const
   {
 #ifdef X_DART
   bool b = 0;
-  Dart_BooleanValue(getDartHandle(_object), &b);
+  Dart_BooleanValue(getDartInternal(*this), &b);
   return b;
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
@@ -530,7 +539,7 @@ QString XScriptValue::toString() const
 #ifdef X_DART
   intptr_t len;
   QString val;
-  Dart_Handle str = getDartHandle(_object);
+  Dart_Handle str = getDartInternal(*this);
   if(!Dart_IsString(str))
     {
     str = Dart_ToString(str);
@@ -538,7 +547,8 @@ QString XScriptValue::toString() const
 
   Dart_StringLength(str, &len);
   if(len > 0)
-    {
+  {
+    val.resize(len);
     Dart_StringGet16(str, (uint16_t*)val.data(), &len);
     }
 
@@ -593,7 +603,7 @@ QVariant XScriptValue::toVariant(int typeHint) const
     {
     return QVariant::fromValue(XScriptConvert::from<XScriptObject>(fromHandle(
 #ifdef X_DART
-getDartHandle(_object)
+getDartInternal(*this)
 #else
 internal->_object
 #endif
@@ -603,7 +613,7 @@ internal->_object
     {
     return QVariant::fromValue(XScriptConvert::from<XScriptFunction>(fromHandle(
 #ifdef X_DART
-      getDartHandle(_object)
+      getDartInternal(*this)
 #else
       internal->_object
 #endif
@@ -660,7 +670,7 @@ internal->_object
     }
 
 #ifdef X_DART
-  xAssert(Dart_IsNull(getDartHandle(_object)));
+  xAssert(Dart_IsNull(getDartInternal(*this)));
 #else
   xAssert(internal->_object->IsNull());
 #endif
@@ -728,7 +738,7 @@ XScriptValue XPersistentScriptValue::asValue() const
   {
   XScriptValue val;
 #ifdef X_DART
-  getDartHandle(val._object) = getDartHandle(_object);
+  getDartHandle(val._object) = getDartHandle(*this);
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(&val);
   const XPersistentScriptValueInternal *other = XPersistentScriptValueInternal::val(this);

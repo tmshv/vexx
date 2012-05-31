@@ -101,9 +101,9 @@ public:
   typedef XScriptValue (*NamedGetter)(XScriptValue, const XAccessorInfo& info);
   typedef XScriptValue (*IndexedGetter)(xuint32, const XAccessorInfo& info);
 
-  void addConstructor(const char *name, xsize argCount, Function, FunctionDart);
+  void addConstructor(const char *name, xsize extraArgs, xsize argCount, Function, FunctionDart);
   void addProperty(const char *name, Getter, FunctionDart, Setter, FunctionDart);
-  void addFunction(const char *name, xsize argCount, Function, FunctionDart);
+  void addFunction(const char *name, xsize extraArgs, xsize argCount, Function, FunctionDart);
   void setIndexAccessor(IndexedGetter);
   void setNamedAccessor(NamedGetter);
 
@@ -172,7 +172,7 @@ public:
 
   void addNativeConvertConstructor()
     {
-    addConstructor("_internal", 1, 0, XScript::CtorNativeWrap<T, XInterface<T>::weak_dtor>::CallDart);
+    addConstructor("_internal", 1, 1, 0, XScript::CtorNativeWrap<T, XInterface<T>::weak_dtor>::CallDart);
     }
 
   template <typename TYPE>
@@ -182,7 +182,8 @@ public:
 
     FunctionDart ctorDart = Wrapper::CallDart;
 
-    addConstructor(name, Wrapper::Arity, 0, ctorDart);
+    // +1 for this
+    addConstructor(name, 1, Wrapper::Arity, 0, ctorDart);
   }
 
   template <typename GETTYPE,
@@ -221,7 +222,8 @@ public:
     {
     typedef XScript::MethodToInCa<T, SIG, METHOD> FunctionType;
 
-    XInterfaceBase::addFunction(name, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
+    // +1 for this
+    XInterfaceBase::addFunction(name, 1, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
     }
 
   template <typename SIG,
@@ -230,7 +232,8 @@ public:
     {
     typedef XScript::ConstMethodToInCa<T, SIG, METHOD> FunctionType;
 
-    XInterfaceBase::addFunction(name, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
+    // +1 for this
+    XInterfaceBase::addFunction(name, 1, FunctionType::Arity, FunctionType::Call, FunctionType::CallDart);
     }
 
   template <typename SIG,
@@ -658,7 +661,7 @@ template <typename T, typename BASE> struct NativeToJSConvertableTypeInherited
       }
     BASE* base = n;
     const XInterfaceBase* interface = findInterface<T>(n);
-    XScriptValue vals[1] = { base };
+    XScriptValue vals[1] = { XScriptValue(base) };
     XScriptObject self = interface->newInstance(1, vals);
     return self;
     }

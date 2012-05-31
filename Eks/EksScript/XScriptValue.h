@@ -10,7 +10,7 @@ class EKSSCRIPT_EXPORT XScriptValue
   {
 public:
   XScriptValue();
-  XScriptValue(bool x);
+  explicit XScriptValue(bool x);
   XScriptValue(xuint32 x);
   XScriptValue(xint32 x);
   XScriptValue(xuint64 x);
@@ -20,7 +20,7 @@ public:
   XScriptValue(const QString &str);
   XScriptValue(const XScriptObject &str);
   XScriptValue(const QVariant& val);
-  XScriptValue(void* val);
+  explicit XScriptValue(void* val);
   ~XScriptValue();
 
   XScriptValue(const XScriptValue&);
