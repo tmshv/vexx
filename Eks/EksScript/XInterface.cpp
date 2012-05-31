@@ -302,24 +302,29 @@ void XInterfaceBase::set(const char *name, XScriptValue val)
 #endif
   }
 
-void XInterfaceBase::addConstructor(const char *cname, size_t argCount, Function fn, FunctionDart ctor)
+void XInterfaceBase::addConstructor(const char *cname, xsize extraArgs, size_t argCount, Function fn, FunctionDart ctor)
   {
 #ifdef X_DART
-  QString args;
+  QString callArgs;
   for(size_t i = 0; i < argCount; ++i)
     {
-    args += "Dynamic _" + QString::number(i);
+    callArgs += "_" + QString::number(i);;
     if(i < (argCount-1))
       {
-      args += ",";
+      callArgs += ",";
       }
     }
 
   QString shortName = cname;
-  QString name = typeName() + "." + shortName;
-  QString resolvedName = addDartNativeLookup(_typeName, " _ctor_" + shortName, argCount, (Dart_NativeFunction)ctor);
-  _functionSource += name + "(" + args + ") {_ctor_" + cname + "} \n";
-  _functionSource += "void _ctor_" + shortName + "(" + args + ") native \"" + resolvedName + "\"\n";
+  QString name = typeName();
+  if(shortName.length())
+    {
+    name += "." + shortName;
+    }
+
+  QString nativeName = addDartNativeLookup(_typeName, "_ctor_" + shortName, extraArgs + argCount, (Dart_NativeFunction)ctor);
+  _functionSource += name + "(" + callArgs + ") {" + nativeName + "(" + callArgs + "); } \n";
+  _functionSource += "void " + nativeName + "(" + callArgs + ") native \"" + nativeName + "\";\n";
 #else
   (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
 
@@ -327,31 +332,39 @@ void XInterfaceBase::addConstructor(const char *cname, size_t argCount, Function
 #endif
   }
 
-void XInterfaceBase::addProperty(const char *name, Getter getter, FunctionDart fnGetter, Setter setter, FunctionDart fnSetter)
+void XInterfaceBase::addProperty(const char *cname, Getter getter, FunctionDart fnGetter, Setter setter, FunctionDart fnSetter)
   {
 #ifdef X_DART
-  xAssertFail();
+  QString name = cname;
+  if(fnGetter)
+    {
+    _functionSource += "Dynamic get " + name + "() => null;\n";
+    }
+  if(fnSetter)
+    {
+    _functionSource += "set " + name + "(var a) => null;\n";
+    }
 #else
   (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
 #endif
   }
 
-void XInterfaceBase::addFunction(const char *cname, xsize argCount, Function fn, FunctionDart fnDart)
+void XInterfaceBase::addFunction(const char *cname, xsize extraArgs, xsize argCount, Function fn, FunctionDart fnDart)
   {
 #ifdef X_DART
-  QString args;
+  QString callArgs;
   for(size_t i = 0; i < argCount; ++i)
     {
-    args += "Dynamic";
+    callArgs += "_" + QString::number(i);;
     if(i < (argCount-1))
       {
-      args += ",";
+      callArgs += ",";
       }
     }
 
   QString name = cname;
-  QString resolvedName = addDartNativeLookup(_typeName, name, argCount, (Dart_NativeFunction)fnDart);
-  _functionSource += "Dynamic " + name + "(" + args + ") native \"" + resolvedName + "\"\n";
+  QString resolvedName = addDartNativeLookup(_typeName, name, extraArgs + argCount, (Dart_NativeFunction)fnDart);
+  _functionSource += "Dynamic " + name + "(" + callArgs + ") native \"" + resolvedName + "\";\n";
 #else
   v8::Handle<v8::FunctionTemplate> fnTmpl = ::v8::FunctionTemplate::New((v8::InvocationCallback)fn);
   (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
@@ -391,9 +404,7 @@ void XInterfaceBase::inherit(const XInterfaceBase *parentType)
     {
     throw std::runtime_error("XInterfaceBase<T> has not been sealed yet!");
     }
-#ifdef X_DART
-  xAssertFail();
-#else
+#ifndef X_DART
   FnTempl* templ = constructor(_constructor);
   const FnTempl* pTempl = constructor(parentType->_constructor);
   (*templ)->Inherit( (*pTempl) );
@@ -453,7 +464,7 @@ v8::Handle<v8::ObjectTemplate> getV8Internal(XInterfaceBase *o)
 QString getDartSource(const XInterfaceBase *ifc, const QString &parentName)
   {
   QString source = "class " + ifc->typeName() +
-                   " extends " + parentName + "{" +
+                   " extends " + parentName + " {\n" +
                    ifc->functionSource() +
                    "}";
 
