@@ -28,8 +28,6 @@ void *XMetaType::construct(Type t)
   {
   XAssert ass(X_CURRENT_CODE_LOCATION, "", "message");
 
-  ass X_EXPAND_ARGS(X_ASSERT_VARIABLE, 0, 1, 2, 3);
-
   xAssert(_types.contains(t));
   return _types[t].ctor(0,0);
   }

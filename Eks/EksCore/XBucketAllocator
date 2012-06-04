@@ -29,7 +29,7 @@ public:
 
   public:
     Bucket(xsize objectSize, xsize count)
-        : _count(count), _size(objectSize), _next(0)
+        : _next(0), _count(count), _size(objectSize)
       {
       xAssertIsAligned(objectSize);
       xAssert((count % 32) == 0);
@@ -163,7 +163,7 @@ public:
     };
 
   XFixedSizeBucketAllocator(xsize s, xsize d=128, xsize e=1024, XAllocatorBase *allocator=XGlobalAllocator::instance())
-      : _freePtr(0), _allocator(allocator), _size(s), _defaultSize(d), _expandSize(e), _first(0)
+      : _freePtr(0), _size(s), _defaultSize(d), _expandSize(e), _first(0), _allocator(allocator)
     {
     xAssert(_allocator);
 
@@ -324,7 +324,7 @@ class EKSCORE_EXPORT XBucketAllocator : public XAllocatorBase
   {
 public:
   XBucketAllocator(xsize d=128, xsize e=1024, XAllocatorBase *alloc=XGlobalAllocator::instance())
-      : _defaultSize(d), _expandSize(e), _allocator(alloc), _internal(alloc)
+      : _defaultSize(d), _expandSize(e), _internal(alloc), _allocator(alloc)
     {
     xAssert(_allocator);
     }

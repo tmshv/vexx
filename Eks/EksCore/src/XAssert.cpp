@@ -3,10 +3,12 @@
 #include "QPushButton"
 #include "QApplication"
 
-#ifdef Q_CC_MSVC
+#if defined(Q_CC_MSVC)
 # define WIN32_LEAN_AND_MEAN
 # include <Windows.h>
 # define snprintf _snprintf_s
+#elif defined(Q_CC_GNU)
+# include <signal.h>
 #endif
 
 XAssert::XAssert(const XCodeLocation &location, const char *condition, const char* message)
@@ -91,6 +93,11 @@ void XAssert::setCurrentFireFunction(FireFunction *f)
   g_currentFireFunction = f;
   }
 
+void interuptBreak()
+  {
+  raise(SIGINT);
+  }
+
 XAssert::BreakFunction *g_currentBreakFunction = 0;
 XAssert::BreakFunction *XAssert::currentBreakFunction()
   {
@@ -98,8 +105,10 @@ XAssert::BreakFunction *XAssert::currentBreakFunction()
 
   if(!f)
     {
-#ifdef Q_CC_MSVC
+#if defined(Q_CC_MSVC)
     f = DebugBreak;
+#elif defined(Q_CC_GNU)
+    f = interuptBreak;
 #else
 # error define a break type macro for this platform
 #endif

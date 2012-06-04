@@ -6,6 +6,12 @@
 #include "XTime"
 #include "QMetaType"
 
+template <typename T> struct EKSCORE_EXPORT XEventLoggerPair
+  {
+  XTime time;
+  T value;
+  };
+
 class EKSCORE_EXPORT XEventLoggerInternal
   {
 public:
@@ -31,8 +37,9 @@ public:
 
   template <typename T> static XEventLoggerInternal *init(const char *name, xsize size, const char *units)
     {
-    XEventLoggerInternal *ev = (XEventLoggerInternal *)malloc(sizeof(XEventLoggerInternal)+(sizeof(XEventLogger<T>::Pair)*size));
-    new(ev) XEventLoggerInternal(name, qMetaTypeId<T>(), sizeof(XEventLogger<T>::Pair), size, units);
+    typedef XEventLoggerPair<T> Pair;
+    XEventLoggerInternal *ev = (XEventLoggerInternal *)malloc(sizeof(XEventLoggerInternal)+(sizeof(Pair)*size));
+    new(ev) XEventLoggerInternal(name, qMetaTypeId<T>(), sizeof(Pair), size, units);
     return ev;
     }
   };
@@ -54,11 +61,7 @@ public:
     Large = 1024
     };
 
-  struct Pair
-    {
-    XTime time;
-    T value;
-    };
+  typedef XEventLoggerPair<T> Pair;
 
   XEventLogger(XEventLoggerInternal *l) : _logger(l)
     {

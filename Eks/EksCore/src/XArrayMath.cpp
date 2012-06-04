@@ -22,7 +22,7 @@ XMathsResult::XMathsResult(const XMathsOperation &o, XVectorI2D tl, xuint32 invS
   XMathsEngine::engine()->evaluateData(&o, (void**)&o._userData, tl, invSampleDensity, type, data);
   }
 
-XMathsOperation::XMathsOperation() : _user(0), _nextUser(0), _inputA(0), _inputB(0), _userData(0)
+XMathsOperation::XMathsOperation() : _inputA(0), _inputB(0), _userData(0), _user(0), _nextUser(0)
   {
   xAssert(XMathsEngine::engine());
   _operation = NoOp;
@@ -242,9 +242,19 @@ template <> struct TypeAccessors <xuint8> : public TypeAccessorsBase<xuint8>
   static xuint8 black() { return 0; }
   };
 
+template <typename T> struct ImageData
+  {
+  typedef TypeAccessors<T> Type;
+  typedef typename Type::Vec Vec;
+  typedef typename Type::Array Array;
+
+  XVectorI2D _offset;
+  Array _data;
+  };
+
 template <typename T> struct OperationQueue
   {
-  typedef typename TypeAccessors<T> Type;
+  typedef TypeAccessors<T> Type;
   typedef typename Type::Vec Vec;
   typedef typename Type::Array Array;
 
@@ -255,36 +265,7 @@ template <typename T> struct OperationQueue
     arr = Vec::Zero();
     }
 
-  static void load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
-    {
-    XProfileFunction
-    const void *u = o->userData();
-    const QueueHolder *h = (const QueueHolder *)u;
-
-    if(h->_imageData)
-      {
-      if(h->_type == XMathsOperation::Float)
-        {
-        const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
-        XVectorI2D sampleAt = pt - imData->_offset;
-
-        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
-        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
-
-        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
-        }
-      else if(h->_type == XMathsOperation::Byte)
-        {
-        const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
-        XVectorI2D sampleAt = pt - imData->_offset;
-
-        sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
-        sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
-
-        arr = imData->_data(sampleAt.x(), sampleAt.y()).cast<T>();
-        }
-      }
-    }
+  static void load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&);
 
   static void add(const XVectorI2D&, const XMathsOperation*, Vec& arr, const Vec& b)
     {
@@ -475,13 +456,13 @@ template <typename T> struct OperationQueue
     T *dataPtr = (T*)data;
     image->_data.resize(width, height);
 
-    Type::Vec wP(Type::white(),Type::white(), Type::white(), Type::white());
+    typename Type::Vec wP(Type::white(),Type::white(), Type::white(), Type::white());
 
     for(int y = 0; y < image->_data.cols(); ++y)
       {
       for(int x = 0; x < image->_data.rows(); ++x)
         {
-        Type::Vec& v = image->_data(x, y);
+        typename Type::Vec& v = image->_data(x, y);
         v = wP;
         memcpy(v.data(), dataPtr, sizeof(T)*channels);
         dataPtr += stride;
@@ -493,15 +474,6 @@ template <typename T> struct OperationQueue
   XAllocatorBase *_allocator;
   xsize _size;
   Operation _operation[1];
-  };
-
-template <typename T> struct ImageData
-  {
-  typedef typename OperationQueue<T>::Vec Vec;
-  typedef typename OperationQueue<T>::Array Array;
-
-  XVectorI2D _offset;
-  Array _data;
   };
 
 struct QueueHolder
@@ -552,6 +524,40 @@ struct QueueHolder
   void *_imageData;
   XMathsOperation::DataType _type;
   };
+
+template <typename T>
+    void OperationQueue<T>::load(const XVectorI2D& pt, const XMathsOperation* o, Vec& arr, const Vec&)
+  {
+  XProfileFunction
+  const void *u = o->userData();
+  const QueueHolder *h = (const QueueHolder *)u;
+
+  if(h->_imageData)
+    {
+    if(h->_type == XMathsOperation::Float)
+      {
+      const ImageData<float> *imData = (const ImageData<float> *)h->_imageData;
+      XVectorI2D sampleAt = pt - imData->_offset;
+
+      sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+      sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
+
+      ImageData<float>::Vec v = imData->_data(sampleAt.x(), sampleAt.y());
+      arr = v.cast<T>();
+      }
+    else if(h->_type == XMathsOperation::Byte)
+      {
+      const ImageData<xuint8> *imData = (const ImageData<xuint8> *)h->_imageData;
+      XVectorI2D sampleAt = pt - imData->_offset;
+
+      sampleAt.x() = xMin(imData->_data.rows(), xMax(sampleAt.x(), 0));
+      sampleAt.y() = xMin(imData->_data.cols(), xMax(sampleAt.y(), 0));
+
+      ImageData<xuint8>::Vec v = imData->_data(sampleAt.x(), sampleAt.y());
+      arr = v.cast<T>();
+      }
+    }
+  }
 
 void XReferenceMathsEngine::evaluateData(const XMathsOperation *op,
                                          void **userData,
