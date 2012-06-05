@@ -3,6 +3,7 @@
 
 #include "XConvertFromScript.h"
 #include "XConvertToScript.h"
+#include "XScriptObject.h"
 
 namespace XScriptConvert
 {
@@ -22,6 +23,7 @@ template <>struct JSToNative<std::string>
     return s
       ? std::string(s, utf8String.length())
       : emptyString;*/
+    return std::string();
     }
   };
 
@@ -63,10 +65,10 @@ template <typename MapT> struct NativeToJSLookup
     {
     typedef typename MapT::const_iterator IT;
     IT it( li.begin() );
-    v8::Handle<v8::Object> rv( v8::Object::New() );
+    XScriptObject rv = XScriptObject::newObject();
     for( int i = 0; li.end() != it; ++it, ++i )
       {
-      rv->Set( CastToJS( (*it).first ), CastToJS( (*it).second ) );
+      rv.set( (*it).first, XScriptConvert::to( (*it).second ) );
       }
     return rv;
     }
@@ -82,12 +84,11 @@ template <typename ListT, typename ValueType = typename ListT::value_type> struc
     {
     typedef ValueType VALT;
     ListT li;
-    if( jv.IsEmpty() || ! jv->IsArray() ) return li;
-    v8::Handle<v8::Array> ar( v8::Array::Cast(*jv) );
+    if( !jv.isValid() || !jv.isArray() ) return li;
     uint32_t ndx = 0;
-    for( ; ar->Has(ndx); ++ndx )
+    for( xsize i = 0; i < jv.length(); ++i )
       {
-      li.push_back( CastFromJS<VALT>( ar->Get(v8::Integer::New(ndx)) ) );
+      li.push_back( XScriptConvert::from<VALT>( jv.at(i)) );
       }
     return li;
     }
@@ -130,7 +131,7 @@ struct JSToNative_map
       {
       Local<Value> const & k = ar->Get(Integer::New(ndx));
       if( ! obj->HasRealNamedProperty(k) ) continue;
-      map[CastFromJS<KeyType>(k)] = CastFromJS<ValueType>(obj->Get(k));
+      map[XScriptConvert::from<KeyType>(k)] = XScriptConvert::from<ValueType>(obj->Get(k));
       }
     return map;
     }

@@ -4,89 +4,39 @@
 #include <stdexcept>
 #include "XConvertFromScript.h"
 #include "XConvertToScriptMap.h"
+#include "XScriptConstructors.h"
+#include "XScriptObject.h"
 
 class XScriptObject;
 
-namespace XScript {
+namespace XScript
+{
 
-    /**
-       Policy template used by ClassCreator<T> for
-       instantiating T objects.
-    */
-    template <typename T>
-    class ClassCreator_Factory
-    {
-    public:
-        typedef T * ReturnType;
-        /**
-           Must instantiate a new T object based on the given
-           arguments. On error it should throw an exception (which the
-           binding framework will convert to a JS-side exception). It
-           may also return NULL on error, but the error message
-           probably won't be as clear for the user.
-
-           Ownership of the object is passed to the caller (the
-           binding API internals), and eventually given to v8.
-
-           jsSelf will be the newly-created JS-side 'this' object.  It
-           is not normally required by this function but it is
-           sometimes useful when we need to bind supplementary
-           properties in the ctor, especially when binding a "pure
-           C++" class which has no native place to store such
-           properties.
-
-           At the time this is called, jsSelf is not connected to the
-           native (because it hasn't yet been created).
-           Implementations must not perform the actual binding of the
-           returned native to jsSelf - ClassCreator will do that
-           immediately after Create() returns the new object.
-
-           The default implementation simply return (new T).
-        */
-        static ReturnType Create( XScriptObject &, XScriptArguments const & )
-        {
-          xAssertFail();
-          return 0;
-        }
-
-        /**
-           Must destroy obj using a mechanism complementary to its
-           construction via a prior call to Create().
-
-           The default implementation simply calls (delete obj).
-        */
-        static void Delete( T * obj )
-        {
-          xAssertFail();
-          delete obj;
-        }
-    };
-
-    /**
+/**
        Base class for static ClassCreator options.
      */
-    template <typename ValT, ValT Val>
-    struct Opt_ConstVal
-    {
-        typedef ValT Type;
-        static const Type Value = Val;
-    };
+template <typename ValT, ValT Val>
+struct Opt_ConstVal
+  {
+  typedef ValT Type;
+  static const Type Value = Val;
+  };
 
-    /**
+/**
        Base class for static integer ClassCreator options.
     */
-    template <int Val>
-    struct Opt_Int : Opt_ConstVal<int,Val>
-    {};
+template <int Val>
+struct Opt_Int : Opt_ConstVal<int,Val>
+  {};
 
-    /**
+/**
        Base class for static boolean ClassCreator options.
     */
-    template <bool Val>
-    struct Opt_Bool : Opt_ConstVal<bool,Val>
-    {};
+template <bool Val>
+struct Opt_Bool : Opt_ConstVal<bool,Val>
+  {};
 
-    /**
+/**
        A ClassCreator policy/option class responsible specifying whether
        or not a ClassCreator-bound class should allow "Foo()" and "new
        Foo()" to behave the same or not. If the Value member is false
@@ -94,11 +44,11 @@ namespace XScript {
        constructor call (it will generate an error), otherwise it will
        be treated exactly as if "new Foo()" had been called.
     */
-    template <typename T>
-    struct ClassCreator_AllowCtorWithoutNew : Opt_Bool<false>
-    {};
+template <typename T>
+struct ClassCreator_AllowCtorWithoutNew : Opt_Bool<false>
+  {};
 
-    /**
+/**
        ClassCreator policy which determines whether lookups for native
        types in JS objects should walk through the prototype
        chain. This can decrease the speed of JS-to-this operations and
@@ -110,11 +60,11 @@ namespace XScript {
        few lookup operations by creating the specialization by subclassing
        Opt_Bool<false>.
     */
-    template <typename T>
-    struct ClassCreator_SearchPrototypeForThis : Opt_Bool<true>
-    {};
+template <typename T>
+struct ClassCreator_SearchPrototypeForThis : Opt_Bool<true>
+  {};
 
-    /**
+/**
         ClassCreator policy type which defines a "type ID" value
         for a type wrapped using ClassCreator. This is used
         together with JSToNative_ObjectWithInternalFieldsTypeSafe
@@ -150,7 +100,7 @@ namespace XScript {
         takes a (void const * &) and TypeName::Value is a (char const *), which
         won't convert to (void const *) in the context of template parameters.
     */
-    /*template <typename T>
+/*template <typename T>
     struct ClassCreator_TypeID
     {
         static const void *Value;
@@ -165,7 +115,7 @@ namespace XScript {
 
     template <typename T> const void * ClassCreator_TypeID<T>::Value = getTypeId<T>();*/
 
-    /**
+/**
        Convenience base type for ClassCreator_InternalFields
        implementations.
 
@@ -189,23 +139,23 @@ namespace XScript {
         JSToNative_ObjectWithInternalFieldsTypeSafe - doing so will trigger
         a compile-time assertion.
     */
-    template <typename T, int HowMany = 2, int TypeIndex = 0, int ObjectIndex = 1>
-    struct ClassCreator_InternalFields_Base
-    {
-        /**
+template <typename T, int HowMany = 2, int TypeIndex = 0, int ObjectIndex = 1>
+struct ClassCreator_InternalFields_Base
+  {
+  /**
            Total number of internal fields assigned to JS-side T
            objects.
         */
-        static const int Count = HowMany;
+  static const int Count = HowMany;
 
-        /**
+  /**
            The internal field index at which ClassCreator policies should
            expect the native object to be found in any given JS object.
            It must be 0 or greater, and must be less than Value.
         */
-        static const int NativeIndex = ObjectIndex;
+  static const int NativeIndex = ObjectIndex;
 
-        /**
+  /**
             The internal field index at which ClassCreator policies
             should expect a type identifier tag to be stored.
             This can be used in conjunction with
@@ -213,17 +163,17 @@ namespace XScript {
             to provide an extra level of type safety at JS runtime.
 
         */
-        static const int TypeIDIndex = TypeIndex;
-    private:
-        typedef char AssertFields[
-            (HowMany > TypeIndex)
-            && (HowMany > ObjectIndex)
-            && (TypeIndex != ObjectIndex)
-            && (ObjectIndex >= 0)
-            ? 1 : -1];
-    };
+  static const int TypeIDIndex = TypeIndex;
+private:
+  typedef char AssertFields[
+  (HowMany > TypeIndex)
+  && (HowMany > ObjectIndex)
+  && (TypeIndex != ObjectIndex)
+  && (ObjectIndex >= 0)
+  ? 1 : -1];
+  };
 
-    /**
+/**
        The ClassCreator policy which sets the number of internal
        fields reserved for JS objects and the internal field index
        (0-based) at which the native object is stored . The Count
@@ -266,22 +216,22 @@ namespace XScript {
        June 2011: see JSToNative_ObjectWithInternalFieldsTypeSafe) will
        treat the subclasses as instances of the base class.
     */
-    template <typename T>
-    struct ClassCreator_InternalFields : ClassCreator_InternalFields_Base<T>
-    {
-    };
+template <typename T>
+struct ClassCreator_InternalFields : ClassCreator_InternalFields_Base<T>
+  {
+  };
 
 
-    /**
+/**
         This policy is used by ClassCreator::SetupBindings() as the generic
         interface for plugging in a bound class. Clients are not required to
         specialise this, but see this class' Initialize() for what might
         happen if they don't.
     */
-    template <typename T>
-    struct ClassCreator_SetupBindings
-    {
-        /**
+template <typename T>
+struct ClassCreator_SetupBindings
+  {
+  /**
             Specializations should perform any class/function-related binding
             here, adding their functionality to the given object (which is
             normally the logical global object but need not be). (Note that the
@@ -319,152 +269,31 @@ namespace XScript {
             return;
             @endcode
         */
-        static void Initialize( XScriptObject const & target )
-        {
-            throw std::runtime_error("ClassCreator_SetupBindings<T> MUST be specialized "
-                                     "in order to be useful!");
-        }
-    };
+  static void Initialize( XScriptObject const & target )
+    {
+    throw std::runtime_error("ClassCreator_SetupBindings<T> MUST be specialized "
+                             "in order to be useful!");
+    }
+  };
 
-    /**
+/**
         A concrete ClassCreator_SetupBindings implementation which forwards
         the call to a user-defined function.
     */
-    template <typename T, void (*Func)( XScriptObject const &) >
-    struct ClassCreator_SetupBindings_ClientFunc
-    {
-        /**
+template <typename T, void (*Func)( XScriptObject const &) >
+struct ClassCreator_SetupBindings_ClientFunc
+  {
+  /**
             Calls Func(target).
         */
-        static void Initialize( XScriptObject const & target )
-        {
-            Func(target);
-        }
-    };
-
-    /**
-       The ClassCreator policy class responsible for doing optional
-       class-specific binding-related work as part of the JS/Native
-       object construction process.
-
-       The default specialization does nothing (which is okay for the
-       general case) but defines the interface which specializations
-       must implement.
-
-       Reminder to self: we could arguably benefit by splitting this policy
-       into 3 classes, but experience has shown that the metadata used by
-       the 3 functions are typically shared amongst the 3 implementations
-       (or 2 of them in most cases).
-    */
-    template <typename T>
-    struct ClassCreator_WeakWrap
+  static void Initialize( XScriptObject const & target )
     {
-        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-
-        /**
-           Similar to ), but this is called before the native constructor is called.
-           It is rarely needed, but is necessary if one needs to manipulate the JS
-           "this" object before the native object is constructed, so that the native ctor
-           can access information stored in the JS-side internal fields.
-
-           If this throws a native exception, construction of the
-           object will fail and Unwrap() is called, passed
-           (jsSelf,NULL), to clean up any data which this function might have
-           stored in jsSelf.
-
-           The argv object is the arguments passed to the constructor.
-
-           The default implementation does nothing.
-        */
-        static void PreWrap( XScriptObject const &, XScriptArguments const & )
-        {
-            return;
-        }
-
-
-        /**
-           This operation is called one time from ClassCreator for each
-           new object, directly after the native has been connected to
-           a Persistent handle.
-
-           Note that the ClassCreator code which calls this has already
-           taken care of connecting nativeSelf to jsSelf. Client
-           specializations of this policy may opt to add their own
-           binding mechanisms, e.g. to allow CastToJS<T>() to work.
-
-           Clients should do any bindings-related cleanup in
-           Factory::Destruct() or Unwrap(), as appropriate for their
-           case.
-
-           Ownership of the objects is unchanged by calling this.
-
-           On error, this function may throw a native exception. If
-           that happens, ClassCreator will call
-           Unwrap(jsSelf,nativeHandle) and
-           Factory<T>::Destruct(nativeSelf) to clean up, and will then
-           propagate the exception.
-
-           The default implementation does nothing.
-        */
-        static void Wrap( XScriptValue const &, NativeHandle )
-        {
-            return;
-        }
-
-        /**
-           This is called from the ClassCreator-generated destructor,
-           just before the native destructor is called. If nativeSelf
-           is NULL then it means that native construction failed,
-           but implementations must (if necessary) clean up any data
-           stored in jsSelf by the PreWrap() function.
-
-           Specializations may use this to clean up data stored in
-           other internal fields of the object (_not_ the field used
-           to hold the native itself - that is removed by the
-           framework). Optionally, such cleanup may be done in the
-           corresponding Factory::Destruct() routine, and must be done
-           there if the dtor will need access to such data.
-
-           Note that when this is called, jsSelf and nativeSelf are
-           about to be destroyed, so do not do anything crazy with the
-           contents of jsSelf and DO NOT destroy nativeSelf (that is
-           the job of the ClassCreator_Factory policy).
-
-           Ownership of the objects is unchanged by calling this.
-
-           Unwrap() is called during destruction or when construction
-           fails (via a native exception), so any cleanup required for
-           the jsSelf object can be delegated to this function, as
-           opposed to being performed (and possibly duplicated) in
-           PreWrap() and/or Wrap().
-
-           The default implementation does nothing.
-        */
-        static void Unwrap( XScriptValue const &, NativeHandle )
-        {
-            return;
-        }
-    };
-
-
-#if 0
-    namespace Detail
-    {
-        template <typename Context>
-        struct SharedType : public Context
-        {
-        private:
-            SharedType(){}
-        public:
-            static SharedType & Instance()
-            {
-                static SharedType bob;
-                return bob;
-            }
-        };
+    Func(target);
     }
-#endif
-    /**
+  };
+
+
+/**
        A basic Native-to-JS class binding mechanism. This class does
        not aim to be a monster framework, just something simple,
        mainly for purposes of showing (and testing) what the core
@@ -507,7 +336,7 @@ namespace XScript {
        i can fix the templates to get this working.
     */
 
-    /**
+/**
         Intended to be the base class for JSToNative<T> specializations
         when T is JS-bound using ClassCreator.
 
@@ -550,64 +379,45 @@ namespace XScript {
     {
     };*/
 
-#if 0
-    //! Experimental.
-    template <typename ParentT, typename SubT >
-    struct JSToNative_ClassCreator_Subclass
-    {
-        typedef typename XScriptTypeInfo<SubT>::NativeHandle ResultType;
-        ResultType operator()( v8::Handle<v8::Value> const & h ) const
-        {
-            typedef typename XScriptTypeInfo<ParentT>::NativeHandle PTP;
-            PTP typeCheck; typeCheck = (ResultType)NULL
-                /* If compiler errors led you here then SubT probably does not
-                    publicly subclass ParentT. */
-                ;
-            PTP p = CastFromJS<ParentT>(h);
-            //std::cerr << "dyncast="<<dynamic_cast<ResultType>(p)<<"\n";
-            return p ? dynamic_cast<ResultType>(p) : NULL;
-        }
-    };
-#endif
-
 #if !defined(DOXYGEN)
-    namespace Detail
-    {
-        /**
+namespace Detail
+{
+/**
            A base class for ClassCreator_Factory_CtorArityDispatcher.
            We don't really need this level of indirection, i think.
         */
-        template <typename T>
-        struct Factory_CtorForwarder_Base
-        {
-            typedef typename XScriptTypeInfo<T>::Type Type;
-            typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-            static void Delete( NativeHandle nself )
-            {
-                delete nself;
-            }
-        protected:
-            /**
-               If argv.Length() >= Arity then this function ignores errmsg and
-               returns true, otherwise it writes a descriptive error message
-               to errmsg and return false.
-            */
-            static bool argv_check( XScriptArguments const & argv, int Arity )
-            {
-                if( argv.Length() >= Arity ) return true;
-                else
-                {
-                    StringBuffer msg;
-                    msg << "constructor requires " << Arity << " arguments!";
-                    throw std::range_error(msg.Content().c_str());
-                    return false;
-                }
-            }
-        };
+template <typename T>
+struct Factory_CtorForwarder_Base
+  {
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+  static void Delete( NativeHandle nself )
+    {
+    delete nself;
     }
+protected:
+  /**
+     If argv.Length() >= Arity then this function ignores errmsg and
+     returns true, otherwise it writes a descriptive error message
+     to errmsg and return false.
+  */
+  static bool argv_check( XScriptArguments const & argv, int Arity )
+    {
+    if( argv.length() >= Arity ) return true;
+    else
+      {
+      qDebug() << "constructor requires " << Arity << " arguments!";
+      xAssertFail();
+      //throw std::range_error(msg.Content().c_str());
+      return false;
+      }
+    }
+  };
+}
+
 #endif // !DOXYGEN
 
-    /**
+/**
         Can be used as a concrete ClassCreator_Factor<T>
         specialization to forward JS ctor calls directly to native
         ctors.
@@ -644,50 +454,50 @@ namespace XScript {
         JS-aware destruction (e.g. via ClassCreator::DestroyObject(),
         assuming the type was wrapped using ClassCreator).
     */
-    template <typename T, typename CtorProxy>
-    struct ClassCreator_Factory_NativeToJSMap : Detail::Factory_CtorForwarder_Base<T>
-    {
-    public:
-        typedef XNativeToJSMap<T> N2JMap;
-        typedef typename XScriptTypeInfo<T>::Type Type;
-        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+template <typename T, typename CtorProxy>
+struct ClassCreator_Factory_NativeToJSMap : Detail::Factory_CtorForwarder_Base<T>
+  {
+public:
+  typedef XNativeToJSMap<T> N2JMap;
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
 
-        /**
+  /**
             If CtorProxy::Call(argv) succeeds, N2JMap::Insert(jself, theNative)
             is called. The result of CtorProxy::Call() is returned.
         */
-        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
-        {
-            NativeHandle n = CtorProxy::Call( argv );
-            if( n ) N2JMap::Insert( jself, n );
-            return n;
-        }
-        /**
+  static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
+    {
+    NativeHandle n = CtorProxy::Call( argv );
+    if( n ) N2JMap::Insert( jself, n );
+    return n;
+    }
+  /**
             Calls N2JMap::Remove( nself ) then (delete nself).
         */
-        static void Delete( NativeHandle nself )
-        {
-            N2JMap::Remove( nself );
-            delete nself;
-        }
-    };
-
-    /** @deprecated Use ClassCreator_Factory_Dispatcher instead (same interface).
-    */
-    template <typename T,typename CtorForwarderList>
-    struct ClassCreator_Factory_CtorArityDispatcher : Detail::Factory_CtorForwarder_Base<T>
+  static void Delete( NativeHandle nself )
     {
-    public:
-        typedef typename XScriptTypeInfo<T>::Type Type;
-        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
-        {
-            typedef CtorArityDispatcher<CtorForwarderList> Proxy;
-            return Proxy::Call( argv );
-        }
-    };
+    N2JMap::Remove( nself );
+    delete nself;
+    }
+  };
 
-    /**
+/** @deprecated Use ClassCreator_Factory_Dispatcher instead (same interface).
+    */
+template <typename T,typename CtorForwarderList>
+struct ClassCreator_Factory_CtorArityDispatcher : Detail::Factory_CtorForwarder_Base<T>
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+  static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
+    {
+    typedef CtorArityDispatcher<CtorForwarderList> Proxy;
+    return Proxy::Call( argv );
+    }
+  };
+
+/**
         A ClassCreator_Factory implementation which forwards its Create()
         member to CtorT::Call() (the interface used by CtorForwarder and friends).
 
@@ -701,7 +511,7 @@ namespace XScript {
         typedef CtorForwarder<MyType *()> C0;
         typedef CtorForwarder<MyType *(int)> C1;
         typedef CtorForwarder<MyType *(int, double)> C2;
-        typedef Signature< CFT (C0, C1, C2) > CtorList;
+        typedef XSignature< CFT (C0, C1, C2) > CtorList;
 
         // Then create Factory specialization based on those:
         template <>
@@ -718,39 +528,232 @@ namespace XScript {
         {};
         @endcode
     */
-    template <typename T,typename CtorT>
-    struct ClassCreator_Factory_Dispatcher : Detail::Factory_CtorForwarder_Base<T>
+template <typename T,typename CtorT>
+struct ClassCreator_Factory_Dispatcher : Detail::Factory_CtorForwarder_Base<T>
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+  static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
     {
-    public:
-        typedef typename XScriptTypeInfo<T>::Type Type;
-        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
-        {
-            return CtorT::Call( argv );
-        }
-    };
+    return CtorT::Call( argv );
+    }
+  };
 
-    /**
+/**
        A special-case factory implementation for use when T
        is abstract or otherwise should not be instantiable
        from JS code. It has one or two obscure uses when binding
        certain class hierarchies.
     */
-    template <typename T>
-    struct ClassCreator_Factory_Abstract : Detail::Factory_CtorForwarder_Base<T>
-    {
-    public:
-        typedef typename XScriptTypeInfo<T>::Type Type;
-        typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
-        /**
+template <typename T>
+struct ClassCreator_Factory_Abstract : Detail::Factory_CtorForwarder_Base<T>
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::Type Type;
+  typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+  /**
            Always returns NULL.
         */
-        static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
-        {
-            return NULL;
-        }
-    };
+  static NativeHandle Create( XScriptObject jself, XScriptArguments const &  argv )
+    {
+    return NULL;
+    }
+  };
+}
 
-}// namespaces
+namespace XScriptConvert
+{
+
+namespace internal
+{
+
+//template <typename T,
+//          int InternalFieldCount = 1,
+//          int InternalFieldIndex = 0,
+//          bool SearchPrototypeChain = false>
+//struct JSToNativeObjectWithInternalFields
+//  {
+//public:
+//  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
+
+//  ResultType operator()(XScriptValue const &h) const
+//    {
+//    if( !h.isValid() || ! h.isObject() )
+//      {
+//      return 0;
+//      }
+//    else
+//      {
+//      void *ext = 0;
+//      XScriptValue proto(h);
+//      while(!ext && proto.isValid() && proto.isObject())
+//        {
+//        XScriptObject const &obj(proto);
+//        ext = (obj.internalFieldCount() != InternalFieldCount)
+//          ? 0
+//          : obj.internalField(InternalFieldIndex);
+//        if(!ext)
+//          {
+//          if(!SearchPrototypeChain)
+//            {
+//            break;
+//            }
+//          else
+//            {
+//            proto = obj.getPrototype();
+//            }
+//          }
+//        }
+//      return ext ? static_cast<ResultType>(ext) : 0;
+//      }
+//    }
+
+//#ifdef X_ASSERTS_ENABLED
+//private:
+//  typedef char AssertIndexRanges
+//    [xCompileTimeAssertDef<
+//    (InternalFieldIndex>=0)
+//    && (InternalFieldCount>0)
+//    && (InternalFieldIndex < InternalFieldCount)
+//    >::Value
+//    ? 1 : -1];
+//#endif
+//  };
+
+template <typename T,
+          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
+          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
+          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
+          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
+struct JSToNativeObject
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    if(!h.isObject())
+      {
+      return 0;
+      }
+    else
+      {
+      const xsize TypeID = findInterface<T>((const T*)0)->typeId();
+      void const *tid = 0;
+      void *ext = 0;
+      XScriptValue proto(h);
+      while(!ext && proto.isObject())
+        {
+        XScriptObject const &obj(proto);
+        tid = (obj.internalFieldCount() != InternalFieldCount)
+              ? 0
+              : obj.internalField(TypeIdFieldIndex);
+
+#define TYPE_DEBUG
+#ifdef TYPE_DEBUG
+        const char *ptr = QMetaType::typeName((int)tid);
+        const char *ptr2 = QMetaType::typeName((int)TypeID);
+        (void)ptr;
+        (void)ptr2;
+#endif
+
+        ext = ((xsize)tid == TypeID)
+              ? obj.internalField(ObjectFieldIndex)
+              : 0;
+        if(!ext)
+          {
+          if(!SearchPrototypeChain)
+            {
+            break;
+            }
+          else
+            {
+            proto = obj.getPrototype();
+            }
+          }
+        }
+      return ext ? static_cast<ResultType>(ext) : 0;
+      }
+    }
+
+private:
+  typedef char AssertIndexRanges
+  [(InternalFieldCount>=2)
+  && (TypeIdFieldIndex != ObjectFieldIndex)
+  && (TypeIdFieldIndex >= 0)
+  && (TypeIdFieldIndex < InternalFieldCount)
+  && (ObjectFieldIndex >= 0)
+  && (ObjectFieldIndex < InternalFieldCount)
+  ? 1 : -1];
+  };
+
+
+
+template <typename T, typename BASE,
+          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
+          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
+          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
+          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
+struct JSToNativeObjectInherited
+  {
+public:
+  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
+
+  ResultType operator()(XScriptValue const &h) const
+    {
+    if(!h.isObject())
+      {
+      return 0;
+      }
+    else
+      {
+      const xsize TypeID = findInterface<BASE>((const BASE*)0)->typeId();
+      void const *tid = 0;
+      void *ext = 0;
+      XScriptValue proto(h);
+      while(!ext && proto.isObject())
+        {
+        XScriptObject const &obj(proto);
+        tid = (obj.internalFieldCount() != InternalFieldCount)
+              ? 0
+              : obj.internalField(TypeIdFieldIndex);
+        ext = ((xsize)tid == TypeID)
+              ? obj.internalField(ObjectFieldIndex)
+              : 0;
+        if(!ext)
+          {
+          if(!SearchPrototypeChain)
+            {
+            break;
+            }
+          else
+            {
+            proto = obj.getPrototype();
+            }
+          }
+        }
+      return ext ? XScriptConvert::castFromBase<T>(static_cast<BASE*>(ext)) : 0;
+      }
+    }
+
+private:
+  typedef char AssertIndexRanges
+  [(InternalFieldCount>=2)
+  && (TypeIdFieldIndex != ObjectFieldIndex)
+  && (TypeIdFieldIndex >= 0)
+  && (TypeIdFieldIndex < InternalFieldCount)
+  && (ObjectFieldIndex >= 0)
+  && (ObjectFieldIndex < InternalFieldCount)
+  ? 1 : -1];
+  };
+}
+
+} // namespaces
+
+template <typename T> XScriptObject XScriptObject::newInstance(XInterface<T>* i)
+  {
+  return i->newInstance(0, NULL);
+  }
 
 #endif // XINTERFACEUTILITIES_H

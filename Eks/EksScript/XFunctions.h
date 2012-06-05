@@ -3,9 +3,11 @@
 
 #include "XScriptEngine.h"
 #include "XScriptValue.h"
+#include "XScriptException.h"
 #include "XScriptFunction.h"
 #include "XScriptConstructors.h"
-#include "XInterface.h"
+#include "XConvertFromScript.h"
+#include "XConvertToScript.h"
 
 namespace XScript
 {
@@ -39,6 +41,49 @@ struct MissingThisExceptionT : MissingThisException
     }
   };
 }
+
+/**
+    This special-case convenience form of Toss() triggers a JS-side
+    exception containing an English-language message explaining that
+    XScriptConvert::from<T>() failed, i.e. the native 'this' pointer for a bound
+    native T object could not be found. It uses TypeName<T>::Value as the
+    class' name.
+
+    This is primarily intended for use in two cases:
+
+    - Internally in the binding mechanisms.
+
+    - In client code when binding non-member functions as JS-side methods of
+    native objects.
+
+    Returns the result of v8::ThrowException(...).
+
+    Example:
+
+    @code
+    v8::Handle<v8::Value> my_bound_func( XScriptArguments const & argv ) {
+        T * self = XScriptConvert::from<T>( argv.calleeThis() );
+        if( ! self ) {
+            return TossMissingThis<T>();
+        }
+        ...
+    }
+    @endcode
+
+    BUG: TypeName<T>::Value is NOT used here because... If we instantiate
+    TypeName<> from here then we require a value for TypeName<>::Value or we
+    break FunctorTo and friends (because TypeName'ing functors isn't always
+    possible). The problem with that is that i want to use TypeName::Value's
+    address as a type key and that can't work cross-DLL on Windows (and
+    possibly other platforms) if we have a default value for TypeName::Value.
+    i hope to eventually find a solution which is both cross-platform and
+    allows us to invoke TypeName<T>::Value from here.
+*/
+template <typename T> XScriptValue TossMissingThis()
+  {
+  return Toss("XScriptConvert::from<'T'>() returned NULL! Cannot find 'this' pointer!");
+  }
+
 
 #define FORWARDER_DEF \
   typedef typename SignatureType::ReturnType ReturnType; \
@@ -89,19 +134,19 @@ template <typename T, typename Sig> struct XMethodForwarderHelperVoid : Sig
   typedef typename SignatureType::Context ThisType;
   FORWARDER_DEF_WITH_TYPE
 
-  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( ThisType & self, FunctionType func, XScriptArguments const & argv )
     {
     T::CallNative( self, func, argv );
     return XScriptValue();
     }
 
-  static void Call( ThisType & self, typename FunctionType func, XScriptDartArguments const & argv )
+  static void Call( ThisType & self, FunctionType func, XScriptDartArguments const & argv )
     {
     XScriptDartArgumentsNoThis args(argv);
     T::CallNative( self, func, args );
     }
 
-  static XScriptValue Call( typename FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
     ThisType *self = XScriptConvert::from<ThisType>(argv.calleeThis());
     if(self)
@@ -112,7 +157,7 @@ template <typename T, typename Sig> struct XMethodForwarderHelperVoid : Sig
     return TossMissingThis<T>();
     }
 
-  static void Call( typename FunctionType func, XScriptDartArguments &argv )
+  static void Call( FunctionType func, XScriptDartArguments &argv )
     {
     XScriptDartArgumentsWithThis args(argv);
     ThisType *self = XScriptConvert::from<ThisType>(args.calleeThis());
@@ -130,13 +175,13 @@ template <typename T, typename Sig> struct XMethodForwarderHelper : Sig
   typedef typename SignatureType::Context ThisType;
   FORWARDER_DEF_WITH_TYPE
 
-  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptArguments const & argv )
+  static XScriptValue Call( ThisType & self, FunctionType func, XScriptArguments const & argv )
     {
     try { return CastToJS( T :: CallNative( self, func, argv ) ); }
     HANDLE_PROPAGATE_EXCEPTION;
     }
 
-  static XScriptValue Call( ThisType & self, typename FunctionType func, XScriptDartArguments const & argv )
+  static XScriptValue Call( ThisType & self, FunctionType func, XScriptDartArguments const & argv )
     {
     XScriptDartArgumentsNoThis args(argv);
     try { return CastToJS( T :: CallNative( self, func, args ) ); }
@@ -185,6 +230,7 @@ struct InCa
 */
 struct InCaVoid : InCa {};
 
+}
 
 /**
    Partial specialization for v8::InvocationCallback-like functions
@@ -272,6 +318,8 @@ struct XConstMethodPtr<T, RV (T::*)(XScriptArguments const &) const,FuncPtr>
     }
   };
 
+namespace XScript
+{
 #if !defined(DOXYGEN)
 namespace Detail {
 /**
@@ -426,48 +474,6 @@ struct XSignatureIsUnlockable<XNilType> : XBoolVal<true> {};
 
 
 
-/**
-    This special-case convenience form of Toss() triggers a JS-side
-    exception containing an English-language message explaining that
-    CastFromJS<T>() failed, i.e. the native 'this' pointer for a bound
-    native T object could not be found. It uses TypeName<T>::Value as the
-    class' name.
-
-    This is primarily intended for use in two cases:
-
-    - Internally in the binding mechanisms.
-
-    - In client code when binding non-member functions as JS-side methods of
-    native objects.
-
-    Returns the result of v8::ThrowException(...).
-
-    Example:
-
-    @code
-    v8::Handle<v8::Value> my_bound_func( XScriptArguments const & argv ) {
-        T * self = CastFromJS<T>( argv.This() );
-        if( ! self ) {
-            return TossMissingThis<T>();
-        }
-        ...
-    }
-    @endcode
-
-    BUG: TypeName<T>::Value is NOT used here because... If we instantiate
-    TypeName<> from here then we require a value for TypeName<>::Value or we
-    break FunctorTo and friends (because TypeName'ing functors isn't always
-    possible). The problem with that is that i want to use TypeName::Value's
-    address as a type key and that can't work cross-DLL on Windows (and
-    possibly other platforms) if we have a default value for TypeName::Value.
-    i hope to eventually find a solution which is both cross-platform and
-    allows us to invoke TypeName<T>::Value from here.
-*/
-template <typename T> XScriptValue TossMissingThis()
-  {
-  return Toss("CastFromJS<'T'>() returned NULL! Cannot find 'this' pointer!");
-  }
-
 #if !defined(DOXYGEN)
 namespace Detail {
 
@@ -500,6 +506,9 @@ template <int Arity, typename RV, bool UnlockV8>
 struct FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>
   : XFunctionForwarderHelper<FunctionForwarder<Arity,RV (XScriptArguments const &), UnlockV8>, RV (XScriptArguments const &)>
   {
+  typedef XFunctionSignature<RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
@@ -517,10 +526,13 @@ template <typename Sig, bool UnlockV8>
 struct FunctionForwarder<0,Sig, UnlockV8>
     : XFunctionForwarderHelper<FunctionForwarder<0,Sig, UnlockV8>, Sig>
   {
+  typedef XFunctionSignature<Sig> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( FunctionType func, ArgsType const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return func();
     }
   };
@@ -533,10 +545,13 @@ template <typename Sig, bool UnlockV8>
 struct FunctionForwarderVoid<0,Sig, UnlockV8>
     : XFunctionForwarderHelperVoid<FunctionForwarderVoid<0,Sig, UnlockV8>, Sig>
   {
+  typedef XFunctionSignature<Sig> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( FunctionType func, ArgsType const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)func()
         /* the explicit cast there is a workaround for the RV==void
                    case. It is a no-op for other cases, since the return value
@@ -550,10 +565,13 @@ template <int Arity, typename RV, bool UnlockV8>
 struct FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>
   : XFunctionForwarderHelperVoid<FunctionForwarderVoid<Arity,RV (XScriptArguments const &), UnlockV8>, RV (XScriptArguments const &)>
   {
+  typedef XFunctionSignature<RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( FunctionType func, ArgsType const & argv )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)func(argv);
     }
   };
@@ -571,6 +589,9 @@ template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarder<T, 0, Sig, UnlockV8>
     : XMethodForwarderHelper<XMethodForwarder<T, 0, Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
+  typedef XMethodSignature<T, Sig> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T & self, FunctionType func, ArgsType const & )
     {
@@ -583,6 +604,9 @@ template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
   : XMethodForwarderHelper<XMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>, XMethodSignature<T, RV (XScriptArguments const &)>>
   {
+  typedef XMethodSignature<T, RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T & self, FunctionType func, ArgsType const & argv )
     {
@@ -604,6 +628,9 @@ template <typename T, typename Sig, bool UnlockV8>
 struct XMethodForwarderVoid<T,0,Sig, UnlockV8>
     : XMethodForwarderHelperVoid<XMethodForwarderVoid<T,0,Sig, UnlockV8>, XMethodSignature<T,Sig>>
   {
+  typedef XMethodSignature<T, Sig> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T & self, FunctionType func, ArgsType const & )
     {
@@ -616,6 +643,9 @@ template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>
   : XMethodForwarderHelperVoid<XMethodForwarderVoid<T,Arity, RV (XScriptArguments const &), UnlockV8>, XMethodSignature<T,RV (XScriptArguments const &)>>
   {
+  typedef XMethodSignature<T, RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T & self, FunctionType func, ArgsType const & argv )
     {
@@ -640,10 +670,13 @@ template <typename T, typename Sig, bool UnlockV8>
 struct XConstMethodForwarder<T,0,Sig, UnlockV8>
     : XMethodForwarderHelper<XConstMethodForwarder<T,0,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
+  typedef XConstMethodSignature<T, Sig> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (self.*func)();
     }
   };
@@ -652,6 +685,9 @@ template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>
   : XMethodForwarderHelper<XConstMethodForwarder<T, Arity, RV (XScriptArguments const &), UnlockV8>, XConstMethodSignature<T, RV (XScriptArguments const &)>>
   {
+  typedef XConstMethodSignature<T, RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF
+
   template <typename ArgsType>
       static ReturnType CallNative( T const & self, FunctionType func, ArgsType const & argv )
     {
@@ -673,10 +709,13 @@ template <typename T, typename Sig, bool UnlockV8>
 struct XConstMethodForwarderVoid<T,0,Sig, UnlockV8>
     : XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T,0,Sig, UnlockV8>, XConstMethodSignature<T,Sig>>
   {
+  typedef XConstMethodSignature<T, Sig> SignatureType;
+  FORWARDER_DEF_WITH_TYPE
+
   template <typename ArgsType>
       static ReturnType CallNative( Type const & self, FunctionType func, ArgsType const & )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)();
     }
   };
@@ -685,10 +724,13 @@ template <typename T, int Arity, typename RV, bool UnlockV8>
 struct XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>
   : XMethodForwarderHelperVoid<XConstMethodForwarderVoid<T, Arity, RV (XScriptArguments const &), UnlockV8>, XConstMethodSignature<T, RV (XScriptArguments const &)>>
   {
+  typedef XConstMethodSignature<T, RV (XScriptArguments const &)> SignatureType;
+  FORWARDER_DEF_WITH_TYPE
+
   template <typename ArgsType>
       static ReturnType CallNative( Type const & self, FunctionType func, ArgsType const & argv )
     {
-    V8Unlocker<UnlockV8> const & unlocker( V8Unlocker<UnlockV8>() );
+    Unlocker<UnlockV8> unlocker;
     return (ReturnType)(self.*func)();
     }
   };
@@ -1066,7 +1108,7 @@ struct FunctionToInCaVoid : Detail::FunctionToInCaVoid< Sig, Func, UnlockV8>
    as for ConstMethodToInCaVoid.
 
    To convert JS objects to native 'this' pointers this API uses
-   CastFromJS<T>(arguments.This()), where arguments is the
+   XScriptConvert::from<T>(arguments.calleeThis()), where arguments is the
    XScriptArguments instance passed to the generated InvocationCallback
    implementation. If that conversion fails then the generated
    functions will throw a JS-side exception when called.
@@ -1256,7 +1298,7 @@ public:
 
   /**
        Like the 3-arg overload, but tries to extract the (T*) object using
-       CastFromJS<T>(argv.This()).
+       XScriptConvert::from<T>(argv.calleeThis()).
     */
   inline static XScriptValue Call( FunctionType func, XScriptArguments const & argv )
     {
@@ -1302,7 +1344,7 @@ public:
 
   /**
        Like the 3-arg overload, but tries to extract the (T const *)
-       object using CastFromJS<T>(argv.This()).
+       object using XScriptConvert::from<T>(argv.calleeThis()).
     */
   inline static v8::Handle<v8::Value> Call( FunctionType func, XScriptArguments const & argv )
     {
@@ -1360,7 +1402,7 @@ forwardMethod( T & self,
 
 /**
    Like the 3-arg forwardMethod() overload, but
-   extracts the native T 'this' object from argv.This().
+   extracts the native T 'this' object from argv.calleeThis().
 
    Note that this function requires that the caller specify
    the T template parameter - it cannot deduce it.
@@ -1406,7 +1448,7 @@ forwardConstMethod( T const & self,
 
 /**
    Like the 3-arg forwardConstMethod() overload, but
-   extracts the native T 'this' object from argv.This().
+   extracts the native T 'this' object from argv.calleeThis().
 
    Note that this function requires that the caller specify
    the T template parameter - it cannot deduce it.
@@ -1432,7 +1474,7 @@ forwardConstMethod(Sig func, XScriptArguments const & argv )
    for a given InvocationCallback. Since we cannot typedef function
    templates this way, this class can fill that gap.
 */
-template <XInterfaceBase::Function ICB>
+template <XScriptValue (*ICB)( XScriptArguments const & argv )>
 struct InCaToInCa : FunctionToInCa< XScriptValue (XScriptArguments const &), ICB>
   {
   };
@@ -1463,10 +1505,8 @@ namespace Detail {
 template <int ExpectingArity>
 XScriptValue TossArgCountError( XScriptArguments const & args )
   {
-  return Toss((StringBuffer()
-               <<"Incorrect argument count ("<<args.Length()
-               <<") for function - expecting "
-               <<ExpectingArity<<" arguments.").toError());
+  return Toss("Incorrect argument count (" + QString::number(args.length()) + ") for function - expecting " +
+               QString::number(ExpectingArity) + " arguments.");
   }
 }
 #endif
@@ -1503,7 +1543,7 @@ struct ArityDispatch : InCa
     */
   inline static XScriptValue Call( XScriptArguments const & args )
     {
-    return ( (-1==Arity) || (Arity == args.Length()) )
+    return ( (-1==Arity) || (Arity == args.length()) )
         ? InCaT::Call(args)
         : Fallback::Call(args);
     }
@@ -1752,7 +1792,7 @@ struct ArityDispatchList : InCa
     typedef typename FwdList::Head FWD;
     typedef typename FwdList::Tail Tail;
     enum { Arity = sl::Arity< FWD >::Value };
-    return ( (-1 == Arity) || (Arity == argv.Length()) )
+    return ( (-1 == Arity) || (Arity == argv.length()) )
         ? Detail::OverloadCallHelper<FWD>::Call(argv)
         : ArityDispatchList<Tail>::Call(argv);
     }
@@ -1905,22 +1945,6 @@ struct InCaLikeConstMethod : ConstMethodToInCa< T, RV (XScriptArguments const &)
   {};
 
 
-#if 0
-//! Don't use. Doesn't yet compile. Trying to consolidate Const/MethodXyz
-template <typename ASig, typename XSignature<ASig>::FunctionType Func>
-struct SigToInCa :
-    XIfElse<
-    sl::IsFunction< XSignature<ASig> >::Value,
-    FunctionToInCa< ASig, Func >,
-    typename XIfElse<
-    sl::IsConstMethod< XSignature<ASig> >::Value,
-    ConstMethodToInCa< typename tmp::PlainType<typename XSignature<ASig>::Context>::Type, ASig, Func >,
-    MethodToInCa< typename XSignature<ASig>::Context, ASig, Func >
-    >::Type
-    >::Type
-  {};
-#endif
-
 /**
     This class acts as a proxy for another InCa-compatible class,
     running client-defined intialization code the _first_ time
@@ -2002,9 +2026,57 @@ template <typename T, typename Sig, typename XMethodSignature<T,Sig>::FunctionTy
 struct NativeToJS< ToInCaVoid<T, Sig, Func> > : NativeToJS_InCa_Base {};
 #endif
 
+
+template <typename Type, typename ArgsType> class ArgumentUnpacker
+  {
+public:
+  typedef XScriptConvert::ArgCaster<Type> Caster;
+
+  ArgumentUnpacker(const ArgsType &v, xsize idx) : val(Caster::toNative(v.at(idx)))
+    {
+    }
+
+  Type& operator()() { return val; }
+
+  Type val;
+  };
+
+template <typename Sig, typename ArgsType> class ArgumentUnpacker1
+  {
+public:
+  ArgumentUnpacker1(const ArgsType &args) : arg0(args, 0) { }
+  
+  ArgumentUnpacker<typename sl::At< 0, XSignature<Sig> >::Type, ArgsType> arg0;
+  };
+
+template <typename Sig, typename ArgsType> class ArgumentUnpacker2 : public ArgumentUnpacker1<Sig, ArgsType>
+  {
+public:
+  ArgumentUnpacker2(const ArgsType &args) : ArgumentUnpacker1<Sig, ArgsType>(args), arg1(args, 1) { }
+  
+  ArgumentUnpacker<typename sl::At< 1, XSignature<Sig> >::Type, ArgsType> arg1;
+  };
+
+template <typename Sig, typename ArgsType> class ArgumentUnpacker3 : public ArgumentUnpacker2<Sig, ArgsType>
+  {
+public:
+  ArgumentUnpacker3(const ArgsType &args) : ArgumentUnpacker2<Sig, ArgsType>(args), arg2(args, 2) { }
+
+  ArgumentUnpacker<typename sl::At< 2, XSignature<Sig> >::Type, ArgsType> arg2;
+  };
+
+template <typename Sig, typename ArgsType> class ArgumentUnpacker4 : public ArgumentUnpacker3<Sig, ArgsType>
+  {
+public:
+  ArgumentUnpacker4(const ArgsType &args) : ArgumentUnpacker3<Sig, ArgsType>(args), arg3(args, 3) { }
+
+  ArgumentUnpacker<typename sl::At< 3, XSignature<Sig> >::Type, ArgsType> arg3;
+  };
+
+
 #include "XFunctionSpecialisations.h"
 #undef FORWARDER_DEF_WITH_TYPE
-
+#undef FOAWARDER_DEF
 } // namespace
 
 

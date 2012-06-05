@@ -6,8 +6,8 @@
 #include "XScriptTypeInfo.h"
 #include "XSignatureHelpers.h"
 #include "XSignatureSpecialisations.h"
-#include "XInterface.h"
 #include "XScriptObject.h"
+#include <stdexcept>
 
 namespace XScriptConvert
 {
@@ -147,187 +147,8 @@ template <> struct JSToNative<void>
     }
   };
 
-//template <typename T,
-//          int InternalFieldCount = 1,
-//          int InternalFieldIndex = 0,
-//          bool SearchPrototypeChain = false>
-//struct JSToNativeObjectWithInternalFields
-//  {
-//public:
-//  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
 
-//  ResultType operator()(XScriptValue const &h) const
-//    {
-//    if( !h.isValid() || ! h.isObject() )
-//      {
-//      return 0;
-//      }
-//    else
-//      {
-//      void *ext = 0;
-//      XScriptValue proto(h);
-//      while(!ext && proto.isValid() && proto.isObject())
-//        {
-//        XScriptObject const &obj(proto);
-//        ext = (obj.internalFieldCount() != InternalFieldCount)
-//          ? 0
-//          : obj.internalField(InternalFieldIndex);
-//        if(!ext)
-//          {
-//          if(!SearchPrototypeChain)
-//            {
-//            break;
-//            }
-//          else
-//            {
-//            proto = obj.getPrototype();
-//            }
-//          }
-//        }
-//      return ext ? static_cast<ResultType>(ext) : 0;
-//      }
-//    }
-
-//#ifdef X_ASSERTS_ENABLED
-//private:
-//  typedef char AssertIndexRanges
-//    [xCompileTimeAssertDef<
-//    (InternalFieldIndex>=0)
-//    && (InternalFieldCount>0)
-//    && (InternalFieldIndex < InternalFieldCount)
-//    >::Value
-//    ? 1 : -1];
-//#endif
-//  };
-
-template <typename T,
-          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
-          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
-          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
-          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
-struct JSToNativeObject
-  {
-public:
-  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
-
-  ResultType operator()(XScriptValue const &h) const
-    {
-    if(!h.isObject())
-      {
-      return 0;
-      }
-    else
-      {
-      const xsize TypeID = findInterface<T>((const T*)0)->typeId();
-      void const *tid = 0;
-      void *ext = 0;
-      XScriptValue proto(h);
-      while(!ext && proto.isObject())
-        {
-        XScriptObject const &obj(proto);
-        tid = (obj.internalFieldCount() != InternalFieldCount)
-          ? 0
-          : obj.internalField(TypeIdFieldIndex);
-
-#define TYPE_DEBUG
-#ifdef TYPE_DEBUG
-        const char *ptr = QMetaType::typeName((int)tid);
-        const char *ptr2 = QMetaType::typeName((int)TypeID);
-        (void)ptr;
-        (void)ptr2;
-#endif
-
-        ext = ((xsize)tid == TypeID)
-          ? obj.internalField(ObjectFieldIndex)
-          : 0;
-        if(!ext)
-          {
-          if(!SearchPrototypeChain)
-            {
-            break;
-            }
-          else
-            {
-            proto = obj.getPrototype();
-            }
-          }
-        }
-      return ext ? static_cast<ResultType>(ext) : 0;
-      }
-    }
-
-private:
-  typedef char AssertIndexRanges
-    [(InternalFieldCount>=2)
-    && (TypeIdFieldIndex != ObjectFieldIndex)
-    && (TypeIdFieldIndex >= 0)
-    && (TypeIdFieldIndex < InternalFieldCount)
-    && (ObjectFieldIndex >= 0)
-    && (ObjectFieldIndex < InternalFieldCount)
-    ? 1 : -1];
-  };
-
-
-
-template <typename T, typename BASE,
-          int InternalFieldCount = XScript::ClassCreator_InternalFields<T>::Count,
-          int TypeIdFieldIndex = XScript::ClassCreator_InternalFields<T>::TypeIDIndex,
-          int ObjectFieldIndex = XScript::ClassCreator_InternalFields<T>::NativeIndex,
-          bool SearchPrototypeChain = XScript::ClassCreator_SearchPrototypeForThis<T>::Value>
-struct JSToNativeObjectInherited
-  {
-public:
-  typedef typename XScriptTypeInfo<T>::NativeHandle ResultType;
-
-  ResultType operator()(XScriptValue const &h) const
-    {
-    if(!h.isObject())
-      {
-      return 0;
-      }
-    else
-      {
-      const xsize TypeID = findInterface<BASE>((const BASE*)0)->typeId();
-      void const *tid = 0;
-      void *ext = 0;
-      XScriptValue proto(h);
-      while(!ext && proto.isObject())
-        {
-        XScriptObject const &obj(proto);
-        tid = (obj.internalFieldCount() != InternalFieldCount)
-          ? 0
-          : obj.internalField(TypeIdFieldIndex);
-        ext = ((xsize)tid == TypeID)
-          ? obj.internalField(ObjectFieldIndex)
-          : 0;
-        if(!ext)
-          {
-          if(!SearchPrototypeChain)
-            {
-            break;
-            }
-          else
-            {
-            proto = obj.getPrototype();
-            }
-          }
-        }
-      return ext ? XScriptConvert::castFromBase<T>(static_cast<BASE*>(ext)) : 0;
-      }
-    }
-
-private:
-  typedef char AssertIndexRanges
-    [(InternalFieldCount>=2)
-    && (TypeIdFieldIndex != ObjectFieldIndex)
-    && (TypeIdFieldIndex >= 0)
-    && (TypeIdFieldIndex < InternalFieldCount)
-    && (ObjectFieldIndex >= 0)
-    && (ObjectFieldIndex < InternalFieldCount)
-    ? 1 : -1];
-  };
-
-namespace
+namespace internal
 {
 template <typename Ret, Ret (XScriptValue::*ToA)() const> struct JSToNativePODType
   {
@@ -355,19 +176,19 @@ template <typename NumType> struct JSToNativeNumberType
   };
 }
 
-template <> struct JSToNative<void *> : JSToNativeExternalType<void *> {};
+template <> struct JSToNative<void *> : internal::JSToNativeExternalType<void *> {};
 
-template <> struct JSToNative<xint8> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xuint8> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xint16> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xuint16> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xint32> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xuint32> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xint64> : JSToNativeIntegerType<xint64> {};
-template <> struct JSToNative<xuint64> : JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint8> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint8> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint16> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint16> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint32> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint32> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xint64> : internal::JSToNativeIntegerType<xint64> {};
+template <> struct JSToNative<xuint64> : internal::JSToNativeIntegerType<xint64> {};
 
-template <> struct JSToNative<double> : JSToNativeNumberType<double> {};
-template <> struct JSToNative<float> : JSToNativeNumberType<double> {};
+template <> struct JSToNative<double> : internal::JSToNativeNumberType<double> {};
+template <> struct JSToNative<float> : internal::JSToNativeNumberType<double> {};
 
 template <> struct JSToNative<bool>
   {
@@ -450,6 +271,123 @@ template <typename NT> typename internal::JSToNative<NT>::ResultType from(XScrip
   return F()( h );
   }
 
+/**
+       ArgCaster is a thin wrapper around CastFromJS(), and primarily
+       exists to give us a way to convert JS values to (char const *)
+       for purposes of passing them to native functions. The main
+       difference between this type and JSToNative<T> is that this
+       interface explicitly allows for the conversion to be stored by
+       an instance of this type. That allows us to get more lifetime
+       out of converted values in certain cases (namely (char const*)).
+
+       The default implementation is suitable for all cases which
+       JSToNative<T> supports, but specializations can handle some of
+       the corner cases which JSToNative cannot (e.g. (char const *)).
+
+       Added 20091121.
+    */
+template <typename T>
+struct ArgCaster
+  {
+  typedef typename XScriptConvert::internal::JSToNative<T>::ResultType ResultType;
+  /**
+           Default impl simply returns XScriptConvert::from<T>(v).
+           Specializations are allowed to store the result of the
+           conversion, as long as they release it when the destruct.
+           See XScriptConvert::ArgCaster<char const *> for an example of that.
+        */
+  static ResultType toNative( XScriptValue const & v )
+    {
+    return XScriptConvert::from<T>( v );
+    }
+  /**
+            To eventually be used for some internal optimizations.
+        */
+  enum { HasConstOp = 1 };
+  };
+/**
+       Specialization for (char const *). The value returned from
+       ToNative() is guaranteed to be valid as long as the ArgCaster
+       object is alive or until ToNative() is called again (which will
+       almost certainly change the pointer). Holding a pointer to the
+       ToNative() return value after the ArgCaster is destroyed will
+       lead to undefined behaviour. Likewise, fetching a pointer, then
+       calling ToNative() a second time, will invalidate the first
+       pointer.
+
+       BEWARE OF THESE LIMITATIONS:
+
+       1) This will only work properly for nul-terminated strings,
+       and not binary data!
+
+       2) Do not use this to pass (char const *) as a function
+       parameter if that function will hold a copy of the pointer
+       after it returns (as opposed to copying/consuming the
+       pointed-to-data before it returns) OR if it returns the
+       pointer passed to it. Returning is a specific corner-case
+       of "holding a copy" for which we cannot guaranty the lifetime
+       at the function-binding level.
+
+       3) Do not use the same ArgCaster object to convert multiple
+       arguments, as each call to ToNative() will invalidate the
+       pointer returned by previous calls.
+
+       4) The to-string conversion uses whatever encoding
+       JSToNative<std::string> uses.
+
+       Violating any of those leads to undefined behaviour, and
+       very possibly memory corruption for cases 2 or 3.
+    */
+template <> struct ArgCaster<char const *>
+  {
+private:
+  /**
+            Reminder to self: we cannot use v8::String::Utf8Value
+            here because at the point the bindings call ToNative(),
+            v8 might have been unlocked, at which point dereferencing
+            the Utf8Value becomes illegal.
+        */
+  std::string val;
+  typedef char Type;
+public:
+  typedef Type const * ResultType;
+  /**
+           Returns the toString() value of v unless:
+
+           - v.IsEmpty()
+           - v->IsNull()
+           - v->IsUndefined()
+
+           In which cases it returns 0.
+
+           The returned value is valid until:
+
+           - ToNative() is called again.
+           - This object is destructed.
+        */
+  static ResultType toNative( XScriptValue const & )
+    {/*
+    typedef XScriptConvert::internal::JSToNative<std::string> C;
+    if( !v.isValid() )
+      {
+      return 0;
+      }
+    this->val = C()( v );*/
+    xAssertFail();
+    return "";//this->val.c_str();
+    }
+  };
+
 }
+
+template <typename T> T *XScriptObject::castTo()
+  {
+  return XScriptConvert::from<T>(*this);
+  }
+
+template <typename T> const T *XScriptObject::castTo() const
+  {
+  return XScriptConvert::from<T>(*this);
+  }
 
 #endif // XCONVERTFROMSCRIPT_H

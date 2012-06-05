@@ -4,6 +4,7 @@
 #include "XScriptGlobal.h"
 #include "XUnorderedMap"
 #include "XInterface.h"
+#include "XInterfaceUtilities.h"
 #include "XScriptObject.h"
 #include "XScriptEngine.h"
 #include "QWidget"

@@ -5,6 +5,8 @@
 #include "XUnorderedMap"
 #include "QStringList"
 #include "XConvertFromScript.h"
+#include "XConvertToScript.h"
+#include "XInterface.h"
 #include "XAssert"
 
 struct XScriptValueInternal
@@ -431,7 +433,7 @@ bool XScriptValue::isInteger() const
   return Dart_IsInteger(getDartInternal(*this));
 #else
   const XScriptValueInternal *internal = XScriptValueInternal::val(this);
-  return internal->_object->IsInteger();
+  return internal->_object->IsInt32() || internal->_object->IsUint32();
 #endif
   }
 

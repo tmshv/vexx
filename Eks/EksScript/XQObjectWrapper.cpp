@@ -241,7 +241,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
 
   // build up custom QObject wrapper
   XInterface<QObject>* interface = XInterface<QObject>::create(qobjectName);
-  interface->addNativeContructor();
+  interface->addNativeConvertConstructor();
   buildInterface(interface, &QObject::staticMetaObject);
   interface->seal();
   c->addInterface(interface);
@@ -250,7 +250,7 @@ void XQObjectWrapper::initiate(XScriptEngine *c)
 
   // build up custom QWidget wrapper
   XInterface<QWidget>* widget = XInterface<QWidget>::createWithParent("QWidget", interface, interface);
-  widget->addNativeContructor();
+  widget->addNativeConvertConstructor();
 
   widget->addConstMethod<QPoint (QWidget*, const QPoint&), &QWidget::mapTo>("mapTo");
   widget->addConstMethod<QPoint (const QPoint&), &QWidget::mapToGlobal>("mapToGlobal");
@@ -337,7 +337,7 @@ struct CallArgument
       return (void *)&allocData;
     }
 
-  void CallArgument::initAsType(int callType)
+  void initAsType(int callType)
     {
     if (type != 0) { cleanup(); type = 0; }
     if (callType == 0) return;
@@ -387,7 +387,7 @@ struct CallArgument
       }
     }
 
-  void CallArgument::fromValue(int callType, v8::Handle<v8::Value> value)
+  void fromValue(int callType, v8::Handle<v8::Value> value)
     {
     if (type != 0)
       {
@@ -509,7 +509,7 @@ struct CallArgument
       }
     }
 
-  v8::Handle<v8::Value> CallArgument::toValue()
+  v8::Handle<v8::Value> toValue()
     {
     /*if (type == qMetaTypeId<QJSValue>())
       {

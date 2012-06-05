@@ -75,7 +75,7 @@ struct GetterToGetter : XAccessorGetterType
         wrap a custom v8::AccessorSetter in a SetterCatcher.
     */
 template <XInterfaceBase::Setter S>
-struct SetterToSetter : AccessorSetterType
+struct SetterToSetter : XAccessorSetterType
   {
   /** Implements the v8::AccessorSetter() interface. */
   inline static void Set(XScriptValue property, XScriptValue value, const XAccessorInfo& info)
@@ -94,7 +94,7 @@ struct SetterToSetter : AccessorSetterType
        CastToJS(*SharedVar) must be legal.
     */
 template <typename PropertyType, PropertyType * const SharedVar>
-struct VarToGetter : AccessorGetterType
+struct VarToGetter : XAccessorGetterType
   {
   /** Implements the v8::AccessorGetter() interface. */
   inline static XScriptValue Get(XScriptValue property, const XAccessorInfo &info)
@@ -109,7 +109,7 @@ struct VarToGetter : AccessorGetterType
        SharedVar must be pointer to a static variable and must not
        be NULL.
 
-       (*SharedVar = CastFromJS<PropertyType>()) must be legal.
+       (*SharedVar = XScriptConvert::from<PropertyType>()) must be legal.
 
        Reminder: this is not included in the StaticVarToGetter
        template so that we can avoid either the Get or Set
@@ -118,12 +118,12 @@ struct VarToGetter : AccessorGetterType
        to be legal.
     */
 template <typename PropertyType, PropertyType * const SharedVar>
-struct VarToSetter : AccessorSetterType
+struct VarToSetter : XAccessorSetterType
   {
   /** Implements the v8::AccessorSetter() interface. */
   inline static void Set(XScriptValue property, XScriptValue value, const XAccessorInfo& info)
     {
-    *SharedVar = CastFromJS<PropertyType>( value );
+    *SharedVar = XScriptConvert::from<PropertyType>( value );
     }
   };
 
@@ -142,27 +142,26 @@ struct VarToAccessors : VarToGetter<PropertyType,SharedVar>,
 
        Requirements:
 
-       - T must be convertible to (T*) via CastFromJS<T>().
+       - T must be convertible to (T*) via XScriptConvert::from<T>().
        - MemVar must be an accessible member of T.
        - PropertyType must be convertible via CastToJS<PropertyType>().
 
        If the underlying native 'this' object cannot be found (that
-       is, if CastFromJS<T>() fails) then this routine will
+       is, if XScriptConvert::from<T>() fails) then this routine will
        trigger a JS exception.
     */
 template <typename T, typename PropertyType, PropertyType T::*MemVar>
-struct MemberToGetter : AccessorGetterType
+struct MemberToGetter : XAccessorGetterType
   {
   /** Implements the v8::AccessorGetter() interface. */
   inline static XScriptValue Get(XScriptValue property, const XAccessorInfo &info)
     {
     typedef typename XScriptTypeInfo<T>::Type Type;
-    typedef typename JSToNative<T>::ResultType NativeHandle;
-    NativeHandle self = CastFromJS<T>( info.This() );
+    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+    NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
     return ( ! self )
-        ? Toss( StringBuffer() << "Native member property getter '"
-                << property << "' could not access native 'this' object!" )
-        : CastToJS( (self->*MemVar) );
+        ? Toss( "Native member property getter '#' could not access native 'this' object!" )
+        : XScriptConvert::to( (self->*MemVar) );
     }
   };
 
@@ -171,7 +170,7 @@ struct MemberToGetter : AccessorGetterType
 
        Requirements:
 
-       - T must be convertible to (T*) via CastFromJS<T>().
+       - T must be convertible to (T*) via XScriptConvert::from<T>().
        - PropertyType must be convertible via CastToJS<PropertyType>().
        - MemVar must be an accessible member of T.
 
@@ -179,17 +178,16 @@ struct MemberToGetter : AccessorGetterType
        routine will trigger a JS exception.
     */
 template <typename T, typename PropertyType, PropertyType T::*MemVar>
-struct MemberToSetter : AccessorSetterType
+struct MemberToSetter : XAccessorSetterType
   {
   /** Implements the v8::AccessorSetter() interface. */
   inline static void Set(XScriptValue property, XScriptValue value, const XAccessorInfo& info)
     {
     typedef typename XScriptTypeInfo<T>::Type Type;
-    typedef typename JSToNative<T>::ResultType NativeHandle;
-    NativeHandle self = CastFromJS<T>( info.This() );
-    if( self ) self->*MemVar = CastFromJS<PropertyType>( value );
-    else Toss( StringBuffer() << "Native member property setter '"
-               << property << "' could not access native 'this'his object!" );
+    typedef typename XScriptConvert::internal::JSToNative<T>::ResultType NativeHandle;
+    NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
+    if( self ) self->*MemVar = XScriptConvert::from<PropertyType>( value );
+    else Toss( "Native member property setter '#' could not access native 'this' object!" );
     }
   };
 
@@ -234,7 +232,7 @@ struct ThrowingSetter : XAccessorSetterType
        exception.
     */
 template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Getter>
-struct FunctionToGetter : AccessorGetterType
+struct FunctionToGetter : XAccessorGetterType
   {
   inline static XScriptValue Get( XScriptValue property, const XAccessorInfo & info )
     {
@@ -267,13 +265,13 @@ struct FunctionToGetter : AccessorGetterType
        exception.
     */
 template <typename Sig, typename XFunctionSignature<Sig>::FunctionType Func>
-struct FunctionToSetter : AccessorSetterType
+struct FunctionToSetter : XAccessorSetterType
   {
   inline static void Set( XScriptValue property, XScriptValue value, const XAccessorInfo &info)
     {
     typedef XFunctionSignature<Sig> FT;
-    ArgCaster<typename sl::At<0,FT>::Type> ac;
-    (*Func)( ac.ToNative( value ) );
+    XScriptConvert::ArgCaster<typename sl::At<0,FT>::Type> ac;
+    (*Func)( ac.toNative( value ) );
     }
   };
 
@@ -349,12 +347,14 @@ struct XMethodToSetter : XAccessorSetterType
       }
     else
       {
-      typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
+      typedef typename XScriptTypeInfo<InputArg>::NativeHandle NativeHandle;
+      typedef XSignature<void (NativeHandle)> Sig;
+      typedef typename sl::At< 0, Sig >::Type ArgT;
       XScriptConvert::ArgCaster<ArgT> ac;
-      XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( value );
+      typename XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.toNative( value );
 
       bool valid = true;
-      InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
+      InputArg in = XScriptConvert::match<InputArg, typename XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
       if(!valid)
         {
         Toss(QString("Native member property setter '%1' could convert input argument!").arg(XScriptConvert::from<QString>(property) ));
@@ -377,12 +377,14 @@ struct XMethodToSetter : XAccessorSetterType
       }
     else
       {
-      typedef typename sl::At< 0, XSignature<void (XScriptTypeInfo<InputArg>::NativeHandle)> >::Type ArgT;
+      typedef typename XScriptTypeInfo<InputArg>::NativeHandle NativeHandle;
+      typedef XSignature<void (NativeHandle)> Sig;
+      typedef typename sl::At< 0, Sig >::Type ArgT;
       XScriptConvert::ArgCaster<ArgT> ac;
-      XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.ToNative( args.at(1) );
+      typename XScriptConvert::ArgCaster<ArgT>::ResultType handle = ac.toNative( args.at(0) );
 
       bool valid = true;
-      InputArg in = XScriptConvert::match<InputArg, XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
+      InputArg in = XScriptConvert::match<InputArg, typename XScriptConvert::ArgCaster<ArgT>::ResultType>(&handle, valid);
       if(!valid)
         {
         Toss(QString("Native member property setter '%1' could convert input argument!") );
@@ -410,9 +412,9 @@ struct XFunctorToSetter
   {
   inline static void Set(XScriptValue property, XScriptValue value, const XAccessorInfo &info)
     {
-    typedef typename sl::At< 0, Signature<Sig> >::Type ArgT;
-    ArgCaster<ArgT> ac;
-    Ftor()( ac.ToNative( value ) );
+    typedef typename sl::At< 0, XSignature<Sig> >::Type ArgT;
+    XScriptConvert::ArgCaster<ArgT> ac;
+    Ftor()( ac.toNative( value ) );
     }
   };
 
@@ -460,7 +462,7 @@ struct XSetterCatcher : XAccessorSetterType
 template <
     typename SetterT,
     typename ConcreteException = std::exception,
-    bool PropagateOtherExceptions = !tmp::SameType< std::exception, ConcreteException >::Value
+    bool PropagateOtherExceptions = !XSameType< std::exception, ConcreteException >::Value
     >
 struct XSetterCatcher_std :
     XSetterCatcher<ConcreteException,
@@ -515,7 +517,7 @@ struct XGetterCatcher : XAccessorGetterType
 template <
     typename GetterT,
     typename ConcreteException = std::exception,
-    bool PropagateOtherExceptions = !tmp::SameType< std::exception, ConcreteException >::Value
+    bool PropagateOtherExceptions = !XSameType< std::exception, ConcreteException >::Value
     >
 struct XGetterCatcher_std :
     XGetterCatcher<ConcreteException,
@@ -552,7 +554,7 @@ struct XMethodToNamedGetter : XAccessorGetterType
     NativeHandle self = XScriptConvert::from<T>( info.calleeThis() );
     if(self)
       {
-      XMethodSignature<T,Sig>::ReturnType rt = (self->*Getter)(XScriptConvert::from<QString>(property));
+      typename XMethodSignature<T,Sig>::ReturnType rt = (self->*Getter)(XScriptConvert::from<QString>(property));
       if(rt)
         {
         return XScriptConvert::to(rt);
@@ -644,7 +646,7 @@ public:
     // jump through a small hoop to ensure identical semantics vis-a-vis
     // the other overload.
     return this->operator()( name, GetterT::Get,
-                             tmp::SameType<NullSetter,SetterT>::Value ? NULL : SetterT::Set,
+                             XSameType<NullSetter,SetterT>::Value ? NULL : SetterT::Set,
                              data, settings, attribute);
     }
   };

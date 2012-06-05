@@ -29,7 +29,7 @@ template <typename NT> struct NativeToJS<NT &>
   };
 
 
-namespace
+namespace internal
 {
 template <typename IntegerT> struct NativeToJS_int_small
   {
@@ -60,29 +60,29 @@ template <typename T> struct UselessConversionType
   };
 }
 
-template <> struct NativeToJS<unsigned char> : NativeToJSUIntSmall<xuint8> {};
-template <> struct NativeToJS<xint16> : NativeToJS_int_small<xint16> {};
-template <> struct NativeToJS<xuint16> : NativeToJSUIntSmall<xuint16> {};
-template <> struct NativeToJS<xint32> : NativeToJS_int_small<xint32> {};
-template <> struct NativeToJS<xuint32> : NativeToJSUIntSmall<xuint32> {};
+template <> struct NativeToJS<unsigned char> : internal::NativeToJSUIntSmall<xuint8> {};
+template <> struct NativeToJS<xint16> : internal::NativeToJS_int_small<xint16> {};
+template <> struct NativeToJS<xuint16> : internal::NativeToJSUIntSmall<xuint16> {};
+template <> struct NativeToJS<xint32> : internal::NativeToJS_int_small<xint32> {};
+template <> struct NativeToJS<xuint32> : internal::NativeToJSUIntSmall<xuint32> {};
 
-template <> struct NativeToJS<xint64> : NativeToJSNumber<xint64> {};
-template <> struct NativeToJS<xuint64> : NativeToJSNumber<xuint64> {};
-template <> struct NativeToJS<double> : NativeToJSNumber<double> {};
-template <> struct NativeToJS<float> : NativeToJSNumber<float> {};
+template <> struct NativeToJS<xint64> : internal::NativeToJSNumber<xint64> {};
+template <> struct NativeToJS<xuint64> : internal::NativeToJSNumber<xuint64> {};
+template <> struct NativeToJS<double> : internal::NativeToJSNumber<double> {};
+template <> struct NativeToJS<float> : internal::NativeToJSNumber<float> {};
 
 // workarounds where long int != uint64
 template <> struct NativeToJS< XIfElse< XSameType<unsigned long int, xuint64>::Value,
-    UselessConversionType<unsigned long>,
+    internal::UselessConversionType<unsigned long>,
     unsigned long >::Type >
-    : NativeToJSNumber<unsigned long int>
+    : internal::NativeToJSNumber<unsigned long int>
   {
   };
 
 template <> struct NativeToJS< XIfElse< XSameType<long, xint64>::Value,
-    UselessConversionType<long>,
+    internal::UselessConversionType<long>,
     long >::Type >
-    : NativeToJSNumber<xint64>
+    : internal::NativeToJSNumber<xint64>
   {
   };
 

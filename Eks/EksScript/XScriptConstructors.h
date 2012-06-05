@@ -1,19 +1,21 @@
 #ifndef XSCRIPRCONSTRUCTORS_H
 #define XSCRIPRCONSTRUCTORS_H
 
+#include <stdexcept>
 #include "XSignature.h"
 #include "XSignatureHelpers.h"
+#include "XScriptException.h"
 #include "XSignatureSpecialisations.h"
 #include "XTemplateMetaHelpers.h"
+#include "XScriptDefinitions.h"
 #include "XAssert"
 #include "XScriptTypeInfo.h"
-#include "XConvertScriptSTL.h"
 
 namespace XScript
 {
 
-#if !defined(DOXYGEN)
-namespace Detail {
+namespace Detail
+{
 /**
             Default (unimplemented) CtorForwarderProxy impl. A helper
             for the CtorForwarder class. All specializations except
@@ -52,7 +54,7 @@ struct CtorForwarderProxy<Sig,-1>
   };
 
 }
-#endif
+
 /**
        A utility type to help forward XScriptArguments to native
        constructors. This type is intended to assist in the creation
@@ -145,7 +147,7 @@ struct CtorFwdDispatch<T, XNilType>
            several a bound native constructors, depending on on the
            argument count.
 
-           List MUST be a Signature< ... > containing ONLY
+           List MUST be a XSignature< ... > containing ONLY
            CtorFowarder types (or compatible).
         */
 template <typename T,typename List>
@@ -192,7 +194,7 @@ struct CtorFwdDispatchList<T,XNilType>
         CtorList must be-a a Signature type in this form:
 
         @code
-        typedef Signature<MyType ( // may optionally be (MyType *) - same effect
+        typedef XSignature<MyType ( // may optionally be (MyType *) - same effect
             CtorForwarder<MyType *()>,
             CtorForwarder<MyType *(char const *)>,
             CtorForwarder<MyType *( int, double )>,
@@ -233,8 +235,6 @@ struct CtorArityDispatcher
 template <typename T, typename Wrapper, void Dtor(XPersistentScriptValue, void *)>
 struct CtorFunctionWrapperBase
   {
-  typedef XScript::ClassCreator_InternalFields<T> InternalFields;
-  typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
   static void CallDart(XScriptDartArguments argv)
@@ -255,9 +255,11 @@ struct CtorFunctionWrapperBase
       Toss("Native constructor failed");
       }
 
-    WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(constructed);
+    typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+    NativeHandle native = static_cast<NativeHandle>(constructed);
+
     persistent.makeWeak( constructed, Dtor );
-    findInterface<T>(native)->wrapInstance(self, constructed);
+    ::findInterface<T>(native)->wrapInstance(self, constructed);
     }
   };
 

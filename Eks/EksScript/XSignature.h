@@ -1,6 +1,8 @@
 #ifndef XSIGNATURE_H
 #define XSIGNATURE_H
 
+#include "XScriptFunction.h"
+
 template <typename Sig> struct XSignature;
 
 #define X_SCRIPT_TYPELIST(X) ::XSignature< void X >

@@ -71,16 +71,16 @@ XInterfaceBase::XInterfaceBase(xsize typeID,
                const XInterfaceBase *parent)
   : _typeName(typeName),
     _typeId(typeID),
-    _nonPointerTypeId(nonPointerTypeID),
-    _internalFieldCount(parent->_internalFieldCount),
     _baseTypeId(parent->_baseTypeId),
+    _nonPointerTypeId(nonPointerTypeID),
     _baseNonPointerTypeId(parent->_baseNonPointerTypeId),
+    _internalFieldCount(parent->_internalFieldCount),
     _typeIdField(parent->_typeIdField),
     _nativeField(parent->_nativeField),
-    _isSealed(true),
-    _parent(parent),
     _toScript(parent->_toScript),
-    _fromScript(parent->_fromScript)
+    _fromScript(parent->_fromScript),
+    _parent(parent),
+    _isSealed(true)
   {
   xAssert(_typeName.length());
 
@@ -102,10 +102,10 @@ XInterfaceBase::XInterfaceBase(xsize typeID,
     }
   }
 
-XInterfaceBase::XInterfaceBase(xsize typeId,
-                               xsize nonPointerTypeId,
-                               xsize baseTypeId,
-                               xsize baseNonPointerTypeId,
+XInterfaceBase::XInterfaceBase(int typeId,
+                               int nonPointerTypeId,
+                               int baseTypeId,
+                               int baseNonPointerTypeId,
                                const QString &typeName,
                                NativeCtor ctor,
                                xsize typeIdField,
@@ -116,16 +116,16 @@ XInterfaceBase::XInterfaceBase(xsize typeId,
                                FromScriptFn fScr)
   : _typeName(typeName),
     _typeId(typeId),
-    _nonPointerTypeId(nonPointerTypeId),
-    _internalFieldCount(internalFieldCount),
     _baseTypeId(baseTypeId),
+    _nonPointerTypeId(nonPointerTypeId),
     _baseNonPointerTypeId(baseNonPointerTypeId),
+    _internalFieldCount(internalFieldCount),
     _typeIdField(typeIdField),
     _nativeField(nativeField),
-    _isSealed(false),
-    _parent(parent),
     _toScript(tScr),
     _fromScript(fScr),
+    _parent(parent),
+    _isSealed(false),
     _nativeCtor(ctor)
   {
   xAssert(_typeName.length());
@@ -268,11 +268,13 @@ void XInterfaceBase::unwrapInstance(XScriptObject scObj) const
 #endif
   }
 
+#ifdef X_DART
 Dart_Handle getDartInternal(const XInterfaceBase *ifc)
   {
   Dart_Handle lib = Dart_LookupLibrary(getDartInternal(XScriptConvert::to(getDartUrl(ifc))));
   return Dart_GetClass(lib, getDartInternal(XScriptConvert::to(ifc->typeName())));
   }
+#endif
 
 XScriptObject XInterfaceBase::newInstance(int argc, XScriptValue argv[], const QString& name) const
   {
@@ -326,7 +328,8 @@ void XInterfaceBase::addConstructor(const char *cname, xsize extraArgs, size_t a
   _functionSource += name + "(" + callArgs + ") {" + nativeName + "(" + callArgs + "); } \n";
   _functionSource += "void " + nativeName + "(" + callArgs + ") native \"" + nativeName + "\";\n";
 #else
-  (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
+  xAssertFail();
+  //(*::prototype(_prototype))->SetAccessor(v8::String::New(cname), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
 
   xAssert(fn);
 #endif
@@ -345,7 +348,7 @@ void XInterfaceBase::addProperty(const char *cname, Getter getter, FunctionDart 
     _functionSource += "set " + name + "(var a) => null;\n";
     }
 #else
-  (*::prototype(_prototype))->SetAccessor(v8::String::New(name), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
+  (*::prototype(_prototype))->SetAccessor(v8::String::New(cname), (v8::AccessorGetter)getter, (v8::AccessorSetter)setter);
 #endif
   }
 
@@ -367,7 +370,7 @@ void XInterfaceBase::addFunction(const char *cname, xsize extraArgs, xsize argCo
   _functionSource += "Dynamic " + name + "(" + callArgs + ") native \"" + resolvedName + "\";\n";
 #else
   v8::Handle<v8::FunctionTemplate> fnTmpl = ::v8::FunctionTemplate::New((v8::InvocationCallback)fn);
-  (*::prototype(_prototype))->Set(v8::String::New(name), fnTmpl->GetFunction());
+  (*::prototype(_prototype))->Set(v8::String::New(cname), fnTmpl->GetFunction());
 #endif
   }
 

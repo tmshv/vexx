@@ -149,7 +149,7 @@ struct StaticEngine
     Dart_ShutdownIsolate();
 #else
     v8::V8::LowMemoryNotification();
-    g_engine->context.Dispose();
+    context.Dispose();
 #endif
     }
 
@@ -208,6 +208,7 @@ XScriptEngine::~XScriptEngine()
 
 XScriptValue XScriptEngine::run(const QString &src)
   {
+#ifdef X_DART
   // Create a test library and Load up a test script in it.
   Dart_Handle source = getDartInternal(XScriptConvert::to(src));
   Dart_Handle url = Dart_NewString("temp");
@@ -221,6 +222,9 @@ XScriptValue XScriptEngine::run(const QString &src)
   CHECK_HANDLE(result)
 
   return fromHandle(result);
+#else
+  return XScriptValue();
+#endif
   }
 
 #ifndef X_DART

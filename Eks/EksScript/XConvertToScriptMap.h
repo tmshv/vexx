@@ -107,7 +107,7 @@ public:
       {
       typedef XNativeToJSMap<T> BM;
       XScriptValue const & rc( BM::GetJSObject(n) );
-      if( rc.IsEmpty() ) return XScriptValue();
+      if( !rc.isValid() ) return XScriptValue();
       else return rc;
       }
     XScriptValue operator()( Type const & n ) const

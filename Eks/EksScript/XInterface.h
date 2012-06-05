@@ -10,6 +10,7 @@
 #include "XInterfaceUtilities.h"
 #include "XScriptObject.h"
 #include "XScriptException.h"
+#include "XFunctions.h"
 #include "XInterfaceUtilities.h"
 #include "XUnorderedMap"
 
@@ -40,12 +41,12 @@ public:
 
 XProperties:
   XROProperty(QString, typeName);
-  XROProperty(xsize, typeId);
-  XROProperty(xsize, nonPointerTypeId);
-  XROProperty(xsize, baseTypeId);
-  XROProperty(xsize, baseNonPointerTypeId);
-  XROProperty(xsize, internalFieldCount);
+  XROProperty(int, typeId);
+  XROProperty(int, baseTypeId);
+  XROProperty(int, nonPointerTypeId);
+  XROProperty(int, baseNonPointerTypeId);
 
+  XROProperty(xsize, internalFieldCount);
   XROProperty(xsize, typeIdField);
   XROProperty(xsize, nativeField);
 
@@ -60,10 +61,10 @@ XProperties:
 
 public:
   typedef XScriptValue (*NativeCtor)(XScriptArguments const &argv);
-  XInterfaceBase(xsize typeID,
-                 xsize nonPointerTypeID,
-                 xsize baseTypeID,
-                 xsize baseNonPointerTypeID,
+  XInterfaceBase(int typeID,
+                 int nonPointerTypeID,
+                 int baseTypeID,
+                 int baseNonPointerTypeID,
                  const QString &typeName,
                  NativeCtor ctor,
                  xsize typeIdField,
@@ -121,16 +122,18 @@ protected:
   void *_constructor;
   void *_prototype;
 
-#ifdef X_DART
+#ifndef X_DART
   XScriptFunction constructorFunction() const;
 #endif
   };
 
-template <typename T> const XInterfaceBase* findInterface(const T*);
-
 EKSSCRIPT_EXPORT XInterfaceBase *findInterface(int qMetaTypeId);
 EKSSCRIPT_EXPORT void registerInterface(XInterfaceBase *interface);
 
+template <typename T> const XInterfaceBase* findInterface(const T *)
+  {
+  return findInterface(qMetaTypeId<T*>());
+  }
 
 #include "XConvertToScript.h"
 #include "XConvertToScriptMap.h"
@@ -178,11 +181,10 @@ public:
   template <typename TYPE>
     void addConstructor(const char *name="")
   {
-    typedef XScript::CtorFunctionWrapper<T, TYPE, weak_dtor> Wrapper;
+    typedef XScript::CtorFunctionWrapper<T, TYPE, XInterface<T>::weak_dtor> Wrapper;
 
     FunctionDart ctorDart = Wrapper::CallDart;
 
-    // +1 for this
     addConstructor(name, 1, Wrapper::Arity, 0, ctorDart);
   }
 
@@ -279,7 +281,9 @@ public:
   */
   static bool destroyObject( XScriptObject const & jo )
     {
-    T * t = CastFromJS<T>(jo);
+    xAssertFail();
+    /*
+    T * t = XScriptConvert::from<T>(jo);
     if( ! t ) return false;
     else
       {
@@ -287,7 +291,8 @@ public:
       p.ClearWeak(); // avoid a second call to weak_dtor() via gc!
       weak_dtor( p, t );
       return true;
-      }
+      }*/
+    return true;
     }
   /**
      If jv is empty or !jv->IsObject() then false is returned,
@@ -296,12 +301,12 @@ public:
   */
   static bool destroyObject( XScriptValue const & jv )
     {
-    return !jv->isObject() ? false : destroyObject(XScriptObject(jv));
+    return !jv.isObject() ? false : destroyObject(XScriptObject(jv));
     }
 
   /**
      A v8::InvocationCallback implementation which calls
-     DestroyObject( argv.This() ).
+     DestroyObject( argv.calleeThis() ).
 
      It is intended to be used as a "manual destructor" for
      classes which need it. The canonical examples are
@@ -312,7 +317,7 @@ public:
   */
   static XScriptValue destroyObjectCallback( XScriptArguments const & argv )
     {
-    return destroyObject(argv.This()) ? v8::True() : v8::False();
+    return destroyObject(argv.calleeThis()) ? true : false;
     }
 
   static XInterface *create(const QString &name)
@@ -388,7 +393,6 @@ public:
 
 private:
   typedef XScript::ClassCreator_InternalFields<T> InternalFields;
-  typedef XScript::ClassCreator_WeakWrap<T> WeakWrap;
   typedef XScript::ClassCreator_Factory<T> Factory;
 
   static XInterface &instance(const QString &name, xsize id, xsize nonPointerId, xsize baseId, xsize baseNonPointerId, const XInterfaceBase* parent)
@@ -407,7 +411,7 @@ private:
     while( !ext && proto.isValid() && proto.isObject() )
       {
       XScriptObject obj(proto);
-      ext = (obj.internalFieldCount() != InternalFields::Count)
+      ext = (obj.internalFieldCount() != (xsize)InternalFields::Count)
             ? NULL
             : obj.internalField( InternalFields::NativeIndex );
       // FIXME: if InternalFields::TypeIDIndex>=0 then also do a check on that one.
@@ -510,7 +514,6 @@ private:
         Factory::Delete(native);
         }
 #else
-      WeakWrap::Unwrap( nholder, native );
       findInterface<T>(native)->unwrapInstance(nholder);
       Factory::Delete(native);
 #endif
@@ -571,33 +574,32 @@ private:
 
     XPersistentScriptValue persistent(jobj);
     XScriptObject self(persistent.asValue());
-    Factory::ReturnType nobj = NULL;
+    typename Factory::ReturnType nobj = NULL;
     try
       {
-      WeakWrap::PreWrap( self, argv  );
       nobj = Factory::Create( self, argv );
       if( ! nobj )
         {
         return XScriptConvert::to<std::exception>(std::runtime_error("Native constructor failed."));
         }
 
-      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
-      WeakWrap::Wrap( self, native );
+      typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+      NativeHandle native = static_cast<NativeHandle>(nobj);
       persistent.makeWeak( nobj, weak_dtor );
       findInterface<T>(native)->wrapInstance(self, nobj);
       }
     catch(std::exception const &ex)
       {
-      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
-      WeakWrap::Unwrap( self, native );
+      typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+      NativeHandle native = static_cast<NativeHandle>(nobj);
       if( nobj ) Factory::Delete( native );
       persistent.dispose();
       return Toss(ex.what());
       }
     catch(...)
       {
-      WeakWrap::NativeHandle native = static_cast<WeakWrap::NativeHandle>(nobj);
-      WeakWrap::Unwrap( self, native );
+      typedef typename XScriptTypeInfo<T>::NativeHandle NativeHandle;
+      NativeHandle native = static_cast<NativeHandle>(nobj);
       if( nobj ) Factory::Delete( native );
       persistent.dispose();
       return Toss("Native constructor threw an unknown exception!");
@@ -605,12 +607,6 @@ private:
     return self;
     }
   };
-
-// Intended for specialising.
-template <typename T> const XInterfaceBase *findInterface(const T*)
-  {
-  return XInterface<T>::lookup();
-  }
 
 namespace XScript
 {

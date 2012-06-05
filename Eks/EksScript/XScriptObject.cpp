@@ -1,6 +1,8 @@
 #include "XScriptObject.h"
 #include "XScriptValueV8Internals.h"
 #include "XScriptValueDartInternals.h"
+#include "XAssert"
+#include "XInterface.h"
 
 struct XScriptObjectInternal
   {
@@ -146,7 +148,7 @@ XInterfaceBase *XScriptObject::getInterface() const
   while(!tid && proto.isObject())
     {
     XScriptObject const &obj(proto);
-    tid = (obj.internalFieldCount() != IF::Count)
+    tid = (obj.internalFieldCount() != (xsize)IF::Count)
       ? 0
       : (xsize)obj.internalField(IF::TypeIDIndex);
 
