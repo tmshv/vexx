@@ -93,10 +93,12 @@ void XAssert::setCurrentFireFunction(FireFunction *f)
   g_currentFireFunction = f;
   }
 
+#ifdef Q_CC_GNU
 void interuptBreak()
   {
   raise(SIGINT);
   }
+#endif
 
 XAssert::BreakFunction *g_currentBreakFunction = 0;
 XAssert::BreakFunction *XAssert::currentBreakFunction()
