@@ -4,3 +4,6 @@
 [submodule "shift"]
 	path = shift
 	url = https://code.google.com/p/vexxshift
+[submodule "Eks"]
+	path = Eks
+	url = https://code.google.com/p/vexxeks/
