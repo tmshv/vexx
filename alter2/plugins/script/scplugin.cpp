@@ -29,6 +29,7 @@
 #include "scdeclarativesurface.h"
 #include "scdbutils.h"
 #include "scdbobserver.h"
+#include "scconsole.h"
 
 ALTER_PLUGIN(ScPlugin);
 
@@ -88,7 +89,7 @@ void ScPlugin::pluginAdded(const QString &type)
 
 void ScPlugin::pluginRemoved(const QString &type)
   {
-  _engine->set(type, XScriptValue());
+  unregisterScriptGlobal(type);
 
   if(type == "db")
     {
@@ -106,29 +107,10 @@ void ScPlugin::pluginRemoved(const QString &type)
 void ScPlugin::typeAdded(const SPropertyInformation *info)
   {
   _engine->addInterface(info->apiInterface());
-
-  XScriptValue arr = _engine->get("db").get("types");
-  XScriptObject obj(arr);
-  xAssert(obj.isValid());
-
-  info->apiInterface()->addClassTo(info->typeName(), obj);
   }
 
 void ScPlugin::typeRemoved(const SPropertyInformation *)
   {
-  }
-
-XScriptValue printFn(XScriptArguments const &args)
-  {
-  QString result;
-  for (xsize i = 0; i < args.length(); ++i)
-    {
-    result.append(args.at(i).toString());
-    }
-
-  qDebug() << result;
-
-  return XScriptValue();
   }
 
 void ScPlugin::load()
@@ -136,8 +118,8 @@ void ScPlugin::load()
   XProfiler::setStringForContext(ScriptProfileScope, "Script");
   _engine = new XScriptEngine(true);
 
-  _engine->set("print", printFn);
-
+  _engine->addInterface(ScConsole::createInterface());
+  _engine->addInterface(ScDbUtils::createInterface());
   _engine->addInterface(ScDbTreeObserver::createInterface());
 
   registerScriptGlobal(this);
@@ -145,19 +127,9 @@ void ScPlugin::load()
   APlugin<SPlugin> db(this, "db");
   xAssert(db.isValid());
 
-  //XScriptObject_engine->set("dbTypes", XScriptValue(XScriptObject::newObject()));
-
   registerScriptGlobal("db", XScriptConvert::to(&db->db()));
 
-  STypeRegistry::addPropertyGroup(dynamicScriptPropertyGroup());
-
   STypeRegistry::addTypeObserver(this);
-  XScriptObject dbObject = _engine->get("db");
-  XScriptObject types = XScriptObject::newObject();
-  dbObject.set("types", types);
-
-  types.set("registerType", XScriptValue(XScriptFunction(registerTypeFn)));
-  types.set("registerExporter", XScriptValue(XScriptFunction(registerExporterFn)));
 
   foreach(const SPropertyInformation *t, STypeRegistry::types())
     {
@@ -298,18 +270,23 @@ void ScPlugin::includeFolder(const QString &folder)
 void ScPlugin::registerScriptGlobal(QObject *in)
   {
   XScriptValue objectValue = XScriptConvert::to(in);
-  _engine->set(in->objectName(), objectValue);
+  _engine->setGlobal(in->objectName(), objectValue);
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, QObject *in)
   {
   XScriptValue objectValue = XScriptConvert::to(in);
-  _engine->set(name, objectValue);
+  _engine->setGlobal(name, objectValue);
+  }
+
+void ScPlugin::unregisterScriptGlobal(const QString &name)
+  {
+  _engine->setGlobal(name, XScriptValue());
   }
 
 void ScPlugin::registerScriptGlobal(const QString &name, const XScriptValue &val)
   {
-  _engine->set(name, val);
+  _engine->setGlobal(name, val);
   }
 
 bool ScPlugin::executeFile(const QString &filename)

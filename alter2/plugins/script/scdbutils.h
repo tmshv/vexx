@@ -8,9 +8,22 @@
 class XScriptArguments;
 class XScriptValue;
 
-XScriptValue registerTypeFn(XScriptArguments const &args);
-XScriptValue registerExporterFn(XScriptArguments const &args);
+class ScDbUtils
+  {
+public:
+  static XInterfaceBase* createInterface();
 
-SPropertyGroup &dynamicScriptPropertyGroup();
+
+private:
+  static XScriptValue registerTypeJS(XScriptArguments const &args);
+
+  static XScriptValue registerType(const XScriptObject &args);
+  //XScriptValue registerExporterFn(const XScriptValue &args);
+  //XScriptValue registerExporterFnJS(XScriptArguments const &args);
+
+  //void registerExporterFnDart(XScriptDartArguments args);
+  };
+
+X_SCRIPTABLE_TYPE(ScDbUtils)
 
 #endif // SCDBUTILS_H

@@ -64,6 +64,8 @@ XInterfaceBase* ScDbTreeObserver::createInterface()
   auto parent = XInterface<STreeObserver>::lookup();
   XInterface<ScDbTreeObserver> *ifc = XInterface<ScDbTreeObserver>::createWithParent("STreeObserver", parent, parent);
 
+  ifc->addConstructor<ScDbTreeObserver *(const XScriptObject &, const XScriptFunction &, const XScriptFunction &, const XScriptFunction &)>();
+
   ifc->seal();
   return ifc;
   }

@@ -11,10 +11,14 @@
 
 SPropertyInstanceInformation::DataKey g_computeKey(SPropertyInstanceInformation::newDataKey());
 
-SPropertyGroup &dynamicScriptPropertyGroup()
+XInterfaceBase* ScDbUtils::createInterface()
   {
-  static SPropertyGroup grp;
-  return grp;
+  auto ifc = XInterface<ScDbUtils>::create("dbutils");
+
+  ifc->addFunction("registerType", 0, 1, registerTypeJS, 0);
+
+  ifc->seal();
+  return ifc;
   }
 
 void computeNode(const SPropertyInstanceInformation *instanceInfo, SPropertyContainer *node)
@@ -199,23 +203,8 @@ bool postParseChildProperties(SPropertyInformation *newType, XScriptValue proper
   return true;
   }
 
-XScriptValue registerTypeFn(XScriptArguments const &args)
+XScriptValue registerTypeFn(const XScriptObject &typeObject)
   {
-  ScProfileFunction
-
-  if(args.length() != 1)
-    {
-    return Toss("Incorrect number of arguments to SDatabase.addType(...);");
-    }
-
-  XScriptValue typeValue = args.at(0);
-  if(!typeValue.isObject())
-    {
-    return Toss("Incorrect argument type to SDatabase.addType(...); expected object");
-    }
-
-  XScriptObject typeObject(typeValue);
-
   XScriptValue nameObject = typeObject.get("name");
   QString name = nameObject.toString();
   if(name == "" || STypeRegistry::findType(name) != 0)
@@ -267,7 +256,26 @@ XScriptValue registerTypeFn(XScriptArguments const &args)
   return XScriptValue();
   }
 
-XScriptValue registerExporterFn(XScriptArguments const &args)
+XScriptValue ScDbUtils::registerTypeJS(XScriptArguments const &args)
+  {
+  ScProfileFunction
+
+  if(args.length() != 1)
+    {
+    return Toss("Incorrect number of arguments to SDatabase.addType(...);");
+    }
+
+  XScriptValue typeValue = args.at(0);
+  if(!typeValue.isObject())
+    {
+    return Toss("Incorrect argument type to SDatabase.addType(...); expected object");
+    }
+
+  XScriptObject typeObject(typeValue);
+  return registerTypeFn(typeObject);
+  }
+
+XScriptValue registerExporterFnJS(XScriptArguments const &args)
   {
   ScProfileFunction
 

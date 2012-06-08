@@ -53,6 +53,7 @@ public:
   void registerScriptGlobal(QObject *);
   void registerScriptGlobal(const QString &, QObject *);
   void registerScriptGlobal(const QString &, const XScriptValue &cl);
+  void unregisterScriptGlobal(const QString &);
 
 signals:
   void debuggingStateChanged(bool enabled);

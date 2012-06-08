@@ -33,12 +33,4 @@ template <> struct NativeToJS<ScDbTreeObserver> : public XScript::NativeToJSConv
 }
 }
 
-namespace XScript
-{
-typedef XSignature< ScDbTreeObserver (
-    XScript::CtorForwarder<ScDbTreeObserver *(const XScriptObject &, const XScriptFunction &, const XScriptFunction &, const XScriptFunction &)>
-  )> ScDbTreeObserverCtors;
-template <> class ClassCreator_Factory<ScDbTreeObserver> : public ClassCreatorCopyableFactory<ScDbTreeObserver, ScDbTreeObserverCtors> {};
-}
-
 #endif // SCDBOBSERVER_H
